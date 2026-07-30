@@ -697,7 +697,7 @@ namespace NETSTART {
         if (NETMOX::_net.network_sync_complete_flag == 0) {
             MOX::_NUM_NEBULAS = 0;
             if (MOX::_NUM_STARS > 0) {
-                for (int32_t i = 0; i < MOX::_NUM_STARS; i++) {
+                for (int16_t i = 0; i < MOX::_NUM_STARS; i++) {
                     MOX::_star[i].in_nebula = 0;
                 }
             }

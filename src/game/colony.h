@@ -108,7 +108,7 @@ namespace COLONY {
     extern int16_t _scanned_bldg_C;
     extern int16_t _scanned_bldg_R;
     extern uint8_t _full_draw;
-    extern int32_t _colony_handle;
+    extern int16_t _colony_handle;
     extern int16_t _building_cr_xy[7][7][4];
 
     extern int16_t _colony_bldg_fields[36];
@@ -117,12 +117,12 @@ namespace COLONY {
 
     extern int16_t _pop_fields_ref[3][42];
 
-    extern int32_t _planet_handle;
-    extern int32_t _star_handle;
+    extern int16_t _planet_handle;
+    extern int16_t _star_handle;
     extern int32_t _orbit_n;
     extern uint8_t _cheats;
-    extern int32_t _sys_disp_star_handle;
-    extern int32_t _sys_disp_scanned_star_handle;
+    extern int16_t _sys_disp_star_handle;
+    extern int16_t _sys_disp_scanned_star_handle;
 
     void __cdecl Load_Colony_Anims_();
     /** Loads the colony-screen animation and bitmap resources into the screen segment. */
@@ -431,7 +431,7 @@ namespace COLONY {
 
     int16_t __cdecl Bldg_Coords_To_Effective_Frame_(int16_t x, int32_t y);
 
-    char* __cdecl Colony_Type_(int32_t colony_idx);
+    char* __cdecl Colony_Type_(int16_t colony_idx);
 
     void __cdecl Set_Colony_Font_To_Red_(uint8_t style, uint8_t color_idx);
 

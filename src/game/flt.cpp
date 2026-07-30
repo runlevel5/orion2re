@@ -10,7 +10,7 @@ void __cdecl Set_Fltscrn_Small_Ship_Icon_XYs_(int16_t map_x, int16_t map_y, int1
     int16_t actual_star_idx;
     int16_t icon_x, icon_y;
 
-    zoom_level = (int16_t)HAROLD::Map_Scale_To_Zoom_Level_();
+    zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
     MOX::_cur_map_scale = MOX::_max_map_scale;
 
     for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {

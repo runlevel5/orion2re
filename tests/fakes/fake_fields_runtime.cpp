@@ -917,3 +917,19 @@ int Show_Message_Box_(void* window_handle, const char* text, const char* caption
     test::fakes::g_last_message_box_is_error = is_error;
     return 0;
 }
+
+namespace oracle {
+    bool Complete_Replay_Click_(bool require_blocked_rng) {
+        (void)require_blocked_rng;
+        return false;
+    }
+
+    bool Replay_Active_() {
+        return false;
+    }
+
+    bool Defer_Replay_Click_Completion_(int16_t field_id) {
+        (void)field_id;
+        return false;
+    }
+}

@@ -96,7 +96,7 @@ namespace HACCESS {
 
     char* __cdecl Get_Planet_Name_No_Prime_(int16_t planet_idx);
 
-    int8_t __cdecl N_Star_Relocations_(int16_t player_idx);
+    int16_t __cdecl N_Star_Relocations_(int16_t player_idx);
 
     int8_t __cdecl Orion_Owner_();
 

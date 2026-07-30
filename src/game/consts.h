@@ -3,13 +3,10 @@
 #define BITMAP(bit_count) (((bit_count) + 7) / 8)
 
 #define MAX_PLAYERS 8
-// Can't go higher than 127 due to int8_t. Change will make game binary-incompatible with previous version.
-#define MAX_STARS 72
-// Limited by int16_t ship indices and encoded ship locations. Change will make game binary-incompatible with previous version.
-#define MAX_SHIPS 500
-// Can't go higher than 255 due to uint8_t. Change will make game binary-incompatible with previous version.
-#define MAX_COLONIES 250
-#define MAX_PLANETS (MAX_STARS * 5)
+#define MAX_STARS 1024
+#define MAX_SHIPS 9000
+#define MAX_PLANETS 4096
+#define MAX_COLONIES MAX_PLANETS
 #define MAX_LEADERS 67
 #define MAX_NEBULAS 4
 #define MAX_REPORTS 50
@@ -17,13 +14,20 @@
 
 #define ORIGINAL_MAX_STARS 72
 #define ORIGINAL_MAX_SHIPS 500
-#define SHIP_LOCATION_MOVING_OFFSET MAX_SHIPS
-#define SHIP_LOCATION_WORMHOLE_OFFSET (MAX_SHIPS * 2)
-#define SHIP_LOCATION_LIMIT (MAX_SHIPS * 3)
+#define ORIGINAL_MAX_PLANETS 360
+#define ORIGINAL_MAX_COLONIES 250
+#define SHIP_LOCATION_STEP 10000
+#define SHIP_LOCATION_MOVING_OFFSET SHIP_LOCATION_STEP
+#define SHIP_LOCATION_WORMHOLE_OFFSET (SHIP_LOCATION_STEP * 2)
+#define SHIP_LOCATION_LIMIT (SHIP_LOCATION_STEP * 3)
 #define SHIP_ICON_COUNT (MAX_SHIPS + MAX_STARS)
 #define SHIP_LIST_CAPACITY (MAX_SHIPS + 1)
+#define SHIP_NODE_UI_TAG_BASE 10000
 
-static_assert(MAX_SHIPS <= (INT16_MAX - MAX_STARS) / 2, "MAX_SHIPS is too large for encoded ship locations");
+static_assert(MAX_STARS < SHIP_LOCATION_STEP, "encoded ship locations must reserve one destination for Antares");
+static_assert(SHIP_LOCATION_LIMIT - 1 <= INT16_MAX, "encoded ship locations do not fit in int16_t");
+static_assert(MAX_SHIPS <= SHIP_NODE_UI_TAG_BASE, "encoded UI ship nodes overlap real ship-node indices");
+static_assert(SHIP_NODE_UI_TAG_BASE + MAX_SHIPS - 1 <= INT16_MAX, "encoded UI ship nodes do not fit in int16_t");
 
 #define GALAXY_SIZE_MAXIMUM 4
 #if MAX_STARS > ORIGINAL_MAX_STARS

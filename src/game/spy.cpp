@@ -672,11 +672,11 @@ namespace spy {
     }
 
     void __cdecl Destroy_Random_Building_(int16_t framed_player_idx, int16_t victim_player_idx, int32_t acting_player_idx) {
-        int32_t target_colony = -1;
+        int16_t target_colony = -1;
         int32_t target_building = -1;
         int32_t total_weight = 0;
 
-        for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
             if (colony->owner == victim_player_idx) {
                 for (int32_t b_idx = 0; b_idx < BUILDING_COUNT; ++b_idx) {
@@ -700,7 +700,7 @@ namespace spy {
         }
 
         if (target_colony != -1) {
-            ERICNET::Remove_Building_((int16_t)target_colony, (int16_t)target_building);
+            ERICNET::Remove_Building_(target_colony, (int16_t)target_building);
 
             int16_t planet_idx = MOX::_colony[target_colony].planet;
             int32_t diplomacy_mode = (framed_player_idx == (int16_t)acting_player_idx) ? 3 : 4;
@@ -717,7 +717,7 @@ namespace spy {
             report.action = 1;
             report.d.sabotage.framed_player_idx = (framed_player_idx == (int16_t)acting_player_idx) ? -1 : (int8_t)acting_player_idx;
             report.d.sabotage.victim_player_idx = (uint8_t)victim_player_idx;
-            report.d.sabotage.planet_idx = (uint8_t)planet_idx;
+            report.d.sabotage.planet_idx = planet_idx;
             report.d.sabotage.building_id = (uint8_t)target_building;
             REPORT::Add_Report_(&report);
 
@@ -726,7 +726,7 @@ namespace spy {
             report.player_idx = victim_player_idx;
             report.action = 1;
             report.d.enemy_sabotage.enemy_player_idx = (int16_t)acting_player_idx;
-            report.d.enemy_sabotage.planet_idx = (uint8_t)planet_idx;
+            report.d.enemy_sabotage.planet_idx = planet_idx;
             report.d.enemy_sabotage.building_id = (uint8_t)target_building;
             REPORT::Add_Report_(&report);
         }

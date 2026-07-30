@@ -2,6 +2,8 @@
 
 namespace INITGAME {
 
+    constexpr int16_t LEGACY_PLANET_LIMIT = 250;
+
     /**
      * Initializes the ship data array. 
      * Zeroes out the entire ship array, then sets default status,
@@ -165,7 +167,10 @@ namespace INITGAME {
                 video::Set_Page_Off_();
                 graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
                 platform::Toggle_Pages_Stub_();
-                MAPGEN::Enforce_Planet_Max_(250);
+                int16_t planet_limit = MOX::_NUM_STARS <= ORIGINAL_MAX_STARS
+                    ? LEGACY_PLANET_LIMIT
+                    : MAX_PLANETS;
+                MAPGEN::Enforce_Planet_Max_(planet_limit);
                 MAPGEN::Set_Black_Hole_Visited_Flags_();
                 HAROLD::Confirm_Planet_And_Star_Index_Link_(HAROLD::s_after_home_world_gen);
 
@@ -392,7 +397,7 @@ namespace INITGAME {
         s_player& player = MOX::_player[player_idx];
 
         player.officer_for_hire = -1;
-        player.offensive_stagepoint = (char)0xFF;
+        player.offensive_stagepoint = -1;
         player.contact[player_idx] = 1;
         player.player_done_flags = 0;
         player.bc = 50;
@@ -431,13 +436,13 @@ namespace INITGAME {
         memset(colony, 0, sizeof(s_colony));
 
         s_planet_data* planet = &MOX::_planet[planet_idx];
-        planet->colony_index = (int16_t)colony_idx;
+        planet->colony_index = colony_idx;
 
-        colony->planet = (int16_t)planet_idx;
+        colony->planet = planet_idx;
         colony->owner = player_num;
         colony->officer = -1;
 
-        int8_t star_idx = planet->star_index;
+        int16_t star_idx = planet->star_index;
         // Mark the star system as visited/seen by the player
         uint8_t visited_player_mask = (uint8_t)(1u << (player_num & 0x1f));
         MOX::_star[star_idx].visited |= visited_player_mask;

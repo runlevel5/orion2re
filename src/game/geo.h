@@ -11,7 +11,7 @@ namespace GEO {
     void __cdecl Initialize_Black_Hole_Blocks_(int16_t distance);
     void __cdecl Initialize_Star_In_Nebula_Info_();
 
-    uint8_t __cdecl Star_Is_In_Some_Nebula_(int32_t star_idx);
+    uint8_t __cdecl Star_Is_In_Some_Nebula_(int16_t star_idx);
 
     int32_t __cdecl Parsecs_Between_Stars_(int16_t star_idx1, int16_t star_idx2);
     int32_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
@@ -38,7 +38,7 @@ namespace GEO {
      * @param out_y Output y coordinate relative to the star.
      * @param orbit_pos Output orbit animation frame.
      */
-    void __cdecl Get_Orbit_Display_X_Y_(int32_t star_idx, int32_t orbit_idx, int32_t* out_x, int32_t* out_y, int32_t* orbit_pos);
+    void __cdecl Get_Orbit_Display_X_Y_(int16_t star_idx, int32_t orbit_idx, int32_t* out_x, int32_t* out_y, int32_t* orbit_pos);
     /** Returns the nearest orbit slot for a display-space orbit coordinate.
      * @param x Relative x coordinate.
      * @param y Relative y coordinate.
@@ -60,7 +60,7 @@ namespace GEO {
      * @param nebula_flag Optional output set when movement enters a nebula.
      * @param interdictor_flag Output set when movement is stopped by an interdictor.
      */
-    void __cdecl Move_Player_1_Turn_To_Star_(uint8_t player_num, int16_t start_x, int16_t start_y, int32_t star_idx, int16_t max_turns, int16_t *out_x, int16_t *out_y, int8_t *nebula_flag, int8_t *interdictor_flag);
+    void __cdecl Move_Player_1_Turn_To_Star_(uint8_t player_num, int16_t start_x, int16_t start_y, int16_t star_idx, int16_t max_turns, int16_t *out_x, int16_t *out_y, int8_t *nebula_flag, int8_t *interdictor_flag);
 
     /** Returns whether a point lies within distance d of a line segment.
      * @param px Point x coordinate.

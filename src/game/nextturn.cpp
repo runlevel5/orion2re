@@ -130,7 +130,7 @@ void __cdecl Next_Turn_Calc_() {
     COLCALC::All_Colony_Calculations_();
     COLCALC::Apply_All_Player_Changes_();
     COLCALC::Compute_Blockades_();
-    settler::Move_Settlers_();
+    SETTLER::Move_Settlers_();
     COLCALC::All_Colony_Calculations_();
     SHIPMOVE::Allocate_New_Ship_Slots_();
     OFFICER::Check_For_Officer_Level_();

@@ -115,7 +115,7 @@ namespace HAROLD {
     }
 
     int8_t __cdecl Planet_Number_(int16_t planet_index) {
-        int8_t star_idx = MOX::_planet[planet_index].star_index;
+        int16_t star_idx = MOX::_planet[planet_index].star_index;
         s_star_data* star = &MOX::_star[star_idx];
 
         int8_t relative_planet_num = 0;
@@ -279,8 +279,8 @@ namespace HAROLD {
                 }
 
                 if (wormhole_exit_id != -1) {
-                    MOX::_star[wormhole_exit_id].wormhole_star_id = (int8_t)star_idx;
-                    MOX::_star[star_idx].wormhole_star_id = (int8_t)wormhole_exit_id;
+                    MOX::_star[wormhole_exit_id].wormhole_star_id = star_idx;
+                    MOX::_star[star_idx].wormhole_star_id = wormhole_exit_id;
                     return;
                 }
             }
@@ -670,7 +670,7 @@ namespace HAROLD {
                     int8_t planet_orbit = planet->orbit;
 
                     if (orbit_taken[planet_orbit] != 0) {
-                        RUSS::PFMT_(0, 1, "orbit %d of star %d has more than 1 planet in it", (int32_t)planet_orbit, (int32_t)star_idx);
+                        RUSS::PFMT_(0, 1, "orbit %d of star %d has more than 1 planet in it", (int32_t)planet_orbit, star_idx);
                         RUSS::PFMT_(0, 2, "relate game conditions EXACTLY as they just happened");
                         RUSS::PFMT_(0, 3, s___s__00556ae4, star->name);
                         key::Wait_For_Key_();
@@ -809,12 +809,12 @@ namespace HAROLD {
      * @address 004f05c0
      */
     int16_t __cdecl Absolute_Location_(int16_t location) {
-        if (location >= MAX_SHIPS && location < (MAX_SHIPS * 2)) {
-            return location - MAX_SHIPS;
+        if (location >= SHIP_LOCATION_MOVING_OFFSET && location < SHIP_LOCATION_WORMHOLE_OFFSET) {
+            return location - SHIP_LOCATION_MOVING_OFFSET;
         }
 
-        if (location >= (MAX_SHIPS * 2) && location < (MAX_SHIPS * 2) + MAX_STARS /* 0x430 */) {
-            return location - (MAX_SHIPS * 2);
+        if (location >= SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_LIMIT) {
+            return location - SHIP_LOCATION_WORMHOLE_OFFSET;
         }
 
         return location;
@@ -826,19 +826,16 @@ namespace HAROLD {
     int16_t __cdecl Actual_Star_Id_(int16_t star_id, int16_t* out_actual_id) {
         int16_t type = 0;
 
-        // Range [MAX_SHIPS, (MAX_SHIPS * 2) - 1]
-        if (star_id >= MAX_SHIPS && star_id < (MAX_SHIPS * 2)) {
-            *out_actual_id = star_id - MAX_SHIPS;
+        if (star_id >= SHIP_LOCATION_MOVING_OFFSET && star_id < SHIP_LOCATION_WORMHOLE_OFFSET) {
+            *out_actual_id = star_id - SHIP_LOCATION_MOVING_OFFSET;
             return 1;
         }
 
-        // Range [(MAX_SHIPS * 2), (MAX_SHIPS * 3) - 1]
-        if (star_id >= (MAX_SHIPS * 2) && star_id < (MAX_SHIPS * 3)) {
-            star_id -= (MAX_SHIPS * 2);
+        if (star_id >= SHIP_LOCATION_WORMHOLE_OFFSET && star_id < SHIP_LOCATION_LIMIT) {
+            star_id -= SHIP_LOCATION_WORMHOLE_OFFSET;
             type = 2;
         }
 
-        // Default or Range >= 1500
         *out_actual_id = star_id;
         return type;
     }
@@ -1054,12 +1051,21 @@ namespace HAROLD {
         return default_galaxy_size;
     }
 
+    bool __cdecl Has_Massive_Star_Count_() {
+        return MAP_SCALE::Uses_Extended_Scaling_(MOX::_NUM_STARS, ORIGINAL_MAX_STARS);
+    }
+
+    int16_t __cdecl Map_Star_Scale_Percent_() {
+        return MAP_SCALE::Star_Scale_Percent_(MOX::_NUM_STARS, ORIGINAL_MAX_STARS, MOX::_cur_map_scale);
+    }
+
     int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx) {
         int8_t star_size = MOX::_star[star_idx].size;
         int16_t zoom_offset = Map_Scale_To_Zoom_Level_();
 
         int16_t combined_index = (int16_t)(zoom_offset + (int16_t)star_size);
-        return static_cast<int16_t>(MOX::_star_fields_dim[combined_index]);
+        int16_t field_size = static_cast<int16_t>(MOX::_star_fields_dim[combined_index]);
+        return MAP_SCALE::Scale_Star_Dimension_(field_size, Map_Star_Scale_Percent_());
     }
 
     /**
@@ -1076,6 +1082,10 @@ namespace HAROLD {
     int16_t __cdecl Map_Scale_To_Zoom_Level_() {
         int16_t max_zoom = MOX::_max_zoom_count;
         int16_t scale = MOX::_cur_map_scale;
+
+        if (Has_Massive_Star_Count_()) {
+            return MAP_SCALE::Extended_Zoom_Level_For_Scale_(scale, MOX::_max_map_scale, max_zoom);
+        }
 
         if (scale == 10) {
             if (max_zoom >= 0) {
@@ -1129,7 +1139,9 @@ namespace HAROLD {
     int16_t __cdecl Get_Map_Scale_(int16_t layer_type) {
         int16_t scale;
 
-        if (layer_type == 0) {
+        if (Has_Massive_Star_Count_()) {
+            scale = MAP_SCALE::Extended_Scale_For_Zoom_Level_(MOX::_max_map_scale, MOX::_max_zoom_count, layer_type);
+        } else if (layer_type == 0) {
             scale = MOX::_max_map_scale;
             if (scale >= 10) {
                 scale = 10;
@@ -1146,15 +1158,9 @@ namespace HAROLD {
             }
         } else {
             scale = MOX::_max_map_scale;
-#if MAX_STARS > ORIGINAL_MAX_STARS
-            if (MOX::_settings.galaxy_size != GALAXY_SIZE_MAXIMUM && scale >= 30) {
-                scale = 30;
-            }
-#else
             if (scale >= 30) {
                 scale = 30;
             }
-#endif
         }
 
         // If the resulting scale is unconstrained (equals the max), reset background star shifts
@@ -1496,8 +1502,8 @@ namespace HAROLD {
         MOX::_red_color1 = 0x49;
         MOX::_red_color2 = 0x4C;
 
-        for (int16_t i = 0; i < 10; ++i) {
-            MOX::_black_hole_anim_count[i] = (int8_t)(i * 2);
+        for (int16_t i = 0; i < MAX_STARS; ++i) {
+            MOX::_black_hole_anim_count[i] = (int8_t)((i % 10) * 2);
         }
         MAINSCR::Clear_Twinkling_Star_Data_();
         memset(MOX::_fleet_icon_selection_status, 0, sizeof(MOX::_fleet_icon_selection_status));

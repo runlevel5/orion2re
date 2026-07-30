@@ -25,7 +25,7 @@ namespace SHIPMOVE {
 
     void __cdecl Make_Ships_Move_To_(int16_t* ship_list, int16_t destination_star_idx, s_ship_move_info* move_info);
 
-    int32_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y);
+    int16_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y);
 
     bool __cdecl Player_Has_Ships_Pestering_Other_Player_(int player_idx, uint8_t colony_bit_idx);
 

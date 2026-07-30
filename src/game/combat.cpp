@@ -617,7 +617,7 @@ namespace COMBAT {
 
         // If no ship targets were found, check if we can target the fixed defense (index 0)
         // Only the attacker can target the colony/starbase.
-        if (MOX::_combat_attacker_player == (int16_t)player && MOX::_cmbt_colony_id != (int16_t)-1) {
+        if (MOX::_combat_attacker_player == player && MOX::_cmbt_colony_id != -1) {
             if (MOX::_qcombat_data[0].status == 0 /* Active */) {
                 return 0;
             }
@@ -904,14 +904,14 @@ namespace COMBAT {
     }
 
     void __cdecl Resolve_Strat_Colony_Damage_() {
-        int8_t msg_buffer[73];
+        int16_t msg_buffer[73];
         struct_::Clear_Structure_(msg_buffer, sizeof(msg_buffer));
 
         if ((uint8_t)MOX::_qcombat_data->status <= 1) {
             if ((MOX::_qcombat_data->structural_damage / 40 > 0) && (MOX::_cmbt_colony_id != -1)) {
                 // Potential message construction, though buffer remains unused locally
-                msg_buffer[8] = (int8_t)MOX::_combat_attacker_player;
-                msg_buffer[9] = (int8_t)MOX::_cmbt_colony_id;
+                msg_buffer[8] = MOX::_combat_attacker_player;
+                msg_buffer[9] = MOX::_cmbt_colony_id;
 
                 // Check and destroy Missile Base
                 if ((MOX::_qcombat_data->structural_damage / 40 > 0) && (MOX::_colony_defense_flags & 0x4)) {
@@ -1342,7 +1342,7 @@ namespace COMBAT {
         struct_::Clear_Structure_(&MOX::_combat_bomb_result, sizeof(s_combat_bomb_result));
 
         int16_t num_ships = 0;
-        uint8_t colony_idx = result->colony_idx;
+        int16_t colony_idx = result->colony_idx;
         int16_t ships[MAX_SHIPS];
 
         for (int16_t i = 0; i < MAX_SHIPS; ++i) {
@@ -1371,7 +1371,7 @@ namespace COMBAT {
 
     void __cdecl Tactical_Bombardment_(int16_t* ship_array, int16_t ship_count, s_combat_bomb_result* bomb_result)
     {
-        MOX::_cmbt_colony_id = (int16_t)bomb_result->colony_idx;
+        MOX::_cmbt_colony_id = bomb_result->colony_idx;
         MOX::_apply_damage_to_planet = 0;
         MOX::_combat_total_ship_count = 1;
 

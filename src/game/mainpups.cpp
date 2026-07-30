@@ -1526,7 +1526,7 @@ namespace MAINPUPS {
         MOX::_draw_system_display_without_button = 1;
 
         SYS::Wrapper_For_Informational_System_Fields_(
-            static_cast<uint32_t>(COLONY::_sys_disp_star_handle),
+            COLONY::_sys_disp_star_handle,
             _g_x,
             _g_y,
             13,
@@ -1561,7 +1561,7 @@ namespace MAINPUPS {
         MAINPUPS::Get_Picture_Draw_XY_(anim);
 
         SYS::Draw_System_Display_Popup_(
-            (short)COLONY::_sys_disp_star_handle,
+            COLONY::_sys_disp_star_handle,
             1,
             msg_buffer,
             MAINPUPS::_g_x,
@@ -1699,7 +1699,7 @@ namespace MAINPUPS {
             snprintf(popup_text, sizeof(popup_text), format, selected_star->name);
 
             SYS::Draw_System_Display_Popup_(
-                (short)COLONY::_sys_disp_star_handle,
+                COLONY::_sys_disp_star_handle,
                 1,
                 popup_text,
                 _g_x,
@@ -2022,7 +2022,7 @@ namespace MAINPUPS {
         COLONY::Clear_Sys_Disp_Fields_();
 
         SYS::Wrapper_For_Informational_System_Fields_(
-            static_cast<uint32_t>(COLONY::_sys_disp_star_handle),
+            COLONY::_sys_disp_star_handle,
             _g_x,
             _g_y,
             0xd,
@@ -2047,7 +2047,7 @@ namespace MAINPUPS {
         snprintf(buffer, sizeof(buffer), format, race_name, star->name);
 
         SYS::Draw_System_Display_Popup_(
-            (int16_t)COLONY::_sys_disp_star_handle,
+            COLONY::_sys_disp_star_handle,
             1,
             buffer,
             MAINPUPS::_g_x,
@@ -2176,7 +2176,7 @@ namespace MAINPUPS {
         }
 
         if (scan_res == 0 && planet_scanned > -1) {
-            int16_t planet_idx = HACCESS::System_Planet_Scanned_To_Planet_Id_((int16_t)COLONY::_sys_disp_star_handle, planet_scanned);
+            int16_t planet_idx = HACCESS::System_Planet_Scanned_To_Planet_Id_(COLONY::_sys_disp_star_handle, planet_scanned);
 
             if (_selection_state_flag == 0) {
                 if (MOX::_planet[planet_idx].planet_type != PLANET_TYPE_PLANET) {
@@ -2329,7 +2329,7 @@ namespace MAINPUPS {
         MOX::_draw_system_display_without_button = 1;
 
         SYS::Wrapper_For_Informational_System_Fields_(
-            static_cast<uint32_t>(COLONY::_sys_disp_star_handle),
+            COLONY::_sys_disp_star_handle,
             _g_x,
             _g_y,
             13,
@@ -2456,7 +2456,7 @@ namespace MAINPUPS {
             COLONY::_full_draw = 0;
         }
 
-        if (_g_scanned_star != (int16_t)-1) {
+        if (_g_scanned_star != -1) {
             fonts::Print_Centered_(376, 254, MOX::_star[_g_scanned_star].name);
         }
     }
@@ -2883,7 +2883,7 @@ namespace MAINPUPS {
         if (scan_result == 0) {
             if (scanned_planet_icon > -1) {
                 int16_t planet_id = HACCESS::System_Planet_Scanned_To_Planet_Id_(
-                    static_cast<int16_t>(COLONY::_sys_disp_star_handle),
+                    COLONY::_sys_disp_star_handle,
                     scanned_planet_icon
                 );
 

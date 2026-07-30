@@ -288,10 +288,10 @@ void __cdecl Find_Troops_(s_invasion_side_info* side_info) {
  */
 void __cdecl Assign_New_Home_Planet_(int8_t player_idx, int16_t excluded_colony_idx) {
     int max_pops = 0;
-    int best_colony_idx = -1;
+    int16_t best_colony_idx = -1;
 
-    for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
-        if (i != (int)excluded_colony_idx && MOX::_colony[i].owner == (int8_t)player_idx) {
+    for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        if (i != excluded_colony_idx && MOX::_colony[i].owner == (int8_t)player_idx) {
             int current_pops = (uint8_t)MOX::_colony[i].n_pops;
 
             if (current_pops >= max_pops) {
@@ -398,7 +398,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
 
         s_MSG msg = {};
         msg.msg_type = MSG_TYPE_COLONY;
-        msg.u.colony.planet_idx = (uint8_t)colony->planet;
+        msg.u.colony.planet_idx = colony->planet;
         msg.u.colony.subtype = 9 /* s_MSG_colony_rebellion */;
         msg.u.colony.c.rebels.owner_player = (int8_t)rebel_player;
         msg.u.colony.c.rebels.rebels = (int8_t)rebel_count;
@@ -491,7 +491,7 @@ void __cdecl Resolve_Invasion_Troops_(s_invasion_side_info info) {
     }
 
     int16_t planet_idx = colony->planet;
-    int8_t star_idx = MOX::_planet[planet_idx].star_index;
+    int16_t star_idx = MOX::_planet[planet_idx].star_index;
 
     COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[star_idx]);
 }
@@ -679,7 +679,7 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
     colony->occupation_policy = 4;
     colony->buildings[BUILDING_COLONY_BASE] = 0;
 
-    int star_idx = (uint8_t)MOX::_planet[colony->planet].star_index;
+    int16_t star_idx = MOX::_planet[colony->planet].star_index;
     COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[star_idx]);
 
     colony->n_turns_existed = 0;

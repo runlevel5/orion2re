@@ -400,7 +400,7 @@ namespace CMBTFIR2 {
         }
 
         if (min_range > 0 && MOX::_combat_total_ship_count > 1) {
-            for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
+            for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[ship_idx].owner != MOX::_combat_data[i].owner &&
                     MOX::_combat_data[i].is_captured == 0 &&
                     MOX::_combat_data[i].unit_status == 0) {
@@ -1144,7 +1144,10 @@ namespace CMBTFIR2 {
                     int16_t new_count = ship->weapons[count].count;
                     if (old_count != new_count) {
                         for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
-                            if (MOX::_combat_data[i].stasis_source_idx == target_ship_idx) {
+                            const int16_t stasis_source_idx = MOX::_combat_data[i].stasis_source_idx == UINT8_MAX
+                                ? -1
+                                : MOX::_combat_data[i].stasis_source_idx;
+                            if (stasis_source_idx == target_ship_idx) {
                                 if (new_count == 0) {
                                     CMBTFIRE::Remove_Stasis_Beam_(i);
                                 } else {
@@ -1160,7 +1163,7 @@ namespace CMBTFIR2 {
                             if (MOX::_combat_data[i].black_hole_source_idx == target_ship_idx) {
                                 if (new_count == 0) {
                                     MOX::_combat_data[i].black_hole_flag = 0;
-                                    MOX::_combat_data[i].black_hole_source_idx = -1;
+                                    MOX::_combat_data[i].black_hole_source_idx = UINT8_MAX;
                                 } else {
                                     new_count--;
                                 }

@@ -20,5 +20,5 @@ require_command cmake
 require_command ctest
 
 cmake -S "$ROOT_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Debug -DORION2RE_BUILD_TESTS=ON
-cmake --build "$BUILD_DIR" --target test_fields test_fields_helpers
+cmake --build "$BUILD_DIR" --parallel
 ctest --test-dir "$BUILD_DIR" --output-on-failure

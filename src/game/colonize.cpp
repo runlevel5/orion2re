@@ -49,7 +49,7 @@ namespace COLONIZE {
                     colonizable_count++;
                 } else {
                     s_colony* colony = &MOX::_colony[colony_idx];
-                    if (colony->outpost_flag != 0 && (int16_t)colony->owner == player_idx) {
+                    if (colony->outpost_flag != 0 && colony->owner == player_idx) {
                         colonizable_count++;
                     }
                 }
@@ -67,12 +67,12 @@ namespace COLONIZE {
         memset(outpost_bits, 0, sizeof(outpost_bits));
 
         // Reset priority for all stars
-        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             MOX::_star[i].colonize_player = MAX_PLAYERS;
         }
 
         // Phase 1: Check ships (Colony and Outpost ships)
-        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->status == 0) { // Active
                 if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
@@ -95,10 +95,10 @@ namespace COLONIZE {
         }
 
         // Phase 2: Check existing colonies with colony bases
-        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
             if (colony->owner != -1 && colony->buildings[BUILDING_COLONY_BASE] != 0) {
-                int star_idx = MOX::_planet[colony->planet].star_index;
+                int16_t star_idx = MOX::_planet[colony->planet].star_index;
                 s_star_data* star = &MOX::_star[star_idx];
                 if (star->colonize_player == MAX_PLAYERS) {
                     star->colonize_player = colony->owner;
@@ -110,7 +110,7 @@ namespace COLONIZE {
         }
 
         // Phase 3: Validate priority against actual colonizable/outpostable planets
-        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
             int8_t priority_player = star->colonize_player;
             if (priority_player == MAX_PLAYERS) {
@@ -135,7 +135,7 @@ namespace COLONIZE {
         }
 
         // Phase 4: Block priority if an enemy/rival warship is present
-        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->status == 0 && ship->d.ship_type == SHIP_TYPE_COMBAT) {
                 int16_t star_idx = ship->location;
@@ -158,10 +158,10 @@ namespace COLONIZE {
         }
 
         // Phase 5: Cleanup redundant colony bases
-        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
             if (colony->owner != -1 && colony->buildings[BUILDING_COLONY_BASE] != 0) {
-                int star_idx = MOX::_planet[colony->planet].star_index;
+                int16_t star_idx = MOX::_planet[colony->planet].star_index;
                 s_star_data* star = &MOX::_star[star_idx];
                 
                 bool remove_base = false;
@@ -180,7 +180,7 @@ namespace COLONIZE {
 
                     s_MSG msg = {};
                     msg.msg_type = MSG_TYPE_COLONY;
-                    msg.u.colony.planet_idx = (uint8_t)colony->planet;
+                    msg.u.colony.planet_idx = colony->planet;
                     msg.u.colony.subtype = 0;
                     msg.u.colony.c.scrap.building_id = BUILDING_COLONY_BASE;
                     msg.u.colony.c.scrap.bc = refund16;
@@ -193,13 +193,13 @@ namespace COLONIZE {
     void Allocate_New_Colony_Slots_() {
         int16_t uncolonized_counts[MAX_PLAYERS] = { 0 };
         int16_t allocated_counts[MAX_PLAYERS] = { 0 };
-        uint8_t free_slots_indices[MAX_COLONIES];
+        int16_t free_slots_indices[MAX_COLONIES];
 
         int16_t free_slots_count = 0;
 
         Find_Colonize_Players_();
 
-        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
             if (star->colonize_player != -1) {
                 int16_t count = Star_N_Uncolonized_Planets_(star);
@@ -210,7 +210,7 @@ namespace COLONIZE {
         for (int16_t i = 0; i < MAX_COLONIES; ++i) {
             MOX::_colony[i].allocated_to = (char)0xFF;
             if (i >= MOX::_NUM_COLONIES || MOX::_colony[i].planet == -1) {
-                free_slots_indices[free_slots_count++] = (uint8_t)i;
+                free_slots_indices[free_slots_count++] = i;
             }
         }
 
@@ -224,7 +224,7 @@ namespace COLONIZE {
 
         while (skipped_players < MOX::_NUM_PLAYERS) {
             if (allocated_counts[current_player] < uncolonized_counts[current_player]) {
-                uint8_t colony_idx = free_slots_indices[free_slot_ptr++];
+                int16_t colony_idx = free_slots_indices[free_slot_ptr++];
                 MOX::_colony[colony_idx].allocated_to = (char)current_player;
                 allocated_counts[current_player]++;
                 skipped_players = 0;
@@ -240,14 +240,14 @@ namespace COLONIZE {
     }
 
     void __cdecl AI_Colonize_(int16_t player_idx) {
-        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
             bool done_with_star = false;
 
             while (!done_with_star) {
                 if (star->colonize_player == player_idx) {
-                    s_colony* colony_base_ptr = REPORT::Player_Colony_Base_At_Star_(player_idx, (int16_t)i);
-                    s_ship_data* colony_ship_ptr = REPORT::Player_Ship_Type_At_Star_(player_idx, SHIP_TYPE_COLONY, (int16_t)i, 1);
+                    s_colony* colony_base_ptr = REPORT::Player_Colony_Base_At_Star_(player_idx, i);
+                    s_ship_data* colony_ship_ptr = REPORT::Player_Ship_Type_At_Star_(player_idx, SHIP_TYPE_COLONY, i, 1);
 
                     if (colony_base_ptr == nullptr && colony_ship_ptr == nullptr) {
                         done_with_star = true;
@@ -273,7 +273,7 @@ namespace COLONIZE {
                                 do {
                                     MOX::_player[player_idx].bc += TECHDATA::_buildings[BUILDING_COLONY_BASE].cost / 2;
                                     colony_base_ptr->buildings[BUILDING_COLONY_BASE] = 0;
-                                    colony_base_ptr = REPORT::Player_Colony_Base_At_Star_(player_idx, (int16_t)i);
+                                    colony_base_ptr = REPORT::Player_Colony_Base_At_Star_(player_idx, i);
                                 } while (colony_base_ptr != nullptr);
                             }
                         } else {
@@ -281,9 +281,9 @@ namespace COLONIZE {
 
                             if (colony_base_ptr == nullptr) {
                                 // Consumed a colony ship
-                                for (int s = 0; s < (int)MOX::_NUM_SHIPS; ++s) {
+                                for (int16_t s = 0; s < MOX::_NUM_SHIPS; ++s) {
                                     s_ship_data* ship = &MOX::_ship[s];
-                                    if (ship->mission == 4 && ship->owner == (char)player_idx && (int)ship->location == i) {
+                                    if (ship->mission == 4 && ship->owner == (char)player_idx && ship->location == i) {
                                         ship->mission = 0;
                                     }
                                 }

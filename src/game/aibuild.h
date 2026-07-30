@@ -80,12 +80,12 @@ namespace AIBUILD {
     bool __cdecl Colony_Is_Conquered_(struct s_colony* colony);
 
     /** Forces one listed colony to switch to a specific production item.
-     * @param id_list List of colony ids to update.
+     * @param id_list List of colony indexes to update.
      * @param list_index Index within id_list to process.
      * @param list_count Number of active ids in the list.
      * @param production_id Product id to assign.
      */
-    void __cdecl Force_Produce_(uint8_t* id_list, int16_t list_index, int32_t* list_count, int16_t production_id);
+    void __cdecl Force_Produce_(int16_t* id_list, int16_t list_index, int32_t* list_count, int16_t production_id);
 
     /** Returns a simple industry value estimate for a colony.
      * @param colony Colony to evaluate.

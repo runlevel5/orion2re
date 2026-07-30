@@ -7,7 +7,7 @@ namespace COLSYSDI {
 
     void __cdecl Draw_Col_Sys_Disp_(int16_t x, int16_t y) {
         int16_t text_y = y + 7;
-        int16_t star_idx = (int16_t)COLONY::_sys_disp_star_handle;
+        int16_t star_idx = COLONY::_sys_disp_star_handle;
         
         for (int16_t i = 0; i < 5; i++) {
             int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
@@ -63,8 +63,9 @@ namespace COLSYSDI {
 
             int16_t display_row = 0;
             if (planet->orbit >= 0) {
+                int16_t star_idx = planet->star_index;
                 do {
-                    volatile int16_t unused_planet_idx = MOX::_star[planet->star_index].planet_index[display_row];
+                    volatile int16_t unused_planet_idx = MOX::_star[star_idx].planet_index[display_row];
                     (void)unused_planet_idx;
                     display_row++;
                 } while (display_row <= planet->orbit);
@@ -188,7 +189,7 @@ namespace COLSYSDI {
         int16_t x2;
         int16_t display_idx = 0;
 
-        star_handle = (int16_t)COLONY::_sys_disp_star_handle;
+        star_handle = COLONY::_sys_disp_star_handle;
 
         for (i = 0; i < 5; i++) {
             planet_idx = MOX::_star[star_handle].planet_index[i];

@@ -79,7 +79,7 @@ namespace EVENTS {
 
         if (event.status == 2 || event.status == 4 || event.status == 6) {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
-            if ((int16_t)MOX::_planet[planet_idx].star_index == event.target_id) {
+            if (MOX::_planet[planet_idx].star_index == event.target_id) {
                 return 1;
             }
         }
@@ -192,7 +192,7 @@ namespace EVENTS {
         memset(&result, 0, sizeof(s_combat_bomb_result));
 
         result.attacker_idx = -1;
-        result.colony_idx = (uint8_t)colony_idx;
+        result.colony_idx = colony_idx;
         result.is_planetary_hit = 1;
 
         int16_t building_count = 0;
@@ -1059,8 +1059,8 @@ namespace EVENTS {
                 EVENTS::_event_data[event_type].turn_count = 0;
                 break;
             case 28:
-                EVENTS::_event_data[event_type].target_id = (int16_t)wormhole_data.dest_star_idx;
-                EVENTS::_event_data[event_type].amount = (int16_t)wormhole_data.count;
+                EVENTS::_event_data[event_type].target_id = wormhole_data.dest_star_idx;
+                EVENTS::_event_data[event_type].amount = wormhole_data.count;
                 break;
             }
 
@@ -1171,7 +1171,7 @@ namespace EVENTS {
 
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) == 1) {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
-            int8_t star_idx = MOX::_planet[planet_idx].star_index;
+            int16_t star_idx = MOX::_planet[planet_idx].star_index;
             int16_t presence_count = 0;
             uint8_t has_colony_mask = MOX::_star[star_idx].has_colony;
 
@@ -1190,7 +1190,7 @@ namespace EVENTS {
         int8_t status14 = _event_data[14].status;
         if (status14 == 2 || status14 == 4 || status14 == 6) {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
-            int8_t star_idx = MOX::_planet[planet_idx].star_index;
+            int16_t star_idx = MOX::_planet[planet_idx].star_index;
 
             if (_event_data[14].target_id == star_idx) {
                 int16_t presence_count = 0;
@@ -1212,7 +1212,7 @@ namespace EVENTS {
         int8_t status24 = _event_data[24].status;
         if (status24 == 2 || status24 == 4 || status24 == 6) {
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
-            int8_t star_idx = MOX::_planet[planet_idx].star_index;
+            int16_t star_idx = MOX::_planet[planet_idx].star_index;
 
             if (_event_data[24].target_id == star_idx) {
                 int16_t presence_count = 0;
@@ -1496,7 +1496,7 @@ namespace EVENTS {
         if ((_event_data[16].status == 2 || _event_data[16].status == 4 || _event_data[16].status == 6)) {
             int16_t colony_idx = _event_data[16].target_id;
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
-            if ((int16_t)MOX::_planet[planet_idx].star_index == star_idx) {
+            if (MOX::_planet[planet_idx].star_index == star_idx) {
                 return 16 /* 0x10 */;
             }
         }
@@ -1505,7 +1505,7 @@ namespace EVENTS {
         if ((_event_data[17].status == 2 || _event_data[17].status == 4 || _event_data[17].status == 6)) {
             int16_t colony_idx = _event_data[17].target_id;
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
-            if ((int16_t)MOX::_planet[planet_idx].star_index == star_idx) {
+            if (MOX::_planet[planet_idx].star_index == star_idx) {
                 return 17 /* 0x11 */;
             }
         }
@@ -1579,7 +1579,7 @@ namespace EVENTS {
         int16_t star_idx;
 
         // Pick initial star
-        star_idx = (int16_t)game_random::Random_(MOX::_NUM_STARS) - 1;
+        star_idx = (int16_t)game_random::Random_(MOX::_NUM_STARS) - 1; /* INDEX_NARROWING */
 
         while (counter < 1000) {
             if (MOX::_star[star_idx].has_colony != 0) {
@@ -1598,7 +1598,7 @@ namespace EVENTS {
                 }
             } else {
                 // If no colony on star, pick a new random star
-                star_idx = (int16_t)game_random::Random_(MOX::_NUM_STARS) - 1;
+                star_idx = (int16_t)game_random::Random_(MOX::_NUM_STARS) - 1; /* INDEX_NARROWING */
             }
 
             counter++;
@@ -1647,7 +1647,7 @@ namespace EVENTS {
         memset(&result, 0, sizeof(s_combat_bomb_result));
 
         result.attacker_idx = -1;
-        result.colony_idx = (uint8_t)colony_idx;
+        result.colony_idx = colony_idx;
         result.is_planetary_hit = 1;
 
         int16_t building_count = 0;
@@ -1819,7 +1819,7 @@ namespace EVENTS {
                 colony_counts[i] = 0;
             }
 
-            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 int16_t player_idx;
 
                 switch (MOX::_star[i].has_colony) {
@@ -1884,7 +1884,7 @@ namespace EVENTS {
         memset(&bomb_result, 0, sizeof(s_combat_bomb_result));
 
         bomb_result.attacker_idx = -1;
-        bomb_result.colony_idx = (uint8_t)colony_idx;
+        bomb_result.colony_idx = colony_idx;
         bomb_result.is_planetary_hit = 1;
         bomb_result.bomb_hits_remaining = 1;
         bomb_result.is_bio_weapon = 1;

@@ -25,8 +25,8 @@ namespace CMBTSPEC {
             return false;
         }
 
-        int16_t target_idx = (int16_t)ship.special_cooldown;
-        if (target_idx == 0xFF) {
+        int16_t target_idx = ship.special_cooldown == UINT8_MAX ? -1 : ship.special_cooldown;
+        if (target_idx < 0) {
             return false;
         }
 

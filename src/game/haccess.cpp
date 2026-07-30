@@ -44,7 +44,7 @@ namespace HACCESS {
             current_owner = (int32_t)MOX::_ship[ship_idx].owner;
         }
 
-        snprintf(message, sizeof(message), "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %d\n", (int)error_code, (int)ship_idx, current_owner, MOX::_stardate);
+        snprintf(message, sizeof(message), "Memory Corruption! val == %d, ship_id == %d, owner == %d stardate = %d\n", (int)error_code, ship_idx, current_owner, MOX::_stardate);
 
         exitm::Exit_With_Message(message);
 
@@ -208,7 +208,7 @@ namespace HACCESS {
     void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* out_str, uint8_t localized_flag) {
         char buffer[200];
 
-        int8_t star_idx = MOX::_planet[planet_idx].star_index;
+        int16_t star_idx = MOX::_planet[planet_idx].star_index;
         int8_t planet_num = HAROLD::Planet_Number_(planet_idx);
 
         const char* numeral_str;
@@ -282,7 +282,7 @@ namespace HACCESS {
     }
 
     void __cdecl Set_All_Star_Relocations_(int16_t target_star_idx, int16_t player_idx) {
-        for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             if (Star_Has_Relocation_(i, player_idx)) {
                 Set_Relocation_(i, player_idx, target_star_idx);
             }
@@ -600,16 +600,16 @@ namespace HACCESS {
         return MOX::_ship[ship_idx].location;
     }
 
-    int8_t __cdecl N_Star_Relocations_(int16_t player_idx) {
+    int16_t __cdecl N_Star_Relocations_(int16_t player_idx) {
         int16_t relocation_count = 0;
 
-        for (int16_t star_idx = 0; star_idx < (int16_t)MOX::_NUM_STARS; ++star_idx) {
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
             if (Star_Has_Relocation_(star_idx, player_idx)) {
                 relocation_count++;
             }
         }
 
-        return (int8_t)relocation_count;
+        return relocation_count;
     }
 
     void __cdecl Clear_Star_Relocation_(int16_t star_idx, int16_t player_idx) {
@@ -770,7 +770,7 @@ namespace HACCESS {
                 const int32_t ship_node_idx = MOX::_fleet_movement_icon[saved_ship_idx].ship_node_idx;
                 struct_::Set_Bit_Field_(
                     MOX::_fleet_box_ship_ids,
-                    (uint16_t)MOX::_ship_node[ship_node_idx].ship_idx);
+                    MOX::_ship_node[ship_node_idx].ship_idx);
             }
         }
     }

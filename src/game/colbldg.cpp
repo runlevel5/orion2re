@@ -368,12 +368,12 @@ namespace COLBLDG {
     int16_t __cdecl Create_Ship_(int16_t player_idx, int16_t design_idx, int16_t colony_idx) {
         int16_t ship_idx = 0;
         int16_t planet_idx = MOX::_colony[colony_idx].planet;
-        int16_t star_idx = (int16_t)MOX::_planet[planet_idx].star_index;
+        int16_t star_idx = MOX::_planet[planet_idx].star_index;
 
         while (ship_idx < MAX_SHIPS) {
             auto& ship = MOX::_ship[ship_idx];
             if (ship.owner == (int8_t)player_idx) {
-                if (ship.status == 5 || ship_idx >= (int16_t)MOX::_NUM_SHIPS) {
+                if (ship.status == 5 || ship_idx >= MOX::_NUM_SHIPS) {
                     break;
                 }
             }
@@ -384,7 +384,7 @@ namespace COLBLDG {
             return -1;
         }
 
-        if (ship_idx >= (int16_t)MOX::_NUM_SHIPS) {
+        if (ship_idx >= MOX::_NUM_SHIPS) {
             MOX::_NUM_SHIPS = ship_idx + 1;
         }
 
@@ -422,15 +422,15 @@ namespace COLBLDG {
 
     void __cdecl Build_Queue_Popup_() {
         uint32_t original_seed = game_random::Get_Random_Seed_();
-        game_random::Set_Random_Seed_((uint32_t)COLONY::_colony_handle);
+        game_random::Set_Random_Seed_(COLONY::_colony_handle);
 
         COLONY::_star_handle = MOX::_screen_data;
         COLONY::_orbit_n = COLONY::_orbit_temp;
 
         int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
-        COLONY::_planet_handle = (int32_t)planet_idx;
+        COLONY::_planet_handle = planet_idx;
 
-        int32_t colony_idx = (int32_t)MOX::_planet[planet_idx].colony_index;
+        int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
         COLONY::_colony_handle = colony_idx;
         COLBLDG::_last_app = -1;
         COLONY::_using_colony_screen_palette = 1;
@@ -765,7 +765,7 @@ namespace COLBLDG {
             return Option_String_(id);
         }
 
-        int32_t index = COLBLDG::Colony_Production_Ship_Index_(id);
+        int16_t index = COLBLDG::Colony_Production_Ship_Index_(id);
         s_ship_data* ship = &MOX::_ship[index];
 
         if (ship->status != 4) {
@@ -1312,7 +1312,7 @@ namespace COLBLDG {
         int16_t ship_idx = Create_Ship_(
             MOX::_colony[COLONY::_colony_handle].owner,
             design_slot,
-            (int16_t)COLONY::_colony_handle
+            COLONY::_colony_handle
         );
 
         if (ship_idx != -1) {

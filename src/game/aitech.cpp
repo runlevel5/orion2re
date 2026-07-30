@@ -326,8 +326,8 @@ namespace aitech {
         uint8_t other_player_bit = 1 << (other_player_id & 0x1F);
         int16_t score = 0;
 
-        int32_t num_stars = (int32_t)MOX::_NUM_STARS;
-        for (int32_t i = 0; i < num_stars; ++i) {
+        int16_t num_stars = MOX::_NUM_STARS;
+        for (int16_t i = 0; i < num_stars; ++i) {
             s_star_data* star = &MOX::_star[i];
 
             if (star->has_colony & other_player_bit) {

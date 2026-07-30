@@ -76,7 +76,7 @@ namespace DIP_SCRN {
     int16_t _offer_help_entry[7] = { 598, 599, 600, 601, 602, 613, -1 };
     char* _offer_diplomacy_list[7];
     char* _offer_title;
-    uint8_t _diplomacy_system_planet_list[5];
+    int16_t _diplomacy_system_planet_list[5];
     int16_t _diplomacy_system_population;
     uint8_t _diplomacy_system_receiver;
     int16_t _diplomacy_system_planet_count;
@@ -2388,7 +2388,7 @@ namespace DIP_SCRN {
 
         fonts::Print_(10, 287 /* 0x11f */, text_buffer);
 
-        if (selected_planet_idx != (int16_t)0xFFFF || use_special_colors) {
+        if (selected_planet_idx != -1 || use_special_colors) {
             fonts::Set_Font_Style_Shadow_Down_(3, &DIP_SCRN::_diplomacy_special_colors);
         } else {
             fonts::Set_Font_Style_Shadow_Down_(3, &DIP_SCRN::_diplomacy_normal_colors);
@@ -2399,12 +2399,12 @@ namespace DIP_SCRN {
         if (DIP_SCRN::_diplomacy_system_planet_count > 0) {
             int y_offset = 32;
             for (int16_t i = 0; i < DIP_SCRN::_diplomacy_system_planet_count; ++i) {
-                uint8_t planet_idx = DIP_SCRN::_diplomacy_system_planet_list[i];
+                int16_t planet_idx = DIP_SCRN::_diplomacy_system_planet_list[i];
                 s_planet_data* planet = &MOX::_planet[planet_idx];
 
                 snprintf(text_buffer, sizeof(text_buffer), "%s, %s", MOX::_planet_size_string[planet->size], MOX::_planet_climate_string[planet->climate]);
 
-                if ((int16_t)planet_idx == selected_planet_idx) {
+                if (planet_idx == selected_planet_idx) {
                     strlcat(text_buffer, DIP_SCRN::_system_homeworld_buffer, sizeof(text_buffer));
                 }
 

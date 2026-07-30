@@ -479,7 +479,7 @@ namespace MAINSCR {
 
                     if (icon_selected_flag) {
                         if (selected_target_id > -1 && mouse_status == 0 && MOX::_star[selected_target_id].spectral_class != STAR_CLASS_BLACK_HOLE) {
-                        HACCESS::Get_Fleet_Box_Selected_Ship_Ids_((int16_t*)ship_ids, MAX_SHIPS, 0xff);
+                        HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(ship_ids, MAX_SHIPS, 0xff);
                         SHIPMOVE::Ships_Try_To_Move_To_(ship_ids, selected_target_id, &MOX::_g_ship_move_info);
 
                         if (MOX::_g_ship_move_info.moving == 0) {
@@ -548,7 +548,7 @@ namespace MAINSCR {
                     int mx = mouse::Pointer_X_();
                     int my = mouse::Pointer_Y_();
 
-                    int res = MAINSCR::Scan_System_Display_Fields_(mouse_input, input, (int16_t*)MOX::_planet_buttons, &m_planet_idx, &planet_idx, &m_ship_idx, &ship_idx, &system_hover_selection_id);
+                    int res = MAINSCR::Scan_System_Display_Fields_(mouse_input, input, MOX::_planet_buttons, &m_planet_idx, &planet_idx, &m_ship_idx, &ship_idx, &system_hover_selection_id);
 
                     MOX::_system_display_ship_scanned = m_ship_idx;
                     if (system_hover_selection_id == -1 && MOX::_system_icon_scanned > 2000 && MOX::_system_icon_scanned < 2004) {
@@ -965,9 +965,9 @@ namespace MAINSCR {
             Draw_Gate_Icons_();
             SHIPS::Do_Ship_Destination_Lines_();
 
-            if ((int16_t)MOX::_eta_star_id > -1 && (int16_t)MOX::_fleet_ship_scanned == -1) {
+            if (MOX::_eta_star_id > -1 && MOX::_fleet_ship_scanned == -1) {
                 Draw_ETA_Destination_Line_();
-                Highlight_Star_((int16_t)MOX::_eta_star_id);
+                Highlight_Star_(MOX::_eta_star_id);
             }
 
             if (_main_screen_scanned_star != -1) {
@@ -1022,7 +1022,7 @@ namespace MAINSCR {
                 }
             }
 
-            if ((int16_t)MOX::_galaxy_map_scanned_star > -1 && (int16_t)MOX::_galaxy_map_scanned_star < MOX::_NUM_STARS) {
+            if (MOX::_galaxy_map_scanned_star > -1 && MOX::_galaxy_map_scanned_star < MOX::_NUM_STARS) {
                 Print_Galaxy_Map_Scanned_Star_();
             }
 

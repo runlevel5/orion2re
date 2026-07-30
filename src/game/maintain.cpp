@@ -73,7 +73,7 @@ namespace maintain {
         }
 
         if (eligible_count > 0 && MOX::_NUM_SHIPS > 0) {
-            for (int j = 0; j < (int)MOX::_NUM_SHIPS; ++j) {
+            for (int16_t j = 0; j < MOX::_NUM_SHIPS; ++j) {
                 s_ship_data& ship = MOX::_ship[j];
                 if (ship.owner == player_idx && ship.status < 5 && ship.d.ship_type == SHIP_TYPE_COMBAT) {
                     for (int k = 0; k < (int)MOX::_NUM_PLAYERS; ++k) {
@@ -142,7 +142,7 @@ namespace maintain {
         int32_t player_idx = (int32_t)(player - MOX::_player);
         bool any_removed = false;
 
-        for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
 
             if (colony->owner == player_idx) {
@@ -152,7 +152,7 @@ namespace maintain {
                     if (colony->buildings[building_id] != 0) {
                         int32_t cost = TECHDATA::_buildings[building_id].cost;
 
-                        ERICNET::Remove_Building_((int16_t)i, (int16_t)building_id);
+                        ERICNET::Remove_Building_(i, (int16_t)building_id);
                         any_removed = true;
 
                         int32_t compensation = cost / 2;
@@ -215,9 +215,9 @@ namespace maintain {
         int32_t num_ships = (int32_t)MOX::_NUM_SHIPS;
         s_ship_data* ships = MOX::_ship;
 
-        for (int32_t i = 0; i < num_ships; ++i) {
+        for (int16_t i = 0; i < num_ships; ++i) {
             if (ships[i].status == 7 || ships[i].status == 8) {
-                SHIPS::Kill_Ship_((int16_t)i);
+                SHIPS::Kill_Ship_(i);
             }
         }
     }
@@ -233,7 +233,7 @@ namespace maintain {
             s_ship_data* cheapest_ship = nullptr;
             int16_t min_worth = 0x7FFF;
 
-            for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                 s_ship_data* ship = &MOX::_ship[i];
 
                 if (ship->owner == player_idx &&
@@ -428,7 +428,7 @@ namespace maintain {
             s_colony* best_colony = nullptr;
             int32_t best_building = 0;
 
-            for (int i = 0; i < (int32_t)MOX::_NUM_COLONIES; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
                 s_colony* col = &MOX::_colony[i];
                 if (col->owner == (int8_t)player_idx) {
                     for (int32_t building_idx = 0; building_idx < (int32_t)(sizeof(col->buildings) / sizeof(col->buildings[0])); ++building_idx) {
@@ -469,7 +469,7 @@ namespace maintain {
                 s_MSG msg;
                 memset(&msg, 0, sizeof(msg));
                 msg.msg_type = MSG_TYPE_COLONY;
-                msg.u.colony.planet_idx = (uint8_t)best_colony->planet;
+                msg.u.colony.planet_idx = best_colony->planet;
                 msg.u.colony.subtype = 0 /* s_MSG_colony_scrap_building */;
                 msg.u.colony.c.scrap.building_id = (int16_t)best_building;
                 msg.u.colony.c.scrap.bc = scrap_value;

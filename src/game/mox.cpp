@@ -403,7 +403,7 @@ namespace MOX {
     int16_t _eta_star_id;
     int16_t _stencil_box_id;
     int16_t _draw_main_screen_stencilled;
-    uint16_t _animated_star;
+    int16_t _animated_star;
     int8_t _just_moved_stack;
     int16_t _first_fleet_movement_icon;
     int16_t _next_free_node;
@@ -774,7 +774,7 @@ namespace MOX {
     int16_t _icon_overlay_x;
     int16_t _fleet_box_ship_stack;
     s_ship_icon _ship_icon[SHIP_ICON_COUNT];
-    int8_t _black_hole_anim_count[10];
+    int8_t _black_hole_anim_count[MAX_STARS];
     int16_t _bill_savegame[6] = {2, 0, 0, 0, 0, 0};
     uint16_t _antaran_resource_level;
     s_crew_data _crew_data[5] = {

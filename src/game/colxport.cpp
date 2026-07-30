@@ -249,7 +249,7 @@ void __cdecl Draw_Colony_Summary_For_Colony_(int16_t colony_idx, int16_t entry_i
     COLXPORT::_list_col[entry_idx] = colony_idx;
 
     int16_t planet_idx = MOX::_colony[colony_idx].planet;
-    int8_t star_idx = MOX::_planet[planet_idx].star_index;
+    int16_t star_idx = MOX::_planet[planet_idx].star_index;
 
     if (((MOX::_star[star_idx].blockaded >> MOX::_PLAYER_NUM) & 1) != 0 || EVENTS::Event_Check_Plague_(colony_idx) != 0) {
         COLONY::Set_Colony_Font_To_Red_(4, 0);

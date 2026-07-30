@@ -13,13 +13,13 @@ namespace BOMB {
 
     int32_t __cdecl Handle_Leader_At_Lost_Colony_(s_colony* colony) {
         int32_t owner_idx = colony->owner;
-        int32_t star_idx = MOX::_planet[colony->planet].star_index;
+        int16_t star_idx = MOX::_planet[colony->planet].star_index;
         int32_t killed_leader_idx = -1;
         int32_t leader_idx = MOX::_star[star_idx].officer_index[owner_idx];
 
         if (leader_idx != -1) {
             bool other_colony_found = false;
-            int32_t current_colony_idx = (int32_t)(colony - MOX::_colony);
+            int16_t current_colony_idx = (int16_t)(colony - MOX::_colony);
 
             for (int32_t planet_slot_idx = 0; planet_slot_idx < 5; ++planet_slot_idx) {
                 int16_t p_idx = MOX::_star[star_idx].planet_index[planet_slot_idx];
@@ -47,11 +47,13 @@ namespace BOMB {
 
     void __cdecl Destroy_Colony_(s_colony* colony, int32_t capturing_player) {
         s_star_data* star;
+        int16_t star_idx;
         int16_t colony_idx;
         int16_t leader_idx;
         s_MSG msg;
 
-        star = &MOX::_star[MOX::_planet[colony->planet].star_index];
+        star_idx = MOX::_planet[colony->planet].star_index;
+        star = &MOX::_star[star_idx];
         colony_idx = (int16_t)(colony - MOX::_colony);
 
         EVENTS::Kill_All_Events_At_Colony_(colony_idx);
@@ -304,7 +306,8 @@ namespace BOMB {
     void __cdecl Apply_Bomb_Hits_(s_combat_bomb_result* bomb_result) {
         int32_t bio_hits = bomb_result->bio_hits_remaining;
         int32_t bomb_hits = bomb_result->bomb_hits_remaining;
-        s_colony* colony = &MOX::_colony[bomb_result->colony_idx];
+        const int16_t colony_idx = bomb_result->colony_idx;
+        s_colony* colony = &MOX::_colony[colony_idx];
 
         while (bio_hits + bomb_hits > 0) {
             if (bio_hits != 0) {

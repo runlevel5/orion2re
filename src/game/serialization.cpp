@@ -65,6 +65,12 @@ namespace SERIAL {
         return value;
     }
 
+    uint64_t Reader_::Read_Uint64_() {
+        uint64_t value;
+        Read_Bytes_(&value, sizeof(value));
+        return value;
+    }
+
     void Reader_::Read_Bytes_(void* dest, size_t size) {
         Require_(size);
         memcpy(dest, _ptr, size);
@@ -133,6 +139,10 @@ namespace SERIAL {
     }
 
     void Writer_::Write_Int32_(int32_t value) {
+        Write_Bytes_(&value, sizeof(value));
+    }
+
+    void Writer_::Write_Uint64_(uint64_t value) {
         Write_Bytes_(&value, sizeof(value));
     }
 

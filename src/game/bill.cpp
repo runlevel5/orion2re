@@ -463,7 +463,7 @@ namespace BILL {
         memset(fleet_history_tmp, 0, sizeof(fleet_history_tmp));
 
         if (MOX::_NUM_SHIPS > 0) {
-            for (int16_t ship_idx = 0; ship_idx < (int16_t)MOX::_NUM_SHIPS; ++ship_idx) {
+            for (int16_t ship_idx = 0; ship_idx < MOX::_NUM_SHIPS; ++ship_idx) {
                 if (MOX::_ship[ship_idx].status < 2) {
                     int32_t owner = MOX::_ship[ship_idx].owner;
                     uint32_t size = MOX::_ship[ship_idx].d.size;

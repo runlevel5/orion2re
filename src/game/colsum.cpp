@@ -88,7 +88,7 @@ namespace COLSUM {
         MOX2::action_func_t saved_auto_fn = nullptr;
         int16_t input_val = 0;
         int16_t scan_val = 0;
-        short colony_list_buffer[MAX_COLONIES];
+        int16_t colony_list_buffer[MAX_COLONIES];
 
         COLSUM::_draw_planet_sum = 0;
         COLXPORT::_g_colony_list_ptr = colony_list_buffer;
@@ -135,7 +135,7 @@ namespace COLSUM {
 
         COLONY::_g_colony_n = COLSUM::_list_col[0];
         COLONY::_using_colony_screen_palette = 1;
-        MOX::_galaxy_map_scanned_star = (int16_t)MOX::_planet[MOX::_colony[COLONY::_g_colony_n].planet].star_index;
+        MOX::_galaxy_map_scanned_star = MOX::_planet[MOX::_colony[COLONY::_g_colony_n].planet].star_index;
         COLONY::_full_draw = 1;
 
         ERICHELP::Set_Colony_Summary_Screen_Help_List_();
@@ -546,7 +546,8 @@ namespace COLSUM {
         uint16_t paragraph_type;
         if (event_id == -1) {
             s_planet_data* planet = &MOX::_planet[planet_idx];
-            s_star_data* star = &MOX::_star[planet->star_index];
+            int16_t star_idx = planet->star_index;
+            s_star_data* star = &MOX::_star[star_idx];
 
             if ((star->blockaded >> (MOX::_PLAYER_NUM & 0x1F) & 1) == 0) {
                 strlcpy(sub_buffer1, ESTRINGS::E_Strings_(0x0C), sizeof(sub_buffer1));
@@ -849,7 +850,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
             
             // Accessing planet index from colony structure (size 361) and star index from planet structure (size 17)
             int16_t planet_idx = MOX::_colony[colony_id].planet;
-            MOX::_galaxy_map_scanned_star = static_cast<int16_t>(MOX::_planet[planet_idx].star_index);
+            MOX::_galaxy_map_scanned_star = MOX::_planet[planet_idx].star_index;
         }
     }
 
@@ -875,7 +876,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
                     int16_t colony_idx = COLSUM::_list_col[i];
                     int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
-                    MOX::_screen_data = (int16_t)MOX::_planet[planet_idx].star_index;
+                    MOX::_screen_data = MOX::_planet[planet_idx].star_index;
                     COLONY::_orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
 
                     MOX::_return_screen = MOX::_current_screen;
@@ -891,7 +892,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
                 int16_t colony_idx = COLSUM::_list_col[i];
                 int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
-                MOX::_screen_data = (int16_t)MOX::_planet[planet_idx].star_index;
+                MOX::_screen_data = MOX::_planet[planet_idx].star_index;
                 COLONY::_orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
 
                 int16_t target_planet = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
@@ -909,7 +910,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
                 int16_t colony_idx = COLSUM::_list_col[i];
                 int16_t planet_idx = MOX::_colony[colony_idx].planet;
 
-                MOX::_screen_data = (int16_t)MOX::_planet[planet_idx].star_index;
+                MOX::_screen_data = MOX::_planet[planet_idx].star_index;
                 COLONY::_orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
                 COLSUM::_draw_planet_sum = 1;
             } else if (_list_buy_fields[i] == current_input) {
@@ -961,7 +962,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         );
 
         COLONY::_g_colony_n = colony_idx;
-        MOX::_galaxy_map_scanned_star = (int16_t)MOX::_planet[MOX::_colony[colony_idx].planet].star_index;
+        MOX::_galaxy_map_scanned_star = MOX::_planet[MOX::_colony[colony_idx].planet].star_index;
 
         return result;
     }
@@ -1079,7 +1080,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
     }
 
     int16_t __cdecl Pick_Best_Planet_To_Goto_At_Star_(int16_t star_idx) {
-        int16_t planet_idx = static_cast<int16_t>(MOX::_star[star_idx].last_planet_selected[MOX::_PLAYER_NUM]);
+        int16_t planet_idx = MOX::_star[star_idx].last_planet_selected[MOX::_PLAYER_NUM];
 
         bool needs_search = false;
         if (planet_idx == -1) {

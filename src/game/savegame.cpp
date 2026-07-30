@@ -10,10 +10,12 @@ namespace SAVEGAME {
         constexpr size_t SETTINGS_RESERVED_OFFSET = 0xE4;
         const uint8_t ZEROES[512] = {};
 
-        static_assert(MAX_STARS == 72, "save version 0 requires 72 stars");
-        static_assert(MAX_PLANETS == 360, "save version 0 requires 360 planets");
-        static_assert(MAX_COLONIES == 250, "save version 0 requires 250 colonies");
-        static_assert(MAX_SHIPS == 500, "save version 0 requires 500 ships");
+        static_assert(ORIGINAL_MAX_STARS == 72, "save version 0 requires 72 stars");
+        static_assert(MAX_STARS >= ORIGINAL_MAX_STARS, "star capacity cannot load version 0 saves");
+        static_assert(MAX_PLANETS >= ORIGINAL_MAX_PLANETS, "planet capacity cannot load version 0 saves");
+        static_assert(MAX_COLONIES >= ORIGINAL_MAX_COLONIES, "colony capacity cannot load version 0 saves");
+        static_assert(ORIGINAL_MAX_SHIPS == 500, "save version 0 requires 500 ship records");
+        static_assert(MAX_SHIPS >= ORIGINAL_MAX_SHIPS, "ship capacity cannot load version 0 saves");
         static_assert(offsetof(s_settings, version) == 0xE2, "settings version offset mismatch");
 
         void Write_Zeroes_(SERIAL::Writer_* writer, size_t size) {
@@ -316,7 +318,7 @@ namespace SAVEGAME {
 
         void Write_Planet_(SERIAL::Writer_* writer, const s_planet_data* planet) {
             writer->Write_Int16_(planet->colony_index);
-            writer->Write_Int8_(planet->star_index);
+            writer->Write_Int16_(planet->star_index);
             writer->Write_Int8_(planet->orbit);
             writer->Write_Int8_(planet->planet_type);
             writer->Write_Int8_(planet->size);
@@ -335,7 +337,7 @@ namespace SAVEGAME {
 
         void Read_Planet_(SERIAL::Reader_* reader, s_planet_data* planet, uint16_t version) {
             planet->colony_index = reader->Read_Int16_();
-            if (version == 0) planet->star_index = reader->Read_Int8_();
+            planet->star_index = version == LEGACY_VERSION ? reader->Read_Int8_() : reader->Read_Int16_();
             planet->orbit = reader->Read_Int8_();
             planet->planet_type = reader->Read_Int8_();
             planet->size = reader->Read_Int8_();
@@ -363,7 +365,7 @@ namespace SAVEGAME {
             writer->Write_Bytes_(star->last_planet_selected, sizeof(star->last_planet_selected));
             writer->Write_Bytes_(star->black_hole_blocks, sizeof(star->black_hole_blocks));
             writer->Write_Int8_(star->system_special);
-            writer->Write_Int8_(star->wormhole_star_id);
+            writer->Write_Int16_(star->wormhole_star_id);
             writer->Write_Uint8_(star->blockaded);
             writer->Write_Bytes_(star->blockaded_by, sizeof(star->blockaded_by));
             writer->Write_Uint8_(star->visited);
@@ -373,7 +375,7 @@ namespace SAVEGAME {
             writer->Write_Int8_(star->colonize_player);
             writer->Write_Uint8_(star->has_colony);
             writer->Write_Uint8_(star->has_warp_field_interdictor);
-            writer->Write_Uint8_(star->next_wfi_in_list);
+            writer->Write_Int16_(star->next_wfi_in_list);
             writer->Write_Uint8_(star->has_tachyon);
             writer->Write_Uint8_(star->has_subspace);
             writer->Write_Uint8_(star->has_stargate);
@@ -401,9 +403,13 @@ namespace SAVEGAME {
             star->pict_type = reader->Read_Int8_();
             star->spectral_class = reader->Read_Int8_();
             reader->Read_Bytes_(star->last_planet_selected, sizeof(star->last_planet_selected));
-            reader->Read_Bytes_(star->black_hole_blocks, sizeof(star->black_hole_blocks));
+            const size_t black_hole_blocks_size = version == LEGACY_VERSION ?
+                    BITMAP(ORIGINAL_MAX_STARS) : sizeof(star->black_hole_blocks);
+            reader->Read_Bytes_(star->black_hole_blocks, black_hole_blocks_size);
+            memset(star->black_hole_blocks + black_hole_blocks_size, 0,
+                   sizeof(star->black_hole_blocks) - black_hole_blocks_size);
             star->system_special = reader->Read_Int8_();
-            if (version == 0) star->wormhole_star_id = reader->Read_Int8_();
+            star->wormhole_star_id = version == LEGACY_VERSION ? reader->Read_Int8_() : reader->Read_Int16_();
             star->blockaded = reader->Read_Uint8_();
             reader->Read_Bytes_(star->blockaded_by, sizeof(star->blockaded_by));
             star->visited = reader->Read_Uint8_();
@@ -413,7 +419,7 @@ namespace SAVEGAME {
             star->colonize_player = reader->Read_Int8_();
             star->has_colony = reader->Read_Uint8_();
             star->has_warp_field_interdictor = reader->Read_Uint8_();
-            star->next_wfi_in_list = reader->Read_Uint8_();
+            star->next_wfi_in_list = version == LEGACY_VERSION ? reader->Read_Uint8_() : reader->Read_Int16_();
             star->has_tachyon = reader->Read_Uint8_();
             star->has_subspace = reader->Read_Uint8_();
             star->has_stargate = reader->Read_Uint8_();
@@ -490,7 +496,7 @@ namespace SAVEGAME {
             writer->Write_Int16_(player->command_points_used);
             writer->Write_Int16_(player->food_freighted);
             writer->Write_Int16_(player->settlers_freighted);
-            for (int i = 0; i < 25; ++i) writer->Write_Uint32_(player->settlers[i].val);
+            for (int i = 0; i < 25; ++i) writer->Write_Uint64_(player->settlers[i].val);
             writer->Write_Int16_(player->total_pop);
             writer->Write_Int16_(player->food_produced);
             writer->Write_Int16_(player->industry_produced);
@@ -529,7 +535,7 @@ namespace SAVEGAME {
             writer->Write_Bytes_(player->n_times_established_contact, sizeof(player->n_times_established_contact));
             writer->Write_Bytes_(player->within_range, sizeof(player->within_range));
             writer->Write_Int8_(player->do_not_research);
-            writer->Write_Int8_(player->offensive_stagepoint);
+            writer->Write_Int16_(player->offensive_stagepoint);
             writer->Write_Int8_(player->best_ftl_drive);
             writer->Write_Uint8_(player->ship_speed);
             writer->Write_Int8_(player->officer_for_hire);
@@ -635,7 +641,7 @@ namespace SAVEGAME {
             writer->Write_Bytes_(player->filler, sizeof(player->filler));
         }
 
-        void Read_Player_(SERIAL::Reader_* reader, s_player* player) {
+        void Read_Player_(SERIAL::Reader_* reader, s_player* player, uint16_t version) {
             player->picture = reader->Read_Int8_();
             reader->Read_Bytes_(player->name, sizeof(player->name));
             reader->Read_Bytes_(player->race_name, sizeof(player->race_name));
@@ -657,7 +663,11 @@ namespace SAVEGAME {
             player->command_points_used = reader->Read_Int16_();
             player->food_freighted = reader->Read_Int16_();
             player->settlers_freighted = reader->Read_Int16_();
-            for (int i = 0; i < 25; ++i) player->settlers[i].val = reader->Read_Uint32_();
+            for (int i = 0; i < 25; ++i) {
+                player->settlers[i].val = version == LEGACY_VERSION
+                        ? SETTLER::From_Legacy(reader->Read_Uint32_())
+                        : reader->Read_Uint64_();
+            }
             player->total_pop = reader->Read_Int16_();
             player->food_produced = reader->Read_Int16_();
             player->industry_produced = reader->Read_Int16_();
@@ -696,7 +706,7 @@ namespace SAVEGAME {
             reader->Read_Bytes_(player->n_times_established_contact, sizeof(player->n_times_established_contact));
             reader->Read_Bytes_(player->within_range, sizeof(player->within_range));
             player->do_not_research = reader->Read_Int8_();
-            player->offensive_stagepoint = reader->Read_Int8_();
+            player->offensive_stagepoint = version == LEGACY_VERSION ? reader->Read_Int8_() : reader->Read_Int16_();
             player->best_ftl_drive = reader->Read_Int8_();
             player->ship_speed = reader->Read_Uint8_();
             player->officer_for_hire = reader->Read_Int8_();
@@ -825,11 +835,14 @@ namespace SAVEGAME {
             writer->Write_Int8_(ship->just_built);
         }
 
-        void Read_Ship_(SERIAL::Reader_* reader, s_ship_data* ship) {
+        void Read_Ship_(SERIAL::Reader_* reader, s_ship_data* ship, uint16_t version) {
             Read_Ship_Design_(reader, &ship->d);
             ship->owner = reader->Read_Int8_();
             ship->status = reader->Read_Int8_();
             ship->location = reader->Read_Int16_();
+            if (version == LEGACY_VERSION) {
+                ship->location = Convert_Legacy_Ship_Location_(ship->location);
+            }
             ship->x = reader->Read_Int16_();
             ship->y = reader->Read_Int16_();
             ship->group_has_navigator = reader->Read_Int8_();
@@ -902,17 +915,19 @@ namespace SAVEGAME {
                 writer->Write_Int8_(report->d.steal.framed_player_idx);
                 writer->Write_Uint8_(report->d.steal.victim_player_idx);
                 writer->Write_Int16_(report->d.steal.tech_app_id);
+                Write_Zeroes_(writer, 1);
             } else if (report->type == 1 && report->action == 1) {
                 writer->Write_Int8_(report->d.sabotage.framed_player_idx);
                 writer->Write_Uint8_(report->d.sabotage.victim_player_idx);
-                writer->Write_Uint8_(report->d.sabotage.planet_idx);
+                writer->Write_Int16_(report->d.sabotage.planet_idx);
                 writer->Write_Uint8_(report->d.sabotage.building_id);
             } else if (report->type == 2 && report->action == 0) {
                 writer->Write_Int16_(report->d.enemy_steal.enemy_player_idx);
                 writer->Write_Int16_(report->d.enemy_steal.tech_app_id);
+                Write_Zeroes_(writer, 1);
             } else if (report->type == 2 && report->action == 1) {
                 writer->Write_Int16_(report->d.enemy_sabotage.enemy_player_idx);
-                writer->Write_Uint8_(report->d.enemy_sabotage.planet_idx);
+                writer->Write_Int16_(report->d.enemy_sabotage.planet_idx);
                 writer->Write_Uint8_(report->d.enemy_sabotage.building_id);
             } else {
                 writer->Write_Bytes_(&report->d, sizeof(report->d));
@@ -920,28 +935,31 @@ namespace SAVEGAME {
             writer->Write_Bytes_(report->reserved, sizeof(report->reserved));
         }
 
-        void Read_Report_(SERIAL::Reader_* reader, s_report* report) {
+        void Read_Report_(SERIAL::Reader_* reader, s_report* report, uint16_t version) {
             report->type = reader->Read_Uint8_();
             report->player_idx = reader->Read_Int16_();
             report->action = reader->Read_Uint8_();
+            memset(&report->d, 0, sizeof(report->d));
             if (report->type == 1 && report->action == 0) {
                 report->d.steal.framed_player_idx = reader->Read_Int8_();
                 report->d.steal.victim_player_idx = reader->Read_Uint8_();
                 report->d.steal.tech_app_id = reader->Read_Int16_();
+                if (version != LEGACY_VERSION) reader->Skip_(1);
             } else if (report->type == 1 && report->action == 1) {
                 report->d.sabotage.framed_player_idx = reader->Read_Int8_();
                 report->d.sabotage.victim_player_idx = reader->Read_Uint8_();
-                report->d.sabotage.planet_idx = reader->Read_Uint8_();
+                report->d.sabotage.planet_idx = version == LEGACY_VERSION ? reader->Read_Uint8_() : reader->Read_Int16_();
                 report->d.sabotage.building_id = reader->Read_Uint8_();
             } else if (report->type == 2 && report->action == 0) {
                 report->d.enemy_steal.enemy_player_idx = reader->Read_Int16_();
                 report->d.enemy_steal.tech_app_id = reader->Read_Int16_();
+                if (version != LEGACY_VERSION) reader->Skip_(1);
             } else if (report->type == 2 && report->action == 1) {
                 report->d.enemy_sabotage.enemy_player_idx = reader->Read_Int16_();
-                report->d.enemy_sabotage.planet_idx = reader->Read_Uint8_();
+                report->d.enemy_sabotage.planet_idx = version == LEGACY_VERSION ? reader->Read_Uint8_() : reader->Read_Int16_();
                 report->d.enemy_sabotage.building_id = reader->Read_Uint8_();
             } else {
-                reader->Read_Bytes_(&report->d, sizeof(report->d));
+                reader->Read_Bytes_(&report->d, version == LEGACY_VERSION ? 4 : sizeof(report->d));
             }
             reader->Read_Bytes_(report->reserved, sizeof(report->reserved));
         }
@@ -965,7 +983,7 @@ namespace SAVEGAME {
         }
 
         void Write_Colony_Message_(SERIAL::Writer_* writer, const s_MSG_colony* colony) {
-            writer->Write_Uint8_(colony->planet_idx);
+            writer->Write_Int16_(colony->planet_idx);
             writer->Write_Int8_(colony->subtype);
             switch (colony->subtype) {
             case 0:
@@ -1011,8 +1029,8 @@ namespace SAVEGAME {
             }
         }
 
-        void Read_Colony_Message_(SERIAL::Reader_* reader, s_MSG_colony* colony) {
-            colony->planet_idx = reader->Read_Uint8_();
+        void Read_Colony_Message_(SERIAL::Reader_* reader, s_MSG_colony* colony, uint16_t version) {
+            colony->planet_idx = version == LEGACY_VERSION ? reader->Read_Uint8_() : reader->Read_Int16_();
             colony->subtype = reader->Read_Int8_();
             switch (colony->subtype) {
             case 0:
@@ -1069,36 +1087,36 @@ namespace SAVEGAME {
             case MSG_TYPE_DECLARE_WAR:
                 writer->Write_Int16_(message->u.players.player_a_idx);
                 writer->Write_Int16_(message->u.players.player_b_idx);
-                Write_Zeroes_(writer, 4);
+                Write_Zeroes_(writer, 5);
                 break;
             case MSG_TYPE_FINANCIAL:
                 writer->Write_Int16_(message->u.financial.a);
                 writer->Write_Int16_(message->u.financial.b);
-                Write_Zeroes_(writer, 4);
+                Write_Zeroes_(writer, 5);
                 break;
             case MSG_TYPE_LOST_SHIP:
                 writer->Write_Int16_(message->u.lost_ship.star_idx);
                 writer->Write_Int16_(message->u.lost_ship.ship_idx);
                 writer->Write_Int8_(message->u.lost_ship.leader_idx);
                 writer->Write_Int8_(message->u.lost_ship.fate);
-                Write_Zeroes_(writer, 2);
+                Write_Zeroes_(writer, 3);
                 break;
             case MSG_TYPE_SCRAP_SHIP:
                 writer->Write_Int16_(message->u.scrap_ship.where);
                 writer->Write_Int16_(message->u.scrap_ship.bc);
                 writer->Write_Int16_(message->u.scrap_ship.ship_idx);
-                Write_Zeroes_(writer, 2);
+                Write_Zeroes_(writer, 3);
                 break;
             case MSG_TYPE_LOST_COLONY:
                 writer->Write_Int16_(message->u.lost_colony.planet_idx);
                 writer->Write_Int16_(message->u.lost_colony.reason);
                 writer->Write_Int16_(message->u.lost_colony.leader_idx);
                 writer->Write_Int8_(message->u.lost_colony.colony_or_outpost);
-                Write_Zeroes_(writer, 1);
+                Write_Zeroes_(writer, 2);
                 break;
             case MSG_TYPE_HYPERSPACE_BEAST:
                 writer->Write_Int16_(message->u.hyperspace_beast.ship_idx);
-                writer->Write_Int8_(message->u.hyperspace_beast.star_idx);
+                writer->Write_Int16_(message->u.hyperspace_beast.star_idx);
                 writer->Write_Int8_(message->u.hyperspace_beast.officer_idx);
                 writer->Write_Int8_(message->u.hyperspace_beast.leader_status);
                 writer->Write_Int8_(message->u.hyperspace_beast.fate);
@@ -1107,24 +1125,24 @@ namespace SAVEGAME {
                 break;
             case MSG_TYPE_LOST_ATTACKING_SPY:
                 writer->Write_Int16_(message->u.lost_attacking_spy.player_idx);
-                Write_Zeroes_(writer, 6);
+                Write_Zeroes_(writer, 7);
                 break;
             case MSG_TYPE_LOST_DEFENDING_SPY:
                 writer->Write_Int16_(message->u.lost_defending_spy.count);
-                Write_Zeroes_(writer, 6);
+                Write_Zeroes_(writer, 7);
                 break;
             case MSG_TYPE_ARTEMIS:
                 writer->Write_Int16_(message->u.artemis.star_idx);
-                Write_Zeroes_(writer, 6);
+                Write_Zeroes_(writer, 7);
                 break;
             case MSG_TYPE_ARTEMIS_LEADER:
-                writer->Write_Int8_(message->u.artemis_leader.star_idx);
+                writer->Write_Int16_(message->u.artemis_leader.star_idx);
                 writer->Write_Int8_(message->u.artemis_leader.leader_idx);
                 writer->Write_Int8_(message->u.artemis_leader.fate);
                 Write_Zeroes_(writer, 5);
                 break;
             case MSG_TYPE_FAILED_RETREAT:
-                writer->Write_Int8_(message->u.retreat.star_idx);
+                writer->Write_Int16_(message->u.retreat.star_idx);
                 writer->Write_Int8_(message->u.retreat.reason);
                 writer->Write_Int16_(message->u.retreat.ships_lost);
                 writer->Write_Int8_(message->u.retreat.leader_count);
@@ -1135,82 +1153,85 @@ namespace SAVEGAME {
                 writer->Write_Int8_(message->u.spy_assasination.plr_b);
                 writer->Write_Int8_(message->u.spy_assasination.leader_id);
                 writer->Write_Int8_(message->u.spy_assasination.victim_id);
-                Write_Zeroes_(writer, 4);
+                Write_Zeroes_(writer, 5);
                 break;
             case MSG_TYPE_ANOMALY:
-                writer->Write_Uint8_(message->u.anomaly.star_idx);
+                writer->Write_Int16_(message->u.anomaly.star_idx);
                 Write_Zeroes_(writer, 7);
                 break;
             case MSG_TYPE_DIPLOMACY:
                 writer->Write_Int8_(message->u.diplomacy.diplomacy_idx);
                 writer->Write_Int8_(message->u.diplomacy.plr_a);
                 writer->Write_Int8_(message->u.diplomacy.plr_b);
-                Write_Zeroes_(writer, 5);
+                Write_Zeroes_(writer, 6);
                 break;
             case MSG_TYPE_EEL_SPAWNED:
             case MSG_TYPE_EEL_VANISHED:
-                writer->Write_Uint8_(message->u.eel.star_idx);
+                writer->Write_Int16_(message->u.eel.star_idx);
                 Write_Zeroes_(writer, 7);
                 break;
             case MSG_TYPE_ARTIFACTS:
-                writer->Write_Uint8_(message->u.artifacts.star_idx);
+                writer->Write_Int16_(message->u.artifacts.star_idx);
                 writer->Write_Int8_(message->u.artifacts.tech1);
                 writer->Write_Int8_(message->u.artifacts.tech2);
                 Write_Zeroes_(writer, 5);
                 break;
             case MSG_TYPE_SCRAP_LEADER:
                 writer->Write_Int8_(message->u.scrap_leader.leader_idx);
-                Write_Zeroes_(writer, 7);
-                break;
-            default:
                 Write_Zeroes_(writer, 8);
                 break;
+            default:
+                Write_Zeroes_(writer, 9);
+                break;
             }
-            writer->Write_Bytes_(reinterpret_cast<const uint8_t*>(message) + 10, 8);
+            writer->Write_Bytes_(message->reserved, sizeof(message->reserved));
         }
 
-        void Read_Message_(SERIAL::Reader_* reader, s_MSG* message) {
+        void Read_Message_(SERIAL::Reader_* reader, s_MSG* message, uint16_t version) {
             message->msg_type = reader->Read_Int8_();
             message->priority = reader->Read_Uint8_();
             memset(&message->u, 0, sizeof(message->u));
             switch (message->msg_type) {
             case MSG_TYPE_COLONY:
-                Read_Colony_Message_(reader, &message->u.colony);
+                Read_Colony_Message_(reader, &message->u.colony, version);
                 break;
             case MSG_TYPE_DECLARE_ALLIANCE:
             case MSG_TYPE_DECLARE_WAR:
                 message->u.players.player_a_idx = reader->Read_Int16_();
                 message->u.players.player_b_idx = reader->Read_Int16_();
-                reader->Skip_(4);
+                reader->Skip_(version == LEGACY_VERSION ? 4 : 5);
                 break;
             case MSG_TYPE_FINANCIAL:
                 message->u.financial.a = reader->Read_Int16_();
                 message->u.financial.b = reader->Read_Int16_();
-                reader->Skip_(4);
+                reader->Skip_(version == LEGACY_VERSION ? 4 : 5);
                 break;
             case MSG_TYPE_LOST_SHIP:
                 message->u.lost_ship.star_idx = reader->Read_Int16_();
                 message->u.lost_ship.ship_idx = reader->Read_Int16_();
                 message->u.lost_ship.leader_idx = reader->Read_Int8_();
                 message->u.lost_ship.fate = reader->Read_Int8_();
-                reader->Skip_(2);
+                reader->Skip_(version == LEGACY_VERSION ? 2 : 3);
                 break;
             case MSG_TYPE_SCRAP_SHIP:
                 message->u.scrap_ship.where = reader->Read_Int16_();
+                if (version == LEGACY_VERSION) {
+                    message->u.scrap_ship.where = Convert_Legacy_Ship_Location_(message->u.scrap_ship.where);
+                }
                 message->u.scrap_ship.bc = reader->Read_Int16_();
                 message->u.scrap_ship.ship_idx = reader->Read_Int16_();
-                reader->Skip_(2);
+                reader->Skip_(version == LEGACY_VERSION ? 2 : 3);
                 break;
             case MSG_TYPE_LOST_COLONY:
                 message->u.lost_colony.planet_idx = reader->Read_Int16_();
                 message->u.lost_colony.reason = reader->Read_Int16_();
                 message->u.lost_colony.leader_idx = reader->Read_Int16_();
                 message->u.lost_colony.colony_or_outpost = reader->Read_Int8_();
-                reader->Skip_(1);
+                reader->Skip_(version == LEGACY_VERSION ? 1 : 2);
                 break;
             case MSG_TYPE_HYPERSPACE_BEAST:
                 message->u.hyperspace_beast.ship_idx = reader->Read_Int16_();
-                message->u.hyperspace_beast.star_idx = reader->Read_Int8_();
+                message->u.hyperspace_beast.star_idx = version == LEGACY_VERSION ? reader->Read_Int8_() : reader->Read_Int16_();
                 message->u.hyperspace_beast.officer_idx = reader->Read_Int8_();
                 message->u.hyperspace_beast.leader_status = reader->Read_Int8_();
                 message->u.hyperspace_beast.fate = reader->Read_Int8_();
@@ -1219,24 +1240,24 @@ namespace SAVEGAME {
                 break;
             case MSG_TYPE_LOST_ATTACKING_SPY:
                 message->u.lost_attacking_spy.player_idx = reader->Read_Int16_();
-                reader->Skip_(6);
+                reader->Skip_(version == LEGACY_VERSION ? 6 : 7);
                 break;
             case MSG_TYPE_LOST_DEFENDING_SPY:
                 message->u.lost_defending_spy.count = reader->Read_Int16_();
-                reader->Skip_(6);
+                reader->Skip_(version == LEGACY_VERSION ? 6 : 7);
                 break;
             case MSG_TYPE_ARTEMIS:
                 message->u.artemis.star_idx = reader->Read_Int16_();
-                reader->Skip_(6);
+                reader->Skip_(version == LEGACY_VERSION ? 6 : 7);
                 break;
             case MSG_TYPE_ARTEMIS_LEADER:
-                message->u.artemis_leader.star_idx = reader->Read_Int8_();
+                message->u.artemis_leader.star_idx = version == LEGACY_VERSION ? reader->Read_Int8_() : reader->Read_Int16_();
                 message->u.artemis_leader.leader_idx = reader->Read_Int8_();
                 message->u.artemis_leader.fate = reader->Read_Int8_();
                 reader->Skip_(5);
                 break;
             case MSG_TYPE_FAILED_RETREAT:
-                message->u.retreat.star_idx = reader->Read_Int8_();
+                message->u.retreat.star_idx = version == LEGACY_VERSION ? reader->Read_Int8_() : reader->Read_Int16_();
                 message->u.retreat.reason = reader->Read_Int8_();
                 message->u.retreat.ships_lost = reader->Read_Int16_();
                 message->u.retreat.leader_count = reader->Read_Int8_();
@@ -1247,38 +1268,38 @@ namespace SAVEGAME {
                 message->u.spy_assasination.plr_b = reader->Read_Int8_();
                 message->u.spy_assasination.leader_id = reader->Read_Int8_();
                 message->u.spy_assasination.victim_id = reader->Read_Int8_();
-                reader->Skip_(4);
+                reader->Skip_(version == LEGACY_VERSION ? 4 : 5);
                 break;
             case MSG_TYPE_ANOMALY:
-                message->u.anomaly.star_idx = reader->Read_Uint8_();
+                message->u.anomaly.star_idx = version == LEGACY_VERSION ? reader->Read_Uint8_() : reader->Read_Int16_();
                 reader->Skip_(7);
                 break;
             case MSG_TYPE_DIPLOMACY:
                 message->u.diplomacy.diplomacy_idx = reader->Read_Int8_();
                 message->u.diplomacy.plr_a = reader->Read_Int8_();
                 message->u.diplomacy.plr_b = reader->Read_Int8_();
-                reader->Skip_(5);
+                reader->Skip_(version == LEGACY_VERSION ? 5 : 6);
                 break;
             case MSG_TYPE_EEL_SPAWNED:
             case MSG_TYPE_EEL_VANISHED:
-                message->u.eel.star_idx = reader->Read_Uint8_();
+                message->u.eel.star_idx = version == LEGACY_VERSION ? reader->Read_Uint8_() : reader->Read_Int16_();
                 reader->Skip_(7);
                 break;
             case MSG_TYPE_ARTIFACTS:
-                message->u.artifacts.star_idx = reader->Read_Uint8_();
+                message->u.artifacts.star_idx = version == LEGACY_VERSION ? reader->Read_Uint8_() : reader->Read_Int16_();
                 message->u.artifacts.tech1 = reader->Read_Int8_();
                 message->u.artifacts.tech2 = reader->Read_Int8_();
                 reader->Skip_(5);
                 break;
             case MSG_TYPE_SCRAP_LEADER:
                 message->u.scrap_leader.leader_idx = reader->Read_Int8_();
-                reader->Skip_(7);
+                reader->Skip_(version == LEGACY_VERSION ? 7 : 8);
                 break;
             default:
-                reader->Skip_(8);
+                reader->Skip_(version == LEGACY_VERSION ? 8 : 9);
                 break;
             }
-            reader->Read_Bytes_(reinterpret_cast<uint8_t*>(message) + 10, 8);
+            reader->Read_Bytes_(message->reserved, sizeof(message->reserved));
         }
 
         void Write_Antaran_(SERIAL::Writer_* writer, const s_antaran* antaran) {
@@ -1309,16 +1330,16 @@ namespace SAVEGAME {
             Write_Settings_(writer, settings);
             writer->Write_Uint32_(random_seed);
             writer->Write_Int16_(MOX::_NUM_COLONIES);
-            for (int i = 0; i < MAX_COLONIES; ++i) Write_Colony_(writer, &MOX::_colony[i]);
+            for (int i = 0; i < MOX::_NUM_COLONIES; ++i) Write_Colony_(writer, &MOX::_colony[i]);
             writer->Write_Int16_(MOX::_planet_count);
-            for (int i = 0; i < MAX_PLANETS; ++i) Write_Planet_(writer, &MOX::_planet[i]);
+            for (int i = 0; i < MOX::_planet_count; ++i) Write_Planet_(writer, &MOX::_planet[i]);
             writer->Write_Int16_(MOX::_NUM_STARS);
-            for (int i = 0; i < MAX_STARS; ++i) Write_Star_(writer, &MOX::_star[i]);
+            for (int i = 0; i < MOX::_NUM_STARS; ++i) Write_Star_(writer, &MOX::_star[i]);
             for (int i = 0; i < MAX_LEADERS; ++i) Write_Leader_(writer, &MOX::_leaders[i]);
             writer->Write_Int16_(MOX::_NUM_PLAYERS);
             for (int i = 0; i < MAX_PLAYERS; ++i) Write_Player_(writer, &MOX::_player[i]);
             writer->Write_Int16_(MOX::_NUM_SHIPS);
-            for (int i = 0; i < MAX_SHIPS; ++i) Write_Ship_(writer, &MOX::_ship[i]);
+            for (int i = 0; i < MOX::_NUM_SHIPS; ++i) Write_Ship_(writer, &MOX::_ship[i]);
             for (int i = 0; i < 5; ++i) Write_Movable_Box_(writer, &MOX::_moveable_box[i]);
             Write_Int16_Array_(writer, MOX::_moveable_box_order, 5);
             writer->Write_Int16_(MOX::_PLAYER_NUM);
@@ -1357,20 +1378,41 @@ namespace SAVEGAME {
             Write_Zeroes_(writer, 1000);
         }
 
-        void Read_Game_State_(SERIAL::Reader_* reader, uint16_t version, s_settings* settings, uint32_t* random_seed) {
+        bool Read_Game_State_(SERIAL::Reader_* reader, uint16_t version, s_settings* settings, uint32_t* random_seed) {
             Read_Settings_(reader, settings);
             *random_seed = reader->Read_Uint32_();
             MOX::_NUM_COLONIES = reader->Read_Int16_();
-            for (int i = 0; i < MAX_COLONIES; ++i) Read_Colony_(reader, &MOX::_colony[i]);
+            if (MOX::_NUM_COLONIES < 0 || MOX::_NUM_COLONIES > MAX_COLONIES) return false;
+            const int colony_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_COLONIES : MOX::_NUM_COLONIES;
+            for (int i = 0; i < colony_record_count; ++i) Read_Colony_(reader, &MOX::_colony[i]);
+            memset(&MOX::_colony[colony_record_count], 0,
+                   (MAX_COLONIES - colony_record_count) * sizeof(*MOX::_colony));
             MOX::_planet_count = reader->Read_Int16_();
-            for (int i = 0; i < MAX_PLANETS; ++i) Read_Planet_(reader, &MOX::_planet[i], version);
+            if (MOX::_planet_count < 0 || MOX::_planet_count > MAX_PLANETS) return false;
+            const int planet_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_PLANETS : MOX::_planet_count;
+            for (int i = 0; i < planet_record_count; ++i) Read_Planet_(reader, &MOX::_planet[i], version);
+            memset(&MOX::_planet[planet_record_count], 0,
+                   (MAX_PLANETS - planet_record_count) * sizeof(*MOX::_planet));
             MOX::_NUM_STARS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_STARS; ++i) Read_Star_(reader, &MOX::_star[i], version);
+            if (MOX::_NUM_STARS < 0 || MOX::_NUM_STARS > MAX_STARS) return false;
+            const int star_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_STARS : MOX::_NUM_STARS;
+            for (int i = 0; i < star_record_count; ++i) Read_Star_(reader, &MOX::_star[i], version);
+            memset(&MOX::_star[star_record_count], 0,
+                   (MAX_STARS - star_record_count) * sizeof(*MOX::_star));
             for (int i = 0; i < MAX_LEADERS; ++i) Read_Leader_(reader, &MOX::_leaders[i]);
             MOX::_NUM_PLAYERS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i]);
+            for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i], version);
             MOX::_NUM_SHIPS = reader->Read_Int16_();
-            for (int i = 0; i < MAX_SHIPS; ++i) Read_Ship_(reader, &MOX::_ship[i]);
+            if (MOX::_NUM_SHIPS < 0 || MOX::_NUM_SHIPS > MAX_SHIPS) return false;
+            const int ship_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_SHIPS : MOX::_NUM_SHIPS;
+            for (int i = 0; i < ship_record_count; ++i) Read_Ship_(reader, &MOX::_ship[i], version);
+            memset(&MOX::_ship[ship_record_count], 0,
+                   (MAX_SHIPS - ship_record_count) * sizeof(*MOX::_ship));
+            for (int i = ship_record_count; i < MAX_SHIPS; ++i) {
+                MOX::_ship[i].status = 5;
+                MOX::_ship[i].location = -1;
+                MOX::_ship[i].officer_index = -1;
+            }
             for (int i = 0; i < 5; ++i) Read_Movable_Box_(reader, &MOX::_moveable_box[i]);
             Read_Int16_Array_(reader, MOX::_moveable_box_order, 5);
             MOX::_PLAYER_NUM = reader->Read_Int16_();
@@ -1384,12 +1426,16 @@ namespace SAVEGAME {
             MOX::_NUM_NEBULAS = reader->Read_Uint8_();
             Read_Int16_Array_(reader, MOX::_bill_savegame, 6);
             REPORT::_n_reports = reader->Read_Int16_();
-            for (int i = 0; i < MAX_REPORTS; ++i) Read_Report_(reader, &REPORT::_reports[i]);
+            for (int i = 0; i < MAX_REPORTS; ++i) Read_Report_(reader, &REPORT::_reports[i], version);
             REPORT::_done_player_reports = reader->Read_Uint8_();
             reader->Read_Bytes_(REPORT::_something_interesting_happened, sizeof(REPORT::_something_interesting_happened));
-            reader->Read_Bytes_(REPORT::_done_colonize_check, sizeof(REPORT::_done_colonize_check));
+            const size_t colonize_check_size = version == LEGACY_VERSION ?
+                    BITMAP(ORIGINAL_MAX_STARS) : sizeof(REPORT::_done_colonize_check);
+            reader->Read_Bytes_(REPORT::_done_colonize_check, colonize_check_size);
+            memset(REPORT::_done_colonize_check + colonize_check_size, 0,
+                   sizeof(REPORT::_done_colonize_check) - colonize_check_size);
             for (int i = 0; i < 36; ++i) Read_Event_(reader, &EVENTS::_event_data[i]);
-            for (int i = 0; i < MAX_MESSAGES; ++i) Read_Message_(reader, &MSG_::_msgs[i]);
+            for (int i = 0; i < MAX_MESSAGES; ++i) Read_Message_(reader, &MSG_::_msgs[i], version);
             reader->Read_Bytes_(MSG_::_first_msg, sizeof(MSG_::_first_msg));
             reader->Read_Bytes_(MSG_::_max_msgs, sizeof(MSG_::_max_msgs));
             reader->Read_Bytes_(MSG_::_n_msgs, sizeof(MSG_::_n_msgs));
@@ -1407,7 +1453,22 @@ namespace SAVEGAME {
             MOX::_cur_map_x = reader->Read_Int16_();
             MOX::_cur_map_y = reader->Read_Int16_();
             reader->Skip_(1000);
+            return true;
         }
+    }
+
+    int16_t Convert_Legacy_Ship_Location_(int16_t location) {
+        constexpr int16_t legacy_moving_offset = ORIGINAL_MAX_SHIPS;
+        constexpr int16_t legacy_wormhole_offset = ORIGINAL_MAX_SHIPS * 2;
+        constexpr int16_t legacy_location_limit = ORIGINAL_MAX_SHIPS * 3;
+
+        if (location >= legacy_moving_offset && location < legacy_wormhole_offset) {
+            return location - legacy_moving_offset + SHIP_LOCATION_MOVING_OFFSET;
+        }
+        if (location >= legacy_wormhole_offset && location < legacy_location_limit) {
+            return location - legacy_wormhole_offset + SHIP_LOCATION_WORMHOLE_OFFSET;
+        }
+        return location;
     }
 
     void Write_Game_(SERIAL::Writer_* writer, const char* description, uint32_t random_seed) {
@@ -1431,7 +1492,6 @@ namespace SAVEGAME {
         metadata->version = metadata->header == LEGACY_HEADER ? LEGACY_VERSION : reader->Read_Uint16_();
         if (metadata->version > CURRENT_VERSION) return false;
 
-        Read_Game_State_(reader, metadata->version, saved_settings, random_seed);
-        return true;
+        return Read_Game_State_(reader, metadata->version, saved_settings, random_seed);
     }
 }

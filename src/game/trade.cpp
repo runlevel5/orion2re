@@ -170,7 +170,7 @@ namespace TRADE {
             MOX::_player[i].n_research_pops = 0;
         }
 
-        for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony& colony = MOX::_colony[i];
 
             if (colony.owner != -1) {

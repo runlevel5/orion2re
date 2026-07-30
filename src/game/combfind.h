@@ -5,7 +5,7 @@ namespace COMBFIND {
     extern uint8_t _in_net_update;
     extern s_combfind_target _target;
     extern uint16_t (*_player_needs_to_attack)[MAX_STARS + 1];
-    extern int8_t* _battle_stars;
+    extern int16_t* _battle_stars;
     extern uint8_t (*_star_has_nonplayer)[MAX_STARS + 1];
     extern int16_t _n_battle_stars;
     extern int8_t (*_attack_confirmed)[MAX_PLAYERS][MAX_PLAYERS];
@@ -37,7 +37,7 @@ namespace COMBFIND {
 
     int16_t __cdecl Find_Planet_At_Star_Satisfying_(s_star_data* star, bool (__cdecl* predicate)(s_planet_data*));
 
-    void __cdecl Update_Player_Needs_To_Attack_(int star_idx, int player_a_idx, int player_b_idx);
+    void __cdecl Update_Player_Needs_To_Attack_(int16_t star_idx, int player_a_idx, int player_b_idx);
 
     void __cdecl Get_Local_Human_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out);
 
@@ -66,7 +66,7 @@ namespace COMBFIND {
      */
     void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t attacker_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out);
 
-    void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx);
+    void __cdecl Do_Dragon_Bribe_(int player_idx, int16_t star_idx, int16_t dest_idx);
 
     void __cdecl Client_Combat_Loop_();
 
@@ -90,7 +90,7 @@ namespace COMBFIND {
 
     void __cdecl Reset_Combat_Ships_At_Current_Star_Has_Player_(int16_t player_idx);
 
-    void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ships, int n_ships, uint32_t colony_idx, s_battle_results* results);
+    void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ships, int n_ships, int16_t colony_idx, s_battle_results* results);
 
     char* __cdecl Load_Combfind_Strings_(char* strings_block);
 
@@ -98,9 +98,9 @@ namespace COMBFIND {
 
     bool __cdecl Planet_Has_Splinter_Colony_(s_planet_data* planet);
 
-    int16_t __cdecl Target_Planet_To_Colony_(int32_t planet_idx);
+    int16_t __cdecl Target_Planet_To_Colony_(int16_t planet_idx);
 
-    int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx);
+    int16_t __cdecl Target_Colony_To_Planet_(int16_t colony_idx);
 
     /**
      * Resolves one combat at a star and optionally fills a battle-results record.
@@ -127,7 +127,7 @@ namespace COMBFIND {
 
     void __cdecl Decode_Star_Player_Presence_(NETPROTO::Packet_Reader_* reader, int16_t star_idx);
 
-    int32_t __cdecl Do_Bombardment_(int8_t attacker_id, uint8_t colony_idx);
+    int32_t __cdecl Do_Bombardment_(int8_t attacker_id, int16_t colony_idx);
 
     uint8_t __cdecl Has_Stellar_Converter_(int16_t* ship_list, int16_t ship_count);
 

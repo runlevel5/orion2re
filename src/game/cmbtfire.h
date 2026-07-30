@@ -38,7 +38,7 @@ namespace CMBTFIRE {
     int16_t __cdecl Fire_Bomb_(int16_t ship_idx, int16_t unused_target_idx, int16_t weapon_slot_idx);
 
     /** Resolves a special-weapon activation against the selected ship or missile target. */
-    void __cdecl Fire_Special_Weapon_(int16_t ship_idx, int16_t x, int16_t y, uint16_t target_idx, int16_t weapon_slot_idx, int16_t target_type);
+    void __cdecl Fire_Special_Weapon_(int16_t ship_idx, int16_t x, int16_t y, int16_t target_idx, int16_t weapon_slot_idx, int16_t target_type);
 
     /** Applies the Black Hole Generator effect to the target ship. */
     void __cdecl BHG_(int16_t source_idx, int16_t target_idx);
@@ -50,7 +50,7 @@ namespace CMBTFIRE {
     void __cdecl Retarget_Missiles_Aimed_At_(int16_t unit_idx);
 
     /** Places the target ship into stasis and records the source ship. */
-    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, uint8_t source_idx);
+    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int16_t source_idx);
 
     /** Returns a bitfield describing which planetary defenses are currently present. */
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_();

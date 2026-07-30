@@ -201,14 +201,14 @@ namespace COLONY {
         bool quit_flag = false;
 
         uint32_t saved_seed = game_random::Get_Random_Seed_();
-        game_random::Set_Random_Seed_(static_cast<uint32_t>(_colony_handle));
+        game_random::Set_Random_Seed_(_colony_handle);
         video::Clip_Off_();
         _using_colony_screen_palette = 1;
 
-        _star_handle = (int32_t)MOX::_screen_data;
+        _star_handle = MOX::_screen_data;
         _orbit_n = (int32_t)_orbit_temp;
         int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, _orbit_temp);
-        _planet_handle = (int32_t)planet_idx;
+        _planet_handle = planet_idx;
 
         _colony_handle = MOX::_planet[_planet_handle].colony_index;
         _g_scanned_star = -1;
@@ -322,7 +322,7 @@ namespace COLONY {
         _using_colony_screen_palette = 0;
 
         if (!quit_flag) {
-            Cleanup_Colony_Queue_((int16_t)_colony_handle);
+            Cleanup_Colony_Queue_(_colony_handle);
             if (MOX::_return_screen == MOX::_current_screen) {
                 MOX::_current_screen = _colony_saved_screen;
                 MOX::_return_screen = _colony_saved_screen;
@@ -494,7 +494,7 @@ namespace COLONY {
 
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_idx, uint8_t is_ui_view) {
         uint32_t previous_seed = game_random::Get_Random_Seed_();
-        game_random::Set_Random_Seed_(static_cast<uint32_t>(colony_idx));
+        game_random::Set_Random_Seed_(colony_idx);
 
         int16_t satellite_count = 0;
         Clear_Colony_Buidlings_();
@@ -706,7 +706,7 @@ namespace COLONY {
             return;
         }
 
-        int star_idx = MOX::_planet[col->planet].star_index;
+        int16_t star_idx = MOX::_planet[col->planet].star_index;
         if ((MOX::_star[star_idx].blockaded >> (MOX::_PLAYER_NUM & 0x1f)) & 1) {
             GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_BUY_WHILE_THIS_STAR_IS_BLOCKADED));
             COLONY::Show_Colony_Screen_();
@@ -762,17 +762,17 @@ namespace COLONY {
 
     void Draw_Info_Name_And_Pop_() {
         char buffer[104];
-        int32_t handle = _colony_handle;
+        int16_t handle = _colony_handle;
 
         if (MOX::_colony[handle].occupation_policy == 0) {
-            char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
+            char* planet_name = HACCESS::Get_Planet_Name_(_planet_handle);
             char* fmt = ESTRINGS::E_Strings_(ESTR_ANNIHILATING_S);
             snprintf(buffer, sizeof(buffer), fmt, planet_name);
             int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
             Set_Colony_Font_To_Red_(4, (uint8_t)cycle_val);
         }
         else {
-            char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
+            char* planet_name = HACCESS::Get_Planet_Name_(_planet_handle);
             char* colony_type = Colony_Type_(handle);
             char* fmt = ESTRINGS::E_Strings_(ESTR_SCOLONY_OF_S);
             snprintf(buffer, sizeof(buffer), fmt, colony_type, planet_name);
@@ -783,7 +783,7 @@ namespace COLONY {
         fonts::Print_Centered_(320, 0, buffer);
 
         int16_t colony_planet = MOX::_colony[handle].planet;
-        int8_t star_idx = MOX::_planet[colony_planet].star_index;
+        int16_t star_idx = MOX::_planet[colony_planet].star_index;
 
         int16_t status_msg_id = -1;
         if ((MOX::_star[star_idx].blockaded >> (MOX::_PLAYER_NUM & 0x1F)) & 1) {
@@ -792,13 +792,13 @@ namespace COLONY {
             fonts::Set_Font_Spacing_(2);
             status_msg_id = ESTR_BLOCKADED1;
         }
-        else if (EVENTS::Event_Check_Plague_(static_cast<int16_t>(handle))) {
+        else if (EVENTS::Event_Check_Plague_(handle)) {
             int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
             Set_Colony_Font_To_Red_(4, (uint8_t)cycle_val);
             fonts::Set_Font_Spacing_(2);
             status_msg_id = ESTR_PLAGUE;
         }
-        else if (EVENTS::Event_Check_Population_Boom_(static_cast<int16_t>(handle))) {
+        else if (EVENTS::Event_Check_Population_Boom_(handle)) {
             Set_Colony_Font_To_(4);
             fonts::Set_Font_Spacing_(2);
             status_msg_id = ESTR_POP_BOOM;
@@ -984,12 +984,12 @@ namespace COLONY {
         if (_colony_fields[8] == field_val) {
             OCPOLPUP::Occupation_Policy_Popup_();
             Show_Colony_Screen_();
-            Col_Calc_Wrapper_(static_cast<int16_t>(_colony_handle));
+            Col_Calc_Wrapper_(_colony_handle);
             return 1;
         }
 
         if (_colony_fields[17] == field_val) {
-            MOX::_temp_star_handle = (int16_t)_star_handle;
+            MOX::_temp_star_handle = _star_handle;
             MOX::_return_screen = MOX::_current_screen;
             MOX::_screen_mouse_list_type = 1;
             MOX::_current_screen = SCREEN_OFFICERS;
@@ -1020,7 +1020,7 @@ namespace COLONY {
                 COLMOVE::Send_Cluster_(transport_result, -1);
             }
             Show_Colony_Screen_();
-            Col_Calc_Wrapper_(static_cast<int16_t>(_colony_handle));
+            Col_Calc_Wrapper_(_colony_handle);
             return 1;
         }
 
@@ -1031,7 +1031,7 @@ namespace COLONY {
         }
 
         if (_colony_fields[3] == field_val) {
-            Tested_Colony_Buys_Outright_(static_cast<int16_t>(_colony_handle));
+            Tested_Colony_Buys_Outright_(_colony_handle);
             Update_Fields_();
             Show_Colony_Screen_();
             *input_field = 0;
@@ -1046,7 +1046,7 @@ namespace COLONY {
                 Show_Colony_Screen_();
                 return 1;
             }
-            Col_Calc_Wrapper_(static_cast<int16_t>(_colony_handle));
+            Col_Calc_Wrapper_(_colony_handle);
             return 1;
         }
 
@@ -1069,13 +1069,13 @@ namespace COLONY {
         }
 
         if (_colony_fields[15] == field_val) {
-            COLCALC::Show_Industry_Production_(static_cast<int16_t>(_colony_handle));
+            COLCALC::Show_Industry_Production_(_colony_handle);
             Show_Colony_Screen_();
             return 1;
         }
 
         if (_colony_fields[16] == field_val) {
-            COLCALC::Show_Research_Production_(static_cast<int16_t>(_colony_handle));
+            COLCALC::Show_Research_Production_(_colony_handle);
             Show_Colony_Screen_();
             return 1;
         }
@@ -1088,7 +1088,7 @@ namespace COLONY {
 
         if (_colony_fields[6] == field_val) {
             int16_t new_colony = Get_Next_Colony_(_colony_handle, 0);
-            if (new_colony != static_cast<int16_t>(_colony_handle)) {
+            if (new_colony != _colony_handle) {
                 Set_Colony_Screen_To_New_Colony_(new_colony);
                 return 0;
             }
@@ -1110,7 +1110,7 @@ namespace COLONY {
         }
         else if (_colony_fields[7] == field_val) {
             int16_t new_colony = Get_Next_Colony_(_colony_handle, 1);
-            if (new_colony != static_cast<int16_t>(_colony_handle)) {
+            if (new_colony != _colony_handle) {
                 Set_Colony_Screen_To_New_Colony_(new_colony);
                 return 0;
             }

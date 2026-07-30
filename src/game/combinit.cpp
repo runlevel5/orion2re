@@ -358,7 +358,7 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
     s_combat_data* ship = &MOX::_combat_data[combat_ship_idx];
 
     ship->stasis_source_idx = 0xFF;
-    ship->black_hole_source_idx = -1;
+    ship->black_hole_source_idx = UINT8_MAX;
     ship->reflected_damage_pool = 0;
     ship->black_hole_flag = 0;
     ship->combat_status_flags = 0;
@@ -512,6 +512,8 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_cmbt_colony_id = colony_idx;
 
     MOX::_combat_data = (s_combat_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, kCombatDataBytes);
+    // Resetting the screen pool invalidates the missile table from the previous combat.
+    MOX::_missile = nullptr;
     struct_::Clear_Structure_(MOX::_combat_data, kCombatDataBytes);
 
     MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
@@ -1184,7 +1186,7 @@ void __cdecl Load_Antaran_Defense_Fleet_() {
 }
 
 void __cdecl Load_Antaran_Star_Fortress_() {
-    int n = MOX::_combat_total_ship_count;
+    int16_t n = MOX::_combat_total_ship_count;
     s_combat_data* ship = &MOX::_combat_data[n];
 
     ship->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
@@ -2055,7 +2057,7 @@ void __cdecl Deploy_Ships_() {
     MOX::_combat_data[0].y = 34;
     MOX::_combat_data[0].size_class = 100;
 
-    for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
             saved_size = MOX::_combat_data[i].size_class;
             MOX::_combat_data[i].size_class = 99;
@@ -2066,13 +2068,13 @@ void __cdecl Deploy_Ships_() {
 
     MOX::_combat_data[0].size_class = SHIP_SIZE_HUGE;
 
-    for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
             MOX::_combat_data[i].size_class = saved_size;
         }
     }
 
-    for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
         if (ship->ftl_type == DRIVE_NO_DRIVE) {
             int8_t x_pos;
@@ -2083,7 +2085,7 @@ void __cdecl Deploy_Ships_() {
             }
             ship->x = x_pos;
             ship->y = MOX::_combat_data[0].y + 1;
-            stationary_ship_idx = (int16_t)i;
+            stationary_ship_idx = i;
         } else {
             if (ship->owner == MOX::_combat_attacker_player) {
                 if (!(attacker_ship_count & 1)) {

@@ -62,7 +62,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
 
         if (summary->explored != -1) {
             s_planet_data* planet = &MOX::_planet[summary->explored];
-            int16_t star_idx = static_cast<int16_t>(planet->star_index);
+            int16_t star_idx = planet->star_index;
             int16_t mineral_class = summary->mineral_class;
             int16_t climate_idx = summary->climate;
             int16_t gravity_class = static_cast<int16_t>(planet->gravity_class);
@@ -211,7 +211,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     ship_list[0] = -1;
     ship_list[1] = -1;
 
-    target_star_idx = (int16_t)MOX::_planet[planet_idx].star_index;
+    target_star_idx = MOX::_planet[planet_idx].star_index;
     omniscient = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
     summary_idx = Planet_Summary_Id_(planet_idx);
     nearest_ship_idx = Nearest_Ship_Id_(summary_idx);
@@ -366,7 +366,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     }
 
     bool __cdecl Planet_Has_Been_Visited_(int16_t planet_index) {
-        bool visited = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, (int16_t)MOX::_planet[planet_index].star_index);
+        bool visited = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, MOX::_planet[planet_index].star_index);
         bool omniscient = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
 
         if (omniscient || visited) {
@@ -377,7 +377,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     }
 
     bool __cdecl Planet_In_Range_Of_A_Colony_(int16_t planet_idx) {
-        int8_t star_idx = MOX::_planet[planet_idx].star_index;
+        int16_t star_idx = MOX::_planet[planet_idx].star_index;
         s_star_data* star = &MOX::_star[star_idx];
 
         return SHIPMOVE::Star_In_Extended_Range_Of_Player_(star, MOX::_PLAYER_NUM);
@@ -406,7 +406,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
     bool __cdecl Planet_Is_Enemy_Controlled_(int16_t planet_idx, int16_t) {
         bool result = false;
-        int8_t star_idx = MOX::_planet[planet_idx].star_index;
+        int16_t star_idx = MOX::_planet[planet_idx].star_index;
 
         for (int16_t i = 0; i < 5; ++i) {
             if (result) {
@@ -435,7 +435,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                     done_traversing = true;
                 } else {
                     int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
-                    if (MOX::_ship[ship_idx].location == static_cast<int16_t>(star_idx)) {
+                    if (MOX::_ship[ship_idx].location == star_idx) {
                         if (HACCESS::Ship_Owner_(ship_idx) != MOX::_PLAYER_NUM) {
                             done_traversing = true;
                             result = true;
@@ -558,7 +558,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
             int16_t planet_idx = PLNTSUM::_planet_summary[i].explored;
 
-            if ((int16_t)MOX::_planet[planet_idx].star_index == star_index) {
+            if (MOX::_planet[planet_idx].star_index == star_index) {
                 result = i;
             }
         }
@@ -625,12 +625,12 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
         for (int16_t i = 0; i < PLNTSUM::_n_ships_in_summary; ++i) {
             if (choice_mode == SHIP_TYPE_COLONY) {
-                short ship_idx = PLNTSUM::_ship_summary[i].colony_ship_idx;
+                int16_t ship_idx = PLNTSUM::_ship_summary[i].colony_ship_idx;
                 if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
                     PLNTSUM::Set_Colony_Ship_To_Star_Distances_(i, ship_idx);
                 }
             } else if (choice_mode == SHIP_TYPE_OUTPOST) {
-                short ship_idx = PLNTSUM::_ship_summary[i].outpost_ship_idx;
+                int16_t ship_idx = PLNTSUM::_ship_summary[i].outpost_ship_idx;
                 if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
                     PLNTSUM::Set_Outpost_Ship_To_Star_Distances_(i, ship_idx);
                 }
@@ -1238,12 +1238,12 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     }
 
     void __cdecl Add_PlntSum_Galaxy_Map_Fields_(int16_t* fields_array) {
-        for (short i = 0; i < MAX_STARS; ++i) {
+        for (int16_t i = 0; i < MAX_STARS; ++i) {
             fields_array[i] = -1000;
         }
 
         if (MOX::_NUM_STARS > 0) {
-            for (short j = 0; j < (short)MOX::_NUM_STARS; ++j) {
+            for (int16_t j = 0; j < MOX::_NUM_STARS; ++j) {
                 short x, y;
                 MOVEBOX::Get_Galaxy_Map_Star_XY_(j, 443, 17, 180, 116, 0, 0, 0, &x, &y);
                 fields_array[j] = fields::Add_Hidden_Field_(x, y, x + 5, y + 5, "", 41);
@@ -1267,7 +1267,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 int16_t explored_idx = PLNTSUM::_planet_summary[current_row].explored;
 
                 if (explored_idx != -1) {
-                    int16_t star_idx = (int16_t)MOX::_planet[explored_idx].star_index;
+                    int16_t star_idx = MOX::_planet[explored_idx].star_index;
 
                     // Handle interaction: Click on fields/icons
                     if (PLNTSUM::_screen->fields[i] == clicked_field_id) {
@@ -1346,7 +1346,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         video::Clip_On_();
 
         if (MOX::_scanned_field != -1) {
-            short star_idx = MOX::_scanned_field;
+            int16_t star_idx = MOX::_scanned_field;
             if (star_idx < 1000) {
                 Draw_Nearest_Ship_Directional_Line_(star_idx);
             } else if (star_idx < MOX::_NUM_STARS + 1000) {
@@ -1503,7 +1503,7 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
     char eta_str[40];
 
     ships[0] = -1;
-    ships[1] = (int16_t)0xffff;
+    ships[1] = -1;
 
     for (int16_t i = 0; i < MOX::_scroll_bar->total_rows; ++i) {
         if (found) break;
@@ -2126,7 +2126,7 @@ void Planet_Summary_Screen_() {
     MISC::Fade_To_Black_();
     fields::Enable_Draw_All_Fields_();
     MOX::_scroll_bar = nullptr;
-    if (MOVEBOX::Moveable_Box_Selected_(2) != 0 && _last_ship_moved != static_cast<int16_t>(0xFFFF)) {
+    if (MOVEBOX::Moveable_Box_Selected_(2) != 0 && _last_ship_moved != -1) {
         MOX::_first_node_ptr_in_stack_ = -1;
     }
     MAINSCR::Draw_Mini_Main_Screen_();
@@ -2158,7 +2158,7 @@ void __cdecl Draw_Colony_ETA_(int16_t unused_planet_sum_idx, int16_t scroll_idx)
     animate::Draw_(x, y, _screen->pics[13]);
 }
 
-int16_t __cdecl Get_ETA_To_Star_(int32_t star_idx) {
+int16_t __cdecl Get_ETA_To_Star_(int16_t star_idx) {
     int16_t best_ship = -1;
 
     if (MOX::_scroll_bar->total_rows > 0) {
@@ -2168,7 +2168,7 @@ int16_t __cdecl Get_ETA_To_Star_(int32_t star_idx) {
             }
 
             int16_t planet_idx = _planet_summary[i].explored;
-            if (static_cast<int16_t>(MOX::_planet[planet_idx].star_index) == static_cast<int16_t>(star_idx)) {
+            if (MOX::_planet[planet_idx].star_index == star_idx) {
                 best_ship = _planet_summary[i].best_colony_ship_idx;
                 if (best_ship <= _planet_summary[i].best_outpost_ship_idx) {
                     best_ship = _planet_summary[i].best_outpost_ship_idx;
@@ -2178,7 +2178,7 @@ int16_t __cdecl Get_ETA_To_Star_(int32_t star_idx) {
     }
 
     if (best_ship != -1) {
-        return HAROLD::N_Turns_To_Star_(best_ship, (int16_t)star_idx);
+        return HAROLD::N_Turns_To_Star_(best_ship, star_idx);
     }
 
     return 0;

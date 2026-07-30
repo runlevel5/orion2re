@@ -26,14 +26,14 @@ namespace ERICNET {
         memset(&colony, 0, sizeof(s_colony));
 
         if (COLONY::_debug_flag) {
-            RUSS::PFMT_(0, 0, "INITING HOMEWORLD ph:%d pl:%d num:%d", (int)planet_idx, (int)player_idx, (int)MOX::_NUM_COLONIES);
+            RUSS::PFMT_(0, 0, "INITING HOMEWORLD ph:%d pl:%d num:%d", planet_idx, (int)player_idx, (int)MOX::_NUM_COLONIES);
             key::Wait_For_Key_();
         }
 
         INITGAME::Init_Colony_(colony_idx, planet_idx, (uint8_t)player_idx);
         COLONY::Set_Colony_Globals_(colony_idx);
 
-        int8_t star_idx = MOX::_planet[planet_idx].star_index;
+        int16_t star_idx = MOX::_planet[planet_idx].star_index;
         MOX::_star[star_idx].visited |= (1 << player_idx);
 
         colony.climate = MOX::_planet[planet_idx].climate;
@@ -251,7 +251,8 @@ namespace ERICNET {
         s_colony* colony = &MOX::_colony[colony_idx];
         s_player* player = &MOX::_player[(uint8_t)colony->owner];
         s_planet_data* planet = &MOX::_planet[colony->planet];
-        s_star_data* star = &MOX::_star[planet->star_index];
+        int16_t star_idx = planet->star_index;
+        s_star_data* star = &MOX::_star[star_idx];
 
         uint8_t add_to_list = 1;
         uint8_t recompute_star = 0;
@@ -277,7 +278,7 @@ namespace ERICNET {
 
             case BUILDING_CAPITOL:
                 player->home_planet_id = colony->planet;
-                for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+                for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
                     if (i != colony_idx && MOX::_colony[i].owner == colony->owner) {
                         COLBLDG::Delete_Prod_From_Colony_Queue_(i, BUILDING_CAPITOL);
                     }
@@ -495,12 +496,15 @@ namespace ERICNET {
             case BUILDING_ARTEMIS_SYSTEM_NET:
             case BUILDING_DIMENSIONAL_PORTAL:
             case BUILDING_WARP_INTERDICTOR:
-                COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[MOX::_planet[MOX::_colony[colony_idx].planet].star_index]);
+            {
+                int16_t star_idx = MOX::_planet[MOX::_colony[colony_idx].planet].star_index;
+                COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[star_idx]);
                 if (building_id == BUILDING_WARP_INTERDICTOR) {
                     SHIPMOVE::Update_Ship_ETAs_((int32_t)MOX::_colony[colony_idx].owner);
                     return;
                 }
                 break;
+            }
 
             case BUILDING_CAPITOL:
                 invasion::Assign_New_Home_Planet_((int8_t)MOX::_colony[colony_idx].owner, colony_idx);

@@ -989,7 +989,7 @@ namespace TECH {
 
         strlcpy(buffer, " ", sizeof(buffer));
 
-        char star_idx = MOX::_planet[planet_idx].star_index;
+        int16_t star_idx = MOX::_planet[planet_idx].star_index;
         char planet_num = HAROLD::Planet_Number_(planet_idx);
 
         const char* numeral_str;

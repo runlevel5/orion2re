@@ -23,7 +23,7 @@ namespace MAPGEN {
     extern int16_t _t_roll;
     extern uint32_t _satellite_stat[6];
     extern uint32_t _nebula_stat[5];
-    extern uint16_t _star_count;
+    extern int16_t _star_count;
     extern s_planet_data* _pl;
     extern const char s_raceopt_lbx[12];
     extern const char s_starname_lbx[13];

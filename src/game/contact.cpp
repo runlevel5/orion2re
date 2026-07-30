@@ -17,23 +17,25 @@ void __cdecl Compute_Contacts_() {
         plr->just_established_contact = 0;
     }
 
-    for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+    for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
         s_colony* colony_a = &MOX::_colony[i];
         if (colony_a->planet == -1) {
             continue;
         }
 
         int8_t owner_a = colony_a->owner;
-        s_star_data* star_a = &MOX::_star[MOX::_planet[colony_a->planet].star_index];
+        int16_t star_a_idx = MOX::_planet[colony_a->planet].star_index;
+        s_star_data* star_a = &MOX::_star[star_a_idx];
 
-        for (int j = 0; j < i; ++j) {
+        for (int16_t j = 0; j < i; ++j) {
             s_colony* colony_b = &MOX::_colony[j];
             if (colony_b->planet == -1) {
                 continue;
             }
 
             int8_t owner_b = colony_b->owner;
-            s_star_data* star_b = &MOX::_star[MOX::_planet[colony_b->planet].star_index];
+            int16_t star_b_idx = MOX::_planet[colony_b->planet].star_index;
+            s_star_data* star_b = &MOX::_star[star_b_idx];
             bool contact_made = false;
 
             // Check if player A can see colony B

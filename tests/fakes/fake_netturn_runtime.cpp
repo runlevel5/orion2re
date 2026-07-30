@@ -109,7 +109,7 @@ namespace COMBFIND {
     void __cdecl Client_Combat_Loop_() {}
     void __cdecl Do_Net_Combat_Update_(bool) {}
     void __cdecl Copy_Target_Info_(s_combfind_target*) {}
-    int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx) { return (int16_t)colony_idx; }
+    int16_t __cdecl Target_Colony_To_Planet_(int16_t colony_idx) { return colony_idx; }
     void __cdecl Decode_Star_Player_Presence_(NETPROTO::Packet_Reader_*, int16_t) {}
     void __cdecl Send_Star_Player_Presence_(NETPROTO::Packet_Writer_*, int16_t) {}
 }
@@ -172,4 +172,15 @@ namespace netcode {
 
 namespace sound {
     void __cdecl Sound_Update_() {}
+}
+
+namespace oracle {
+    uint32_t Replay_Random_Seed_(uint32_t local_seed,
+        const uintptr_t* return_addresses, uint32_t return_address_count,
+        uintptr_t image_base) {
+        (void)return_addresses;
+        (void)return_address_count;
+        (void)image_base;
+        return local_seed;
+    }
 }

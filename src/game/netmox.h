@@ -9,7 +9,7 @@ struct s_net_snapshot_cache {
 };
 
 namespace NETMOX {
-    constexpr uint32_t NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES = 0xE1000u;
+    constexpr uint32_t NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES = 8 * 1024 * 1024;
 
     extern s_network _net;
 
@@ -158,9 +158,9 @@ namespace NETMOX {
 
     void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* packet, uint16_t len);
 
-    void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr, uint16_t len);
+    void __cdecl Decode_Dragon_Info_(int16_t* colony_id_ptr, uint16_t len);
 
-    void __cdecl Send_Dragon_Info_(int32_t colony_id);
+    void __cdecl Send_Dragon_Info_(int16_t colony_id);
 
     void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info);
 
@@ -170,7 +170,7 @@ namespace NETMOX {
 
 #pragma pack(push, 1)
     struct s_packet_dragon_info {
-        int32_t colony_id;
+        int16_t colony_id;
     };
 
     struct s_packet_0x12 {

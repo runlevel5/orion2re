@@ -781,7 +781,7 @@ namespace CMBTFIRE {
         if (ship_idx == MOX::_dont_draw_ship) {
             frame = 1;
         } else {
-            frame = ((int)(MOX::_ship_frame / 2) + (int)ship_idx) % (int)frame_count;
+            frame = ((int)(MOX::_ship_frame / 2) + ship_idx) % (int)frame_count;
         }
 
         animate::Set_Animation_Frame_(seg, frame);
@@ -868,7 +868,7 @@ namespace CMBTFIRE {
         int16_t colony_hits = 0;
         int16_t shield_hit_flag = 0;
 
-        struct_::Clear_Structure_(&bomb_stats, 0x49);
+        struct_::Clear_Structure_(&bomb_stats, sizeof(s_combat_bomb_result));
 
         int16_t best_armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
         int16_t armor_threshold = (int16_t)(((TECHDATA::_armor[best_armor_idx].ships_bonus * 4 + 400) * 25) /
@@ -896,7 +896,7 @@ namespace CMBTFIRE {
                     bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                     MOX::_combat_bomb_result.bio_hits_remaining += 1;
                     bomb_stats.bomb_hits_remaining = 0;
-                    bomb_stats.colony_idx = (uint8_t)MOX::_cmbt_colony_id;
+                    bomb_stats.colony_idx = MOX::_cmbt_colony_id;
                     bomb_stats.bio_hits_remaining = 1;
                     bomb_stats.is_planetary_hit = 0;
                     MOX::_combat_bomb_result.is_bio_weapon = 1;
@@ -956,7 +956,7 @@ namespace CMBTFIRE {
 
                     if (MOX::_combat_data->structure_max > 100) {
                         bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
-                        bomb_stats.colony_idx = (uint8_t)MOX::_cmbt_colony_id;
+                        bomb_stats.colony_idx = MOX::_cmbt_colony_id;
                         bomb_stats.is_planetary_hit = 1;
                         MOX::_combat_bomb_result.is_planetary_hit = 1;
                         bomb_stats.bomb_hits_remaining = MOX::_combat_data->structure_max / 100;
@@ -1331,7 +1331,7 @@ namespace CMBTFIRE {
         }
     }
 
-    void __cdecl Fire_Special_Weapon_(int16_t ship_idx, int16_t x, int16_t y, uint16_t target_idx, int16_t weapon_slot_idx, int16_t target_type) {
+    void __cdecl Fire_Special_Weapon_(int16_t ship_idx, int16_t x, int16_t y, int16_t target_idx, int16_t weapon_slot_idx, int16_t target_type) {
         int16_t dx;
         int16_t dy;
         int16_t range;
@@ -1355,7 +1355,7 @@ namespace CMBTFIRE {
             case WEAPON_STASIS_FIELD:
                 if (target_idx != 0 && target_type == 0) {
                     CMBTSPEC::Draw_Stasis_Beam_(ship_idx, target_idx);
-                    Place_Ship_In_Stasis_(target_idx, (uint8_t)ship_idx);
+                    Place_Ship_In_Stasis_(target_idx, ship_idx);
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left--;
                 }
                 break;
@@ -1402,14 +1402,17 @@ namespace CMBTFIRE {
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 }
                 break;
-            case WEAPON_TRACTOR_BEAM:
+            case WEAPON_TRACTOR_BEAM: {
+                const int16_t tractor_target_idx = MOX::_combat_data[ship_idx].special_cooldown == UINT8_MAX
+                    ? int16_t{-1}
+                    : MOX::_combat_data[ship_idx].special_cooldown;
                 if (target_idx == 0) {
                     if (MOX::_apply_damage_to_planet == 0) {
                         MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                         return;
                     }
                 } else {
-                    if (target_type == 0 && (uint16_t)MOX::_combat_data[ship_idx].special_cooldown != target_idx && MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left > 0) {
+                    if (target_type == 0 && tractor_target_idx != target_idx && MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left > 0) {
                         CMBTSPEC::Tractor_Beam_(ship_idx, target_idx);
                         MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                     }
@@ -1419,6 +1422,7 @@ namespace CMBTFIRE {
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 }
                 break;
+            }
             case WEAPON_PLASMA_FLUX:
                 if (MOX::_apply_damage_to_planet == 1) {
                     CMBTSPEC::Do_Spherical_SFX_(ship_idx, x, y, 0, MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left);
@@ -1455,7 +1459,7 @@ namespace CMBTFIRE {
         int16_t range;
         if (weapon_flags == 0) {
             shield_arc = CMBTFIRE::Facing_Shield_(CMBTDRW1::Relative_Bearing_(target, source));
-            range = (int16_t)CMBTAI::Range_To_Ship_(source, target);
+            range = CMBTAI::Range_To_Ship_(source, target);
         } else {
             range = CMBTAI::Range_To_Missile_(source, target);
         }
@@ -1594,7 +1598,7 @@ namespace CMBTFIRE {
         int16_t damage_bonus = 0;
         int16_t target_shield_arc = Facing_Shield_(CMBTDRW1::Relative_Bearing_(target_ship_idx, source_ship_idx));
 
-        int16_t range = (int16_t)CMBTAI::Range_To_Ship_(source_ship_idx, target_ship_idx);
+        int16_t range = CMBTAI::Range_To_Ship_(source_ship_idx, target_ship_idx);
         int16_t hit_bonus;
         Get_Beam_Weapon_Modifiers_(source_ship_idx, range, 0, 3, &hit_bonus, &damage_bonus);
 
@@ -1694,8 +1698,8 @@ namespace CMBTFIRE {
         }
     }
 
-    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, uint8_t source_idx) {
-        MOX::_combat_data[ship_idx].stasis_source_idx = source_idx;
+    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int16_t source_idx) {
+        MOX::_combat_data[ship_idx].stasis_source_idx = (uint8_t)source_idx;
         CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
     }
 
@@ -1763,6 +1767,6 @@ namespace CMBTFIRE {
         }
 
         MOX::_combat_data[target_idx].black_hole_flag = 1;
-        MOX::_combat_data[target_idx].black_hole_source_idx = (int8_t)source_idx;
+        MOX::_combat_data[target_idx].black_hole_source_idx = (uint8_t)source_idx;
     }
 }

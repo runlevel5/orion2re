@@ -20,10 +20,10 @@ namespace REPORT {
 
     s_colony* __cdecl Player_Colony_Base_At_Star_(int16_t player_idx, int16_t star_idx) {
         for (int i = 0; i < 5; ++i) {
-            short planet_idx = MOX::_star[star_idx].planet_index[i];
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
             
             if (planet_idx != -1) {
-                short colony_idx = MOX::_planet[planet_idx].colony_index;
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
                 
                 if (colony_idx != -1) {
                     s_colony* colony = &MOX::_colony[colony_idx];
@@ -339,7 +339,8 @@ namespace REPORT {
                          TECHDATA::_technology_applications[report->d.steal.tech_app_id].name,
                          MOX::_player[report->d.steal.victim_player_idx].race_name);
             } else if (report->action == 1 /* SPY_ACTION_SABOTAGE */) {
-                char* planet_name = HACCESS::Get_Planet_Name_(report->d.sabotage.planet_idx);
+                int16_t planet_idx = report->d.sabotage.planet_idx;
+                char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
                 snprintf(buffer, buffer_size, REPORT::_your_spy_destroys_fmt,
                          MOX::_player[report->d.sabotage.victim_player_idx].race_name,
                          TECHDATA::_buildings[report->d.sabotage.building_id].name,
@@ -359,7 +360,8 @@ namespace REPORT {
                          MOX::_player[report->d.enemy_steal.enemy_player_idx].race_name,
                          TECHDATA::_technology_applications[report->d.enemy_steal.tech_app_id].name);
             } else if (report->action == 1 /* SPY_ACTION_SABOTAGE */) {
-                char* planet_name = HACCESS::Get_Planet_Name_(report->d.enemy_sabotage.planet_idx);
+                int16_t planet_idx = report->d.enemy_sabotage.planet_idx;
+                char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
                 snprintf(buffer, buffer_size, REPORT::_enemy_spy_destroys_fmt,
                          MOX::_player[report->d.enemy_sabotage.enemy_player_idx].race_name,
                          TECHDATA::_buildings[report->d.enemy_sabotage.building_id].name,
@@ -583,7 +585,7 @@ namespace REPORT {
     }
 
     int8_t __cdecl Explored_New_Star_(int16_t player_idx, int8_t show_popup) {
-        for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
             int8_t has_special = REPORT::Star_Has_Special_For_Player_(star, (int)player_idx);
 
@@ -674,11 +676,11 @@ namespace REPORT {
             if (!((MOX::_antarans.attack_notified_mask >> (uint8_t)MOX::_PLAYER_NUM) & 1)) {
                 result = 6;
                 if (show_notification != 0) {
-                    int32_t target_star_idx = -1;
+                    int16_t target_star_idx = -1;
                     uint8_t max_turns_left = 0;
 
                     // Locate the Antaran ship with the longest remaining travel time to determine target
-                    for (int32_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                    for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                         s_ship_data* ship = &MOX::_ship[i];
                         if (ship->owner == 8 /* Antaran */ && ship->status == 1 /* Active */) {
                             if (max_turns_left < (uint8_t)ship->turns_left) {
@@ -717,7 +719,7 @@ namespace REPORT {
         int16_t num_colonies = MOX::_NUM_COLONIES;
         s_colony* colonies = MOX::_colony;
 
-        for (int i = 0; i < num_colonies; ++i) {
+        for (int16_t i = 0; i < num_colonies; ++i) {
             s_colony* colony = &colonies[i];
 
             if (colony->owner == (int8_t)player_idx && colony->occupation_policy == 4) {
@@ -732,7 +734,7 @@ namespace REPORT {
                             int16_t planet_idx = colony->planet;
                             s_planet_data* planet = &MOX::_planet[planet_idx];
                             
-                            MOX::_screen_data = (int16_t)planet->star_index;
+                            MOX::_screen_data = planet->star_index;
                             COLONY::_orbit_temp = (int16_t)planet->orbit;
                             
                             COLONY::Colony_Screen_();
@@ -830,9 +832,9 @@ namespace REPORT {
 
     int8_t __cdecl Empty_Colony_Queue_(int16_t player_idx, int8_t do_jump) {
         s_colony* target_colony = nullptr;
-        int16_t num_colonies = (int16_t)MOX::_NUM_COLONIES;
+        int16_t num_colonies = MOX::_NUM_COLONIES;
 
-        for (int i = 0; i < num_colonies; ++i) {
+        for (int16_t i = 0; i < num_colonies; ++i) {
             s_colony* colony = &MOX::_colony[i];
             // Check if colony belongs to player, is not an outpost, and its production queue is empty.
             if (colony->owner == player_idx && colony->outpost_flag == 0 && colony->producing[0] == COLONY_PRODUCTION_NONE) {
@@ -851,7 +853,7 @@ namespace REPORT {
             MOX::_current_screen = SCREEN_COLONY;
             
             // Set up planet specific data for the colony screen jump
-            MOX::_screen_data = (int16_t)MOX::_planet[target_colony->planet].star_index;
+            MOX::_screen_data = MOX::_planet[target_colony->planet].star_index;
             COLONY::_orbit_temp = (int16_t)MOX::_planet[target_colony->planet].orbit;
             MOX::_global_esc = 1;
         }

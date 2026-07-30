@@ -347,7 +347,7 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
     uint8_t has_moving_ships = 0;
     int16_t status = -1;
     int16_t owner = -1;
-    uint16_t val = 0;
+    int16_t val = 0;
 
     visited = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, MOX::_galaxy_map_scanned_star);
 

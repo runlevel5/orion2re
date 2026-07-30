@@ -63,6 +63,18 @@ orion2re_add_unit_test(test_colony_production_helpers
         tests/unit/test_colony_production_helpers.cpp
 )
 
+orion2re_add_unit_test(test_map_scale
+    SOURCES
+        tests/unit/test_map_scale.cpp
+)
+
+orion2re_add_unit_test(test_msg_queue
+    SOURCES
+        tests/unit/test_msg_queue.cpp
+    PRODUCTION_SOURCES
+        src/game/msg_queue.cpp
+)
+
 orion2re_add_unit_test(test_savegame
     SOURCES
         tests/unit/test_savegame.cpp

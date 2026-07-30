@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace OFFICER {
+    // Legacy galaxy-map UI encoding for race-only fleet labels. The first tagged
+    // value represents ship-stack head node 9; subsequent values are contiguous.
+    constexpr int16_t RACE_ONLY_SHIP_NODE_FIRST_INDEX = MAX_PLAYERS + 1;
+
     char s_OFFICER_LBX_00556980[16] = "OFFICER.LBX";
     s_colors _normal_text_colors = {{61, 68, 67, 68, 68, 68, 68, 68}};
     s_colors _red_colors = {{75, 129, 77, 129, 129, 129, 129, 129}};
@@ -803,7 +807,7 @@ namespace OFFICER {
         }
 
         if (!is_fleet_screen && OFFICER::_officer_star_displayed != -1) {
-            int star_idx = OFFICER::_officer_star_displayed;
+            int16_t star_idx = OFFICER::_officer_star_displayed;
             int8_t leader_idx = MOX::_star[star_idx].officer_index[MOX::_PLAYER_NUM];
             if (leader_idx == -1) {
                 strlcpy(buffer, MOX::_star[star_idx].name, sizeof(buffer));
@@ -1224,7 +1228,7 @@ namespace OFFICER {
         // Calculate indices based on base pointers
         int32_t player_index = static_cast<int32_t>(player - MOX::_player);
         int32_t leader_index = static_cast<int32_t>(leader - MOX::_leaders);
-        int32_t star_index = static_cast<int32_t>(star - MOX::_star);
+        int16_t star_index = (int16_t)(star - MOX::_star);
 
         // Check if there's already an officer assigned to this star for the player
         int8_t current_leader_idx = star->officer_index[player_index];
@@ -1241,7 +1245,7 @@ namespace OFFICER {
         }
 
         // Set the leader's new assignment details
-        leader->location = static_cast<int16_t>(star_index);
+        leader->location = star_index;
         leader->eta = eta;
         leader->status = 1;
 
@@ -1251,7 +1255,7 @@ namespace OFFICER {
 
     void __cdecl Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship, int8_t eta) {
         int leader_idx = (int)(leader - MOX::_leaders);
-        int ship_idx = (int)(ship - MOX::_ship);
+        int16_t ship_idx = (int16_t)(ship - MOX::_ship);
 
         // If the ship already has an officer, clear that officer's assignment data.
         short current_officer_idx = ship->officer_index;
@@ -1268,7 +1272,7 @@ namespace OFFICER {
         }
 
         // Apply new assignment
-        leader->location = (short)ship_idx;
+        leader->location = ship_idx;
         leader->eta = eta;
         leader->status = 1;
         ship->officer_index = (short)leader_idx;
@@ -1579,7 +1583,7 @@ namespace OFFICER {
     }
 
     int8_t __cdecl Get_Star_Leader_ETA_(int16_t player_index, int16_t leader_index, int16_t target_star_index) {
-        short home_star_index = MOX::_planet[MOX::_player[player_index].home_planet_id].star_index;
+        int16_t home_star_index = MOX::_planet[MOX::_player[player_index].home_planet_id].star_index;
 
         if (OFFICER::_prev_leaders == nullptr) {
             if (target_star_index == home_star_index && MOX::_leaders[leader_index].status == 0) {
@@ -2060,8 +2064,8 @@ namespace OFFICER {
     }
 
     void __cdecl Print_Galmap_Scanned_Ship_(int16_t icon_idx) {
-        int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
-        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+        int16_t ship_stack_head_node_idx = MOX::_ship_icon[icon_idx].node_idx;
+        int16_t ship_idx = MOX::_ship_node[ship_stack_head_node_idx].ship_idx;
         s_ship_data* ship = &MOX::_ship[ship_idx];
         int16_t ship_x = ship->x;
         int16_t ship_y = ship->y;
@@ -2083,13 +2087,14 @@ namespace OFFICER {
         char race_name[256];
         race_name[0] = '\0';
 
-        if (node_idx >= 5000) {
-            int16_t adjusted_node_idx = node_idx - 0x137F;
-            adjusted_node_idx = HACCESS::Ship_Stack_Owner_(adjusted_node_idx);
-            HACCESS::Race_Name_(adjusted_node_idx, race_name, sizeof(race_name));
+        if (ship_stack_head_node_idx >= SHIP_NODE_UI_TAG_BASE) {
+            int16_t decoded_node_idx = ship_stack_head_node_idx - SHIP_NODE_UI_TAG_BASE +
+                                       RACE_ONLY_SHIP_NODE_FIRST_INDEX;
+            int16_t race_idx = HACCESS::Ship_Stack_Owner_(decoded_node_idx);
+            HACCESS::Race_Name_(race_idx, race_name, sizeof(race_name));
         } else if (owner > 8) {
-            int16_t adjusted_node_idx = HACCESS::Ship_Stack_Owner_(node_idx);
-            HACCESS::Race_Name_(adjusted_node_idx, race_name, sizeof(race_name));
+            int16_t race_idx = HACCESS::Ship_Stack_Owner_(ship_stack_head_node_idx);
+            HACCESS::Race_Name_(race_idx, race_name, sizeof(race_name));
         }
 
         if (race_name[0] != '\0') {
@@ -2203,7 +2208,7 @@ namespace OFFICER {
         bitmap::Get_Bitmap_Size_(100, 100);
 
         auto& player = MOX::_player[MOX::_PLAYER_NUM];
-        int8_t home_star_idx = MOX::_planet[player.home_planet_id].star_index;
+        int16_t home_star_idx = MOX::_planet[player.home_planet_id].star_index;
 
         RUSS::Mox_Update_();
         MAINSCR::Allocate_First_Screen_Seg_(5);
@@ -2522,7 +2527,7 @@ namespace OFFICER {
      * and performs the assignment.
      */
     void __cdecl Ai_Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship) {
-        int16_t ship_idx = static_cast<int16_t>(ship - MOX::_ship);
+        int16_t ship_idx = (int16_t)(ship - MOX::_ship);
         int16_t leader_idx = static_cast<int16_t>(leader - MOX::_leaders);
         int16_t player_idx = static_cast<int16_t>(player - MOX::_player);
 
@@ -3413,7 +3418,7 @@ bool __cdecl Marooned_Hero_At_Star_Can_Join_(int16_t star_idx, int16_t* hero_idx
 void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star) {
     int16_t player_idx = static_cast<int16_t>(player - MOX::_player);
     int16_t leader_idx = static_cast<int16_t>(leader - MOX::_leaders);
-    int16_t star_idx = static_cast<int16_t>(star - MOX::_star);
+    int16_t star_idx = (int16_t)(star - MOX::_star);
 
     int8_t eta = Get_Star_Leader_ETA_(player_idx, leader_idx, star_idx);
     Assign_Leader_To_Star_(player, leader, star, eta);

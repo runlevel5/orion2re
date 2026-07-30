@@ -78,6 +78,12 @@ namespace HAROLD {
 
     int16_t __cdecl Map_Scale_To_Zoom_Level_();
 
+    /** Returns whether the current galaxy exceeds the original 72-star capacity. */
+    bool __cdecl Has_Massive_Star_Count_();
+
+    /** Returns the percentage used to scale main-map star sprites at the current zoom. */
+    int16_t __cdecl Map_Star_Scale_Percent_();
+
     void __cdecl Decrement_Zoom_Count_();
 
     int16_t __cdecl Increment_Zoom_Count_With_Limit_();

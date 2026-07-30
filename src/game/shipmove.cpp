@@ -18,7 +18,7 @@ namespace SHIPMOVE {
         }
 
         int colony_production_slots[MAX_PLAYERS] = {0};
-        for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* col = &MOX::_colony[i];
             if (col->owner != -1 && col->outpost_flag == 0) {
                 for (int j = 0; j < 7; ++j) {
@@ -35,13 +35,13 @@ namespace SHIPMOVE {
             player_max_slots = 20;
         }
 
-        int unassigned_indices[MAX_SHIPS];
+        int16_t unassigned_indices[MAX_SHIPS];
         int unassigned_count = 0;
         int antaran_assigned = 0;
         int player_assigned = 0;
 
-        for (int i = 0; i < MAX_SHIPS; ++i) {
-            if (i >= (int)MOX::_NUM_SHIPS || MOX::_ship[i].status == 5) {
+        for (int16_t i = 0; i < MAX_SHIPS; ++i) {
+            if (i >= MOX::_NUM_SHIPS || MOX::_ship[i].status == 5) {
                 if (antaran_assigned < antaran_max_slots) {
                     MOX::_ship[i].owner = (int8_t)MAX_PLAYERS;
                     antaran_assigned++;
@@ -66,7 +66,7 @@ namespace SHIPMOVE {
                 if (fail_count >= (int)MOX::_NUM_PLAYERS) break;
 
                 if (ships_assigned_per_player[current_player] < colony_production_slots[current_player]) {
-                    int ship_idx = unassigned_indices[assigned_from_unassigned++];
+                    int16_t ship_idx = unassigned_indices[assigned_from_unassigned++];
                     MOX::_ship[ship_idx].owner = (int8_t)current_player;
                     ships_assigned_per_player[current_player]++;
                     fail_count = 0;
@@ -83,7 +83,7 @@ namespace SHIPMOVE {
 
         while (assigned_from_unassigned < unassigned_count) {
             if (MOX::_player[current_player].eliminated == 0) {
-                int ship_idx = unassigned_indices[assigned_from_unassigned++];
+                int16_t ship_idx = unassigned_indices[assigned_from_unassigned++];
                 MOX::_ship[ship_idx].owner = (int8_t)current_player;
                 ships_assigned_per_player[current_player]++;
             }
@@ -146,15 +146,15 @@ namespace SHIPMOVE {
         // dist is scaled by 30 pixels per unit (30^2 = 900)
         int32_t dist_sq_limit = (int32_t)dist * dist * 900;
 
-        for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* current_star = &MOX::_star[i];
 
             // Check if player_idx bit is set in has_colony bitmask
             if ((current_star->has_colony >> (player_idx & 0x1F)) & 1) {
                 // Check if current_star can 'see' the target star through black hole blockages
                 if (!struct_::Test_Bit_Field_(current_star->black_hole_blocks, star_idx)) {
-                    int32_t dx = static_cast<int32_t>(star->x) - current_star->x;
-                    int32_t dy = static_cast<int32_t>(star->y) - current_star->y;
+                    int32_t dx = (int32_t)star->x - current_star->x;
+                    int32_t dy = (int32_t)star->y - current_star->y;
 
                     if ((dx * dx + dy * dy) <= dist_sq_limit) {
                         return true;
@@ -185,8 +185,9 @@ namespace SHIPMOVE {
         }
 
         // Check range via wormhole if the destination star is visited
-        if (star->wormhole_star_id != -1) {
-            s_star_data* wormhole_star = &MOX::_star[star->wormhole_star_id];
+        int16_t wormhole_star_idx = star->wormhole_star_id;
+        if (wormhole_star_idx != -1) {
+            s_star_data* wormhole_star = &MOX::_star[wormhole_star_idx];
 
             if ((wormhole_star->visited >> ((uint8_t)player_idx & 0x1F)) & 1) {
                 if (Star_In_Range_Of_Player_Aux1_(wormhole_star, player_idx, dist)) {
@@ -287,7 +288,7 @@ namespace SHIPMOVE {
 
             uint8_t player_mask = (uint8_t)((uint32_t)1 << ((uint8_t)ship->owner & 0x1F));
 
-            for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 s_star_data* star = &MOX::_star[i];
                 int dist = GEO::Parsecs_Between_Points_(star->x, star->y, ship->x, ship->y);
 
@@ -350,14 +351,14 @@ namespace SHIPMOVE {
      * @param x Initial x-coordinate.
      * @param y Initial y-coordinate.
      */
-    int32_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y) {
+    int16_t __cdecl Create_Nonplayer_Ship_(int8_t owner, s_ship_design* design, int16_t x, int16_t y) {
         int16_t i;
 
         // Search for an available ship slot
         for (i = 0; i < MAX_SHIPS; ++i) {
             if (MOX::_ship[i].owner == MAX_PLAYERS) {
                 // Slot is free if status is 5 or it's beyond the current total count
-                if (MOX::_ship[i].status == 5 || i >= (int16_t)MOX::_NUM_SHIPS) {
+                if (MOX::_ship[i].status == 5 || i >= MOX::_NUM_SHIPS) {
                     break;
                 }
             }
@@ -367,7 +368,7 @@ namespace SHIPMOVE {
             return -1;
         }
 
-        if (i >= (int16_t)MOX::_NUM_SHIPS) {
+        if (i >= MOX::_NUM_SHIPS) {
             MOX::_NUM_SHIPS = i + 1;
         }
 
@@ -390,7 +391,7 @@ namespace SHIPMOVE {
         MOX::_ship[i].officer_index = -1;
         MOX::_ship[i].d.date_of_design = (uint16_t)MOX::_stardate;
 
-        return (int32_t)i;
+        return i;
     }
 
     /**
@@ -401,12 +402,12 @@ namespace SHIPMOVE {
         int8_t unused_direction;
 
         if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
-            for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 MOX::_star[i].just_visited = 0;
             }
         }
 
-        for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
 
             if (Ship_Is_Moving_(ship)) {
@@ -505,10 +506,10 @@ namespace SHIPMOVE {
      * Clears the just_built flag on AI-controlled ships.
      */
     void __cdecl Unmark_Just_Built_AI_Ships_() {
-        int32_t num_ships = (int32_t)MOX::_NUM_SHIPS;
+        int32_t num_ships = MOX::_NUM_SHIPS;
         s_ship_data* ship_array = MOX::_ship;
 
-        for (int32_t i = 0; i < num_ships; ++i) {
+        for (int16_t i = 0; i < num_ships; ++i) {
             s_ship_data& ship = ship_array[i];
 
             // AI players (owner 0-7) who aren't the primary human player
@@ -525,7 +526,7 @@ namespace SHIPMOVE {
      * @param star_idx Destination star index.
      */
     void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx) {
-        ship->location = (short)star_idx;
+        ship->location = star_idx;
         ship->status = 0;
         ship->x = MOX::_star[star_idx].x;
         ship->y = MOX::_star[star_idx].y;
@@ -651,7 +652,8 @@ namespace SHIPMOVE {
             }
 
             if (start_star_id >= 0) {
-                if (MOX::_star[start_star_id].wormhole_star_id == target_star_idx) {
+                int16_t wormhole_star_idx = MOX::_star[start_star_id].wormhole_star_id;
+                if (wormhole_star_idx == target_star_idx) {
                     move_info->uses_wormhole = 1;
                 }
 
@@ -744,10 +746,10 @@ namespace SHIPMOVE {
      * @param player_id Player index to exclude from the update.
      */
     void __cdecl Update_Ship_ETAs_(int16_t player_id) {
-        int num_ships = (int)MOX::_NUM_SHIPS;
+        int num_ships = MOX::_NUM_SHIPS;
         s_ship_data* ships = MOX::_ship;
 
-        for (int i = 0; i < num_ships; ++i) {
+        for (int16_t i = 0; i < num_ships; ++i) {
             s_ship_data* ship = &ships[i];
 
             // Only process ships that are active/moving and do not belong to player_id
@@ -801,7 +803,7 @@ namespace SHIPMOVE {
 
         // Mark player presence via ships
         if (MOX::_NUM_SHIPS > 0) {
-            for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                 s_ship_data* ship = &MOX::_ship[i];
                 // Only active ships with a valid owner count
                 if (ship->owner != (char)0xFF && ship->status == 0) {
@@ -812,10 +814,10 @@ namespace SHIPMOVE {
 
         // Mark player presence via colonies
         if (MOX::_NUM_COLONIES > 0) {
-            for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
                 s_colony* colony = &MOX::_colony[i];
                 if (colony->owner != (char)0xFF) {
-                    int star_index = MOX::_planet[colony->planet].star_index;
+                    int16_t star_index = MOX::_planet[colony->planet].star_index;
                     presence_mask[star_index] |= (1 << colony->owner);
                 }
             }
@@ -823,7 +825,7 @@ namespace SHIPMOVE {
 
         // Review stars and clear ignore_combat_ships flags where no longer applicable
         if (MOX::_NUM_STARS > 0) {
-            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 s_star_data* star = &MOX::_star[i];
 
                 if (star->ignore_combat_ships != 0) {
@@ -848,15 +850,15 @@ namespace SHIPMOVE {
      */
     bool __cdecl Player_Has_Ships_Pestering_Other_Player_(int player_idx, uint8_t colony_bit_idx) {
         s_ship_data* ship = MOX::_ship;
-        s_ship_data* ship_end = MOX::_ship + (int16_t)MOX::_NUM_SHIPS;
+        s_ship_data* ship_end = MOX::_ship + MOX::_NUM_SHIPS;
 
         for (; ship < ship_end; ++ship) {
             if ((int8_t)ship->owner == player_idx && ship->status == 0) {
-                int32_t star_idx = (int16_t)ship->location;
+                int16_t star_idx = ship->location;
                 uint8_t colony_mask = MOX::_star[star_idx].has_colony;
 
                 if (((colony_mask >> (colony_bit_idx & 0x1f)) & 1) != 0 &&
-                    ((colony_mask >> (static_cast<uint8_t>(player_idx) & 0x1f)) & 1) == 0) {
+                    ((colony_mask >> ((uint8_t)player_idx & 0x1f)) & 1) == 0) {
                     return true;
                 }
             }
@@ -887,7 +889,8 @@ namespace SHIPMOVE {
         }
 
         // Check wormhole link
-        if (start_star->wormhole_star_id == end_star_idx) {
+        int16_t wormhole_star_idx = start_star->wormhole_star_id;
+        if (wormhole_star_idx == end_star_idx) {
             return 1;
         }
 
@@ -903,7 +906,7 @@ namespace SHIPMOVE {
 
         if (!is_jumpgate_used) {
             // Black holes block travel unless jumpgates are used
-            if (struct_::Test_Bit_Field_(start_star->black_hole_blocks, (uint16_t)end_star_idx)) {
+            if (struct_::Test_Bit_Field_(start_star->black_hole_blocks, end_star_idx)) {
                 return -1;
             }
         }
@@ -951,7 +954,7 @@ namespace SHIPMOVE {
 
         if (player_idx != -1) {
             int32_t candidate_count = 0;
-            for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                 s_ship_data* ship = &MOX::_ship[i];
                 if (ship->owner == player_idx && ship->status == 1) {
                     candidate_count++;
@@ -970,7 +973,7 @@ namespace SHIPMOVE {
 
             msg.u.hyperspace_beast.ship_idx = ship_index;
             msg.u.hyperspace_beast.officer_idx = (int8_t)officer_index;
-            msg.u.hyperspace_beast.star_idx = (int8_t)(selected_ship->location + 12);
+            msg.u.hyperspace_beast.star_idx = selected_ship->location + 12;
 
             if (officer_index != -1) {
                 OFFICER::Move_Officer_To_Pool_(officer_index);
@@ -983,7 +986,7 @@ namespace SHIPMOVE {
                         s_ship_data* replacement_ship = nullptr;
                         bool found_similar = false;
 
-                        for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+                        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                             s_ship_data* ship = &MOX::_ship[i];
                             if (ship->owner == player_idx &&
                                 ship->status == selected_ship->status &&
@@ -1050,7 +1053,7 @@ namespace SHIPMOVE {
         int32_t candidate_count = 0;
         s_ship_data* selected_ship = nullptr;
 
-        for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->owner == player_idx && ship->status == 1 && ship->turns_left != 1) {
                 candidate_count++;
@@ -1061,15 +1064,15 @@ namespace SHIPMOVE {
         }
 
         if (selected_ship != nullptr) {
-            int32_t location = selected_ship->location;
+            int16_t location = selected_ship->location;
             int32_t x = selected_ship->x;
             int32_t y = selected_ship->y;
-            int32_t star_idx = location - SHIP_LOCATION_MOVING_OFFSET;
+            int16_t star_idx = location - SHIP_LOCATION_MOVING_OFFSET;
 
             wormhole->success = 1;
             wormhole->count = star_idx;
 
-            for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+            for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
                 s_ship_data* ship = &MOX::_ship[i];
                 if (ship->owner == player_idx &&
                     ship->status == 1 &&
@@ -1078,7 +1081,7 @@ namespace SHIPMOVE {
                     ship->location == location &&
                     ship->travelling_speed == selected_ship->travelling_speed) {
 
-                    Make_Ship_Arrive_At_Star_(ship, (int16_t)star_idx);
+                    Make_Ship_Arrive_At_Star_(ship, star_idx);
                     wormhole->dest_star_idx++;
                 }
             }

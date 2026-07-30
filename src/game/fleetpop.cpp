@@ -265,7 +265,7 @@ void __cdecl Reload_Fleet_Box_Data_(void) {
         return;
     }
 
-    int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(static_cast<int16_t>(MOX::_fleet_box_ship_stack));
+    int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
     int16_t num_icons = FLEETPOP::N_Fleet_Icons_(node_ptr);
     FLEETPOP::Fleet_Box_Data_(num_icons);
 }
@@ -401,7 +401,7 @@ bool __cdecl Can_Select_Fleet_Box_Ship_(int16_t icon_index) {
 }
 
 int16_t __cdecl Icon_Selection_Status_(int16_t icon_field_id) {
-    int16_t first_icon_idx = static_cast<int16_t>(MOX::_first_fleet_movement_icon);
+    int16_t first_icon_idx = MOX::_first_fleet_movement_icon;
     int16_t limit_idx = MOX::_fleet_icon_buttons_added + first_icon_idx;
 
     if (limit_idx > MOX::_fleet_box.count) {
@@ -1101,7 +1101,7 @@ void __cdecl Print_Fleet_Box_Info_() {
         break;
 
     case 2:
-        if (MOX::_NUM_STARS == static_cast<int16_t>(destination_star)) {
+        if (MOX::_NUM_STARS == destination_star) {
             strlcpy(text, HAROLD::H_Message_(0x68), sizeof(text));
         } else if (info_value == 1) {
             snprintf(text, sizeof(text), HAROLD::H_Message_(0x69), 1, MOX::_star[destination_star].name);
@@ -1462,7 +1462,7 @@ void __cdecl Get_Absolute_Location_Scan_Info_(
     int16_t absolute_location = HAROLD::Absolute_Location_(ship.location);
     uint16_t turns_left = static_cast<uint16_t>(static_cast<uint8_t>(ship.turns_left));
 
-    if (static_cast<uint16_t>(absolute_location) != static_cast<uint16_t>(MOX::_NUM_STARS)) {
+    if (absolute_location != MOX::_NUM_STARS) {
         if (!HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, absolute_location)) {
             *value = static_cast<int16_t>(turns_left);
             *info_type = 3;
@@ -1493,7 +1493,7 @@ uint8_t __cdecl Set_Build_Outpost_Button_Flag_(int16_t ship_count) {
     }
 
     bool valid_offset_location = false;
-    if (location > SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_WORMHOLE_OFFSET + MAX_STARS) {
+    if (location > SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_LIMIT) {
         valid_offset_location = true;
     }
 
@@ -1562,7 +1562,7 @@ int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count) {
 
     bool needs_xy_to_star = false;
     if (star_idx > SHIP_LOCATION_WORMHOLE_OFFSET) {
-        needs_xy_to_star = (star_idx < SHIP_LOCATION_WORMHOLE_OFFSET + MAX_STARS);
+        needs_xy_to_star = (star_idx < SHIP_LOCATION_LIMIT);
     }
 
     if (needs_xy_to_star) {
@@ -1637,7 +1637,7 @@ bool __cdecl Set_Attack_Antares_Button_Flag_(void) {
                     }
 
                     ++ship_slot;
-                } while (ship_slot < (int16_t)MOX::_NUM_SHIPS && !found_matching_ship);
+                } while (ship_slot < MOX::_NUM_SHIPS && !found_matching_ship);
             }
 
             if (found_matching_ship) {
@@ -1663,7 +1663,7 @@ int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {
 
     int16_t star_index = MOX::_ship[ship_idx].location;
     const bool is_at_star = (star_index > -1) && (star_index < SHIP_LOCATION_MOVING_OFFSET);
-    const bool is_in_transit_to_star = (star_index > SHIP_LOCATION_WORMHOLE_OFFSET) && (star_index < SHIP_LOCATION_WORMHOLE_OFFSET + MAX_STARS);
+    const bool is_in_transit_to_star = (star_index > SHIP_LOCATION_WORMHOLE_OFFSET) && (star_index < SHIP_LOCATION_LIMIT);
 
     if (is_in_transit_to_star) {
         star_index -= SHIP_LOCATION_WORMHOLE_OFFSET;
@@ -1760,7 +1760,7 @@ int8_t __cdecl Set_Engage_Enemy_Forces_Flag_(int16_t ship_count) {
   int16_t star_idx = MOX::_ship[primary_ship_idx].location;
 
   const bool is_at_star = (star_idx > -1) && (star_idx < SHIP_LOCATION_MOVING_OFFSET);
-  const bool is_at_xy_star = (star_idx > SHIP_LOCATION_WORMHOLE_OFFSET) && (star_idx < SHIP_LOCATION_WORMHOLE_OFFSET + MAX_STARS);
+  const bool is_at_xy_star = (star_idx > SHIP_LOCATION_WORMHOLE_OFFSET) && (star_idx < SHIP_LOCATION_LIMIT);
 
   if (is_at_xy_star) {
     star_idx = HAROLD::XY_To_Star_Id_(MOX::_ship[primary_ship_idx].x, MOX::_ship[primary_ship_idx].y);

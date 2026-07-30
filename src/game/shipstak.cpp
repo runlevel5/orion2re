@@ -64,7 +64,7 @@ namespace SHIPSTAK {
             }
 
             bool found_stack = false;
-            for (int16_t j = 0; j < (int16_t)MOX::_ship_stack_count; ++j) {
+            for (int16_t j = 0; j < MOX::_ship_stack_count; ++j) {
                 int16_t first_node_idx = MOX::_ship_stack_start[j];
                 int16_t first_ship_idx = MOX::_ship_node[first_node_idx].ship_idx;
 
@@ -108,13 +108,13 @@ namespace SHIPSTAK {
             Remove_Non_Detected_Ships_();
         }
 
-        for (int16_t j = 0; j < (int16_t)MOX::_ship_stack_count; ++j) {
+        for (int16_t j = 0; j < MOX::_ship_stack_count; ++j) {
             Sort_Ships_In_Stack_(MOX::_ship_stack_start[j]);
         }
     }
 
     void __cdecl Remove_Non_Detected_Ships_() {
-        const int16_t player_num = (int16_t)MOX::_PLAYER_NUM;
+        const int16_t player_num = MOX::_PLAYER_NUM;
         int16_t scan_range = 2;
 
         if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_TACHYON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
@@ -127,7 +127,7 @@ namespace SHIPSTAK {
             scan_range = 9;
         }
 
-        for (int16_t stack_idx = 0; stack_idx < (int16_t)MOX::_ship_stack_count; ++stack_idx) {
+        for (int16_t stack_idx = 0; stack_idx < MOX::_ship_stack_count; ++stack_idx) {
             int16_t* stack_head_ptr = &MOX::_ship_stack_start[stack_idx];
             int16_t stack_head_node = *stack_head_ptr;
 
@@ -135,11 +135,11 @@ namespace SHIPSTAK {
             if ((int16_t)(int8_t)stack_head_ship.owner != player_num) {
                 int16_t best_detection = -300;
 
-                for (int16_t colony_idx = 0; colony_idx < (int16_t)MOX::_NUM_COLONIES; ++colony_idx) {
+                for (int16_t colony_idx = 0; colony_idx < MOX::_NUM_COLONIES; ++colony_idx) {
                     const s_colony& colony = MOX::_colony[colony_idx];
                     if ((int16_t)(int8_t)colony.owner == player_num) {
-                        const s_star_data& colony_star =
-                            MOX::_star[MOX::_planet[colony.planet].star_index];
+                        const int16_t colony_star_idx = MOX::_planet[colony.planet].star_index;
+                        const s_star_data& colony_star = MOX::_star[colony_star_idx];
 
                         int16_t range_steps = (int16_t)((special::Range_(
                                                              stack_head_ship.x,
@@ -170,7 +170,7 @@ namespace SHIPSTAK {
                     }
                 }
 
-                for (int16_t other_ship_idx = 0; other_ship_idx < (int16_t)MOX::_NUM_SHIPS; ++other_ship_idx) {
+                for (int16_t other_ship_idx = 0; other_ship_idx < MOX::_NUM_SHIPS; ++other_ship_idx) {
                     const s_ship_data& other_ship = MOX::_ship[other_ship_idx];
                     if ((int16_t)(int8_t)other_ship.owner == player_num && (int8_t)other_ship.status < 3) {
                         int16_t range_steps = (int16_t)((special::Range_(

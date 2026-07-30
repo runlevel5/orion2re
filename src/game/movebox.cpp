@@ -436,7 +436,7 @@ namespace MOVEBOX {
     }
 
     void __cdecl Box_Officer_Screen_Scanned_Star_() {
-        const int32_t scanned_star_index = static_cast<int32_t>(MOX::_galaxy_map_scanned_star);
+        const int16_t scanned_star_index = MOX::_galaxy_map_scanned_star;
         s_star_data* const scanned_star = &MOX::_star[scanned_star_index];
         const int32_t map_scale = static_cast<int32_t>(MOX::_max_map_scale);
 

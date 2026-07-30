@@ -175,7 +175,7 @@ struct s_aidesign_ship_design {
 typedef struct s_aidudes_colony_info s_aidudes_colony_info, *Ps_aidudes_colony_info;
 
 struct s_aidudes_colony_info {
-    uint8_t colony_idx;
+    int16_t colony_idx;
     uint8_t n_farmers;
     uint8_t n_workers;
     uint8_t first_assignable_pop_idx;
@@ -204,7 +204,7 @@ struct s_aimove_intercept_player {
 };
 
 struct s_aimove_intercept_entry {
-    int32_t star_idx;
+    int16_t star_idx;
     uint16_t player_mask;
     uint8_t min_eta;
     int32_t strength[10];
@@ -214,7 +214,7 @@ struct s_aimove_intercept_entry {
 typedef struct s_aimove_npc_dest s_aimove_npc_dest, *Ps_aimove_npc_dest;
 
 struct s_aimove_npc_dest {
-    uint8_t star_idx;
+    int16_t star_idx;
     uint8_t dist;
     uint8_t has_lucky;
     uint8_t has_unlucky;
@@ -339,7 +339,7 @@ struct s_battle_results_info {
 
 struct s_combat_bomb_result {
     int8_t attacker_idx;
-    uint8_t colony_idx;
+    int16_t colony_idx;
     int8_t is_planetary_hit;
     int16_t bomb_hits_remaining;
     int8_t is_bio_weapon;
@@ -357,7 +357,7 @@ struct s_combat_bomb_result {
 
 struct s_net_player_info {
     int8_t player_state;
-    uint8_t combat_star_id;
+    int16_t combat_star_id;
     int16_t combat_defender_id;
     int16_t combat_planet_id;
     int16_t combat_target_player_id;
@@ -653,7 +653,7 @@ struct s_combat_data {
     int16_t special_hits[8];
     int16_t shield_current_hits;
     int8_t black_hole_flag;
-    int8_t black_hole_source_idx;
+    uint8_t black_hole_source_idx;
     uint8_t previous_owner;
 };
 
@@ -1502,7 +1502,7 @@ struct s_MSG_artemis {
 };
 
 struct s_MSG_artifacts {
-    uint8_t star_idx;
+    int16_t star_idx;
     int8_t tech1;
     int8_t tech2;
 };
@@ -1512,20 +1512,20 @@ struct s_MSG_scrap_leader {
 };
 
 struct s_MSG_failed_retreat {
-    int8_t star_idx;
+    int16_t star_idx;
     int8_t reason;
     int16_t ships_lost;
     int8_t leader_count;
 };
 
 struct s_MSG_artemis_leader {
-    int8_t star_idx;
+    int16_t star_idx;
     int8_t leader_idx;
     int8_t fate;
 };
 
 struct s_MSG_eel {
-    uint8_t star_idx;
+    int16_t star_idx;
 };
 
 struct s_MSG_scrap_ship {
@@ -1536,7 +1536,7 @@ struct s_MSG_scrap_ship {
 
 struct s_MSG_hyperspace_beast {
     int16_t ship_idx;
-    int8_t star_idx;
+    int16_t star_idx;
     int8_t officer_idx;
     int8_t leader_status;
     int8_t fate;
@@ -1587,7 +1587,7 @@ union s_MSG_colony_union {
 };
 
 struct s_MSG_colony {
-    uint8_t planet_idx;
+    int16_t planet_idx;
     int8_t subtype;
     union s_MSG_colony_union c;
 };
@@ -1617,7 +1617,7 @@ struct s_MSG_spy_assasination {
 };
 
 struct s_MSG_anomaly {
-    uint8_t star_idx;
+    int16_t star_idx;
 };
 
 union s_MSG_union {
@@ -1748,9 +1748,8 @@ struct s_ship_design {
 };
 
 struct s_settler_info {
-    // Packed transit-settler record used as a raw dword by the original code:
-    // bits 0-7 source_colony, 8-15 dest_planet, 16-19 race, 20-23 eta, 24-25 job.
-    uint32_t val;
+    // bits 0-15 source_colony, 16-31 dest_planet, 32-35 race, 36-39 eta, 40-41 job.
+    SETTLER::value_type val;
 };
 
 struct s_player {
@@ -1814,7 +1813,7 @@ struct s_player {
     int8_t n_times_established_contact[MAX_PLAYERS];
     sbyte within_range[MAX_PLAYERS];
     int8_t do_not_research;
-    int8_t offensive_stagepoint;
+    int16_t offensive_stagepoint;
     int8_t best_ftl_drive;
     uint8_t ship_speed;
     int8_t officer_for_hire;
@@ -1942,7 +1941,7 @@ typedef struct s_net_pack_monster_update s_net_pack_monster_update, *Ps_net_pack
 
 struct s_net_pack_monster_update {
     int32_t param_1;
-    int32_t param_2;
+    int16_t param_2;
     int32_t param_3;
 };
 
@@ -2115,7 +2114,7 @@ struct s_network {
     undefined field107_0x179;
     undefined field108_0x17a;
     uint8_t sync_state;
-    int8_t combat_star_id;
+    int16_t combat_star_id;
     int16_t combat_defender_id;
     int16_t combat_planet_id;
     int16_t combat_target_player_id;
@@ -2172,7 +2171,7 @@ struct s_network {
     undefined field165_0x206;
     int8_t diplomacy_initiator_id;
     int8_t diplomacy_active_flag;
-    undefined field168_0x209;
+    int16_t field168_0x209;
     uint32_t cur_session_id;
 };
 
@@ -2230,7 +2229,7 @@ typedef struct s_planet_data s_planet_data, *Ps_planet_data;
 
 struct s_planet_data {
     int16_t colony_index;
-    int8_t star_index;
+    int16_t star_index;
     int8_t orbit;
     int8_t planet_type;
     int8_t size;
@@ -2413,14 +2412,14 @@ typedef struct s_report_enemy_sabotage s_report_enemy_sabotage, *Ps_report_enemy
 
 struct s_report_enemy_sabotage {
     int16_t enemy_player_idx;
-    uint8_t planet_idx;
+    int16_t planet_idx;
     uint8_t building_id;
 };
 
 struct s_report_sabotage {
     int8_t framed_player_idx;
     uint8_t victim_player_idx;
-    uint8_t planet_idx;
+    int16_t planet_idx;
     uint8_t building_id;
 };
 
@@ -3061,7 +3060,7 @@ struct s_star_data {
     int8_t last_planet_selected[MAX_PLAYERS];
     int8_t black_hole_blocks[BITMAP(MAX_STARS)];
     int8_t system_special;
-    int8_t wormhole_star_id;
+    int16_t wormhole_star_id;
     uint8_t blockaded;
     uint8_t blockaded_by[MAX_PLAYERS];
     uint8_t visited;
@@ -3071,7 +3070,7 @@ struct s_star_data {
     int8_t colonize_player;
     uint8_t has_colony;
     uint8_t has_warp_field_interdictor;
-    uint8_t next_wfi_in_list;
+    int16_t next_wfi_in_list;
     uint8_t has_tachyon;
     uint8_t has_subspace;
     uint8_t has_stargate;
@@ -3093,7 +3092,7 @@ struct s_star_data {
 typedef struct s_star_weight s_star_weight, *Ps_star_weight;
 
 struct s_star_weight {
-    uint8_t star_idx;
+    int16_t star_idx;
     uint8_t weight;
 };
 
@@ -3210,8 +3209,8 @@ typedef struct s_wormhole_data s_wormhole_data, *Ps_wormhole_data;
 
 struct s_wormhole_data {
     uint8_t success;
-    int32_t dest_star_idx;
-    int32_t count;
+    int16_t dest_star_idx;
+    int16_t count;
 };
 
 struct s_palette_header {
