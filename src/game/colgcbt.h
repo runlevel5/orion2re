@@ -183,7 +183,7 @@ namespace COLGCBT {
      * Runs the colony ground-combat presentation loop for one invasion result.
      * @param attacker Attacking side summary and troop data.
      * @param defender Defending side summary and troop data.
-     * @param seed Random seed used to replay the combat presentation.
+     * @param seed Random seed used to simulate the combat presentation.
      * @param colony_idx Colony index whose background and state should be displayed.
      */
     void __cdecl Colony_Combat_Screen_(s_invasion_side_info* attacker, s_invasion_side_info* defender, uint32_t seed, int16_t colony_idx);

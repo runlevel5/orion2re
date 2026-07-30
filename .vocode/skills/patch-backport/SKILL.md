@@ -61,6 +61,39 @@ Decompiler output is only a hint. Validate behavior against disassembly, control
 
 The patcher's `off` value may be an executable file offset rather than a loaded Ghidra address. Never use it as a Ghidra address without proving the mapping. Resolve it through program memory-block source information, known symbols, patch tooling, or a verified file-offset-to-address mapping.
 
+### Resolving `asm.pl` offsets to Ghidra addresses
+
+Use the patcher's section metadata whenever available. In MOO2150 this is commonly defined in `src/binary-header.pl` through `section_offset`, `section_base`, and `section_length`.
+
+For an `asm.pl` file offset `off`:
+
+1. Find the section whose file range contains it:
+
+   ```text
+   section_offset <= off < section_offset + section_length
+   ```
+
+2. Convert it to the loaded address:
+
+   ```text
+   address = section_base + (off - section_offset)
+   ```
+
+3. Prove the mapping rather than relying on the formula alone:
+   - map at least one nearby symbol from `src/symbols.pl` to the symbol address in Ghidra
+   - compare the `cchunk` bytes or instructions at the calculated address
+   - confirm that the containing function and call targets match the patch description
+   - inspect references to relevant globals and callees
+
+Additional tips:
+
+- First identify the patcher's actual base executable from `source_input_file`; do not infer it from the currently open program's filename.
+- If Ghidra memory blocks expose file-byte source information, use it as independent confirmation of the mapping. XML or reconstructed imports may have no file-byte mappings, in which case patcher metadata plus symbols and bytes are required.
+- Distinguish executable file offsets, section-relative offsets, loaded addresses, and runtime pointers. Document which kind each value represents.
+- LE loader relocation can change loaded address operands even when the underlying code is the same. Validate relocated instructions semantically and compare stable opcode bytes or the original file when necessary.
+- A version-label or digest difference is not sufficient to declare code equivalent. Require documented version equivalence or exact matches for every affected instruction sequence and its surrounding control flow.
+- If more than one mapping fits, or any affected `cchunk` still fails to match, stop and ask the user instead of choosing the nearest address.
+
 ## Mandatory process
 
 ### 1. Confirm Ghidra and target program
@@ -164,6 +197,11 @@ Present the user with:
 4. A file-by-file implementation plan.
 5. Focused suggested diffs for every proposed source, test, and documentation edit.
 6. Assumptions, compatibility effects, and validation commands.
+
+Before the suggested diffs, include two short implementation paragraphs:
+
+- **Original patch implementation:** state concretely what the selected `asm.pl` edits do, including saved/restored state, changed instructions, wrappers, diversions, and added code or data that matter to the behavior.
+- **Proposed source implementation:** when the source-level fix differs from the original binary implementation, explain how it enforces the same invariant in the restored code and why the binary mechanism is unnecessary or inappropriate. If it is equivalent in structure, say so explicitly.
 
 Suggested diffs must be based on complete current file contents, not summaries. Keep them focused; do not print complete files.
 

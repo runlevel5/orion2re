@@ -25,7 +25,7 @@ Sources:
 
 ### Economy and production
 
-- [ ] Credit cheat: under some conditions a colony can both generate Trade Goods income and still keep production toward a build item in the same turn. Historical patch 1.40 handled the bug with a DOS-side next-turn call-order change. A previous source-level workaround cleared `production_spent` for Trade Goods, Housing, and no selected product, but that changed original save-state semantics and caused oracle mismatches, so it was removed pending a restoration-compatible implementation.
+- [ ] Credit cheat: under some conditions a colony can both generate Trade Goods income and still keep production toward a build item in the same turn. Historical patch 1.40 handled the bug with a DOS-side next-turn call-order change. A previous source-level workaround cleared `production_spent` for Trade Goods, Housing, and no selected product, but that changed original save-state semantics, so it was removed pending a correct implementation.
 - [x] Repeat Build cancel exploit: a bought repeat-build item can be canceled to convert money into stored production. Fixed in source by clearing `bought_outright` whenever build-queue edits change `producing[0]` as the popup commits back to the colony, so purchased production cannot transfer to a different front item. Historical patch 1.40 handled this at the UI level by blocking cancellation or movement of the first queue item after an outright purchase; source now enforces the accounting invariant directly instead of relying only on popup restrictions.
 
 ### Colony and galaxy state
@@ -77,7 +77,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 
 ### Backport audit
 
-- [ ] `asm.pl:307` - `artemis strategic combat fix`
+- [x] `asm.pl:307` - `artemis strategic combat fix`: fixed in `COMBAT::Strategic_Combat_()` by keeping the loaded attacker-slot count separate from the live post-Artemis survivor count when deriving defenders; this replaces the 1.50 save/restore and ghost-balance assembly workaround with direct source-level accounting.
 - [ ] `asm.pl:397` - `plasma torpedo`
 - [ ] `asm.pl:475` - `outpost ship prohibits colonizing bug`
 - [ ] `asm.pl:511` - `artifacts click bonus`

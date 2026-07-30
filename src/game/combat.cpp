@@ -68,7 +68,8 @@ namespace COMBAT {
         Get_Leader_Combat_Bonuses_(plr1_ships, plr1_ship_count, &bonus1, &bonus2, &leader_combat_bonuses[MOX::_combat_attacker_player], &bonus3, &bonus4);
         Qload_Ships_(plr1_ships, plr1_ship_count, bonus1, bonus2, bonus3, bonus4);
 
-        MOX::_combat_attacker_count = MOX::_combat_total_ship_count - 1;
+        const int16_t attacker_ship_count = MOX::_combat_total_ship_count - 1;
+        MOX::_combat_attacker_count = attacker_ship_count;
 
         int16_t result = 0;
         int16_t colony_defense_flags = 0;
@@ -98,7 +99,7 @@ namespace COMBAT {
                 Qload_Ships_(plr2_ships, plr2_ship_count, bonus1, bonus2, bonus3, bonus4);
             }
 
-            MOX::_combat_defender_count = MOX::_combat_total_ship_count - MOX::_combat_attacker_count;
+            MOX::_combat_defender_count = MOX::_combat_total_ship_count - attacker_ship_count;
             if (MOX::_colony_defense_flags == 0) {
                 MOX::_combat_defender_count--;
             }

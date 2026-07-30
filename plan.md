@@ -5,10 +5,6 @@
 
   * [ ] Add helpers to work with pops instead of using raw bit operations
 
-* Oracle verification
-
-  * [ ] Reconstruct or normalize movable-box state for isolated turn replay. Turn-boundary saves serialize an open system box ID, but the original game does not reconstruct the visible box when that save is loaded; isolated replay can therefore differ from continuous replay in the saved movable-box ID.
-
 * Networking
 
   * [ ] Add a server-side handshake timeout so accepted TCP clients must send HELLO promptly or be disconnected.
