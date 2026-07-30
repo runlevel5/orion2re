@@ -65,7 +65,7 @@ void __cdecl Search_For_Battles_() {
     for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
         s_ship_data* ship = &MOX::_ship[i];
         int16_t loc = ship->location;
-        if (loc < MAX_STARS) {
+        if (loc >= 0 && loc < MOX::_NUM_STARS) {
             if (ship->status == 0) {
                 int8_t owner = ship->owner;
                 if (owner < MAX_PLAYERS) {

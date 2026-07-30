@@ -1051,12 +1051,21 @@ namespace HAROLD {
         return default_galaxy_size;
     }
 
+    bool __cdecl Has_Massive_Star_Count_() {
+        return MAP_SCALE::Uses_Extended_Scaling_(MOX::_NUM_STARS, ORIGINAL_MAX_STARS);
+    }
+
+    int16_t __cdecl Map_Star_Scale_Percent_() {
+        return MAP_SCALE::Star_Scale_Percent_(MOX::_NUM_STARS, ORIGINAL_MAX_STARS, MOX::_cur_map_scale);
+    }
+
     int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx) {
         int8_t star_size = MOX::_star[star_idx].size;
         int16_t zoom_offset = Map_Scale_To_Zoom_Level_();
 
         int16_t combined_index = (int16_t)(zoom_offset + (int16_t)star_size);
-        return static_cast<int16_t>(MOX::_star_fields_dim[combined_index]);
+        int16_t field_size = static_cast<int16_t>(MOX::_star_fields_dim[combined_index]);
+        return MAP_SCALE::Scale_Star_Dimension_(field_size, Map_Star_Scale_Percent_());
     }
 
     /**
@@ -1073,6 +1082,10 @@ namespace HAROLD {
     int16_t __cdecl Map_Scale_To_Zoom_Level_() {
         int16_t max_zoom = MOX::_max_zoom_count;
         int16_t scale = MOX::_cur_map_scale;
+
+        if (Has_Massive_Star_Count_()) {
+            return MAP_SCALE::Extended_Zoom_Level_For_Scale_(scale, MOX::_max_map_scale, max_zoom);
+        }
 
         if (scale == 10) {
             if (max_zoom >= 0) {
@@ -1126,7 +1139,9 @@ namespace HAROLD {
     int16_t __cdecl Get_Map_Scale_(int16_t layer_type) {
         int16_t scale;
 
-        if (layer_type == 0) {
+        if (Has_Massive_Star_Count_()) {
+            scale = MAP_SCALE::Extended_Scale_For_Zoom_Level_(MOX::_max_map_scale, MOX::_max_zoom_count, layer_type);
+        } else if (layer_type == 0) {
             scale = MOX::_max_map_scale;
             if (scale >= 10) {
                 scale = 10;
@@ -1143,15 +1158,9 @@ namespace HAROLD {
             }
         } else {
             scale = MOX::_max_map_scale;
-#if MAX_STARS > ORIGINAL_MAX_STARS
-            if (MOX::_settings.galaxy_size != GALAXY_SIZE_MAXIMUM && scale >= 30) {
-                scale = 30;
-            }
-#else
             if (scale >= 30) {
                 scale = 30;
             }
-#endif
         }
 
         // If the resulting scale is unconstrained (equals the max), reset background star shifts

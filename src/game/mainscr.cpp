@@ -3,6 +3,49 @@
 namespace MAINSCR {
     constexpr uint32_t k_max_game_data_payload_bytes = NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES;
 
+    namespace {
+        int16_t Scaled_Star_Map_Dimension_(int16_t dimension) {
+            return MAP_SCALE::Scale_Star_Dimension_(dimension, HAROLD::Map_Star_Scale_Percent_());
+        }
+
+        bool Is_Extended_Max_Map_View_() {
+            return MAP_SCALE::Is_Extended_Max_Map_View_(
+                MOX::_NUM_STARS,
+                ORIGINAL_MAX_STARS,
+                MOX::_cur_map_scale,
+                MOX::_max_map_scale
+            );
+        }
+
+        void Draw_Scaled_Star_Picture_(
+            int16_t center_x,
+            int16_t center_y,
+            int16_t unscaled_dimension,
+            s_animation_header* picture
+        ) {
+            int16_t scale_percent = HAROLD::Map_Star_Scale_Percent_();
+            if (scale_percent >= 100) {
+                animate::Draw_(center_x - unscaled_dimension / 2, center_y - unscaled_dimension / 2, picture);
+                return;
+            }
+
+            allocate::Push_Block_(MOX::_screen_seg);
+            uint32_t source_size = bitmap::Get_Bitmap_Size_(picture->width, picture->height);
+            s_animation_header* source_bitmap = static_cast<s_animation_header*>(
+                allocate::Allocate_Next_Block_(MOX::_screen_seg, source_size)
+            );
+            s_animation_header* scaled_bitmap = static_cast<s_animation_header*>(
+                allocate::Allocate_Next_Block_(MOX::_screen_seg, source_size)
+            );
+
+            bitmap::Draw_Picture_To_Bitmap_(source_bitmap, picture);
+            bitmap::Scale_Bitmap_(scaled_bitmap, source_bitmap, scale_percent, scale_percent);
+            animate::Draw_(center_x - scaled_bitmap->width / 2, center_y - scaled_bitmap->height / 2, scaled_bitmap);
+
+            allocate::Pop_Block_(MOX::_screen_seg);
+        }
+    }
+
     int16_t _zoom_in_button;
     int16_t _zoom_out_button;
     int16_t _whole_screen_field;
@@ -110,7 +153,8 @@ namespace MAINSCR {
     }
 
     void __cdecl Draw_Influence_Overlay_() {
-        if (_influence_view_mode == 0) {
+        const bool draw_automatic_outline = Is_Extended_Max_Map_View_();
+        if (_influence_view_mode == 0 && !draw_automatic_outline) {
             return;
         }
 
@@ -208,7 +252,7 @@ namespace MAINSCR {
             cached_star_count = MOX::_NUM_STARS;
         }
 
-        if (_influence_view_mode == 1) {
+        if (_influence_view_mode == 1 && !draw_automatic_outline) {
             for (int16_t y = 0; y < map_height; ++y) {
                 for (int16_t x = 0; x < map_width; ++x) {
                     const uint8_t owners = influence_owners[y][x];
@@ -417,12 +461,8 @@ namespace MAINSCR {
         int16_t screen_y;
         Get_Star_Draw_Coords_(star_idx, &screen_x, &screen_y);
 
-        screen_x -= zoom_size / 2;
-        screen_y -= zoom_size / 2;
-
         if (static_cast<int8_t>(star->twinkling1) < 0) {
             animate::Reset_Animation_Frame_(star_seg);
-            animate::Draw_(screen_x, screen_y, star_seg);
         } else {
             int8_t twinkling1 = (int8_t)(star->twinkling1 + 1);
             star->twinkling1 = twinkling1;
@@ -442,11 +482,16 @@ namespace MAINSCR {
             }
 
             animate::Set_Animation_Frame_(star_seg, current_frame);
-            animate::Draw_(screen_x, screen_y, star_seg);
         }
+
+        Draw_Scaled_Star_Picture_(screen_x, screen_y, zoom_size, star_seg);
     }
 
     void __cdecl Print_Star_Names_() {
+        if (Is_Extended_Max_Map_View_()) {
+            return;
+        }
+
         int16_t window_status;
         int8_t star_type;
         s_animation_header* star_data;
@@ -643,7 +688,7 @@ namespace MAINSCR {
     }
 
     void __cdecl Draw_Black_Holes_() {
-        int16_t zoom_dist[4] = { 0x27, 0x21, 0x21, 0x18 };
+        static const int16_t zoom_dist[4] = { 0x27, 0x21, 0x21, 0x18 };
         int16_t window_status;
         int16_t star_idx;
         int16_t black_hole_slot = 0;
@@ -659,25 +704,25 @@ namespace MAINSCR {
                 if (MOX::_star[star_idx].spectral_class == STAR_CLASS_BLACK_HOLE) {
                     Get_Star_Draw_Coords_(star_idx, &x, &y);
 
-                    int16_t offset = zoom_dist[zoom_level] / 2;
-                    x -= offset;
-                    y -= offset;
-
                     s_animation_header* seg = Get_Star_Picture_Seg_(
                         MOX::_star[star_idx].spectral_class,
                         MOX::_star[star_idx].pict_type,
                         MOX::_star[star_idx].size
                     );
 
-                    int16_t slot = black_hole_slot;
-                    int8_t count = MOX::_black_hole_anim_count[slot];
-                    int16_t frame_count = animate::Get_Animation_Frame_Count_(seg);
+                    int16_t scale_percent = HAROLD::Map_Star_Scale_Percent_();
+                    if (MAP_SCALE::Advance_Black_Hole_Animation_(scale_percent)) {
+                        int16_t slot = black_hole_slot;
+                        int8_t count = MOX::_black_hole_anim_count[slot];
+                        int16_t frame_count = animate::Get_Animation_Frame_Count_(seg);
+                        int8_t new_count = (int8_t)((count + 1) % (frame_count * 2));
+                        MOX::_black_hole_anim_count[slot] = new_count;
+                        animate::Set_Animation_Frame_(seg, new_count / 2);
+                    } else {
+                        animate::Set_Animation_Frame_(seg, 0);
+                    }
 
-                    int8_t new_count = (int8_t)((count + 1) % (frame_count * 2));
-                    MOX::_black_hole_anim_count[slot] = new_count;
-
-                    animate::Set_Animation_Frame_(seg, new_count / 2);
-                    animate::Draw_(x, y, seg);
+                    Draw_Scaled_Star_Picture_(x, y, zoom_dist[zoom_level], seg);
 
                     black_hole_slot++;
                 }
@@ -1554,6 +1599,10 @@ namespace MAINSCR {
     }
 
     void __cdecl Print_Highlighted_Star_Name_(int16_t star_idx) {
+        if (Is_Extended_Max_Map_View_()) {
+            return;
+        }
+
         int16_t window_status_cookie;
         int8_t is_highlighted;
         char star_name[32];
@@ -1662,7 +1711,7 @@ namespace MAINSCR {
             int32_t dy = (int32_t)screen_y - (int32_t)y;
             int32_t dist_sq = dx * dx + dy * dy;
 
-            int32_t threshold = thresholds[(int32_t)star.size];
+            int32_t threshold = Scaled_Star_Map_Dimension_(static_cast<int16_t>(thresholds[(int32_t)star.size]));
             if (dist_sq <= threshold * threshold) {
                 MOX::_mouse_XY.star_idx = star_idx;
                 MOX::_mouse_XY.selected = selected;
@@ -2472,12 +2521,15 @@ namespace MAINSCR {
             int16_t radius;
 
             if (MOX::_star[star_idx].spectral_class == STAR_CLASS_BLACK_HOLE) {
-                radius = zoom_radii[scale];
+                radius = Scaled_Star_Map_Dimension_(zoom_radii[scale]);
             } else {
                 radius = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
             }
 
             int16_t adjusted_radius = (radius / 2) - 2;
+            if (adjusted_radius < 2) {
+                adjusted_radius = 2;
+            }
 
             MOX::_star_button[star_idx] = fields::Add_Clipped_Circle_Field_(
                 x_coord, y_coord, adjusted_radius, "", '\0'
@@ -2879,12 +2931,6 @@ namespace MAINSCR {
         star_range_by_size[1] = 10;
         star_range_by_size[2] = 8;
 
-        int16_t zoom_box_sizes[4];
-        zoom_box_sizes[0] = 39;
-        zoom_box_sizes[1] = 33;
-        zoom_box_sizes[2] = 33;
-        zoom_box_sizes[3] = 24;
-
         bool star_processed = false;
         _moving_a_stack = 0;
 
@@ -2896,11 +2942,11 @@ namespace MAINSCR {
             int16_t star_draw_x, star_draw_y;
             Get_Star_Draw_Coords_(star_idx, &star_draw_x, &star_draw_y);
 
-            int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
             int16_t box_size;
 
             if (MOX::_star[star_idx].spectral_class == STAR_CLASS_BLACK_HOLE) {
-                box_size = zoom_box_sizes[zoom_level];
+                static const int16_t zoom_box_sizes[4] = { 39, 33, 33, 24 };
+                box_size = Scaled_Star_Map_Dimension_(zoom_box_sizes[HAROLD::Map_Scale_To_Zoom_Level_()]);
             } else {
                 box_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
             }
@@ -2909,7 +2955,9 @@ namespace MAINSCR {
             int32_t dy = (int32_t)star_draw_y - (int32_t)mouse_y;
             int32_t dist_sq = (dx * dx) + (dy * dy);
 
-            int32_t range = star_range_by_size[(int32_t)MOX::_star[star_idx].size];
+            int32_t range = Scaled_Star_Map_Dimension_(
+                static_cast<int16_t>(star_range_by_size[(int32_t)MOX::_star[star_idx].size])
+            );
             if (dist_sq <= (range * range) && MOX::_mouse_XY.hovering_ship_icon_idx == -1) {
                 s_colors font_colors;
                 font_colors.colors[0] = 0;

@@ -88,33 +88,25 @@ namespace MSG_ {
     }
 
     void __cdecl Add_Msg_(s_MSG msg, int16_t plr_idx) {
-        if (_max_msgs[plr_idx] == 0) {
+        if (plr_idx < 0 || plr_idx >= MAX_PLAYERS) {
             return;
         }
 
-        uint8_t count = _n_msgs[plr_idx];
-
-        if (count < _max_msgs[plr_idx]) {
-            int index = _first_msg[plr_idx] + count;
-            _msgs[index] = msg;
-            _n_msgs[plr_idx] = count + 1;
-        } else {
-            s_MSG* lowest_priority_msg = &_msgs[_first_msg[plr_idx]];
-            s_MSG* current = lowest_priority_msg + 1;
-
-            // Note: The original assembly uses a shifting window comparison loop 'current < lowest_priority_msg + count + 1'
-            // resulting in potential buffer overrun into adjacent player message slots or uninitialized data.
-            while (current < lowest_priority_msg + count + 1) {
-                if (current->priority < lowest_priority_msg->priority) {
-                    lowest_priority_msg = current;
-                }
-                current++;
-            }
-
-            if (msg.priority > lowest_priority_msg->priority) {
-                *lowest_priority_msg = msg;
-            }
+        const int16_t first_msg = _first_msg[plr_idx];
+        if (first_msg < 0 || first_msg >= MAX_MESSAGES) {
+            return;
         }
+
+        int16_t capacity = _max_msgs[plr_idx];
+        const int16_t remaining_capacity = MAX_MESSAGES - first_msg;
+        if (capacity > remaining_capacity) {
+            capacity = remaining_capacity;
+        }
+        if (capacity <= 0) {
+            return;
+        }
+
+        MSG_QUEUE::Add_(&_msgs[first_msg], capacity, &_n_msgs[plr_idx], msg);
     }
 
     int16_t __cdecl First_Msg_For_Player_(int16_t player_idx) {

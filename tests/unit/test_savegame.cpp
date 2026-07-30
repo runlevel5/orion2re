@@ -41,6 +41,14 @@ namespace {
         MOX::_nebula = state.nebulas;
     }
 
+    bool Is_Unused_Ship_(const s_ship_data& ship) {
+        s_ship_data expected = {};
+        expected.status = 5;
+        expected.location = -1;
+        expected.officer_index = -1;
+        return memcmp(&ship, &expected, sizeof(ship)) == 0;
+    }
+
     void Fill_Messages_() {
         memset(MSG_::_msgs, 0, sizeof(MSG_::_msgs));
         for (int i = 0; i < MAX_MESSAGES; ++i) {
@@ -363,8 +371,9 @@ namespace {
         DOCTEST_CHECK(memcmp(expected.players, actual.players, sizeof(expected.players)) == 0);
         DOCTEST_CHECK(memcmp(expected.ships, actual.ships,
                              MOX::_NUM_SHIPS * sizeof(*expected.ships)) == 0);
-        DOCTEST_CHECK(Is_Zero_(&actual.ships[MOX::_NUM_SHIPS],
-                               (MAX_SHIPS - MOX::_NUM_SHIPS) * sizeof(*actual.ships)));
+        for (int i = MOX::_NUM_SHIPS; i < MAX_SHIPS; ++i) {
+            DOCTEST_CHECK(Is_Unused_Ship_(actual.ships[i]));
+        }
         DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);
     }
 
@@ -389,8 +398,7 @@ namespace {
             DOCTEST_CHECK(memcmp(&expected_ship, &actual.ships[i], sizeof(expected_ship)) == 0);
         }
         for (int i = ORIGINAL_MAX_SHIPS; i < MAX_SHIPS; ++i) {
-            const s_ship_data empty_ship = {};
-            DOCTEST_CHECK(memcmp(&empty_ship, &actual.ships[i], sizeof(empty_ship)) == 0);
+            DOCTEST_CHECK(Is_Unused_Ship_(actual.ships[i]));
         }
         DOCTEST_CHECK(converted_locations > 0);
         DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);

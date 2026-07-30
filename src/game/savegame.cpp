@@ -1408,6 +1408,11 @@ namespace SAVEGAME {
             for (int i = 0; i < ship_record_count; ++i) Read_Ship_(reader, &MOX::_ship[i], version);
             memset(&MOX::_ship[ship_record_count], 0,
                    (MAX_SHIPS - ship_record_count) * sizeof(*MOX::_ship));
+            for (int i = ship_record_count; i < MAX_SHIPS; ++i) {
+                MOX::_ship[i].status = 5;
+                MOX::_ship[i].location = -1;
+                MOX::_ship[i].officer_index = -1;
+            }
             for (int i = 0; i < 5; ++i) Read_Movable_Box_(reader, &MOX::_moveable_box[i]);
             Read_Int16_Array_(reader, MOX::_moveable_box_order, 5);
             MOX::_PLAYER_NUM = reader->Read_Int16_();
