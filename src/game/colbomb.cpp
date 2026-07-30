@@ -5,8 +5,6 @@ namespace COLBOMB {
     s_combat_bomb_result* _backup_results_ptr;
 
     void __cdecl Colony_Bombing_Screen_(s_combat_bomb_result* results) {
-        oracle::Begin_Bombing_Presentation_();
-
         s_combat_bomb_result backup_results;
 
         _results_ptr = results;
@@ -18,8 +16,6 @@ namespace COLBOMB {
         COLONY::Set_Colony_Globals_(_results_ptr->colony_idx);
 
         MOX::_current_screen = MOX::_return_screen;
-
-        oracle::End_Bombing_Presentation_();
     }
 
     void __cdecl Do_Summary_String_Popup_() {

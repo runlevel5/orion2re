@@ -541,12 +541,10 @@ void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint3
     _noise_threshold = noise_threshold;
     uint8_t threshold = _noise_threshold;
 
-    // ORACLE: The original loads 1000 into EAX but does not push it. Random_ instead
+    // The original loads 1000 into EAX but does not push it. Random_ instead
     // reads Vanish_Bitmap_Pixels_'s saved incoming ESI, which holds the source pointer.
-    const uint32_t local_random_max =
-        static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src));
     const uint32_t random_max =
-        oracle::Replay_Address_Dependent_Random_Max_(local_random_max);
+        static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src));
     uint32_t rand_val = game_random::Random_(random_max);
     _noise_start_index = (rand_val - 1) & 0xFFFE;
 
@@ -594,7 +592,7 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
     shear::_noise_threshold = noise_threshold;
     shear::_jumble_mask = jumble_mask;
 
-    // ORACLE: The original loads 1000 into EAX, but Random_ reads the saved ESI stack slot instead.
+    // The original loads 1000 into EAX, but Random_ reads the saved ESI stack slot instead.
     const uint32_t random_max = 0xFFFF0000u | (height & 0xFFFFu);
     shear::_noise_start_index = (game_random::Random_(random_max) - 1) & 0xFFFF;
 

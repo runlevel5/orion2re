@@ -370,9 +370,6 @@ namespace MOX2 {
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: initial screen=%d", (int)MOX::_current_screen);
 
         KEN::Ken_Init_();
-        if (!oracle::Start_()) {
-            return;
-        }
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: Ken_Init complete, entering screen control");
         MOX2::Screen_Control_();
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: Screen_Control returned");

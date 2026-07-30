@@ -211,18 +211,6 @@ namespace mouse {
         platform::Update_Cursor_Image_();
     }
 
-    void Restore_Input_State_(int16_t mouse_x, int16_t mouse_y, int16_t mouse_buttons,
-        int16_t buffer_button, int16_t buffer_x, int16_t buffer_y,
-        int16_t buffer_flag, uint16_t buffer_flag2) {
-        platform::Set_Logical_Mouse_Position_(mouse_x, mouse_y);
-        _mouse_buttons = mouse_buttons;
-        _mouse_buffer_button = buffer_button;
-        _mouse_buffer_x = buffer_x;
-        _mouse_buffer_y = buffer_y;
-        _mouse_buffer_flag = buffer_flag;
-        _mouse_buffer_flag2 = buffer_flag2;
-    }
-
     void __cdecl User_Mouse_Handler_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons) {
         if (mouse::_in_mouse_handler == 1) {
             return;

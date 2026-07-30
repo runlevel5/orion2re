@@ -87,7 +87,6 @@ void Next_Turn_() {
     }
 
     MOX::_old_system_index = -1;
-    oracle::Complete_Turn_();
 }
 
 void __cdecl Next_Turn_Calc_() {

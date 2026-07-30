@@ -141,8 +141,6 @@ namespace TEXTBOX {
 
         fields::Clear_Mouse_Buffer_();
 
-        oracle::Allow_Bombing_Completion_();
-
         // Wait for any keyboard or mouse input
         do {
             timer::Mark_Time_();

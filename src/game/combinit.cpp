@@ -453,8 +453,6 @@ int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special
 }
 
 int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int16_t retreat_flag) {
-    oracle::Begin_Tactical_Combat_();
-
     int8_t abort_tactical = 0;
     bool no_defender_ships = star_idx != MOX::_NUM_STARS;
     int16_t has_tractor_beam = 0;
@@ -1100,7 +1098,6 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         }
     }
 
-    oracle::Verify_Tactical_Combat_End_();
     End_Of_Combat_(star_idx, colony_pop, combat_winner);
 
     if (combat_winner == 1 || combat_winner == 0x29A) {

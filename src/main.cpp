@@ -131,15 +131,6 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    if (!oracle::Configure_(argc, argv)) {
-        vfs::Shutdown();
-        if (current_directory != nullptr) {
-            SDL_free(current_directory);
-        }
-        Shutdown_Game_Log_();
-        return -1;
-    }
-
     size_t command_line_length = 0;
     for (int i = 1; i < argc; ++i) {
         command_line_length += strlen(argv[i]);

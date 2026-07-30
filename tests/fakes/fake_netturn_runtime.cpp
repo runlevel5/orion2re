@@ -173,14 +173,3 @@ namespace netcode {
 namespace sound {
     void __cdecl Sound_Update_() {}
 }
-
-namespace oracle {
-    uint32_t Replay_Random_Seed_(uint32_t local_seed,
-        const uintptr_t* return_addresses, uint32_t return_address_count,
-        uintptr_t image_base) {
-        (void)return_addresses;
-        (void)return_address_count;
-        (void)image_base;
-        return local_seed;
-    }
-}

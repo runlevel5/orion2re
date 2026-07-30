@@ -287,13 +287,11 @@ namespace SCIENCE {
                     if (jumble_amount <= 0) {
                         animate::Draw_(0xDD, 0x2C, (s_animation_header*)current_text_bitmap);
                     } else {
-                        if (!oracle::Deliver_Science_Input_Before_Jumble_()) {
-                            bitmap::Jumble_Bitmap_((s_animation_header*)previous_text_bitmap, (s_animation_header*)current_text_bitmap, jumble_amount, jumble_steps);
-                            jumble_amount -= 0x14;
+                        bitmap::Jumble_Bitmap_((s_animation_header*)previous_text_bitmap, (s_animation_header*)current_text_bitmap, jumble_amount, jumble_steps);
+                        jumble_amount -= 0x14;
 
-                            if (jumble_steps > 1) {
-                                --jumble_steps;
-                            }
+                        if (jumble_steps > 1) {
+                            --jumble_steps;
                         }
                         animate::Draw_(0xDD, 0x2C, (s_animation_header*)previous_text_bitmap);
                     }
@@ -355,9 +353,6 @@ namespace SCIENCE {
             }
         }
 
-        // Native callbacks deliver the release during the closing animation. Oracle
-        // replay is poll-driven, so finish the stationary click before fields change.
-        oracle::Complete_Replay_Click_();
         allocate::Pop_Block_(MOX::_screen_seg);
         fields::Clear_Fields_();
         fields::Clear_Mouse_Buffer_();

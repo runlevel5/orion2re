@@ -189,8 +189,6 @@ namespace COMBAT1 {
     }
 
     void __cdecl Do_Combat_Turn_(int16_t active_player_id, int16_t time_warp_only) {
-        oracle::Verify_Tactical_Turn_(active_player_id, time_warp_only);
-
         MOX::_player_mode[MOX::_combat_attacker_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_attacker_player);
         MOX::_player_mode[MOX::_combat_defender_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_defender_player);
 

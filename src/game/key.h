@@ -17,8 +17,4 @@ namespace key {
 
     // Queues one translated key code into the legacy keyboard ring buffer.
     void Push_Key_Code_(uint32_t key_code, uint32_t scan_code);
-
-    // Restores the legacy keyboard state captured at the start of an oracle turn.
-    void Restore_Input_State_(uint8_t key_pressed, uint8_t key_write, int8_t key_read,
-        uint32_t last_scan_code, const int32_t* key_buffer);
 }

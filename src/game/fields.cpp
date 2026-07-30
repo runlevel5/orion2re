@@ -1213,14 +1213,6 @@ namespace fields {
         }
 
         int16_t mouse_btn = mouse::Mouse_Button_();
-        bool defer_replay_click_completion = false;
-        if (mouse_btn != 0 && oracle::Replay_Active_()) {
-            defer_replay_click_completion =
-                oracle::Defer_Replay_Click_Completion_(Scan_Field_());
-            if (!defer_replay_click_completion && oracle::Complete_Replay_Click_(true)) {
-                mouse_btn = mouse::Mouse_Button_();
-            }
-        }
         if (mouse_btn == 0) {
             if (mouse::Mouse_Buffer_() == 0) {
                 _pressed_button_flag = 0;
@@ -1450,9 +1442,6 @@ namespace fields {
                 
                 if (mouse::Mouse_Button_() != 0) {
                     Call_Auto_Function_();
-                    if (defer_replay_click_completion) {
-                        oracle::Complete_Replay_Click_();
-                    }
                 }
                 mouse::Mouse_Buffer_();
                 mouse::Mouse_Buffer2_();
