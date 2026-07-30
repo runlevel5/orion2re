@@ -56,10 +56,415 @@ Sources:
 
 ## Patch 1.50
 
-Sources:
+### Scope and source of truth
 
-- TBD
+This catalog was generated from `C:\Projects\MOO2150\src\asm.pl`. The working copy inspected contains 344 active `topic(...)` declarations, from `asm.pl:29` through `asm.pl:19821`. The ordered `line:name` inventory has SHA-256 `0a744664c0abfc4f0bc601d4e4e8fc516d46f03895c37c8bea918927c625706f`.
 
-### TODO
+`asm.pl` is authoritative even when a hook delegates its implementation to `src/c/patch.c`. Non-Lua C files were also inspected. Game-level C fixes are concentrated in `src/c/patch.c`; they normally extend an `asm.pl` topic and are cataloged under that parent rather than as duplicate patches. `src/c/lua`, `src/c/script.c`, Lua APIs, scripting support, generic runtime wrappers, build tooling, LBX substitution, and unrelated new features are out of backport scope.
 
-- No 1.50 items recorded yet.
+The MOO2150 working tree had unrelated local modifications when inspected. Line numbers therefore identify that working copy, while repository HEAD was `e5d3857f1d30456b5e4b4abd734dc81e4ba1ff8f`.
+
+### Status and disposition
+
+Each topic appears exactly once in one of the four inventories below:
+
+- **Backport audit** (140): likely original-game correctness, stability, desync, overflow, bad-state, or incorrect-display fixes. Determine whether current source already contains an equivalent root fix, then mark complete.
+- **Mixed topic** (19): combines fixes with optional behavior, map generation, compatibility, or broader redesign. Audit individual patch blocks rather than importing the whole topic.
+- **Behavior review** (79): balance, rules, AI policy, table corrections, or ambiguous intended behavior. Do not backport automatically.
+- **Follow up** (106): infrastructure, configuration/modding, scripting, UI features, format compatibility specific to 1.50, or other new functionality. These are not immediate backport candidates, but remain cataloged for later review and to prove completeness.
+
+Checkboxes record migration review, not whether MOO2150 implemented the topic.
+
+### Backport audit
+
+- [ ] `asm.pl:307` - `artemis strategic combat fix`
+- [ ] `asm.pl:397` - `plasma torpedo`
+- [ ] `asm.pl:475` - `outpost ship prohibits colonizing bug`
+- [ ] `asm.pl:511` - `artifacts click bonus`
+- [ ] `asm.pl:520` - `ship cost exchange aka feudal bug`
+- [ ] `asm.pl:539` - `planet +10 offense bonus bug`
+- [ ] `asm.pl:837` - `fighters point blank bug`
+- [ ] `asm.pl:846` - `combat repair`
+- [ ] `asm.pl:913` - `combat raid`
+- [ ] `asm.pl:978` - `fighters use pd`
+- [ ] `asm.pl:1023` - `EM desync + calc correction`
+- [ ] `asm.pl:1137` - `raid and capture`
+- [ ] `asm.pl:1263` - `mutation unclickable picks`
+- [ ] `asm.pl:1281` - `tolerant races maintenance bug`
+- [ ] `asm.pl:1290` - `telepath skill level is 1 too low bug`
+- [ ] `asm.pl:1306` - `ordinary assasin skill works`
+- [ ] `asm.pl:1315` - `navigator skill display bug`
+- [ ] `asm.pl:1368` - `AI fighters size`
+- [ ] `asm.pl:1377` - `filter boarding for stasis, bhg`
+- [ ] `asm.pl:1492` - `tech field desync`
+- [ ] `asm.pl:1548` - `clip fighter damage`
+- [ ] `asm.pl:1577` - `bombardment hits fix`
+- [ ] `asm.pl:1654` - `stealth`
+- [ ] `asm.pl:1964` - `mapedge retreat crash`
+- [ ] `asm.pl:2160` - `diplomatic event`
+- [ ] `asm.pl:2219` - `relax end of turn`
+- [ ] `asm.pl:2261` - `pop limit bug`
+- [ ] `asm.pl:2364` - `recalc prod`
+- [ ] `asm.pl:2885` - `displacer, cloak missile`
+- [ ] `asm.pl:3474` - `teleporter + tractor fix`
+- [ ] `asm.pl:4421` - `AI missile targeting`
+- [ ] `asm.pl:5530` - `speed calc speed driveless no div zero`
+- [ ] `asm.pl:5877` - `other player's portal fix`
+- [ ] `asm.pl:6090` - `BHG slot multiple shots`
+- [ ] `asm.pl:6295` - `lightning field`
+- [ ] `asm.pl:6433` - `woes of stasis`
+- [ ] `asm.pl:6573` - `tractor cuts`
+- [ ] `asm.pl:6787` - `specials repair`
+- [ ] `asm.pl:6812` - `ICS cloak`
+- [ ] `asm.pl:6866` - `starbase capture`
+- [ ] `asm.pl:6994` - `retreat fix`
+- [ ] `asm.pl:7084` - `flyer targeting`
+- [ ] `asm.pl:7224` - `stolen prod`
+- [ ] `asm.pl:7839` - `turn 1 research`
+- [ ] `asm.pl:7864` - `unload ship damage storage`
+- [ ] `asm.pl:7887` - `destroying combat cloaks`
+- [ ] `asm.pl:8101` - `miniaturization`
+- [ ] `asm.pl:8114` - `mark stack overflow`
+- [ ] `asm.pl:8145` - `turn order ini overflow`
+- [ ] `asm.pl:8169` - `damper planet`
+- [ ] `asm.pl:8263` - `satellites plasma darkening`
+- [ ] `asm.pl:8272` - `shuttle hijack`
+- [ ] `asm.pl:8367` - `marines overload`
+- [ ] `asm.pl:8662` - `cloak initialize`
+- [ ] `asm.pl:8685` - `stasis cut`
+- [ ] `asm.pl:8703` - `infantry and armor growth and death bug fixes`
+- [ ] `asm.pl:8762` - `nullifier missiles`
+- [ ] `asm.pl:8814` - `cybernetic advanced damage control`
+- [ ] `asm.pl:8838` - `stasis area effects`
+- [ ] `asm.pl:8897` - `absorber cleanup`
+- [ ] `asm.pl:9091` - `monster bug`
+- [ ] `asm.pl:9871` - `send leader to pool on capture`
+- [ ] `asm.pl:9900` - `system popup freeze`
+- [ ] `asm.pl:9995` - `stumble breakthrough research storage`
+- [ ] `asm.pl:10195` - `curship visuals`
+- [ ] `asm.pl:10260` - `fighter retargeting`
+- [ ] `asm.pl:10315` - `pirate overflow`
+- [ ] `asm.pl:10339` - `skan cleanup`
+- [ ] `asm.pl:10633` - `beam sfx crash`
+- [ ] `asm.pl:10675` - `getchar die`
+- [ ] `asm.pl:11151` - `warlord woes`
+- [ ] `asm.pl:11345` - `raid message`
+- [ ] `asm.pl:11591` - `get all technology from surrender`
+- [ ] `asm.pl:12180` - `fighters return`
+- [ ] `asm.pl:12231` - `no computer hp`
+- [ ] `asm.pl:12253` - `destroy building trigger engage`
+- [ ] `asm.pl:12319` - `lander ships no best armor minus 1`
+- [ ] `asm.pl:12342` - `event conditions`
+- [ ] `asm.pl:12386` - `leaders desynch`
+- [ ] `asm.pl:12470` - `fighters helmsman`
+- [ ] `asm.pl:12492` - `crystal fleet`
+- [ ] `asm.pl:13063` - `ensure officer_star_displayed is set`
+- [ ] `asm.pl:13295` - `wrong missile bearing`
+- [ ] `asm.pl:13430` - `no rifle no sound on invasion crash`
+- [ ] `asm.pl:14094` - `wandering monster search range`
+- [ ] `asm.pl:14103` - `AI selfdestruct`
+- [ ] `asm.pl:14203` - `Loknar message`
+- [ ] `asm.pl:14312` - `brown stars blank`
+- [ ] `asm.pl:14445` - `comet event message`
+- [ ] `asm.pl:14479` - `negative thrust`
+- [ ] `asm.pl:14529` - `scrap value cap`
+- [ ] `asm.pl:14561` - `AI fleet strength assessment`
+- [ ] `asm.pl:15387` - `sound of crash`
+- [ ] `asm.pl:15470` - `msgbox overflow`
+- [ ] `asm.pl:15618` - `fast mod removal from anti-matter torpedo`
+- [ ] `asm.pl:16269` - `hypertech bug`
+- [ ] `asm.pl:16341` - `dead on graphs`
+- [ ] `asm.pl:16430` - `usable orbit fix`
+- [ ] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`
+- [ ] `asm.pl:16567` - `true omni`
+- [ ] `asm.pl:16692` - `bombardment ammo fix`
+- [ ] `asm.pl:16729` - `bombardment fair armor`
+- [ ] `asm.pl:16814` - `wormhole to Orion fix`
+- [ ] `asm.pl:16823` - `planet screen arti`
+- [ ] `asm.pl:16869` - `empty bombardment`
+- [ ] `asm.pl:17018` - `blockaded freeze`
+- [ ] `asm.pl:17027` - `no assault shuttles shots`
+- [ ] `asm.pl:17089` - `del_ships`
+- [ ] `asm.pl:17144` - `no green system popup`
+- [ ] `asm.pl:17265` - `planets screen: high-g race has -25% prod penalty on low-g planet`
+- [ ] `asm.pl:17281` - `new pop not assigned to farming on housing colony`
+- [ ] `asm.pl:17307` - `amoeba regeneration`
+- [ ] `asm.pl:17417` - `new leader window2 shown on tutor only`
+- [ ] `asm.pl:17828` - `AI zero field research`
+- [ ] `asm.pl:17871` - `food replicator no negative production`
+- [ ] `asm.pl:17981` - `artificial planet on outposts climate fix`
+- [ ] `asm.pl:18002` - `commando bonus`
+- [ ] `asm.pl:18437` - `net nested combat`
+- [ ] `asm.pl:18649` - `no homeworld`
+- [ ] `asm.pl:18679` - `outpost false button`
+- [ ] `asm.pl:18757` - `nebula check`
+- [ ] `asm.pl:18774` - `zero colony loss`
+- [ ] `asm.pl:18883` - `unload troops button wrong message`
+- [ ] `asm.pl:18925` - `telepatic capture`
+- [ ] `asm.pl:18959` - `autodesign considers x3 shot`
+- [ ] `asm.pl:18989` - `ship explosion leader says nooo`
+- [ ] `asm.pl:19157` - `dimensional portal icon in system display box displays race name instead of ruler name`
+- [ ] `asm.pl:19225` - `energy absorber 21 squares range bug`
+- [ ] `asm.pl:19256` - `artemis desync`
+- [ ] `asm.pl:19295` - `food shortage anims also shown when colony has 0 food production and 0 food import`
+- [ ] `asm.pl:19304` - `scrap freighters wrong message`
+- [ ] `asm.pl:19313` - `captured ship's missile's armor's owner`
+- [ ] `asm.pl:19362` - `non-zero missile hp`
+- [ ] `asm.pl:19409` - `assassin message race_name instead of ruler_name`
+- [ ] `asm.pl:19594` - `large fleet net freeze`
+- [ ] `asm.pl:19640` - `grain and barrels not shown during anomaly`
+- [ ] `asm.pl:19659` - `Loknar cannot give tech_0`
+- [ ] `asm.pl:19675` - `Leader #0, Ruola, shown in ship refit popup`
+- [ ] `asm.pl:19684` - `galactic lore does not see planet defenses`
+- [ ] `asm.pl:19702` - `destroying multi-phased shields`
+
+### Mixed topics requiring block-level review
+
+- [ ] `asm.pl:1158` - `mapgen`
+- [ ] `asm.pl:1973` - `refit`
+- [ ] `asm.pl:2387` - `town Zero`
+- [ ] `asm.pl:3545` - `ICS + weapon breakages`
+- [ ] `asm.pl:5757` - `antaran fixup for starbasi`
+- [ ] `asm.pl:6957` - `free maintenance cash`
+- [ ] `asm.pl:9343` - `unbuy and queue`
+- [ ] `asm.pl:10360` - `show arti tech`
+- [ ] `asm.pl:11479` - `scrap ships`
+- [ ] `asm.pl:13245` - `fleet summary giveaways`
+- [ ] `asm.pl:13578` - `overmap speed recalc`
+- [ ] `asm.pl:14135` - `scrap stuff maintenance`
+- [ ] `asm.pl:15487` - `keep autocolonization`
+- [ ] `asm.pl:16349` - `design button behaviour`
+- [ ] `asm.pl:16395` - `runaway homeworlds`
+- [ ] `asm.pl:16409` - `home systems min 3 planets default`
+- [ ] `asm.pl:16448` - `BH to real star planet generation`
+- [ ] `asm.pl:16621` - `orphans fix`
+- [ ] `asm.pl:17094` - `surrender maps`
+
+### Behavior and balance review
+
+- [ ] `asm.pl:339` - `missile initiative`
+- [ ] `asm.pl:343` - `HEF/mount`
+- [ ] `asm.pl:1230` - `torpedoes for satellites`
+- [ ] `asm.pl:1244` - `tractor power table`
+- [ ] `asm.pl:1272` - `pre-warp refit requires just nuclear fission instead of cold fusion`
+- [ ] `asm.pl:1331` - `strategic tech tree corrections`
+- [ ] `asm.pl:1425` - `crew experience affects capture`
+- [ ] `asm.pl:1593` - `missile speed table`
+- [ ] `asm.pl:1613` - `TD ftl bonus`
+- [ ] `asm.pl:1748` - `enforce pop limit`
+- [ ] `asm.pl:1780` - `command points fix OP&CS`
+- [ ] `asm.pl:1828` - `heavy fighter scramble`
+- [ ] `asm.pl:1901` - `detach 1.40 growth modifier from /nohousing switch`
+- [ ] `asm.pl:1917` - `unglue CS&TR`
+- [ ] `asm.pl:2579` - `planet non-enveloping`
+- [ ] `asm.pl:2632` - `cannon zero`
+- [ ] `asm.pl:2710` - `autodesign`
+- [ ] `asm.pl:2948` - `sfx in flics`
+- [ ] `asm.pl:3286` - `teleporters and boarding`
+- [ ] `asm.pl:3935` - `stealth landers`
+- [ ] `asm.pl:4444` - `android cost`
+- [ ] `asm.pl:4766` - `moving farmer`
+- [ ] `asm.pl:4813` - `absorber, damper`
+- [ ] `asm.pl:4912` - `phasing cloak shwifty`
+- [ ] `asm.pl:4939` - `thousands of millions colony ships`
+- [ ] `asm.pl:5286` - `starbases`
+- [ ] `asm.pl:5553` - `bombing range`
+- [ ] `asm.pl:5616` - `planet visuals`
+- [ ] `asm.pl:5634` - `strategic visuals`
+- [ ] `asm.pl:5917` - `report cheaters`
+- [ ] `asm.pl:5940` - `biospheres`
+- [ ] `asm.pl:5968` - `correct food output`
+- [ ] `asm.pl:6017` - `shield table`
+- [ ] `asm.pl:6317` - `side end turn`
+- [ ] `asm.pl:6632` - `scout lab bonus`
+- [ ] `asm.pl:6645` - `command points`
+- [ ] `asm.pl:6772` - `feudal cost reduction`
+- [ ] `asm.pl:8411` - `specials repair percent`
+- [ ] `asm.pl:8433` - `trade goods`
+- [ ] `asm.pl:8468` - `rotate warning`
+- [ ] `asm.pl:8604` - `postwarp techtable length`
+- [ ] `asm.pl:9036` - `no engine explosion`
+- [ ] `asm.pl:9321` - `spatial size class`
+- [ ] `asm.pl:9486` - `range to xy`
+- [ ] `asm.pl:9559` - `red the weapon`
+- [ ] `asm.pl:9579` - `colony bases and outposts`
+- [ ] `asm.pl:9614` - `fighter ordnance`
+- [ ] `asm.pl:9685` - `shwifty range`
+- [ ] `asm.pl:10496` - `mixed race penalty`
+- [ ] `asm.pl:10523` - `battle pods cap`
+- [ ] `asm.pl:10617` - `extended fuel range rounding`
+- [ ] `asm.pl:11600` - `colony enviromental stuff stuff`
+- [ ] `asm.pl:11617` - `required climate to build weather controller`
+- [ ] `asm.pl:12616` - `warlord leaders +1 level`
+- [ ] `asm.pl:13504` - `colony commando`
+- [ ] `asm.pl:14321` - `strategic weapon damage`
+- [ ] `asm.pl:14601` - `strategic weapon damage value corrections`
+- [ ] `asm.pl:14701` - `telepath skill blocks mind control`
+- [ ] `asm.pl:15672` - `2x penalty`
+- [ ] `asm.pl:15717` - `expected damage`
+- [ ] `asm.pl:16106` - `fair beams`
+- [ ] `asm.pl:16844` - `subterranean bonuses`
+- [ ] `asm.pl:16912` - `stealth mutual exclusive with cloaks`
+- [ ] `asm.pl:16935` - `double range accuracy penalty inherent mod removals`
+- [ ] `asm.pl:16951` - `starting relations symmetry meklar-bulrathi`
+- [ ] `asm.pl:16960` - `leader hire tech`
+- [ ] `asm.pl:17108` - `star base fleet beam offense`
+- [ ] `asm.pl:17131` - `fair leader hire`
+- [ ] `asm.pl:17157` - `aquatic treats tundra as swamp`
+- [ ] `asm.pl:17339` - `transport ship extended fuel tanks`
+- [ ] `asm.pl:17365` - `skip outpostization prompt`
+- [ ] `asm.pl:17499` - `freighter cost`
+- [ ] `asm.pl:17531` - `satellite special 6 and 14`
+- [ ] `asm.pl:18379` - `ground defense armor multiplier`
+- [ ] `asm.pl:18892` - `fighter garrison strength for bomber bays`
+- [ ] `asm.pl:18901` - `xeno psychology spy bonus`
+- [ ] `asm.pl:19202` - `mixed race penalty building`
+- [ ] `asm.pl:19382` - `is_ship_out_of_ammo checks`
+- [ ] `asm.pl:19812` - `F9 displays star distance if black hole is in between`
+
+### Follow-up topics
+
+- [ ] `asm.pl:29` - `meta`
+- [ ] `asm.pl:158` - `library`
+- [ ] `asm.pl:567` - `shortcuts`
+- [ ] `asm.pl:774` - `case sensitive shortcuts`
+- [ ] `asm.pl:954` - `missiles gluing option`
+- [ ] `asm.pl:1090` - `no autodone`
+- [ ] `asm.pl:1107` - `stored prod display`
+- [ ] `asm.pl:1452` - `reports reordered`
+- [ ] `asm.pl:1463` - `tech review items reordered`
+- [ ] `asm.pl:1926` - `AI extra races`
+- [ ] `asm.pl:2078` - `names in config`
+- [ ] `asm.pl:2107` - `subst LBX`
+- [ ] `asm.pl:2234` - `scroll timer`
+- [ ] `asm.pl:2294` - `config net sync`
+- [ ] `asm.pl:2344` - `command line config sync`
+- [ ] `asm.pl:2964` - `default game settings`
+- [ ] `asm.pl:2987` - `combat boni visuals`
+- [ ] `asm.pl:4029` - `race picks`
+- [ ] `asm.pl:4064` - `sixth slot`
+- [ ] `asm.pl:4468` - `cluster`
+- [ ] `asm.pl:4518` - `pollution conf`
+- [ ] `asm.pl:4570` - `multi-phased shields conf`
+- [ ] `asm.pl:4625` - `analyzer conf`
+- [ ] `asm.pl:4660` - `ESD conf`
+- [ ] `asm.pl:4957` - `stock races`
+- [ ] `asm.pl:4983` - `race info visuals`
+- [ ] `asm.pl:5079` - `sync pics and races`
+- [ ] `asm.pl:5137` - `antaran delay`
+- [ ] `asm.pl:5158` - `megafluxers`
+- [ ] `asm.pl:6124` - `newgame screen extensions`
+- [ ] `asm.pl:6339` - `race boni`
+- [ ] `asm.pl:6479` - `strict combat sequencing`
+- [ ] `asm.pl:6936` - `starting outpost`
+- [ ] `asm.pl:7058` - `autosave`
+- [ ] `asm.pl:7242` - `turn structure`
+- [ ] `asm.pl:8025` - `save/load game hooks`
+- [ ] `asm.pl:8080` - `no blockers dialog`
+- [ ] `asm.pl:8635` - `Zfast messages`
+- [ ] `asm.pl:8995` - `timeout for battle message`
+- [ ] `asm.pl:9027` - `newgame help`
+- [ ] `asm.pl:9143` - `defence fire`
+- [ ] `asm.pl:9286` - `final fire`
+- [ ] `asm.pl:9840` - `grayboxing`
+- [ ] `asm.pl:9923` - `i18n`
+- [ ] `asm.pl:10282` - `known techs modding`
+- [ ] `asm.pl:10727` - `bc bonuses`
+- [ ] `asm.pl:10781` - `food buildings`
+- [ ] `asm.pl:11112` - `research buildings`
+- [ ] `asm.pl:11287` - `production buildings`
+- [ ] `asm.pl:11654` - `events`
+- [ ] `asm.pl:12122` - `5+ leaders`
+- [ ] `asm.pl:12673` - `placement`
+- [ ] `asm.pl:12838` - `current fleet summary`
+- [ ] `asm.pl:12993` - `fleet screen`
+- [ ] `asm.pl:13037` - `officer screen scrollbars`
+- [ ] `asm.pl:13083` - `fleet scrollbars`
+- [ ] `asm.pl:13439` - `alternate diplomacy`
+- [ ] `asm.pl:13541` - `AI ground combat bonus visuals`
+- [ ] `asm.pl:14577` - `MOX.SET >> 150.SET`
+- [ ] `asm.pl:14592` - `lastrace.rac >> lastr150.rac`
+- [ ] `asm.pl:14771` - `custom defenses missiles mods`
+- [ ] `asm.pl:14822` - `custom defenses heavy mods`
+- [ ] `asm.pl:14850` - `custom defenses normal mods`
+- [ ] `asm.pl:14897` - `custom defenses pd mods`
+- [ ] `asm.pl:14944` - `planet defenses mods`
+- [ ] `asm.pl:15014` - `satellite space allocation`
+- [ ] `asm.pl:15135` - `proper defenses arcs`
+- [ ] `asm.pl:15224` - `mods aware pd selection`
+- [ ] `asm.pl:15243` - `satellite missile distrubution`
+- [ ] `asm.pl:15334` - `satellite missile distribution limit`
+- [ ] `asm.pl:15364` - `satellite +1/3 space adjustment for 360 arcs and missile mods`
+- [ ] `asm.pl:15428` - `satellite heavy beams`
+- [ ] `asm.pl:15523` - `autodesign beam modifications`
+- [ ] `asm.pl:15627` - `tunable animation speed`
+- [ ] `asm.pl:16093` - `tunable antaran star fortress space`
+- [ ] `asm.pl:16129` - `AI Hypertech`
+- [ ] `asm.pl:16173` - `rebalanced HA techfield chances`
+- [ ] `asm.pl:16189` - `convert toxic to barren`
+- [ ] `asm.pl:16217` - `human techtrade`
+- [ ] `asm.pl:16879` - `antaran extra state`
+- [ ] `asm.pl:17049` - `multibuild`
+- [ ] `asm.pl:17389` - `show enemy moves`
+- [ ] `asm.pl:17433` - `planets screen scrollbar`
+- [ ] `asm.pl:17457` - `build screen cost and time info`
+- [ ] `asm.pl:17625` - `draw race_extra info`
+- [ ] `asm.pl:17749` - `planet extra specials`
+- [ ] `asm.pl:17840` - `independent space scanner`
+- [ ] `asm.pl:17912` - `food replicator pp and bc cost`
+- [ ] `asm.pl:18087` - `antaran ship designs`
+- [ ] `asm.pl:18178` - `system monster weapons`
+- [ ] `asm.pl:18326` - `build screen colors and ordering`
+- [ ] `asm.pl:18480` - `leader xp`
+- [ ] `asm.pl:18504` - `freight limit`
+- [ ] `asm.pl:18586` - `orders hooks`
+- [ ] `asm.pl:18688` - `pregame script support`
+- [ ] `asm.pl:18703` - `cleaner tech init`
+- [ ] `asm.pl:18732` - `main screen delayed messages`
+- [ ] `asm.pl:18796` - `noreport`
+- [ ] `asm.pl:19064` - `display hyperspace beast presence`
+- [ ] `asm.pl:19166` - `max one dimensional portal per system using existing artemis check`
+- [ ] `asm.pl:19234` - `reimplement builtin random`
+- [ ] `asm.pl:19469` - `type research value printed in Empire Info Window`
+- [ ] `asm.pl:19540` - `freighted population value printed in Empire Info Window`
+- [ ] `asm.pl:19770` - `population history includes freighted pop`
+- [ ] `asm.pl:19791` - `all wait hotkey`
+- [ ] `asm.pl:19821` - `Doom Star name`
+
+### Non-Lua C-level follow-up
+
+The following correctness changes were found in `src/c/patch.c` or its history. Most are revisions of an existing `asm.pl` topic, so the parent topic remains the migration unit.
+
+| Parent catalog topic | C implementation or later correction to inspect |
+|---|---|
+| `strict combat sequencing` | `next_ship_strict()`, `iterate_tships()`, and `SHIP_DONE_FLAG`: fixes duplicate AI/AUTO boarding caused by confusing the done and boarding flags. Also inspect the later last-ship shuttle-capture multiplayer stall correction. |
+| `ICS + weapon breakages` / `tractor cuts` | `moo_tship.tractor_target`, `proc_break_weapon()`, and `proc_recalc_ship_id()`: use an unsigned 0..254 target with 255 as invalid, fixing tractor crashes in battles with ship ids above 127. |
+| `expected damage` | `need_to_shoot_at_missile()`: later fixes select the requested missile instead of element zero, use the launched missile's overloaded modifier, and make predicted damage match actual anti-missile damage. |
+| `mapgen` | `n_food_planets_in_system()` and `remove_monsters_from_food_worlds()`: multiple repairs to ensure at least one food world, including counter reset and monster removal. |
+| `orphans fix` / `del_ships` / `zero colony loss` | `planet_is_orphan_ptr()`, `del_planets()`, and `decide_zero_loss()`: clear deleted records and unlink destroyed colonies from their planets. |
+| `pop limit bug` / `freight limit` | `proc_n_room_for_pop_wf()`, `realloc_freights_maybe()`, and freight load fallback: enforce the actual freight cap and correctly include inbound population. |
+| `nebula check` | `point_is_in_nebula_n()`: corrected image-bound and point-in-nebula checks. |
+| `overmap speed recalc` | Jump-gate redirection helpers: clear stuck jump-gate state and avoid double redirect or incorrectly reduced travel speed. |
+| `bombing range` | `proc_can_bomb()`: compare untruncated point range against the weapon range instead of dividing before comparison. |
+| `fleet summary giveaways` | `proc_stack_ship_per_type_counts()` and fleet-screen hook revisions: close three indirect detection leaks involving undetected ships. |
+| `large fleet net freeze` | Network combat count/packet revisions: fix tactical network freeze above 99 ships and retain full-width ship ids/counts. |
+| `cluster` | `size_and_civ_to_lb()`, `size_and_civ_from_lb()`, and `wrap_init_new_game()`: fixes the 1.50 cluster mode generating 54 rather than 71 stars. This is a patch-feature regression and remains a follow-up unless equivalent modes are adopted. |
+| `case sensitive shortcuts` | `proc_lowercase_shortcut_maybe()`: accepts a null diplomacy shortcut pointer instead of dereferencing it. This is a real crash fix embedded in an otherwise follow-up UI topic. |
+| `names in config` | `proc_init_tech()`: fixes broken custom technology names and network/config reload synchronization. Follow up if configurable names are adopted. |
+| `save/load game hooks` | `load_old_header()` and `proc_load_game_hook()`: repairs corrupt historical 1.50/VDC save variants and old freight storage. This is 1.50 compatibility, not an original-game fix. |
+| `config net sync` / `orders hooks` | `unpack_gdd()`, `unpack_net_pdus()`, and PDU validation: handle `max_pop_freighted == 0`, unknown PDUs, and stream signatures. Follow up if the 1.50 protocol is adopted. |
+
+Potential standalone C correctness item with no dedicated `topic(...)` declaration:
+
+- [ ] `src/c/patch.c:wrap_init_new_game()` - random-player starts must inspect the player's stored type directly; calling the normal human-player predicate during incomplete initialization caused a crash. Backport only if the corresponding current new-game path can make the same premature query.
+
+### Completeness check
+
+- Active `topic(...)` declarations in inspected `asm.pl`: **344**.
+- Cataloged as backport audit: **140**.
+- Cataloged as mixed: **19**.
+- Cataloged as behavior review: **79**.
+- Cataloged for follow-up: **106**.
+- Total: **344**.
+- No commented-out `topic(...)` declarations were found; all 344 declarations are active Perl statements.
+- `src/c/patch.c` is an implementation source, not a second definition registry. Its Lua-gated sections and `src/c/script.c` were left for follow-up as requested.
