@@ -2,6 +2,8 @@
 
 namespace INITGAME {
 
+    constexpr int16_t LEGACY_PLANET_LIMIT = 250;
+
     /**
      * Initializes the ship data array. 
      * Zeroes out the entire ship array, then sets default status,
@@ -165,7 +167,10 @@ namespace INITGAME {
                 video::Set_Page_Off_();
                 graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
                 platform::Toggle_Pages_Stub_();
-                MAPGEN::Enforce_Planet_Max_(250);
+                int16_t planet_limit = MOX::_NUM_STARS <= ORIGINAL_MAX_STARS
+                    ? LEGACY_PLANET_LIMIT
+                    : MAX_PLANETS;
+                MAPGEN::Enforce_Planet_Max_(planet_limit);
                 MAPGEN::Set_Black_Hole_Visited_Flags_();
                 HAROLD::Confirm_Planet_And_Star_Index_Link_(HAROLD::s_after_home_world_gen);
 

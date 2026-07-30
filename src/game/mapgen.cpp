@@ -30,6 +30,21 @@ namespace MAPGEN {
 
 namespace {
 
+constexpr int32_t STAR_NAME_COUNT = 829;
+
+int16_t Generation_Progress_Interval_() {
+    return MOX::_NUM_STARS <= ORIGINAL_MAX_STARS ? 1 : 16;
+}
+
+bool Should_Update_Generation_Progress_(int16_t star_idx) {
+    return star_idx % Generation_Progress_Interval_() == 0;
+}
+
+int16_t Generation_Progress_Max_() {
+    int16_t interval = Generation_Progress_Interval_();
+    return (int16_t)(((MOX::_NUM_STARS + interval - 1) / interval) * 2);
+}
+
 int16_t Maximum_Galaxy_Grid_Y_() {
     const int16_t star_count = MAX_STARS - 1;
     int16_t grid_y = 8;
@@ -95,12 +110,15 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
     for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
         MAPGEN::_star_count = i;
-        RUSS::Mox_Update_();
+        bool update_progress = (generate_spectral || use_names) && Should_Update_Generation_Progress_(i);
+        if (update_progress) {
+            RUSS::Mox_Update_();
+        }
 
-        if (MAPGEN::_num_maps_to_generate == 1) {
+        if (MAPGEN::_num_maps_to_generate == 1 && update_progress) {
             fonts::Set_Font_Style_(4, &font_colors_main);
             int16_t str_w = fonts::Get_String_Width_(MAPGEN::_fill_msg);
-            MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, MOX::_NUM_STARS * 2, &font_colors_main,
+            MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, Generation_Progress_Max_(), &font_colors_main,
                 &font_colors_alt, (0x280 - str_w) / 2, 0xD7,
                 MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
             RUSS::Mox_Sync_Update_();
@@ -159,24 +177,26 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             if (!collision) break;
 
             if (++retry_count > 0x96) {
-                int16_t fallback_retries = 0;
                 bool fallback_found = false;
-                int32_t fallback_range_x = std::max(0x189, 0x189 * (int32_t)MOX::_MAP_MAX_X / 0x5EE);
-                int32_t fallback_range_y = std::max(0x155, 0x155 * (int32_t)MOX::_MAP_MAX_Y / 0x4B0);
-                do {
-                    RUSS::Mox_Update_();
-                    int32_t fx = game_random::Random_(fallback_range_x) + 0x14;
-                    int32_t fy = game_random::Random_(fallback_range_y) + 0x14;
+                int32_t fallback_min_x = 0x18;
+                int32_t fallback_min_y = 0x16;
+                int32_t fallback_range_x = scaled_max_x - (MOX::_star_width / 2) - fallback_min_x + 1;
+                int32_t fallback_range_y = scaled_max_y - (MOX::_star_height / 2) - y_collision_padding - fallback_min_y + 1;
+                int32_t fallback_attempt_limit = std::max<int32_t>(0x96, MOX::_NUM_STARS * 8);
+
+                for (int32_t fallback_attempt = 0; fallback_attempt < fallback_attempt_limit; ++fallback_attempt) {
+                    int32_t fx = game_random::Random_(fallback_range_x) + fallback_min_x - 1;
+                    int32_t fy = game_random::Random_(fallback_range_y) + fallback_min_y - 1;
                     MOX::_star[i].x = (int16_t)HAROLD::Get_Up_Scaled_Value_((int16_t)fx);
                     MOX::_star[i].y = (int16_t)HAROLD::Get_Up_Scaled_Value_((int16_t)fy);
 
                     if (!MAPGEN::Star_XY_Invalid_(i, collision_w, collision_h, (int16_t)fx)) {
                         fallback_found = true;
+                        break;
                     }
-                    else {
-                        if (++fallback_retries > 0x96) return true;
-                    }
-                } while (!fallback_found);
+                }
+
+                if (!fallback_found) return true;
                 collision = false;
             }
         } while (collision);
@@ -518,18 +538,23 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             s_star_data* star_backup = (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, MAX_STARS * sizeof(*MOX::_star));
             memcpy(star_backup, MOX::_star, MAX_STARS * sizeof(*MOX::_star));
 
-            while (max_planets <= MOX::_planet_count - gas_giant_count) {
-                int16_t random_idx = game_random::Random_(MOX::_planet_count) - 1;
-                s_planet_data* backup_p = &_pl[random_idx];
-
-                int16_t star_idx = backup_p->star_index;
-                if (backup_p->colony_index != -2 && is_home_system[star_idx] == 0) {
-                    int16_t mapped_idx = MOX::_star[star_idx].planet_index[(uint8_t)backup_p->orbit];
-                    if (mapped_idx > -1 && _pl[mapped_idx].planet_type != PLANET_TYPE_GAS_GIANT) {
-                        backup_p->colony_index = -2;
-                        MOX::_planet_count--;
-                    }
+            int16_t* removable_planets = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, original_planet_count * sizeof(*removable_planets));
+            int16_t removable_planet_count = 0;
+            for (int16_t planet_idx = 0; planet_idx < original_planet_count; ++planet_idx) {
+                s_planet_data* backup_p = &_pl[planet_idx];
+                if (is_home_system[backup_p->star_index] == 0 && backup_p->planet_type != PLANET_TYPE_GAS_GIANT) {
+                    removable_planets[removable_planet_count++] = planet_idx;
                 }
+            }
+
+            while (max_planets <= MOX::_planet_count - gas_giant_count) {
+                if (removable_planet_count == 0) break;
+
+                int16_t choice = (int16_t)(game_random::Random_(removable_planet_count) - 1);
+                int16_t planet_idx = removable_planets[choice];
+                removable_planets[choice] = removable_planets[--removable_planet_count];
+                _pl[planet_idx].colony_index = -2;
+                MOX::_planet_count--;
             }
 
             int16_t new_idx = 0;
@@ -1183,17 +1208,17 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     /**
      * @brief Initializes and then shuffles an array of star name indices.
      * 
-     * This function fills the star name index array with sequential values from 0 to 828,
-     * then performs 829 random swaps to shuffle the order.
+     * This function fills the star name index array with every available name,
+     * then performs one random swap per name to shuffle the order.
      */
     void __cdecl Randomize_Star_Names_(uint16_t* star_name_indices) {
-        for (uint16_t i = 0; i < 829; ++i) {
+        for (uint16_t i = 0; i < STAR_NAME_COUNT; ++i) {
             star_name_indices[i] = i;
         }
 
-        for (int i = 0; i < 829; ++i) {
-            int32_t idx1 = game_random::Random_(829) - 1;
-            int32_t idx2 = game_random::Random_(829) - 1;
+        for (int i = 0; i < STAR_NAME_COUNT; ++i) {
+            int32_t idx1 = game_random::Random_(STAR_NAME_COUNT) - 1;
+            int32_t idx2 = game_random::Random_(STAR_NAME_COUNT) - 1;
 
             if (idx1 != idx2) {
                 uint16_t swapped_name_idx = star_name_indices[idx1];
@@ -1289,12 +1314,20 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     }
 
     void __cdecl Get_Star_Name_(int16_t star_idx) {
-        int32_t name_id = (int16_t)_name_index[star_idx];
+        int32_t name_id = (int16_t)_name_index[star_idx % STAR_NAME_COUNT];
+        int32_t numeral_id = star_idx / STAR_NAME_COUNT;
         const char (*name_table)[15] = (const char (*)[15])_name_seg;
         const char* src_name = name_table[name_id];
-        char* dest_name = MOX::_star[star_idx].name;
+        char (&dest_name)[15] = MOX::_star[star_idx].name;
 
-        while ((*dest_name++ = *src_name++) != '\0');
+        if (numeral_id == 0) {
+            snprintf(dest_name, sizeof(dest_name), "%.14s", src_name);
+            return;
+        }
+
+        const char* numeral = MOX::_roman_literals[numeral_id];
+        int32_t base_name_length = (int32_t)sizeof(dest_name) - (int32_t)strlen(numeral) - 2;
+        snprintf(dest_name, sizeof(dest_name), "%.*s %s", base_name_length, src_name, numeral);
     }
 
     void __cdecl Universe_Generation_(uint8_t gal_size, uint8_t gal_age, int8_t nebula_freq) {
@@ -1469,11 +1502,13 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     MOX::_star[_star_count].wormhole_star_id = -1;
 
                     if (_num_maps_to_generate == 1 && map_idx < 1) {
-                        fonts::Set_Font_Style_(4, &local_colors1);
-                        int16_t swidth = fonts::Get_String_Width_(_fill_msg);
-                        MISC::Draw_Advancing_Fill_Message_(4, &_fill_msg_ctr, MOX::_NUM_STARS * 2, &local_colors1,
-                            &local_colors2, (640 - swidth) / 2, 215, _fill_msg, _fill_msg_bitmap, 0);
-                        RUSS::Mox_Sync_Update_();
+                        if (Should_Update_Generation_Progress_(_star_count)) {
+                            fonts::Set_Font_Style_(4, &local_colors1);
+                            int16_t swidth = fonts::Get_String_Width_(_fill_msg);
+                            MISC::Draw_Advancing_Fill_Message_(4, &_fill_msg_ctr, Generation_Progress_Max_(), &local_colors1,
+                                &local_colors2, (640 - swidth) / 2, 215, _fill_msg, _fill_msg_bitmap, 0);
+                            RUSS::Mox_Sync_Update_();
+                        }
                     }
 
                     MOX::_star[_star_count].owner = -1;

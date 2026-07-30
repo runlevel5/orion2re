@@ -93,7 +93,7 @@ void __cdecl Search_For_Battles_() {
     }
 
     _n_battle_stars = 0;
-    for (int16_t i = 0; i <= MOX::_NUM_STARS + 1; ++i) {
+    for (int16_t i = 0; i <= MOX::_NUM_STARS; ++i) {
         if ((*_player_needs_to_attack)[i] != 0) {
             if (EVENTS::Event_Check_Space_Anomaly_At_Star_(i) == 0) {
                 _battle_stars[_n_battle_stars++] = i;

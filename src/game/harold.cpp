@@ -1493,8 +1493,8 @@ namespace HAROLD {
         MOX::_red_color1 = 0x49;
         MOX::_red_color2 = 0x4C;
 
-        for (int16_t i = 0; i < 10; ++i) {
-            MOX::_black_hole_anim_count[i] = (int8_t)(i * 2);
+        for (int16_t i = 0; i < MAX_STARS; ++i) {
+            MOX::_black_hole_anim_count[i] = (int8_t)((i % 10) * 2);
         }
         MAINSCR::Clear_Twinkling_Star_Data_();
         memset(MOX::_fleet_icon_selection_status, 0, sizeof(MOX::_fleet_icon_selection_status));

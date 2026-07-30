@@ -654,7 +654,7 @@ namespace MOX {
 
     extern s_ship_icon _ship_icon[SHIP_ICON_COUNT];
 
-    extern int8_t _black_hole_anim_count[10];
+    extern int8_t _black_hole_anim_count[MAX_STARS];
 
     extern int16_t _bill_savegame[6];
     extern uint16_t _antaran_resource_level;

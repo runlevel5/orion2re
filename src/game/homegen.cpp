@@ -8,6 +8,14 @@ namespace HOMEGEN {
     int16_t _nearest_food_worlds[MAX_PLAYERS];
     s_star_dist* _star_list;
 
+    static int16_t Generation_Update_Interval_() {
+        return MOX::_NUM_STARS <= ORIGINAL_MAX_STARS ? 1 : 32;
+    }
+
+    static bool Should_Update_Generation_(int16_t star_idx) {
+        return star_idx % Generation_Update_Interval_() == 0;
+    }
+
     static int32_t __cdecl Compare_Star_Dist_(const s_star_dist* candidate_a, const s_star_dist* candidate_b) {
         if (candidate_a->dist == candidate_b->dist) {
             return 0;
@@ -160,7 +168,9 @@ namespace HOMEGEN {
 
     void __cdecl Build_Min_Star_Distances_(int32_t min_dist_sq) {
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
-            RUSS::Mox_Update_();
+            if (Should_Update_Generation_(i)) {
+                RUSS::Mox_Update_();
+            }
 
             s_good_star* current_star = &_good_stars[i];
             current_star->star_count = 0;
@@ -191,21 +201,22 @@ namespace HOMEGEN {
 
         if (MOX::_NUM_STARS > 1) {
             for (int16_t current_star = 1; current_star < MOX::_NUM_STARS; ++current_star) {
-                RUSS::Mox_Update_();
+                bool update_progress = Should_Update_Generation_(current_star);
+                if (update_progress) {
+                    RUSS::Mox_Update_();
+                }
 
                 CandidateList* list = &candidates[current_star]; // Note: Original code uses index up to NUM_STARS
                 list->count = 1;
                 list->stars[0] = current_star;
 
-                if (MAPGEN::_fill_msg_ctr < _HOME_WORLD_GEN_MAX_CTR) {
+                if (update_progress && MAPGEN::_fill_msg_ctr < _HOME_WORLD_GEN_MAX_CTR) {
                     fonts::Set_Font_Style_(4, &colors1);
                     int16_t width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
                     MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR,
                                                       &colors1, &colors2, (640 - width) / 2, 215,
                                                       MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
                     RUSS::Mox_Sync_Update_();
-                } else {
-                    Set_Up_Home_Gen_Msg_();
                 }
 
                 for (int16_t star_j = 1; star_j < MOX::_NUM_STARS; ++star_j) {
@@ -239,7 +250,9 @@ namespace HOMEGEN {
         int16_t selected_index = -1;
         int32_t pick_count = 1;
         for (int16_t si = 0; si < MAX_STARS; ++si) {
-            RUSS::Mox_Update_();
+            if (Should_Update_Generation_(si)) {
+                RUSS::Mox_Update_();
+            }
             if (candidates[si].count >= MOX::_NUM_PLAYERS) {
                 if (game_random::Random_(pick_count) == 1) {
                     selected_index = si;
@@ -389,8 +402,13 @@ namespace HOMEGEN {
         (void)colors2;
 
         // Determine home world generation counter limits
-        _HOME_WORLD_GEN_MAX_CTR = ((int32_t)MOX::_NUM_STARS * 25) / 20;
-        if (MOX::_NUM_STARS > 54) {
+        if (MOX::_NUM_STARS <= ORIGINAL_MAX_STARS) {
+            _HOME_WORLD_GEN_MAX_CTR = ((int32_t)MOX::_NUM_STARS * 25) / 20;
+        } else {
+            _HOME_WORLD_GEN_MAX_CTR =
+                (MOX::_NUM_STARS + Generation_Update_Interval_() - 1) / Generation_Update_Interval_() + 2;
+        }
+        if (MOX::_NUM_STARS > 54 && MOX::_NUM_STARS <= ORIGINAL_MAX_STARS) {
             _HOME_WORLD_GEN_MAX_CTR = 372;
         }
 

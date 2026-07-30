@@ -774,7 +774,7 @@ namespace MOX {
     int16_t _icon_overlay_x;
     int16_t _fleet_box_ship_stack;
     s_ship_icon _ship_icon[SHIP_ICON_COUNT];
-    int8_t _black_hole_anim_count[10];
+    int8_t _black_hole_anim_count[MAX_STARS];
     int16_t _bill_savegame[6] = {2, 0, 0, 0, 0, 0};
     uint16_t _antaran_resource_level;
     s_crew_data _crew_data[5] = {

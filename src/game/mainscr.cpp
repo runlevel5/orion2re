@@ -680,9 +680,6 @@ namespace MAINSCR {
                     animate::Draw_(x, y, seg);
 
                     black_hole_slot++;
-                    if (black_hole_slot >= 10) {
-                        black_hole_slot = 10;
-                    }
                 }
             }
         }
