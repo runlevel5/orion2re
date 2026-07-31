@@ -113,6 +113,29 @@ orion2re_add_unit_test(test_config_lifecycle
         tests/fakes/fake_config_runtime.cpp
 )
 
+orion2re_add_unit_test(test_config_loader
+    SOURCES
+        tests/unit/test_config_loader.cpp
+    PRODUCTION_SOURCES
+        src/config/cfg_parser.cpp
+        src/config/config_decode.cpp
+        src/config/config_lifecycle.cpp
+        src/config/config_loader.cpp
+        src/config/generated/config_bindings.cpp
+        src/config/generated/config_schema.cpp
+        src/game/compat.cpp
+        src/game/vfs.cpp
+        src/game/vfs_file.cpp
+        src/game/vfs_lbx.cpp
+        src/game/vfs_path.cpp
+        src/game/vfs_zip.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_config_runtime.cpp
+    LIBRARIES
+        miniz
+    LINK_SDL
+)
+
 orion2re_add_unit_test(test_pop_helpers
     SOURCES
         tests/unit/test_pop_helpers.cpp

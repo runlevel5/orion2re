@@ -129,7 +129,9 @@ bool Apply_Config_Document(const s_cfg_document* document, const char* package_i
             provenance.has_override = true;
             provenance.package_id = package_id;
             provenance.location = write.provenance;
-            provenance.statement = static_cast<uint32_t>(statement_index + 1);
+            provenance.statement = statement.statement_number != 0 ?
+                                   statement.statement_number :
+                                   static_cast<uint32_t>(statement_index + 1);
             candidate_provenance[parameter_index] = std::move(provenance);
         }
     }

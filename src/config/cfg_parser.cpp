@@ -598,6 +598,8 @@ bool Parse_Cfg(const char* source_name, const char* source, size_t source_size,
             return true;
         }
         document->statements.emplace_back();
+        document->statements.back().statement_number =
+            static_cast<uint32_t>(document->statements.size());
         if (!Read_Statement_(&parser, &document->statements.back())) {
             document->statements.clear();
             return false;

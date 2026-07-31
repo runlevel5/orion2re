@@ -194,12 +194,12 @@ Deliverable: effective configuration is explainable, extractable, reload-control
 
 ## Step 10: implement includes
 
-- [ ] Resolve include paths relative to the current file/package using the approved VFS path policy.
-- [ ] Maintain include stacks and reject cycles with the complete chain in diagnostics.
-- [ ] Make `stop;` return only from the current file.
-- [ ] Implement optional includes only if Step 1 approves explicit syntax.
-- [ ] Apply an included configuration as part of the caller's transaction; any failure leaves prior live state unchanged.
-- [ ] Add tests for nested includes, cycles, missing versus malformed files, `stop;`, path normalization, and rollback.
+- [x] Resolve include paths relative to the current file using normalized, case-insensitive VFS paths; reject absolute paths and traversal above the VFS root.
+- [x] Maintain include stacks and reject cycles with the complete normalized chain in diagnostics.
+- [x] Make `stop;` return only from the current file.
+- [x] Keep optional includes unsupported; missing and malformed files remain distinct errors.
+- [x] Apply the complete include graph as one transaction; any read, parse, decode, or nested-loader failure leaves effective and native state unchanged.
+- [x] Add tests for nested includes, case-insensitive cycles, missing versus malformed files, `stop;`, path normalization, deferred `enable`, provenance, and rollback.
 
 Deliverable: multi-file base configuration works without introducing package activation semantics.
 

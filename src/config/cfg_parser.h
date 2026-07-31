@@ -41,6 +41,7 @@ enum e_cfg_statement_kind {
 struct s_cfg_statement {
     e_cfg_statement_kind kind = CFG_STATEMENT_ASSIGNMENT;
     s_source_location location;
+    uint32_t statement_number = 0;
     std::vector<s_cfg_token> path;
     std::vector<s_cfg_token> values;
     s_cfg_token argument;
