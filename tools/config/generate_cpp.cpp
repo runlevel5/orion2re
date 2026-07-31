@@ -1,12 +1,15 @@
 #include "generate_cpp.h"
 
 #include <cctype>
+#include <climits>
 #include <cstdio>
 #include <filesystem>
 
 namespace config::tool {
 namespace {
     const char* const GENERATED_FILES[] = {
+        "config_bindings.cpp",
+        "config_bindings.h",
         "config_schema.cpp",
         "config_schema.h",
     };
@@ -36,6 +39,18 @@ namespace {
             }
         }
         output += '"';
+        return output;
+    }
+
+    std::string State_Member_(const std::string& path) {
+        std::string output;
+        for (uint8_t byte : path) {
+            if (std::isalnum(byte) != 0 || byte == '_') {
+                output += static_cast<char>(std::tolower(byte));
+            } else {
+                output += '_';
+            }
+        }
         return output;
     }
 
@@ -99,6 +114,236 @@ namespace {
         case PRIMITIVE_STRING: return "CONFIG_VALUE_STRING";
         }
         return "CONFIG_VALUE_BOOL";
+    }
+
+    const char* Storage_Type_(e_primitive_type type) {
+        switch (type) {
+        case PRIMITIVE_BOOL: return "bool";
+        case PRIMITIVE_INT8: return "int8_t";
+        case PRIMITIVE_UINT8: return "uint8_t";
+        case PRIMITIVE_INT16: return "int16_t";
+        case PRIMITIVE_UINT16: return "uint16_t";
+        case PRIMITIVE_INT32: return "int32_t";
+        case PRIMITIVE_UINT32: return "uint32_t";
+        case PRIMITIVE_STRING: return "std::string";
+        }
+        return "bool";
+    }
+
+    std::string Default_Value_(const s_parameter& parameter) {
+        if (parameter.type == PRIMITIVE_BOOL) {
+            return parameter.default_bool ? "true" : "false";
+        }
+        if (parameter.type == PRIMITIVE_STRING) {
+            return Cpp_String_(parameter.default_string);
+        }
+        return std::to_string(parameter.default_integer);
+    }
+
+    std::string Binding_Header_(const s_schema* schema) {
+        std::string output =
+            "// Generated from specs/config/main.json5. Do not edit.\n"
+            "#pragma once\n\n"
+            "#include <cstdint>\n"
+            "#include <string>\n\n"
+            "#include \"config/config_decode.h\"\n\n"
+            "namespace config::generated {\n\n"
+            "struct s_config_state {\n";
+        for (const s_parameter& parameter : schema->parameters) {
+            output += "    " + std::string(Storage_Type_(parameter.type)) + " " +
+                      State_Member_(parameter.path) + " = " + Default_Value_(parameter) + ";\n";
+        }
+        output +=
+            "};\n\n"
+            "void Initialize_Defaults(s_config_state* state);\n"
+            "void Read_Native_State(s_config_state* state);\n"
+            "bool Apply_Write_Set(const s_config_write_set* write_set,\n"
+            "                     const s_config_state* base_state,\n"
+            "                     s_config_state* candidate_state,\n"
+            "                     s_cfg_diagnostic* diagnostic);\n"
+            "bool Apply_Transaction(const s_config_write_set* write_set,\n"
+            "                       s_cfg_diagnostic* diagnostic);\n"
+            "void Commit_State(const s_config_state* state);\n\n"
+            "}\n";
+        return output;
+    }
+
+    std::string Native_Compatibility_(const s_parameter& parameter) {
+        const std::string native = parameter.binding.symbol + "." +
+                                   parameter.binding.members.front();
+        std::string condition = "std::is_integral_v<std::remove_cvref_t<decltype(" + native + ")>>";
+        switch (parameter.type) {
+        case PRIMITIVE_BOOL:
+            condition += " && sizeof(" + native + ") == 1";
+            break;
+        case PRIMITIVE_INT8:
+            condition += " && sizeof(" + native + ") == 1 && "
+                         "std::is_signed_v<std::remove_cvref_t<decltype(" + native + ")>>";
+            break;
+        case PRIMITIVE_UINT8:
+            condition += " && sizeof(" + native + ") == 1 && "
+                         "std::is_unsigned_v<std::remove_cvref_t<decltype(" + native + ")>>";
+            break;
+        case PRIMITIVE_INT16:
+            condition += " && sizeof(" + native + ") == 2 && "
+                         "std::is_signed_v<std::remove_cvref_t<decltype(" + native + ")>>";
+            break;
+        case PRIMITIVE_UINT16:
+            condition += " && sizeof(" + native + ") == 2 && "
+                         "std::is_unsigned_v<std::remove_cvref_t<decltype(" + native + ")>>";
+            break;
+        case PRIMITIVE_INT32:
+            condition += " && sizeof(" + native + ") == 4 && "
+                         "std::is_signed_v<std::remove_cvref_t<decltype(" + native + ")>>";
+            break;
+        case PRIMITIVE_UINT32:
+            condition += " && sizeof(" + native + ") == 4 && "
+                         "std::is_unsigned_v<std::remove_cvref_t<decltype(" + native + ")>>";
+            break;
+        case PRIMITIVE_STRING:
+            condition = "false";
+            break;
+        }
+        return condition;
+    }
+
+    std::string Binding_Source_(const s_schema* schema) {
+        std::string output =
+            "// Generated from specs/config/main.json5. Do not edit.\n"
+            "#include \"config_bindings.h\"\n\n"
+            "#include <type_traits>\n\n";
+        std::vector<std::string> headers;
+        for (const s_parameter& parameter : schema->parameters) {
+            bool found = false;
+            for (const std::string& header : headers) {
+                if (header == parameter.binding.header) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                headers.push_back(parameter.binding.header);
+                output += "#include \"" + parameter.binding.header + "\"\n";
+            }
+        }
+        output += "\nnamespace config::generated {\n\n";
+        for (const s_parameter& parameter : schema->parameters) {
+            output += "static_assert(std::is_same_v<std::remove_cvref_t<decltype(" +
+                      parameter.binding.symbol + ")>, " + parameter.binding.cpp_type +
+                      ">, \"native binding root type mismatch for " + parameter.path + "\");\n";
+            output += "static_assert(" + Native_Compatibility_(parameter) +
+                      ", \"native binding type mismatch for " + parameter.path + "\");\n";
+        }
+        output +=
+            "\nnamespace {\n"
+            "    bool Fail_(const s_config_write* write, const char* message,\n"
+            "               s_cfg_diagnostic* diagnostic) {\n"
+            "        diagnostic->location = write->provenance;\n"
+            "        diagnostic->message = message;\n"
+            "        return false;\n"
+            "    }\n\n"
+            "    bool Apply_Write_(const s_config_write* write, s_config_state* state,\n"
+            "                      s_cfg_diagnostic* diagnostic) {\n"
+            "        switch (write->parameter_id) {\n";
+        for (const s_parameter& parameter : schema->parameters) {
+            output += "        case " + Identifier_(parameter.path) + ":\n";
+            output += "            if (write->value.type != " +
+                      std::string(Cpp_Type_(parameter.type)) + ") {\n";
+            output += "                return Fail_(write, \"typed write mismatch for " +
+                      parameter.path + "\", diagnostic);\n"
+                      "            }\n";
+            if (parameter.type != PRIMITIVE_BOOL && parameter.type != PRIMITIVE_STRING) {
+                int64_t primitive_minimum = 0;
+                int64_t primitive_maximum = 0;
+                switch (parameter.type) {
+                case PRIMITIVE_INT8: primitive_minimum = INT8_MIN; primitive_maximum = INT8_MAX; break;
+                case PRIMITIVE_UINT8: primitive_minimum = 0; primitive_maximum = UINT8_MAX; break;
+                case PRIMITIVE_INT16: primitive_minimum = INT16_MIN; primitive_maximum = INT16_MAX; break;
+                case PRIMITIVE_UINT16: primitive_minimum = 0; primitive_maximum = UINT16_MAX; break;
+                case PRIMITIVE_INT32: primitive_minimum = INT32_MIN; primitive_maximum = INT32_MAX; break;
+                case PRIMITIVE_UINT32: primitive_minimum = 0; primitive_maximum = UINT32_MAX; break;
+                default: break;
+                }
+                const int64_t minimum = parameter.constraints.has_min ? parameter.constraints.min : primitive_minimum;
+                const int64_t maximum = parameter.constraints.has_max ? parameter.constraints.max : primitive_maximum;
+                output += "            if (write->value.integer_value < " + std::to_string(minimum) +
+                          " || write->value.integer_value > " + std::to_string(maximum) + ") {\n"
+                          "                return Fail_(write, \"typed write range error for " +
+                          parameter.path + "\", diagnostic);\n"
+                          "            }\n";
+            }
+            const std::string member = State_Member_(parameter.path);
+            if (parameter.type == PRIMITIVE_BOOL) {
+                output += "            state->" + member + " = write->value.bool_value;\n";
+            } else if (parameter.type == PRIMITIVE_STRING) {
+                output += "            state->" + member + " = write->value.string_value;\n";
+            } else {
+                output += "            state->" + member + " = static_cast<" +
+                          Storage_Type_(parameter.type) + ">(write->value.integer_value);\n";
+            }
+            output += "            return true;\n";
+        }
+        output +=
+            "        }\n"
+            "        return Fail_(write, \"unknown typed write parameter\", diagnostic);\n"
+            "    }\n"
+            "}\n\n"
+            "void Initialize_Defaults(s_config_state* state) {\n"
+            "    *state = {};\n"
+            "}\n\n"
+            "void Read_Native_State(s_config_state* state) {\n";
+        for (const s_parameter& parameter : schema->parameters) {
+            const std::string native = parameter.binding.symbol + "." +
+                                       parameter.binding.members.front();
+            const std::string member = State_Member_(parameter.path);
+            if (parameter.type == PRIMITIVE_BOOL) {
+                output += "    state->" + member + " = " + native + " != 0;\n";
+            } else {
+                output += "    state->" + member + " = static_cast<" +
+                          Storage_Type_(parameter.type) + ">(" + native + ");\n";
+            }
+        }
+        output +=
+            "}\n\n"
+            "bool Apply_Write_Set(const s_config_write_set* write_set,\n"
+            "                     const s_config_state* base_state,\n"
+            "                     s_config_state* candidate_state,\n"
+            "                     s_cfg_diagnostic* diagnostic) {\n"
+            "    if (write_set == nullptr || base_state == nullptr ||\n"
+            "        candidate_state == nullptr || diagnostic == nullptr) {\n"
+            "        return false;\n"
+            "    }\n"
+            "    *diagnostic = {};\n"
+            "    s_config_state temporary = *base_state;\n"
+            "    for (const s_config_write& write : write_set->writes) {\n"
+            "        if (!Apply_Write_(&write, &temporary, diagnostic)) {\n"
+            "            return false;\n"
+            "        }\n"
+            "    }\n"
+            "    *candidate_state = temporary;\n"
+            "    return true;\n"
+            "}\n\n"
+            "bool Apply_Transaction(const s_config_write_set* write_set,\n"
+            "                       s_cfg_diagnostic* diagnostic) {\n"
+            "    s_config_state base_state;\n"
+            "    s_config_state candidate_state;\n"
+            "    Read_Native_State(&base_state);\n"
+            "    if (!Apply_Write_Set(write_set, &base_state, &candidate_state, diagnostic)) {\n"
+            "        return false;\n"
+            "    }\n"
+            "    Commit_State(&candidate_state);\n"
+            "    return true;\n"
+            "}\n\n"
+            "void Commit_State(const s_config_state* state) {\n";
+        for (const s_parameter& parameter : schema->parameters) {
+            const std::string native = parameter.binding.symbol + "." +
+                                       parameter.binding.members.front();
+            const std::string member = State_Member_(parameter.path);
+            output += "    " + native + " = static_cast<decltype(" + native + ")>(state->" +
+                      member + ");\n";
+        }
+        output += "}\n\n}\n";
+        return output;
     }
 
     std::string Header_(const s_schema* schema) {
@@ -231,7 +476,9 @@ bool Generate_Cpp(const s_schema* schema, const char* output_directory,
         return false;
     }
     return Write_If_Different_(Join_Path_(output_directory, "config_schema.h"), Header_(schema), diagnostic) &&
-           Write_If_Different_(Join_Path_(output_directory, "config_schema.cpp"), Source_(schema), diagnostic);
+           Write_If_Different_(Join_Path_(output_directory, "config_schema.cpp"), Source_(schema), diagnostic) &&
+           Write_If_Different_(Join_Path_(output_directory, "config_bindings.h"), Binding_Header_(schema), diagnostic) &&
+           Write_If_Different_(Join_Path_(output_directory, "config_bindings.cpp"), Binding_Source_(schema), diagnostic);
 }
 
 bool Check_Generated_Cpp(const s_schema* schema, const char* committed_directory,

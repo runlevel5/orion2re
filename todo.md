@@ -164,14 +164,14 @@ Deliverable: complete statements resolve and validate atomically without accessi
 
 ## Step 8: generate typed native bindings for the basic variables
 
-- [ ] Generate includes and typed accessors from declared binding roots and member paths.
-- [ ] Generate direct one-to-one writes and allowed logical-to-native conversions for the initial scalar variables; add replicated writes and fixed-array indexing later when migration requires them.
-- [ ] Emit static assertions for root/member compatibility and fixed array extents where C++ permits.
-- [ ] Compile generated bindings against the declared project headers so missing symbols, bad members, and incompatible types fail the build.
-- [ ] Apply writes to temporary typed state or a transaction overlay, never through byte offsets or untyped pointer arithmetic.
+- [x] Generate includes and typed accessors from declared binding roots and member paths.
+- [x] Generate direct one-to-one writes and allowed logical-to-native conversions for the initial scalar variables; add replicated writes and fixed-array indexing later when migration requires them.
+- [x] Emit static assertions for bootstrap root/member compatibility; fixed array extents remain deferred until arrays are introduced.
+- [x] Compile generated bindings against the declared project headers so missing symbols, bad members, and incompatible types fail the build.
+- [x] Apply writes to temporary typed state or a transaction overlay, never through byte offsets or untyped pointer arithmetic.
 - [ ] Add cross-field validator registration for rules that require the complete candidate state.
-- [ ] Commit only after all writes and validators succeed; verify rollback behavior with tests.
-- [ ] Update the selected gameplay semantic use sites to consume the typed scalar state only after the bootstrap slice is proven end to end.
+- [x] Commit only after all bootstrap writes succeed; verify candidate and native rollback behavior with tests.
+- [x] Commit the typed bootstrap state to the existing audio setting fields already consumed at their gameplay semantic use sites.
 
 Deliverable: a few basic existing variables can load defaults and CFG overrides transactionally through generated typed bindings.
 

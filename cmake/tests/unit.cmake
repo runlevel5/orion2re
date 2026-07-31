@@ -88,6 +88,18 @@ orion2re_add_unit_test(test_config_decode
         src/config/generated/config_schema.cpp
 )
 
+orion2re_add_unit_test(test_config_bindings
+    SOURCES
+        tests/unit/test_config_bindings.cpp
+    PRODUCTION_SOURCES
+        src/config/cfg_parser.cpp
+        src/config/config_decode.cpp
+        src/config/generated/config_bindings.cpp
+        src/config/generated/config_schema.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_config_runtime.cpp
+)
+
 orion2re_add_unit_test(test_pop_helpers
     SOURCES
         tests/unit/test_pop_helpers.cpp

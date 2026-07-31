@@ -74,7 +74,8 @@ DOCTEST_TEST_CASE("C++ generation is byte-for-byte deterministic") {
     DOCTEST_REQUIRE(config::tool::Generate_Cpp(&schema, first.string().c_str(), &diagnostic));
     DOCTEST_REQUIRE(config::tool::Generate_Cpp(&schema, second.string().c_str(), &diagnostic));
 
-    for (const char* name : {"config_schema.h", "config_schema.cpp"}) {
+    for (const char* name : {"config_schema.h", "config_schema.cpp",
+                             "config_bindings.h", "config_bindings.cpp"}) {
         std::ifstream first_file(first / name, std::ios::binary);
         std::ifstream second_file(second / name, std::ios::binary);
         const std::string first_content((std::istreambuf_iterator<char>(first_file)),
