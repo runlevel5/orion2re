@@ -140,6 +140,16 @@ Deliverable: parser tests do not depend on the game schema or native bindings.
 
 ## Step 7: generate path resolution, bounded traversal, and typed decode
 
+Bootstrap scalar progress:
+
+- [x] Generate exact canonical-name lookup for the initial root-scalar parameters.
+- [x] Resolve primitive root-scalar assignments and reject selectors on scalar parameters.
+- [x] Decode logical booleans and decimal, hexadecimal, and binary integers using generated primitive types and field constraints.
+- [x] Enforce the one-leaf scalar boundary, reject overflow and skips-only assignments, and clear temporary writes on every failure.
+- [x] Produce typed temporary scalar writes containing the canonical-path identity and source provenance.
+- [x] Add focused tests for lookup, type mismatch, range validation, scalar overflow, unknown paths, provenance, and atomic failure.
+- [ ] Extend resolution, traversal, and typed decoding to records, arrays, aliases, enums, masks, ratios, strings, and aggregate skips when those schema shapes are introduced.
+
 - [ ] Resolve raw path tokens through records, arrays, and any approved keyed collections.
 - [ ] Enforce index bases and produce a canonical resolved path.
 - [ ] Return the selected node, first writable leaf, nearest valid traversal boundary, and remaining writable leaves.

@@ -79,6 +79,15 @@ orion2re_add_unit_test(test_cfg_parser
         src/config/cfg_parser.cpp
 )
 
+orion2re_add_unit_test(test_config_decode
+    SOURCES
+        tests/unit/test_config_decode.cpp
+    PRODUCTION_SOURCES
+        src/config/cfg_parser.cpp
+        src/config/config_decode.cpp
+        src/config/generated/config_schema.cpp
+)
+
 orion2re_add_unit_test(test_pop_helpers
     SOURCES
         tests/unit/test_pop_helpers.cpp

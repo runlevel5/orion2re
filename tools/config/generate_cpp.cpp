@@ -159,6 +159,7 @@ namespace {
             "extern const size_t group_count;\n"
             "extern const s_parameter_descriptor parameters[];\n"
             "extern const size_t parameter_count;\n\n"
+            "const s_parameter_descriptor* Find_Parameter(const char* path, size_t path_length);\n\n"
             "}\n";
         return output;
     }
@@ -167,6 +168,7 @@ namespace {
         std::string output =
             "// Generated from specs/config/main.json5. Do not edit.\n"
             "#include \"config_schema.h\"\n\n"
+            "#include <cstring>\n\n"
             "namespace config::generated {\n\n"
             "const s_group_descriptor groups[] = {\n";
         for (const s_group& group : schema->groups) {
@@ -203,6 +205,18 @@ namespace {
         output +=
             "};\n\n"
             "const size_t parameter_count = sizeof(parameters) / sizeof(parameters[0]);\n\n"
+            "const s_parameter_descriptor* Find_Parameter(const char* path, size_t path_length) {\n"
+            "    if (path == nullptr) {\n"
+            "        return nullptr;\n"
+            "    }\n"
+            "    for (size_t index = 0; index < parameter_count; ++index) {\n"
+            "        if (std::strlen(parameters[index].path) == path_length &&\n"
+            "            std::memcmp(parameters[index].path, path, path_length) == 0) {\n"
+            "            return &parameters[index];\n"
+            "        }\n"
+            "    }\n"
+            "    return nullptr;\n"
+            "}\n\n"
             "}\n";
         return output;
     }

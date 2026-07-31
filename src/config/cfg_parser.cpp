@@ -179,9 +179,9 @@ namespace {
         return true;
     }
 
-    bool Is_Decimal_(const std::string& value, bool allow_sign) {
+    bool Is_Decimal_(const std::string& value, bool allow_negative) {
         size_t offset = 0;
-        if (allow_sign && !value.empty() && (value[0] == '+' || value[0] == '-')) {
+        if (allow_negative && !value.empty() && value[0] == '-') {
             offset = 1;
         }
         if (offset == value.size()) {
@@ -197,7 +197,7 @@ namespace {
 
     bool Is_Base_Integer_(const std::string& value, char prefix, const char* digits) {
         size_t offset = 0;
-        if (!value.empty() && (value[0] == '+' || value[0] == '-')) {
+        if (!value.empty() && value[0] == '-') {
             offset = 1;
         }
         if (offset + 2 >= value.size() || value[offset] != '0' ||

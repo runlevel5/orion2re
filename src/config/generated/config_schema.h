@@ -60,4 +60,6 @@ extern const size_t group_count;
 extern const s_parameter_descriptor parameters[];
 extern const size_t parameter_count;
 
+const s_parameter_descriptor* Find_Parameter(const char* path, size_t path_length);
+
 }

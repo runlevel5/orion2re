@@ -120,6 +120,7 @@ DOCTEST_TEST_CASE("syntax failures report their phase and clear partial output")
         {"music_enabled = 0x;", "malformed numeric value '0x'", 1, 17},
         {"music_enabled = 0b102;", "malformed numeric value '0b102'", 1, 17},
         {"music_enabled = 1.2;", "malformed numeric value '1.2'", 1, 17},
+        {"music_enabled = +1;", "malformed numeric value '+1'", 1, 17},
         {"captain = \"bad\\q\";", "invalid string escape", 1, 16},
         {"captain = \"unterminated", "unterminated string", 1, 11},
         {"first = 1;\nsecond = 2", "unterminated assignment; expected ';'", 2, 1},

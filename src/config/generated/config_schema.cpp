@@ -1,6 +1,8 @@
 // Generated from specs/config/main.json5. Do not edit.
 #include "config_schema.h"
 
+#include <cstring>
+
 namespace config::generated {
 
 const s_group_descriptor groups[] = {
@@ -17,5 +19,18 @@ const s_parameter_descriptor parameters[] = {
 };
 
 const size_t parameter_count = sizeof(parameters) / sizeof(parameters[0]);
+
+const s_parameter_descriptor* Find_Parameter(const char* path, size_t path_length) {
+    if (path == nullptr) {
+        return nullptr;
+    }
+    for (size_t index = 0; index < parameter_count; ++index) {
+        if (std::strlen(parameters[index].path) == path_length &&
+            std::memcmp(parameters[index].path, path, path_length) == 0) {
+            return &parameters[index];
+        }
+    }
+    return nullptr;
+}
 
 }
