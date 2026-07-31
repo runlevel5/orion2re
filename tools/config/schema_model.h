@@ -48,7 +48,6 @@ struct s_binding {
 struct s_group {
     std::string id;
     s_metadata metadata;
-    std::string mutable_policy;
     bool save = false;
     bool synchronize = false;
 };

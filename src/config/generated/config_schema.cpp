@@ -6,7 +6,7 @@
 namespace config::generated {
 
 const s_group_descriptor groups[] = {
-    { "interface", "Interface", "Local presentation, audio, and control settings.", "runtime", false, false },
+    { "interface", "Interface", "Local presentation, audio, and control settings.", false, false },
 };
 
 const size_t group_count = sizeof(groups) / sizeof(groups[0]);
@@ -31,6 +31,19 @@ const s_parameter_descriptor* Find_Parameter(const char* path, size_t path_lengt
         }
     }
     return nullptr;
+}
+
+bool Find_Parameter_Index(e_parameter_id parameter_id, size_t* index) {
+    if (index == nullptr) {
+        return false;
+    }
+    for (size_t current = 0; current < parameter_count; ++current) {
+        if (parameters[current].id == parameter_id) {
+            *index = current;
+            return true;
+        }
+    }
+    return false;
 }
 
 }

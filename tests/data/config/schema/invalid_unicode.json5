@@ -2,7 +2,7 @@
   groups: {
     interface: {
       title: "Interface", description: "Local settings.",
-      mutable: "runtime", save: false, synchronize: false,
+      save: false, synchronize: false,
     },
   },
   types: {}, records: {},

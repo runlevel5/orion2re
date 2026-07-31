@@ -100,6 +100,19 @@ orion2re_add_unit_test(test_config_bindings
         tests/fakes/fake_config_runtime.cpp
 )
 
+orion2re_add_unit_test(test_config_lifecycle
+    SOURCES
+        tests/unit/test_config_lifecycle.cpp
+    PRODUCTION_SOURCES
+        src/config/cfg_parser.cpp
+        src/config/config_decode.cpp
+        src/config/config_lifecycle.cpp
+        src/config/generated/config_bindings.cpp
+        src/config/generated/config_schema.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_config_runtime.cpp
+)
+
 orion2re_add_unit_test(test_pop_helpers
     SOURCES
         tests/unit/test_pop_helpers.cpp

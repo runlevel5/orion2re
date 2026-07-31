@@ -157,6 +157,8 @@ namespace {
             "};\n\n"
             "void Initialize_Defaults(s_config_state* state);\n"
             "void Read_Native_State(s_config_state* state);\n"
+            "bool Read_State_Value(const s_config_state* state, e_parameter_id parameter_id,\n"
+            "                      s_typed_value* value);\n"
             "bool Apply_Write_Set(const s_config_write_set* write_set,\n"
             "                     const s_config_state* base_state,\n"
             "                     s_config_state* candidate_state,\n"
@@ -305,6 +307,30 @@ namespace {
         }
         output +=
             "}\n\n"
+            "bool Read_State_Value(const s_config_state* state, e_parameter_id parameter_id,\n"
+            "                      s_typed_value* value) {\n"
+            "    if (state == nullptr || value == nullptr) {\n"
+            "        return false;\n"
+            "    }\n"
+            "    *value = {};\n"
+            "    switch (parameter_id) {\n";
+        for (const s_parameter& parameter : schema->parameters) {
+            const std::string member = State_Member_(parameter.path);
+            output += "    case " + Identifier_(parameter.path) + ":\n"
+                      "        value->type = " + Cpp_Type_(parameter.type) + ";\n";
+            if (parameter.type == PRIMITIVE_BOOL) {
+                output += "        value->bool_value = state->" + member + ";\n";
+            } else if (parameter.type == PRIMITIVE_STRING) {
+                output += "        value->string_value = state->" + member + ";\n";
+            } else {
+                output += "        value->integer_value = state->" + member + ";\n";
+            }
+            output += "        return true;\n";
+        }
+        output +=
+            "    }\n"
+            "    return false;\n"
+            "}\n\n"
             "bool Apply_Write_Set(const s_config_write_set* write_set,\n"
             "                     const s_config_state* base_state,\n"
             "                     s_config_state* candidate_state,\n"
@@ -375,7 +401,6 @@ namespace {
             "    const char* id;\n"
             "    const char* title;\n"
             "    const char* description;\n"
-            "    const char* mutable_policy;\n"
             "    bool save;\n"
             "    bool synchronize;\n"
             "};\n\n"
@@ -405,6 +430,7 @@ namespace {
             "extern const s_parameter_descriptor parameters[];\n"
             "extern const size_t parameter_count;\n\n"
             "const s_parameter_descriptor* Find_Parameter(const char* path, size_t path_length);\n\n"
+            "bool Find_Parameter_Index(e_parameter_id parameter_id, size_t* index);\n\n"
             "}\n";
         return output;
     }
@@ -419,7 +445,7 @@ namespace {
         for (const s_group& group : schema->groups) {
             output += "    { " + Cpp_String_(group.id) + ", " + Cpp_String_(group.metadata.title) +
                       ", " + Cpp_String_(group.metadata.description) + ", " +
-                      Cpp_String_(group.mutable_policy) + ", " + (group.save ? "true" : "false") +
+                      (group.save ? "true" : "false") +
                       ", " + (group.synchronize ? "true" : "false") + " },\n";
         }
         output +=
@@ -461,6 +487,18 @@ namespace {
             "        }\n"
             "    }\n"
             "    return nullptr;\n"
+            "}\n\n"
+            "bool Find_Parameter_Index(e_parameter_id parameter_id, size_t* index) {\n"
+            "    if (index == nullptr) {\n"
+            "        return false;\n"
+            "    }\n"
+            "    for (size_t current = 0; current < parameter_count; ++current) {\n"
+            "        if (parameters[current].id == parameter_id) {\n"
+            "            *index = current;\n"
+            "            return true;\n"
+            "        }\n"
+            "    }\n"
+            "    return false;\n"
             "}\n\n"
             "}\n";
         return output;

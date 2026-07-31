@@ -177,12 +177,18 @@ Deliverable: a few basic existing variables can load defaults and CFG overrides 
 
 ## Step 9: add configuration lifecycle, groups, extraction, and provenance
 
-- [ ] Define group policies for mutability, reload timing, save participation, multiplayer synchronization, and derived-state refresh.
-- [ ] Initialize candidate state from generated logical defaults before applying base or mod configuration.
-- [ ] Add lifecycle services that rebuild derived caches only after successful commit.
-- [ ] Track source package, file, line, statement, and prior-value provenance per effective leaf.
-- [ ] Implement canonical extraction with symbolic values, explicit numeric prefixes, stable order, bounded aggregate assignments, and optional provenance comments.
-- [ ] Add round-trip tests: defaults/overrides -> canonical CFG -> equivalent effective state.
+- [ ] Define group policies for save participation, multiplayer synchronization, and derived-state refresh when those services are implemented. Do not introduce mutability phases or reload-timing policy without concrete subsystem requirements.
+- [x] Initialize candidate state from generated logical defaults before applying base or mod configuration.
+- [ ] Add lifecycle services that rebuild derived caches only after successful commit when a migrated setting requires a derived cache.
+- [x] Track source package, file, line, statement, and prior-value provenance per effective bootstrap leaf.
+- [x] Implement canonical extraction for the primitive bootstrap with stable schema order and optional provenance comments. Symbolic values and bounded aggregate assignments remain deferred until those schema types exist.
+- [x] Add round-trip tests: defaults/overrides -> canonical CFG -> equivalent effective state.
+
+Bootstrap lifecycle progress:
+
+- [x] Decode a complete CFG document into temporary typed state and commit effective and native state only after every applicable statement succeeds.
+- [x] Make `stop;` end the current document and leave `include` and `enable` execution to their dedicated loader steps.
+- [x] Preserve effective state, native state, current provenance, and prior-value history when any document statement fails.
 
 Deliverable: effective configuration is explainable, extractable, reload-controlled, and deterministic.
 

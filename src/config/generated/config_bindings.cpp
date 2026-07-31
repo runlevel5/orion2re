@@ -73,6 +73,33 @@ void Read_Native_State(s_config_state* state) {
     state->sound_effects_volume = static_cast<int8_t>(MOX::_settings.sound_fx_level);
 }
 
+bool Read_State_Value(const s_config_state* state, e_parameter_id parameter_id,
+                      s_typed_value* value) {
+    if (state == nullptr || value == nullptr) {
+        return false;
+    }
+    *value = {};
+    switch (parameter_id) {
+    case CONFIG_PARAMETER_MUSIC_ENABLED:
+        value->type = CONFIG_VALUE_BOOL;
+        value->bool_value = state->music_enabled;
+        return true;
+    case CONFIG_PARAMETER_MUSIC_VOLUME:
+        value->type = CONFIG_VALUE_INT8;
+        value->integer_value = state->music_volume;
+        return true;
+    case CONFIG_PARAMETER_SOUND_EFFECTS_ENABLED:
+        value->type = CONFIG_VALUE_BOOL;
+        value->bool_value = state->sound_effects_enabled;
+        return true;
+    case CONFIG_PARAMETER_SOUND_EFFECTS_VOLUME:
+        value->type = CONFIG_VALUE_INT8;
+        value->integer_value = state->sound_effects_volume;
+        return true;
+    }
+    return false;
+}
+
 bool Apply_Write_Set(const s_config_write_set* write_set,
                      const s_config_state* base_state,
                      s_config_state* candidate_state,

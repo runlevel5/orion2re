@@ -28,7 +28,6 @@ struct s_group_descriptor {
     const char* id;
     const char* title;
     const char* description;
-    const char* mutable_policy;
     bool save;
     bool synchronize;
 };
@@ -61,5 +60,7 @@ extern const s_parameter_descriptor parameters[];
 extern const size_t parameter_count;
 
 const s_parameter_descriptor* Find_Parameter(const char* path, size_t path_length);
+
+bool Find_Parameter_Index(e_parameter_id parameter_id, size_t* index);
 
 }

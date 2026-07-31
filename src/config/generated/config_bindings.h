@@ -17,6 +17,8 @@ struct s_config_state {
 
 void Initialize_Defaults(s_config_state* state);
 void Read_Native_State(s_config_state* state);
+bool Read_State_Value(const s_config_state* state, e_parameter_id parameter_id,
+                      s_typed_value* value);
 bool Apply_Write_Set(const s_config_write_set* write_set,
                      const s_config_state* base_state,
                      s_config_state* candidate_state,

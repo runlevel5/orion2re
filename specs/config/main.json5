@@ -5,7 +5,6 @@
     interface: {
       title: "Interface",
       description: "Local presentation, audio, and control settings.",
-      mutable: "runtime",
       save: false,
       synchronize: false,
     },

@@ -4,7 +4,6 @@
       title: "Interface",
       title: "Duplicate",
       description: "Local settings.",
-      mutable: "runtime",
       save: false,
       synchronize: false,
     },

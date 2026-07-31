@@ -67,7 +67,6 @@ bool Generate_Documentation(const s_schema* schema, const char* output_path,
     for (const s_group& group : schema->groups) {
         output += "### " + group.metadata.title + " (`" + group.id + "`)\n\n" +
                   group.metadata.description + "\n\n" +
-                  "- Mutable: `" + group.mutable_policy + "`\n" +
                   "- Saved: `" + (group.save ? std::string("yes") : std::string("no")) + "`\n" +
                   "- Multiplayer synchronized: `" +
                   (group.synchronize ? std::string("yes") : std::string("no")) + "`\n\n";

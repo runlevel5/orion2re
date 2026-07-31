@@ -361,16 +361,10 @@ namespace {
             *diagnostic = path + ": group names must use lower_snake_case";
             return false;
         }
-        if (!Has_Only_Members_(value, {"title", "description", "remarks", "units", "examples", "mutable", "save", "synchronize"}, path, diagnostic) ||
+        if (!Has_Only_Members_(value, {"title", "description", "remarks", "units", "examples", "save", "synchronize"}, path, diagnostic) ||
             !Metadata_(value, path, &group->metadata, diagnostic) ||
-            !Required_String_(value, "mutable", path, &group->mutable_policy, diagnostic) ||
             !Required_Bool_(value, "save", path, &group->save, diagnostic) ||
             !Required_Bool_(value, "synchronize", path, &group->synchronize, diagnostic)) {
-            return false;
-        }
-        if (group->mutable_policy != "startup" && group->mutable_policy != "pregame" &&
-            group->mutable_policy != "runtime") {
-            *diagnostic = path + ".mutable: expected 'startup', 'pregame', or 'runtime'";
             return false;
         }
         group->id = id;
