@@ -1,0 +1,84 @@
+{
+  // Declaration order is public traversal order. This bootstrap contains only
+  // primitive scalar settings already present in the restored game.
+  groups: {
+    interface: {
+      title: "Interface",
+      description: "Local presentation, audio, and control settings.",
+      mutable: "runtime",
+      save: false,
+      synchronize: false,
+    },
+  },
+
+  types: {},
+  records: {},
+
+  parameters: {
+    music_enabled: {
+      title: "Music enabled",
+      description: "Controls whether game music is played.",
+      group: "interface",
+      type: "bool",
+      default: true,
+      bind_root: {
+        header: "game/mox.h",
+        symbol: "MOX::_settings",
+        cpp_type: "s_settings",
+      },
+      bind: ["music_on"],
+    },
+
+    music_volume: {
+      title: "Music volume",
+      description: "Sets music playback volume as a percentage.",
+      units: "percent",
+      group: "interface",
+      type: "int8",
+      constraints: {
+        min: 0,
+        max: 100,
+      },
+      default: 50,
+      bind_root: {
+        header: "game/mox.h",
+        symbol: "MOX::_settings",
+        cpp_type: "s_settings",
+      },
+      bind: ["music_level"],
+    },
+
+    sound_effects_enabled: {
+      title: "Sound effects enabled",
+      description: "Controls whether game sound effects are played.",
+      group: "interface",
+      type: "bool",
+      default: true,
+      bind_root: {
+        header: "game/mox.h",
+        symbol: "MOX::_settings",
+        cpp_type: "s_settings",
+      },
+      bind: ["sound_fx_on"],
+    },
+
+    sound_effects_volume: {
+      title: "Sound effects volume",
+      description: "Sets sound-effect playback volume as a percentage.",
+      units: "percent",
+      group: "interface",
+      type: "int8",
+      constraints: {
+        min: 0,
+        max: 100,
+      },
+      default: 50,
+      bind_root: {
+        header: "game/mox.h",
+        symbol: "MOX::_settings",
+        cpp_type: "s_settings",
+      },
+      bind: ["sound_fx_level"],
+    },
+  },
+}

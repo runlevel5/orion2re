@@ -85,6 +85,8 @@ set(ORION2RE_VENDORED_LZ4_COMMIT "0774d05537f9762f838f7ab541b7765f1a729cb5")
 set(ORION2RE_VENDORED_MINIZ_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/miniz")
 set(ORION2RE_VENDORED_MINIZ_COMMIT "77d0dce8627735138c51770d1799a1ef48f2117d")
 set(ORION2RE_VENDORED_LIBSMACKER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/libsmacker")
+set(ORION2RE_VENDORED_YYJSON_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendors/yyjson")
+set(ORION2RE_VENDORED_YYJSON_COMMIT "8b4a38dc994a110abaec8a400615567bd996105f")
 
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
@@ -101,8 +103,18 @@ option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported debug builds"
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
 option(ORION2RE_BUILD_GAME "Build the SDL game executable" ON)
 option(ORION2RE_BUILD_TESTS "Build tests" OFF)
+option(ORION2RE_BUILD_CONFIG_TOOL "Build configuration validation and generation tools" OFF)
 option(ORION2RE_ENFORCE_ORIGINAL_STRUCT_SIZES "Require structures to retain their original game sizes" OFF)
 option(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL "Exclude runtime executables from the default all target" ${ORION2RE_BUILD_TESTS})
+
+if(ORION2RE_BUILD_CONFIG_TOOL AND
+   (NOT EXISTS "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.h" OR
+    NOT EXISTS "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.c"))
+    message(FATAL_ERROR
+        "Configuration tooling requires the yyjson submodule at vendors/yyjson. "
+        "Run 'git submodule update --init vendors/yyjson' and ensure it is pinned to ${ORION2RE_VENDORED_YYJSON_COMMIT}."
+    )
+endif()
 
 if(ORION2RE_ENFORCE_ORIGINAL_STRUCT_SIZES)
     add_compile_definitions(ORION2RE_ENFORCE_ORIGINAL_STRUCT_SIZES=1)
@@ -197,6 +209,85 @@ add_subdirectory("${ORION2RE_VENDORED_LIBUV_DIR}" EXCLUDE_FROM_ALL)
 add_library(orion2re_lz4 STATIC
     "${ORION2RE_VENDORED_LZ4_DIR}/lib/lz4.c"
 )
+
+set(ORION2RE_CONFIG_TOOL_SOURCES
+    tools/config/config_tool.cpp
+    tools/config/generate_cpp.cpp
+    tools/config/generate_cpp.h
+    tools/config/generate_docs.cpp
+    tools/config/generate_docs.h
+    tools/config/json5_reader.cpp
+    tools/config/json5_reader.h
+    tools/config/schema_model.cpp
+    tools/config/schema_model.h
+)
+
+set(ORION2RE_CONFIG_SCHEMA "${CMAKE_CURRENT_SOURCE_DIR}/specs/config/main.json5")
+set(ORION2RE_CONFIG_GENERATED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/config/generated")
+set(ORION2RE_CONFIG_GENERATED_FILES
+    "${ORION2RE_CONFIG_GENERATED_DIR}/config_schema.cpp"
+    "${ORION2RE_CONFIG_GENERATED_DIR}/config_schema.h"
+)
+
+if(ORION2RE_BUILD_CONFIG_TOOL)
+    add_executable(config-tool EXCLUDE_FROM_ALL
+        ${ORION2RE_CONFIG_TOOL_SOURCES}
+        "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.c"
+    )
+    target_compile_features(config-tool PRIVATE cxx_std_20)
+    target_include_directories(config-tool PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/config"
+        "${ORION2RE_VENDORED_YYJSON_DIR}/src"
+    )
+
+    add_custom_target(config-schema-validate
+        COMMAND $<TARGET_FILE:config-tool> validate "${ORION2RE_CONFIG_SCHEMA}"
+        DEPENDS config-tool "${ORION2RE_CONFIG_SCHEMA}"
+        VERBATIM
+    )
+
+    set(ORION2RE_CONFIG_GENERATED_STAMP "${CMAKE_CURRENT_BINARY_DIR}/config-generated.stamp")
+    add_custom_command(
+        OUTPUT "${ORION2RE_CONFIG_GENERATED_STAMP}"
+        BYPRODUCTS ${ORION2RE_CONFIG_GENERATED_FILES}
+        COMMAND $<TARGET_FILE:config-tool> generate
+            "${ORION2RE_CONFIG_SCHEMA}"
+            "${ORION2RE_CONFIG_GENERATED_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E touch "${ORION2RE_CONFIG_GENERATED_STAMP}"
+        DEPENDS
+            config-tool
+            "${ORION2RE_CONFIG_SCHEMA}"
+            ${ORION2RE_CONFIG_TOOL_SOURCES}
+        VERBATIM
+    )
+
+    add_custom_target(config-regenerate
+        DEPENDS "${ORION2RE_CONFIG_GENERATED_STAMP}"
+    )
+
+    add_custom_target(config-generated-check
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_CURRENT_BINARY_DIR}/generated-check"
+        COMMAND $<TARGET_FILE:config-tool> check
+            "${ORION2RE_CONFIG_SCHEMA}"
+            "${ORION2RE_CONFIG_GENERATED_DIR}"
+            "${CMAKE_CURRENT_BINARY_DIR}/generated-check"
+        DEPENDS config-tool "${ORION2RE_CONFIG_SCHEMA}" ${ORION2RE_CONFIG_TOOL_SOURCES}
+        VERBATIM
+    )
+
+    set(ORION2RE_CONFIG_DOCUMENTATION "${CMAKE_CURRENT_BINARY_DIR}/config-reference.md")
+    add_custom_command(
+        OUTPUT "${ORION2RE_CONFIG_DOCUMENTATION}"
+        COMMAND $<TARGET_FILE:config-tool> docs
+            "${ORION2RE_CONFIG_SCHEMA}"
+            "${ORION2RE_CONFIG_DOCUMENTATION}"
+        DEPENDS config-tool "${ORION2RE_CONFIG_SCHEMA}" ${ORION2RE_CONFIG_TOOL_SOURCES}
+        VERBATIM
+    )
+    add_custom_target(config-docs
+        DEPENDS "${ORION2RE_CONFIG_DOCUMENTATION}"
+    )
+endif()
 target_include_directories(orion2re_lz4 PUBLIC
     "${ORION2RE_VENDORED_LZ4_DIR}/lib"
 )
@@ -317,6 +408,9 @@ if(MSVC)
         target_compile_options(orion2re PRIVATE /W3 /permissive-)
     endif()
     target_compile_options(orion2re-router PRIVATE /W3 /permissive-)
+    if(TARGET config-tool)
+        target_compile_options(config-tool PRIVATE /W3 /permissive-)
+    endif()
     if(TARGET orion2re)
         target_link_options(orion2re PRIVATE /MANIFESTUAC:NO)
     endif()

@@ -334,7 +334,7 @@ Sequential order is depth-first declaration order:
 - nested aggregates are recursively flattened into leaves
 - computed or read-only fields are omitted
 
-Declaration order is therefore part of the public schema contract. Reordering fields can change the meaning of terse assignments and requires a schema compatibility decision.
+Declaration order is therefore part of the public schema contract. Reordering fields can change the meaning of terse assignments and requires explicit review of the affected configuration files.
 
 ### Overflow diagnostics
 
@@ -373,6 +373,8 @@ JSON5 provides:
 - cleaner diffs than a code-based declaration system
 
 YAML is not preferred because implicit scalar conversions and its larger syntax surface make strict schema tooling harder.
+
+Build tooling uses vendored yyjson through a small project-owned adapter under `tools/config/`. yyjson is an MIT-licensed ANSI C library with one `.c` and one `.h` file, no transitive dependency, preserved object order, UTF-8 validation, and opt-in JSON5 syntax. The adapter enables only the approved JSON5 flags, rejects duplicate keys and excessive nesting, converts parse-error byte offsets to line and column, and reports semantic errors with the canonical schema path. yyjson is linked only into the build-time `config-tool`, not the game runtime. `mortie/json5cpp` is not used because it also requires JsonCpp and exposes a template-heavy C++ value API.
 
 ### Schema responsibilities
 
@@ -886,7 +888,7 @@ Numeric constraints include `min` and `max`. String constraints include `min_len
 }
 ```
 
-`pattern` denotes a regular expression and is unrelated to bit masks. The schema version must define the supported regular-expression dialect and whether matching covers the complete string. Reusable formats such as `identifier`, `mod_id`, `semantic_version`, and `vfs_path` are preferred over repeated patterns.
+`pattern` denotes a regular expression and is unrelated to bit masks. The schema contract must define the supported regular-expression dialect and whether matching covers the complete string. Reusable formats such as `identifier`, `mod_id`, `semantic_version`, and `vfs_path` are preferred over repeated patterns.
 
 ### Enums
 
@@ -985,7 +987,7 @@ Ratios are normalized during decoding:
 
 Strings have explicit length, encoding, format, and pattern constraints. Paths are semantic string aliases with VFS-aware normalization and package-relative resolution.
 
-## Names and schema evolution
+## Names and schema changes
 
 ### Canonical names
 
@@ -999,17 +1001,17 @@ Canonical names should:
 
 There is no legacy alias layer for old 1.50 field names or flattened positions. Numeric selectors are reserved for actual arrays and keyed numeric collections.
 
-### Schema versioning
+### Change review
 
-The schema has its own version independent of the executable version. A mod manifest declares the schema compatibility range it targets.
+The configuration schema has no independent runtime version. The canonical JSON5 specification and its generated C++ outputs change with the engine source, and Git history records those changes. Mod manifests target compatible engine releases rather than a separate schema version.
 
-Changes are classified as:
+Schema changes are classified during review as:
 
 - additive: new parameter or new trailing field with a default
 - behavioral: same syntax receives changed semantics
 - breaking: field removal, field reordering, type change, or numeric identity change
 
-Because declaration order controls terse traversal, field reordering is a breaking change even when all names remain present.
+Because declaration order controls terse traversal, field reordering can break existing configuration even when all names remain present. Such changes require explicit migration of configuration shipped with the repository and clear release notes for mod authors.
 
 ## Parsing and application architecture
 
@@ -1096,7 +1098,7 @@ Each mod has a JSON5 manifest containing at least:
 
 - stable mod ID
 - display name and version
-- supported engine and schema ranges
+- supported engine range
 - dependencies
 - optional dependencies
 - conflicts
@@ -1121,7 +1123,6 @@ Example direction:
 
   requires: {
     engine: ">=0.1.0",
-    config_schema: ">=1 <2",
   },
 
   dependencies: [
@@ -1147,7 +1148,7 @@ enable example_balance_mod;
 performs the following operation:
 
 1. Resolve the manifest by stable ID.
-2. Validate engine and schema compatibility.
+2. Validate engine compatibility.
 3. Resolve dependencies and ordering.
 4. Detect cycles and conflicts.
 5. Prepare VFS mounts in dependency order.
@@ -1180,7 +1181,6 @@ Save files store the effective deterministic configuration using stable field id
 
 The save should also record:
 
-- configuration schema version
 - enabled mod IDs and versions
 - deterministic package/resource identity
 - creation engine version
@@ -1192,7 +1192,6 @@ Unknown optional fields should be skippable. Missing fields receive schema defau
 
 The host synchronizes a canonical deterministic configuration and mod manifest. Peers compare:
 
-- schema version
 - mod IDs and versions
 - deterministic resource hashes where required
 - canonical gameplay configuration
@@ -1236,6 +1235,8 @@ The build should provide validation for:
 
 Generated documentation can list every parameter, path, type, constraint, default, enum value, mask bit, group, unit, example, and native binding.
 
+Generated C++ schema descriptors, parsers, defaults, and bindings are committed under `src/config/generated/`. Normal builds compile these checked-in files directly and do not build or run the generator. An opt-in CMake regeneration target uses `add_custom_command(OUTPUT ...)` with the canonical JSON5 specification and generator implementation as dependencies, so invoking the target runs the generator only when an input is newer than a generated output or an output is missing. It is not part of `ALL` and is not a dependency of normal game or test targets. CI regenerates into a temporary directory and fails if the result differs from the committed files. Generated files are never edited by hand.
+
 ## Error handling
 
 Errors should identify the relevant phase.
@@ -1266,7 +1267,7 @@ Errors should identify the relevant phase.
 ### Mod-loading errors
 
 - missing manifest
-- incompatible engine or schema version
+- incompatible engine version
 - missing or cyclic dependency
 - conflict
 - resource mount collision forbidden by policy
@@ -1290,8 +1291,8 @@ Errors should identify the relevant phase.
 - Define explicit-width primitive, semantic alias, enum, mask, ratio, string, record, array, and parameter nodes.
 - Define typed scalar, record, exact-array, and repeated element defaults.
 - Define documentation metadata and field-level constraints.
-- Import and verify a small set of value catalogs from 1.50 and restored source.
-- Generate schema IDs and documentation.
+- Bootstrap the canonical schema with a few existing primitive scalar variables only.
+- Generate schema IDs and documentation for those basic variables.
 
 ### Phase 2: assignment parser
 
@@ -1331,13 +1332,14 @@ Errors should identify the relevant phase.
 
 - Assign stable serialized field identities.
 - Save effective deterministic configuration and mod identity.
-- Add migrations and compatibility fixtures.
+- Add save/wire-format migrations and compatibility fixtures.
 - Synchronize canonical gameplay configuration and deterministic resources.
 
 ### Phase 8: expand coverage
 
-- Port configuration and fixes subsystem by subsystem.
+- Migrate and expose existing configuration and fixes subsystem by subsystem until community 1.50 behavior is covered.
 - Replace weak integer IDs with verified enums.
+- Add records, arrays, enums, masks, ratios, and other richer schema shapes when the migrated variables require them.
 - Add additional validation learned from restored gameplay rules.
 - Evaluate scripting separately after the declarative system is stable.
 

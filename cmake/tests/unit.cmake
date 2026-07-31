@@ -53,6 +53,25 @@ orion2re_add_unit_test(test_fields_helpers
         tests/fakes/fake_video.cpp
 )
 
+if(ORION2RE_BUILD_CONFIG_TOOL)
+    orion2re_add_unit_test(test_config_schema
+        SOURCES
+            tests/unit/test_config_schema.cpp
+        PRODUCTION_SOURCES
+            tools/config/generate_cpp.cpp
+            tools/config/json5_reader.cpp
+            tools/config/schema_model.cpp
+            vendors/yyjson/src/yyjson.c
+    )
+    target_include_directories(test_config_schema PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/config"
+        "${ORION2RE_VENDORED_YYJSON_DIR}/src"
+    )
+    target_compile_definitions(test_config_schema PRIVATE
+        CONFIG_SCHEMA_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/config/schema"
+    )
+endif()
+
 orion2re_add_unit_test(test_pop_helpers
     SOURCES
         tests/unit/test_pop_helpers.cpp
