@@ -72,6 +72,13 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
     )
 endif()
 
+orion2re_add_unit_test(test_cfg_parser
+    SOURCES
+        tests/unit/test_cfg_parser.cpp
+    PRODUCTION_SOURCES
+        src/config/cfg_parser.cpp
+)
+
 orion2re_add_unit_test(test_pop_helpers
     SOURCES
         tests/unit/test_pop_helpers.cpp

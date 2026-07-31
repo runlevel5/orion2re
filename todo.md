@@ -57,7 +57,7 @@ Deliverable: a short decision record appended to this file, with every choice re
 - Generated reference documentation is written only to the build directory by the explicit `config-docs` target. It is not committed under `docs/`.
 - Generated in-memory schema IDs are derived from canonical paths. They are not serialization identities and may change when a canonical path changes.
 - JSON5 source is valid UTF-8. Logical game strings are restricted to text representable in CP850, with limits measured in encoded bytes. Unicode-only text is rejected because the game cannot render it.
-- Configuration `include` statements and array-range selectors are out of scope. Individual array indexes and whole-array selection remain supported by the later traversal phase.
+- JSON5 schema inclusion and CFG array-range selectors are out of scope. CFG `include` statements are supported; file resolution, cycle detection, and transactional loading are implemented in Step 10. Individual array indexes and whole-array selection remain supported by the later traversal phase.
 - Aggregate and scalar-start assignments may end before their traversal boundary. They update only the supplied suffix values; excess values beyond the boundary remain errors.
 - Regular-expression constraints are out of scope. Enums use exact symbolic validation, and strings use explicit encoding, byte-length, and approved named-format checks only when required.
 - Interface settings remain local by default. Multiplayer configuration sharing, mod-list exchange, and resource identity comparison are deferred to the networking phase.
@@ -129,12 +129,12 @@ Deliverable: the initial basic variables have inspectable generated C++ metadata
 
 ## Step 6: implement the standalone CFG lexical parser
 
-- [ ] Add runtime value and source-location types under `src/config/`.
-- [ ] Parse semicolon-terminated assignment, `include`, `enable`, and `stop` statements without game-specific names.
-- [ ] Support comments, whitespace-separated paths, quoted strings and escapes, bare identifiers, decimal/hex/binary integers, ratios, comma-separated masks, and explicit skip tokens.
-- [ ] Preserve raw path and RHS tokens plus file, line, and column information.
-- [ ] Define and test malformed-number boundaries so a lexical error is not misreported as a schema error.
-- [ ] Add unit tests for valid syntax, invalid escapes, unterminated strings/statements, missing RHS values, comments, and source locations.
+- [x] Add runtime value and source-location types under `src/config/`.
+- [x] Parse semicolon-terminated assignment, `include`, `enable`, and `stop` statements without game-specific names.
+- [x] Support comments, whitespace-separated paths, quoted strings and JSON escapes, bare identifiers, decimal/hex/binary integers, ratios, comma-separated masks, and explicit skip tokens.
+- [x] Preserve raw path and RHS tokens plus file, line, column, and byte-offset information.
+- [x] Define and test malformed-number boundaries so a lexical error is not misreported as a schema error.
+- [x] Add unit tests for valid syntax, invalid escapes, unterminated strings/statements, missing RHS values, comments, directives, and source locations.
 
 Deliverable: parser tests do not depend on the game schema or native bindings.
 
