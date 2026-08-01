@@ -1,7 +1,6 @@
 #include "config_lifecycle.h"
 
 #include "config/config_decode.h"
-#include "config/generated/config_schema.h"
 
 namespace config {
 namespace {
@@ -39,9 +38,9 @@ namespace {
     }
 
     void Append_Value_(const s_typed_value& value, std::string* output) {
-        if (value.type == generated::CONFIG_VALUE_BOOL) {
+        if (value.type == CONFIG_VALUE_BOOL) {
             *output += value.bool_value ? "true" : "false";
-        } else if (value.type == generated::CONFIG_VALUE_STRING) {
+        } else if (value.type == CONFIG_VALUE_STRING) {
             Append_Escaped_String_(value.string_value, output);
         } else {
             *output += std::to_string(value.integer_value);
@@ -56,19 +55,19 @@ namespace {
 }
 
 void Initialize_Effective_Config(s_effective_config* effective) {
-    generated::Initialize_Defaults(&effective->state);
+    Initialize_Defaults(&effective->state);
     effective->provenance.clear();
-    effective->provenance.resize(generated::parameter_count);
+    effective->provenance.resize(variable_count);
     effective->prior_values.clear();
-    effective->prior_values.resize(generated::parameter_count);
+    effective->prior_values.resize(variable_count);
 }
 
 void Read_Effective_Native_Config(s_effective_config* effective) {
-    generated::Read_Native_State(&effective->state);
+    Read_Current_State(&effective->state);
     effective->provenance.clear();
-    effective->provenance.resize(generated::parameter_count);
+    effective->provenance.resize(variable_count);
     effective->prior_values.clear();
-    effective->prior_values.resize(generated::parameter_count);
+    effective->prior_values.resize(variable_count);
 }
 
 bool Apply_Config_Document(const s_cfg_document* document, const char* package_id,
@@ -77,13 +76,14 @@ bool Apply_Config_Document(const s_cfg_document* document, const char* package_i
         return false;
     }
     *diagnostic = {};
-    if (effective->provenance.size() != generated::parameter_count ||
-        effective->prior_values.size() != generated::parameter_count) {
+    if (effective->state.values.size() != variable_count ||
+        effective->provenance.size() != variable_count ||
+        effective->prior_values.size() != variable_count) {
         diagnostic->message = "effective configuration is not initialized";
         return false;
     }
 
-    generated::s_config_state candidate_state = effective->state;
+    s_config_state candidate_state = effective->state;
     std::vector<s_value_provenance> candidate_provenance = effective->provenance;
     std::vector<std::vector<s_prior_value>> candidate_prior_values = effective->prior_values;
     for (size_t statement_index = 0; statement_index < document->statements.size(); ++statement_index) {
@@ -104,26 +104,22 @@ bool Apply_Config_Document(const s_cfg_document* document, const char* package_i
             return false;
         }
         for (s_config_write& write : statement_writes.writes) {
-            size_t parameter_index = 0;
-            if (!generated::Find_Parameter_Index(write.parameter_id, &parameter_index)) {
-                return Fail_(write.provenance, "generated parameter index is missing", diagnostic);
-            }
+            const size_t variable_index = write.variable_id;
 
             s_prior_value prior;
-            if (!generated::Read_State_Value(&candidate_state, write.parameter_id, &prior.value)) {
-                return Fail_(write.provenance, "generated state accessor is missing", diagnostic);
+            if (!Read_State_Value(&candidate_state, write.variable_id, &prior.value)) {
+                return Fail_(write.provenance, "configuration state accessor is missing", diagnostic);
             }
-            prior.provenance = candidate_provenance[parameter_index];
+            prior.provenance = candidate_provenance[variable_index];
 
             s_config_write_set one_write;
             one_write.writes.push_back(write);
-            generated::s_config_state next_state;
-            if (!generated::Apply_Write_Set(&one_write, &candidate_state,
-                                            &next_state, diagnostic)) {
+            s_config_state next_state;
+            if (!Apply_Write_Set(&one_write, &candidate_state, &next_state, diagnostic)) {
                 return false;
             }
             candidate_state = next_state;
-            candidate_prior_values[parameter_index].push_back(std::move(prior));
+            candidate_prior_values[variable_index].push_back(std::move(prior));
 
             s_value_provenance provenance;
             provenance.has_override = true;
@@ -132,11 +128,14 @@ bool Apply_Config_Document(const s_cfg_document* document, const char* package_i
             provenance.statement = statement.statement_number != 0 ?
                                    statement.statement_number :
                                    static_cast<uint32_t>(statement_index + 1);
-            candidate_provenance[parameter_index] = std::move(provenance);
+            candidate_provenance[variable_index] = std::move(provenance);
         }
     }
 
-    generated::Commit_State(&candidate_state);
+    if (!Commit_State(&candidate_state)) {
+        diagnostic->message = "unable to commit configuration state";
+        return false;
+    }
     effective->state = candidate_state;
     effective->provenance = std::move(candidate_provenance);
     effective->prior_values = std::move(candidate_prior_values);
@@ -150,29 +149,29 @@ bool Extract_Canonical_Config(const s_effective_config* effective, bool include_
     }
     output->clear();
     *diagnostic = {};
-    if (effective->provenance.size() != generated::parameter_count ||
-        effective->prior_values.size() != generated::parameter_count) {
+    if (effective->state.values.size() != variable_count ||
+        effective->provenance.size() != variable_count ||
+        effective->prior_values.size() != variable_count) {
         diagnostic->message = "effective configuration is not initialized";
         return false;
     }
 
-    for (size_t index = 0; index < generated::parameter_count; ++index) {
+    for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
         s_typed_value value;
-        if (!generated::Read_State_Value(&effective->state,
-                                         generated::parameters[index].id, &value)) {
-            diagnostic->message = "generated state accessor is missing for '" +
-                                  std::string(generated::parameters[index].path) + "'";
+        if (!Read_State_Value(&effective->state, variable_id, &value)) {
+            diagnostic->message = "configuration state accessor is missing for '" +
+                                  std::string(variables[variable_id].name) + "'";
             return false;
         }
-        if (include_provenance && effective->provenance[index].has_override) {
-            const s_value_provenance& provenance = effective->provenance[index];
+        if (include_provenance && effective->provenance[variable_id].has_override) {
+            const s_value_provenance& provenance = effective->provenance[variable_id];
             *output += "# from ";
             Append_Comment_Text_(provenance.package_id, output);
             *output += ": ";
             Append_Comment_Text_(provenance.location.source, output);
             *output += ":" + std::to_string(provenance.location.line) + "\n";
         }
-        *output += generated::parameters[index].path;
+        *output += variables[variable_id].name;
         *output += " = ";
         Append_Value_(value, output);
         *output += ";\n";

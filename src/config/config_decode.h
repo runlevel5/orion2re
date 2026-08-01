@@ -5,19 +5,12 @@
 #include <vector>
 
 #include "config/cfg_parser.h"
-#include "config/generated/config_schema.h"
+#include "config/config_runtime.h"
 
 namespace config {
 
-struct s_typed_value {
-    generated::e_value_type type = generated::CONFIG_VALUE_BOOL;
-    bool bool_value = false;
-    int64_t integer_value = 0;
-    std::string string_value;
-};
-
 struct s_config_write {
-    generated::e_parameter_id parameter_id = generated::CONFIG_PARAMETER_MUSIC_ENABLED;
+    t_variable_id variable_id = 0;
     std::string canonical_path;
     s_typed_value value;
     s_source_location provenance;

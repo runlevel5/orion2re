@@ -54,7 +54,6 @@ struct s_group {
 
 struct s_parameter {
     std::string path;
-    uint64_t schema_id = 0;
     s_metadata metadata;
     std::string group;
     e_primitive_type type = PRIMITIVE_BOOL;

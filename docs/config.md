@@ -24,7 +24,7 @@ The assignment language preserves the strongest part of the 1.50 format: one sta
 - Support explicit-width primitive types and reusable semantic type aliases with stricter constraints.
 - Store human-readable titles, descriptions, remarks, units, and examples as schema data for generated documentation.
 - Store typed logical defaults, including record and array defaults, without embedding native initializer text.
-- Generate typed C++ bindings and validation from a no-code JSON5 schema.
+- Generate minimal typed C++ accessors from a no-code JSON5 schema.
 - Load configuration transactionally: validate the complete operation before changing live state.
 - Make `enable` load a complete mod package, including dependencies, configuration, and resources.
 - Integrate resource replacement through the project's VFS rather than through individual binary-era filename substitutions.
@@ -62,7 +62,7 @@ An original patch offset can help locate behavior in Ghidra, but it is not a nat
 
 The parser knows how to read statements and values. It does not know what `guardian`, `weapon`, or `plasma_cannon` mean.
 
-The generated schema layer resolves paths, types values, determines traversal boundaries, and produces an atomic set of writes.
+The configuration runtime resolves generated schema paths, types values, determines traversal boundaries, and produces an atomic set of writes.
 
 The generated binding layer maps those writes to typed native state.
 
@@ -762,7 +762,7 @@ If changing a setting requires procedural behavior, the preferred design is to s
 
 Derived caches and resources may be rebuilt by explicit configuration lifecycle services after a successful transaction. Those services are engine code, not field mappings.
 
-Generated code must compile against the declared native headers and types. The generator should emit static checks for fixed array extents and compatible field types where possible; the C++ compiler is the final authority on binding validity. Generated initialization must preserve the same logical-to-native conversions and replicated bindings used by ordinary writes.
+Generated code must compile against the declared native headers and types. It contains only accessors to get a variable's default value, set its native value, and get its current native value, using simple casts between typed configuration values and native fields. Schema descriptors, path lookup, validation, candidate state, transactions, and lifecycle behavior belong to the handwritten configuration runtime rather than generated code.
 
 ## Strong typing policy
 
@@ -1029,7 +1029,7 @@ It handles comments, quoting, escapes, semicolons, and includes no game-specific
 
 ### Stage 2: path resolution
 
-Generated schema code resolves the path through records, arrays, and keyed collections. It returns:
+Configuration runtime code resolves the path through generated record, array, and keyed-collection descriptors. It returns:
 
 - selected node
 - first writable leaf and traversal boundary
@@ -1039,11 +1039,11 @@ Generated schema code resolves the path through records, arrays, and keyed colle
 
 The decoder walks forward from the resolved first leaf to the boundary and converts each RHS token according to the current leaf's type. A root scalar has a one-leaf boundary; a scalar inside an aggregate may consume the remaining leaves within that boundary.
 
-Its output is an atomic write set containing stable schema field identities, resolved indexes, typed values, and source provenance.
+Its output is an atomic write set containing build-local numeric variable IDs, stable canonical variable names, typed values, and source provenance. Persisted or received writes carry the canonical name and resolve it back to the current build's numeric ID before replay.
 
 ### Stage 4: typed apply
 
-Generated binding code applies the write set to temporary typed state or a transaction overlay. No raw byte offsets or untyped pointer arithmetic are used.
+The configuration runtime applies the write set to temporary typed state or a transaction overlay. Generated binding accessors commit validated values to native state. No raw byte offsets or untyped pointer arithmetic are used.
 
 ### Stage 5: validation and commit
 
@@ -1177,7 +1177,7 @@ The native model uses package resource mounts rather than binary-era per-file su
 
 ### Save games
 
-Save files store the effective deterministic configuration using stable field identities, not JSON5 text, native memory dumps, or positional schema order.
+Save files store the effective deterministic configuration using stable canonical variable names, not build-local numeric IDs, JSON5 text, native memory dumps, or positional schema order. A leaf's stable name is its full logical path with dot-separated record fields and decimal array indexes, for example `weapons.foo.bar.1.baz`. On load, the runtime resolves this name to the current build's numeric variable ID before replaying the set.
 
 The save should also record:
 
@@ -1235,7 +1235,7 @@ The build should provide validation for:
 
 Generated documentation can list every parameter, path, type, constraint, default, enum value, mask bit, group, unit, example, and native binding.
 
-Generated C++ schema descriptors, parsers, defaults, and bindings are committed under `src/config/generated/`. Normal builds compile these checked-in files directly and do not build or run the generator. An opt-in CMake regeneration target uses `add_custom_command(OUTPUT ...)` with the canonical JSON5 specification and generator implementation as dependencies, so invoking the target runs the generator only when an input is newer than a generated output or an output is missing. It is not part of `ALL` and is not a dependency of normal game or test targets. CI regenerates into a temporary directory and fails if the result differs from the committed files. Generated files are never edited by hand.
+Generated C++ schema descriptors, defaults, and native accessors are committed as `src/config/generated/config.cpp`. Normal builds compile this checked-in file directly and do not build or run the generator. An opt-in CMake regeneration target uses `add_custom_command(OUTPUT ...)` with the canonical JSON5 specification and generator implementation as dependencies, so invoking the target runs the generator only when an input is newer than the generated output or the output is missing. It is not part of `ALL` and is not a dependency of normal game or test targets. CI regenerates into a temporary directory and fails if the result differs from the committed file. Generated files are never edited by hand.
 
 ## Error handling
 
@@ -1280,7 +1280,7 @@ Errors should identify the relevant phase.
 - C++ type mismatch
 - invalid replicated target
 - unsupported schema shape
-- unstable or duplicate stable field identity
+- invalid or duplicate canonical variable name
 
 ## Implementation phases
 
@@ -1292,7 +1292,7 @@ Errors should identify the relevant phase.
 - Define typed scalar, record, exact-array, and repeated element defaults.
 - Define documentation metadata and field-level constraints.
 - Bootstrap the canonical schema with a few existing primitive scalar variables only.
-- Generate schema IDs and documentation for those basic variables.
+- Generate variable descriptors, canonical names, and documentation for those basic variables.
 
 ### Phase 2: assignment parser
 
@@ -1330,7 +1330,7 @@ Errors should identify the relevant phase.
 
 ### Phase 7: saves and networking
 
-- Assign stable serialized field identities.
+- Serialize canonical hierarchical variable names and resolve them to build-local IDs when loading.
 - Save effective deterministic configuration and mod identity.
 - Add save/wire-format migrations and compatibility fixtures.
 - Synchronize canonical gameplay configuration and deterministic resources.
@@ -1351,7 +1351,6 @@ Errors should identify the relevant phase.
 - Whether whole-record assignment may omit trailing values without warnings.
 - Whether explicit array ranges are needed after whole-array assignment and skips are available.
 - Exact regular-expression dialect and string-length unit.
-- How schema stable field identities are assigned and reviewed.
 - Which interface settings belong in saves or multiplayer synchronization.
 - Whether unknown deterministic resource files are rejected or merely excluded from identity hashes.
 

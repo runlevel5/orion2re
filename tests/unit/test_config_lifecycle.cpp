@@ -4,7 +4,6 @@
 
 #include "config/cfg_parser.h"
 #include "config/config_lifecycle.h"
-#include "config/generated/config_schema.h"
 #include "doctest/doctest.h"
 
 namespace {
@@ -22,12 +21,20 @@ namespace {
                config::Apply_Config_Document(&document, package_id, effective, diagnostic);
     }
 
-    bool States_Equal_(const config::generated::s_config_state& left,
-                       const config::generated::s_config_state& right) {
-        return left.music_enabled == right.music_enabled &&
-               left.music_volume == right.music_volume &&
-               left.sound_effects_enabled == right.sound_effects_enabled &&
-               left.sound_effects_volume == right.sound_effects_volume;
+    bool States_Equal_(const config::s_config_state& left,
+                       const config::s_config_state& right) {
+        if (left.values.size() != right.values.size()) {
+            return false;
+        }
+        for (size_t index = 0; index < left.values.size(); ++index) {
+            if (left.values[index].type != right.values[index].type ||
+                left.values[index].bool_value != right.values[index].bool_value ||
+                left.values[index].integer_value != right.values[index].integer_value ||
+                left.values[index].string_value != right.values[index].string_value) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
@@ -36,11 +43,11 @@ DOCTEST_TEST_SUITE("configuration lifecycle") {
 DOCTEST_TEST_CASE("effective state initializes from defaults or current native values") {
     config::s_effective_config defaults;
     config::Initialize_Effective_Config(&defaults);
-    DOCTEST_CHECK(defaults.state.music_enabled);
-    DOCTEST_CHECK(defaults.state.music_volume == 50);
-    DOCTEST_CHECK(defaults.state.sound_effects_enabled);
-    DOCTEST_CHECK(defaults.state.sound_effects_volume == 50);
-    DOCTEST_CHECK(defaults.provenance.size() == config::generated::parameter_count);
+    DOCTEST_CHECK(defaults.state.values[0].bool_value);
+    DOCTEST_CHECK(defaults.state.values[1].integer_value == 50);
+    DOCTEST_CHECK(defaults.state.values[2].bool_value);
+    DOCTEST_CHECK(defaults.state.values[3].integer_value == 50);
+    DOCTEST_CHECK(defaults.provenance.size() == config::variable_count);
     for (const config::s_value_provenance& provenance : defaults.provenance) {
         DOCTEST_CHECK_FALSE(provenance.has_override);
     }
@@ -51,10 +58,10 @@ DOCTEST_TEST_CASE("effective state initializes from defaults or current native v
     MOX::_settings.sound_fx_level = 67;
     config::s_effective_config native;
     config::Read_Effective_Native_Config(&native);
-    DOCTEST_CHECK_FALSE(native.state.music_enabled);
-    DOCTEST_CHECK(native.state.music_volume == 34);
-    DOCTEST_CHECK(native.state.sound_effects_enabled);
-    DOCTEST_CHECK(native.state.sound_effects_volume == 67);
+    DOCTEST_CHECK_FALSE(native.state.values[0].bool_value);
+    DOCTEST_CHECK(native.state.values[1].integer_value == 34);
+    DOCTEST_CHECK(native.state.values[2].bool_value);
+    DOCTEST_CHECK(native.state.values[3].integer_value == 67);
 }
 
 DOCTEST_TEST_CASE("complete documents commit state and per-value provenance atomically") {
@@ -72,16 +79,16 @@ DOCTEST_TEST_CASE("complete documents commit state and per-value provenance atom
         "sound_effects_volume = 25;\n",
         "base_game", &effective, &diagnostic));
 
-    DOCTEST_CHECK_FALSE(effective.state.music_enabled);
-    DOCTEST_CHECK(effective.state.music_volume == 75);
-    DOCTEST_CHECK(effective.state.sound_effects_volume == 25);
+    DOCTEST_CHECK_FALSE(effective.state.values[0].bool_value);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 75);
+    DOCTEST_CHECK(effective.state.values[3].integer_value == 25);
     DOCTEST_CHECK(MOX::_settings.music_on == 0);
     DOCTEST_CHECK(MOX::_settings.music_level == 75);
     DOCTEST_CHECK(MOX::_settings.sound_fx_level == 25);
 
-    size_t music_index = 0;
-    DOCTEST_REQUIRE(config::generated::Find_Parameter_Index(
-        config::generated::CONFIG_PARAMETER_MUSIC_VOLUME, &music_index));
+    config::t_variable_id music_index = 0;
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "music_volume", std::strlen("music_volume"), &music_index));
     DOCTEST_CHECK(effective.provenance[music_index].has_override);
     DOCTEST_CHECK(effective.provenance[music_index].package_id == "base_game");
     DOCTEST_CHECK(effective.provenance[music_index].location.source == "lifecycle.cfg");
@@ -93,7 +100,7 @@ DOCTEST_TEST_CASE("complete documents commit state and per-value provenance atom
 
     DOCTEST_REQUIRE(Apply_("music_volume = 90;", "balance_mod",
                            &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.music_volume == 90);
+    DOCTEST_CHECK(effective.state.values[music_index].integer_value == 90);
     DOCTEST_CHECK(effective.provenance[music_index].package_id == "balance_mod");
     DOCTEST_CHECK(effective.provenance[music_index].statement == 1);
     DOCTEST_REQUIRE(effective.prior_values[music_index].size() == 2);
@@ -111,7 +118,7 @@ DOCTEST_TEST_CASE("document failure rolls back earlier writes provenance and nat
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Apply_("music_enabled = false;", "first",
                            &effective, &diagnostic));
-    const config::generated::s_config_state prior_state = effective.state;
+    const config::s_config_state prior_state = effective.state;
     const std::vector<config::s_value_provenance> prior_provenance = effective.provenance;
     const std::vector<std::vector<config::s_prior_value>> prior_values =
         effective.prior_values;
@@ -145,7 +152,7 @@ DOCTEST_TEST_CASE("stop terminates the current document before later statements"
     DOCTEST_REQUIRE(Apply_(
         "music_volume = 70; stop; music_volume = 99;",
         "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.music_volume == 70);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 70);
     DOCTEST_CHECK(MOX::_settings.music_level == 70);
 }
 
@@ -159,13 +166,13 @@ DOCTEST_TEST_CASE("include and enable remain loader operations and roll back the
         "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
                   "include execution requires the configuration loader");
-    DOCTEST_CHECK(effective.state.music_volume == 50);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
 
     DOCTEST_CHECK_FALSE(Apply_(
         "music_volume = 70; enable balance_mod;",
         "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message == "enable execution requires the mod loader");
-    DOCTEST_CHECK(effective.state.music_volume == 50);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
 }
 
 DOCTEST_TEST_CASE("canonical extraction follows schema order and round trips") {

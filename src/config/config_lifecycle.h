@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "config/cfg_parser.h"
-#include "config/generated/config_bindings.h"
+#include "config/config_runtime.h"
 
 namespace config {
 
@@ -22,7 +22,7 @@ struct s_prior_value {
 };
 
 struct s_effective_config {
-    generated::s_config_state state;
+    s_config_state state;
     std::vector<s_value_provenance> provenance;
     std::vector<std::vector<s_prior_value>> prior_values;
 };

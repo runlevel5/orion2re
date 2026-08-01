@@ -345,15 +345,6 @@ namespace {
         return true;
     }
 
-    uint64_t Schema_Id_(const std::string& path) {
-        uint64_t hash = UINT64_C(14695981039346656037);
-        for (uint8_t byte : path) {
-            hash ^= byte;
-            hash *= UINT64_C(1099511628211);
-        }
-        return hash;
-    }
-
     bool Group_(const std::string& id, const s_json_value* value, const std::string& root,
                 s_group* group, std::string* diagnostic) {
         const std::string path = root + ".groups." + id;
@@ -439,7 +430,6 @@ namespace {
         }
 
         parameter->path = id;
-        parameter->schema_id = Schema_Id_(id);
         return true;
     }
 }
@@ -517,12 +507,6 @@ bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* d
             *diagnostic = schema_path + ".parameters." + parameters->member_names[index] +
                           ".group: unknown group '" + schema->parameters.back().group + "'";
             return false;
-        }
-        for (size_t prior = 0; prior + 1 < schema->parameters.size(); ++prior) {
-            if (schema->parameters[prior].schema_id == schema->parameters.back().schema_id) {
-                *diagnostic = schema_path + ".parameters: canonical-path schema ID collision";
-                return false;
-            }
         }
     }
     return true;

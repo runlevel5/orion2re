@@ -85,7 +85,10 @@ orion2re_add_unit_test(test_config_decode
     PRODUCTION_SOURCES
         src/config/cfg_parser.cpp
         src/config/config_decode.cpp
-        src/config/generated/config_schema.cpp
+        src/config/config_runtime.cpp
+        src/config/generated/config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_config_runtime.cpp
 )
 
 orion2re_add_unit_test(test_config_bindings
@@ -94,8 +97,8 @@ orion2re_add_unit_test(test_config_bindings
     PRODUCTION_SOURCES
         src/config/cfg_parser.cpp
         src/config/config_decode.cpp
-        src/config/generated/config_bindings.cpp
-        src/config/generated/config_schema.cpp
+        src/config/config_runtime.cpp
+        src/config/generated/config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -107,8 +110,8 @@ orion2re_add_unit_test(test_config_lifecycle
         src/config/cfg_parser.cpp
         src/config/config_decode.cpp
         src/config/config_lifecycle.cpp
-        src/config/generated/config_bindings.cpp
-        src/config/generated/config_schema.cpp
+        src/config/config_runtime.cpp
+        src/config/generated/config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -121,8 +124,8 @@ orion2re_add_unit_test(test_config_loader
         src/config/config_decode.cpp
         src/config/config_lifecycle.cpp
         src/config/config_loader.cpp
-        src/config/generated/config_bindings.cpp
-        src/config/generated/config_schema.cpp
+        src/config/config_runtime.cpp
+        src/config/generated/config.cpp
         src/game/compat.cpp
         src/game/vfs.cpp
         src/game/vfs_file.cpp

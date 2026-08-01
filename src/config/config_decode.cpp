@@ -13,28 +13,28 @@ namespace {
         return false;
     }
 
-    const char* Type_Name_(generated::e_value_type type) {
+    const char* Type_Name_(e_value_type type) {
         switch (type) {
-        case generated::CONFIG_VALUE_BOOL: return "bool";
-        case generated::CONFIG_VALUE_INT8: return "int8";
-        case generated::CONFIG_VALUE_UINT8: return "uint8";
-        case generated::CONFIG_VALUE_INT16: return "int16";
-        case generated::CONFIG_VALUE_UINT16: return "uint16";
-        case generated::CONFIG_VALUE_INT32: return "int32";
-        case generated::CONFIG_VALUE_UINT32: return "uint32";
-        case generated::CONFIG_VALUE_STRING: return "string";
+        case CONFIG_VALUE_BOOL: return "bool";
+        case CONFIG_VALUE_INT8: return "int8";
+        case CONFIG_VALUE_UINT8: return "uint8";
+        case CONFIG_VALUE_INT16: return "int16";
+        case CONFIG_VALUE_UINT16: return "uint16";
+        case CONFIG_VALUE_INT32: return "int32";
+        case CONFIG_VALUE_UINT32: return "uint32";
+        case CONFIG_VALUE_STRING: return "string";
         }
         return "unknown";
     }
 
-    void Primitive_Range_(generated::e_value_type type, int64_t* minimum, int64_t* maximum) {
+    void Primitive_Range_(e_value_type type, int64_t* minimum, int64_t* maximum) {
         switch (type) {
-        case generated::CONFIG_VALUE_INT8: *minimum = INT8_MIN; *maximum = INT8_MAX; break;
-        case generated::CONFIG_VALUE_UINT8: *minimum = 0; *maximum = UINT8_MAX; break;
-        case generated::CONFIG_VALUE_INT16: *minimum = INT16_MIN; *maximum = INT16_MAX; break;
-        case generated::CONFIG_VALUE_UINT16: *minimum = 0; *maximum = UINT16_MAX; break;
-        case generated::CONFIG_VALUE_INT32: *minimum = INT32_MIN; *maximum = INT32_MAX; break;
-        case generated::CONFIG_VALUE_UINT32: *minimum = 0; *maximum = UINT32_MAX; break;
+        case CONFIG_VALUE_INT8: *minimum = INT8_MIN; *maximum = INT8_MAX; break;
+        case CONFIG_VALUE_UINT8: *minimum = 0; *maximum = UINT8_MAX; break;
+        case CONFIG_VALUE_INT16: *minimum = INT16_MIN; *maximum = INT16_MAX; break;
+        case CONFIG_VALUE_UINT16: *minimum = 0; *maximum = UINT16_MAX; break;
+        case CONFIG_VALUE_INT32: *minimum = INT32_MIN; *maximum = INT32_MAX; break;
+        case CONFIG_VALUE_UINT32: *minimum = 0; *maximum = UINT32_MAX; break;
         default: *minimum = 0; *maximum = 0; break;
         }
     }
@@ -105,15 +105,15 @@ namespace {
         return false;
     }
 
-    bool Decode_Value_(const generated::s_parameter_descriptor* parameter,
+    bool Decode_Value_(const s_variable_descriptor* variable,
                        const s_cfg_token& token, s_typed_value* value,
                        std::string* expected) {
-        value->type = parameter->type;
-        *expected = Type_Name_(parameter->type);
-        if (parameter->type == generated::CONFIG_VALUE_BOOL) {
+        value->type = variable->type;
+        *expected = Type_Name_(variable->type);
+        if (variable->type == CONFIG_VALUE_BOOL) {
             return Decode_Bool_(token, value);
         }
-        if (parameter->type == generated::CONFIG_VALUE_STRING) {
+        if (variable->type == CONFIG_VALUE_STRING) {
             if (token.kind != CFG_TOKEN_STRING) {
                 return false;
             }
@@ -126,9 +126,9 @@ namespace {
 
         int64_t primitive_minimum = 0;
         int64_t primitive_maximum = 0;
-        Primitive_Range_(parameter->type, &primitive_minimum, &primitive_maximum);
-        const int64_t minimum = parameter->has_min ? parameter->min : primitive_minimum;
-        const int64_t maximum = parameter->has_max ? parameter->max : primitive_maximum;
+        Primitive_Range_(variable->type, &primitive_minimum, &primitive_maximum);
+        const int64_t minimum = variable->has_min ? variable->min : primitive_minimum;
+        const int64_t maximum = variable->has_max ? variable->max : primitive_maximum;
         if (value->integer_value < minimum || value->integer_value > maximum) {
             *expected += " in range " + std::to_string(minimum) + ".." + std::to_string(maximum);
             return false;
@@ -152,17 +152,19 @@ bool Decode_Assignment(const s_cfg_statement* statement, s_config_write_set* wri
     }
 
     const s_cfg_token& root = statement->path.front();
-    const generated::s_parameter_descriptor* parameter =
-        generated::Find_Parameter(root.value.data(), root.value.size());
-    if (parameter == nullptr) {
-        return Fail_(root.location, "unknown configuration parameter '" + root.value + "'",
+    std::string canonical_path;
+    for (const s_cfg_token& path_token : statement->path) {
+        if (!canonical_path.empty()) {
+            canonical_path += '.';
+        }
+        canonical_path += path_token.value;
+    }
+    t_variable_id variable_id = 0;
+    if (!Find_Variable(canonical_path.data(), canonical_path.size(), &variable_id)) {
+        return Fail_(root.location, "unknown configuration variable '" + canonical_path + "'",
                      write_set, diagnostic);
     }
-    if (statement->path.size() > 1) {
-        return Fail_(statement->path[1].location,
-                     "parameter '" + root.value + "' is a scalar and cannot be traversed",
-                     write_set, diagnostic);
-    }
+    const s_variable_descriptor* variable = Get_Variable(variable_id);
     if (statement->values.empty()) {
         return Fail_(statement->location, "assignment requires a value", write_set, diagnostic);
     }
@@ -179,13 +181,15 @@ bool Decode_Assignment(const s_cfg_statement* statement, s_config_write_set* wri
     }
 
     s_config_write write;
-    write.parameter_id = parameter->id;
-    write.canonical_path = parameter->path;
+    write.canonical_path = variable->name;
     write.provenance = token.location;
     std::string expected;
-    if (!Decode_Value_(parameter, token, &write.value, &expected)) {
+    if (!Decode_Value_(variable, token, &write.value, &expected)) {
         return Fail_(token.location, "invalid value '" + token.raw + "' for '" +
-                     root.value + "'; expected " + expected, write_set, diagnostic);
+                     canonical_path + "'; expected " + expected, write_set, diagnostic);
+    }
+    if (!Resolve_Write_Path(&write, diagnostic)) {
+        return false;
     }
     write_set->writes.push_back(std::move(write));
     return true;

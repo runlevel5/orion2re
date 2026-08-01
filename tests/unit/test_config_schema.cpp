@@ -29,7 +29,6 @@ DOCTEST_TEST_CASE("primitive schema preserves declaration order and normalizes C
     DOCTEST_CHECK(schema.parameters[0].path == "enabled");
     DOCTEST_CHECK(schema.parameters[1].path == "signed_value");
     DOCTEST_CHECK(schema.parameters[2].path == "captain_name");
-    DOCTEST_CHECK(schema.parameters[0].schema_id != schema.parameters[1].schema_id);
     DOCTEST_CHECK(schema.parameters[1].constraints.min == -10);
     DOCTEST_CHECK(schema.parameters[1].constraints.max == 10);
     DOCTEST_CHECK(schema.parameters[2].default_string == "Grüße");
@@ -74,16 +73,19 @@ DOCTEST_TEST_CASE("C++ generation is byte-for-byte deterministic") {
     DOCTEST_REQUIRE(config::tool::Generate_Cpp(&schema, first.string().c_str(), &diagnostic));
     DOCTEST_REQUIRE(config::tool::Generate_Cpp(&schema, second.string().c_str(), &diagnostic));
 
-    for (const char* name : {"config_schema.h", "config_schema.cpp",
-                             "config_bindings.h", "config_bindings.cpp"}) {
-        std::ifstream first_file(first / name, std::ios::binary);
-        std::ifstream second_file(second / name, std::ios::binary);
-        const std::string first_content((std::istreambuf_iterator<char>(first_file)),
-                                        std::istreambuf_iterator<char>());
-        const std::string second_content((std::istreambuf_iterator<char>(second_file)),
-                                         std::istreambuf_iterator<char>());
-        DOCTEST_CHECK(first_content == second_content);
-    }
+    std::ifstream first_file(first / "config.cpp", std::ios::binary);
+    std::ifstream second_file(second / "config.cpp", std::ios::binary);
+    const std::string first_content((std::istreambuf_iterator<char>(first_file)),
+                                    std::istreambuf_iterator<char>());
+    const std::string second_content((std::istreambuf_iterator<char>(second_file)),
+                                     std::istreambuf_iterator<char>());
+    DOCTEST_CHECK(first_content == second_content);
+    DOCTEST_CHECK(first_content.find("Get_Default_Value") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("Set_Value") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("Get_Current_Value") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("decltype") == std::string::npos);
+    DOCTEST_CHECK(first_content.find("static_assert") == std::string::npos);
+    DOCTEST_CHECK(first_content.find("CONFIG_PARAMETER_") == std::string::npos);
 
     std::filesystem::remove_all(root);
 }

@@ -88,14 +88,14 @@ DOCTEST_TEST_CASE("nested includes resolve relative paths in statement order") {
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "config/main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK_FALSE(effective.state.music_enabled);
-    DOCTEST_CHECK(effective.state.music_volume == 80);
-    DOCTEST_CHECK(effective.state.sound_effects_volume == 25);
+    DOCTEST_CHECK_FALSE(effective.state.values[0].bool_value);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 80);
+    DOCTEST_CHECK(effective.state.values[3].integer_value == 25);
     DOCTEST_CHECK(MOX::_settings.music_level == 80);
 
-    size_t music_index = 0;
-    DOCTEST_REQUIRE(config::generated::Find_Parameter_Index(
-        config::generated::CONFIG_PARAMETER_MUSIC_VOLUME, &music_index));
+    config::t_variable_id music_index = 0;
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "music_volume", std::strlen("music_volume"), &music_index));
     DOCTEST_CHECK(effective.provenance[music_index].location.source ==
                   "config/balance/first.cfg");
     DOCTEST_CHECK(effective.provenance[music_index].location.line == 3);
@@ -123,8 +123,8 @@ DOCTEST_TEST_CASE("stop ends only the included file") {
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.music_volume == 75);
-    DOCTEST_CHECK(effective.state.sound_effects_volume == 30);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 75);
+    DOCTEST_CHECK(effective.state.values[3].integer_value == 30);
 }
 
 DOCTEST_TEST_CASE("include cycles report the normalized include chain") {
@@ -164,14 +164,14 @@ DOCTEST_TEST_CASE("missing and malformed includes are distinct and roll back") {
     DOCTEST_CHECK(diagnostic.message ==
                   "configuration file not found: 'absent.cfg'");
     DOCTEST_CHECK(diagnostic.location.source == "missing-main.cfg");
-    DOCTEST_CHECK(effective.state.music_volume == 50);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
 
     DOCTEST_CHECK_FALSE(config::Load_Config_File(
         "malformed-main.cfg", "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message == "malformed numeric value '0x'");
     DOCTEST_CHECK(diagnostic.location.source == "malformed.cfg");
-    DOCTEST_CHECK(effective.state.music_volume == 50);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
 }
 
@@ -207,7 +207,7 @@ DOCTEST_TEST_CASE("enable in an include graph remains a mod-loader operation") {
     DOCTEST_CHECK_FALSE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message == "enable execution requires the mod loader");
-    DOCTEST_CHECK(effective.state.music_volume == 50);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
 }
 

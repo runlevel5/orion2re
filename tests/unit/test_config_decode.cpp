@@ -4,7 +4,7 @@
 
 #include "config/cfg_parser.h"
 #include "config/config_decode.h"
-#include "config/generated/config_schema.h"
+#include "config/config_runtime.h"
 #include "doctest/doctest.h"
 
 namespace {
@@ -30,7 +30,7 @@ namespace {
 
     void Add_Sentinel_(config::s_config_write_set* write_set) {
         config::s_config_write write;
-        write.parameter_id = config::generated::CONFIG_PARAMETER_MUSIC_VOLUME;
+        write.variable_id = 1;
         write.canonical_path = "sentinel";
         write_set->writes.push_back(std::move(write));
     }
@@ -38,32 +38,53 @@ namespace {
 
 DOCTEST_TEST_SUITE("configuration assignment decode") {
 
-DOCTEST_TEST_CASE("generated lookup resolves exact canonical paths") {
-    const config::generated::s_parameter_descriptor* music =
-        config::generated::Find_Parameter("music_volume", std::strlen("music_volume"));
+DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
+    config::t_variable_id music_id = 99;
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "music_volume", std::strlen("music_volume"), &music_id));
+    DOCTEST_CHECK(music_id == 1);
+    const config::s_variable_descriptor* music = config::Get_Variable(music_id);
     DOCTEST_REQUIRE(music != nullptr);
-    DOCTEST_CHECK(music->id == config::generated::CONFIG_PARAMETER_MUSIC_VOLUME);
-    DOCTEST_CHECK(music->type == config::generated::CONFIG_VALUE_INT8);
+    DOCTEST_CHECK(music->type == config::CONFIG_VALUE_INT8);
     DOCTEST_CHECK(music->min == 0);
     DOCTEST_CHECK(music->max == 100);
-    DOCTEST_CHECK(config::generated::Find_Parameter("music", 5) == nullptr);
-    DOCTEST_CHECK(config::generated::Find_Parameter("MUSIC_VOLUME", 12) == nullptr);
-    DOCTEST_CHECK(config::generated::Find_Parameter(nullptr, 0) == nullptr);
+    DOCTEST_CHECK(std::strcmp(config::Get_Variable_Name(music_id), "music_volume") == 0);
+    DOCTEST_CHECK_FALSE(config::Find_Variable("music", 5, &music_id));
+    DOCTEST_CHECK_FALSE(config::Find_Variable("MUSIC_VOLUME", 12, &music_id));
+    DOCTEST_CHECK_FALSE(config::Find_Variable(nullptr, 0, &music_id));
+    DOCTEST_CHECK(config::Get_Variable(config::variable_count) == nullptr);
+}
+
+DOCTEST_TEST_CASE("stable path writes resolve for replay in the current build") {
+    config::s_config_write write;
+    write.variable_id = 99;
+    write.canonical_path = "sound_effects_volume";
+    write.value.type = config::CONFIG_VALUE_INT8;
+    write.value.integer_value = 35;
+    write.provenance.source = "savegame";
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Resolve_Write_Path(&write, &diagnostic));
+    DOCTEST_CHECK(write.variable_id == 3);
+
+    write.canonical_path = "weapons.foo.bar.1.baz";
+    DOCTEST_CHECK_FALSE(config::Resolve_Write_Path(&write, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+                  "unknown configuration variable 'weapons.foo.bar.1.baz'");
+    DOCTEST_CHECK(diagnostic.location.source == "savegame");
 }
 
 DOCTEST_TEST_CASE("bool and integer assignments produce typed atomic writes") {
     struct s_integer_case {
         const char* source;
-        config::generated::e_parameter_id parameter_id;
+        config::t_variable_id variable_id;
         int64_t expected;
     };
     const s_integer_case integers[] = {
-        {"music_volume = 75;", config::generated::CONFIG_PARAMETER_MUSIC_VOLUME, 75},
-        {"music_volume = 0x32;", config::generated::CONFIG_PARAMETER_MUSIC_VOLUME, 50},
-        {"sound_effects_volume = 0b110010;",
-         config::generated::CONFIG_PARAMETER_SOUND_EFFECTS_VOLUME, 50},
-        {"sound_effects_volume = 25;",
-         config::generated::CONFIG_PARAMETER_SOUND_EFFECTS_VOLUME, 25},
+        {"music_volume = 75;", 1, 75},
+        {"music_volume = 0x32;", 1, 50},
+        {"sound_effects_volume = 0b110010;", 3, 50},
+        {"sound_effects_volume = 25;", 3, 25},
     };
 
     for (const s_integer_case& test_case : integers) {
@@ -71,8 +92,8 @@ DOCTEST_TEST_CASE("bool and integer assignments produce typed atomic writes") {
         config::s_cfg_diagnostic diagnostic;
         DOCTEST_REQUIRE(Decode_(test_case.source, &write_set, &diagnostic));
         DOCTEST_REQUIRE(write_set.writes.size() == 1);
-        DOCTEST_CHECK(write_set.writes[0].parameter_id == test_case.parameter_id);
-        DOCTEST_CHECK(write_set.writes[0].value.type == config::generated::CONFIG_VALUE_INT8);
+        DOCTEST_CHECK(write_set.writes[0].variable_id == test_case.variable_id);
+        DOCTEST_CHECK(write_set.writes[0].value.type == config::CONFIG_VALUE_INT8);
         DOCTEST_CHECK(write_set.writes[0].value.integer_value == test_case.expected);
         DOCTEST_CHECK(write_set.writes[0].provenance.source == "decode.cfg");
         DOCTEST_CHECK(write_set.writes[0].provenance.column > 1);
@@ -82,7 +103,7 @@ DOCTEST_TEST_CASE("bool and integer assignments produce typed atomic writes") {
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Decode_("music_enabled = true;", &enabled, &diagnostic));
     DOCTEST_REQUIRE(enabled.writes.size() == 1);
-    DOCTEST_CHECK(enabled.writes[0].value.type == config::generated::CONFIG_VALUE_BOOL);
+    DOCTEST_CHECK(enabled.writes[0].value.type == config::CONFIG_VALUE_BOOL);
     DOCTEST_CHECK(enabled.writes[0].value.bool_value);
     DOCTEST_CHECK(enabled.writes[0].canonical_path == "music_enabled");
 
@@ -99,9 +120,9 @@ DOCTEST_TEST_CASE("resolution and decode failures retain no partial writes") {
         uint32_t column;
     };
     const s_case cases[] = {
-        {"unknown_setting = 1;", "unknown configuration parameter 'unknown_setting'", 1},
+        {"unknown_setting = 1;", "unknown configuration variable 'unknown_setting'", 1},
         {"music_volume extra = 50;",
-         "parameter 'music_volume' is a scalar and cannot be traversed", 14},
+         "unknown configuration variable 'music_volume.extra'", 1},
         {"music_volume = 101;",
          "invalid value '101' for 'music_volume'; expected int8 in range 0..100", 16},
         {"music_volume = -1;",
