@@ -174,35 +174,4 @@ DOCTEST_TEST_CASE("include remains a loader operation and deferred enable is ign
     DOCTEST_CHECK(effective.state.values[1].integer_value == 70);
 }
 
-DOCTEST_TEST_CASE("canonical extraction follows schema order and round trips") {
-    config::s_effective_config effective;
-    config::Initialize_Effective_Config(&effective);
-    config::s_cfg_diagnostic diagnostic;
-    DOCTEST_REQUIRE(Apply_(
-        "sound_effects_volume = 12; music_enabled = false; music_volume = 88;",
-        "balance_mod", &effective, &diagnostic));
-
-    std::string canonical;
-    DOCTEST_REQUIRE(config::Extract_Canonical_Config(
-        &effective, false, &canonical, &diagnostic));
-    DOCTEST_CHECK(canonical ==
-        "music_enabled = false;\n"
-        "music_volume = 88;\n"
-        "sound_effects_enabled = true;\n"
-        "sound_effects_volume = 12;\n");
-
-    config::s_effective_config round_trip;
-    config::Initialize_Effective_Config(&round_trip);
-    DOCTEST_REQUIRE(Apply_(canonical.c_str(), "extracted",
-                           &round_trip, &diagnostic));
-    DOCTEST_CHECK(States_Equal_(round_trip.state, effective.state));
-
-    std::string with_provenance;
-    DOCTEST_REQUIRE(config::Extract_Canonical_Config(
-        &effective, true, &with_provenance, &diagnostic));
-    DOCTEST_CHECK(with_provenance.find(
-        "# from balance_mod: lifecycle.cfg:1\nmusic_enabled = false;") !=
-        std::string::npos);
-}
-
 }

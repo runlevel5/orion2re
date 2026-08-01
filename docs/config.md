@@ -26,6 +26,7 @@ The assignment language preserves the strongest part of the 1.50 format: one sta
 - Store typed logical defaults, including record and array defaults, without embedding native initializer text.
 - Generate minimal typed C++ accessors from a no-code JSON5 schema.
 - Load configuration transactionally: validate the complete operation before changing live state.
+- Treat CFG files as authoritative human-authored input; the engine never creates or rewrites them.
 - Make `enable` load a complete mod package, including dependencies, configuration, and resources.
 - Integrate resource replacement through the project's VFS rather than through individual binary-era filename substitutions.
 - Keep configuration deterministic and suitable for save games and multiplayer synchronization.
@@ -40,6 +41,7 @@ The assignment language preserves the strongest part of the 1.50 format: one sta
 - Embedding C++ expressions or executable scripts in the schema.
 - Treating Lua or another scripting language as a substitute for declarative configuration.
 - Implementing build-list files as part of the main configuration grammar.
+- Generating, extracting, formatting, or rewriting CFG files from effective runtime state.
 
 ## Design principles
 
@@ -1056,6 +1058,9 @@ validated against that candidate. Invalid syntax, paths, values, includes, or bi
 errors. Defaults and overrides are committed to native state together only after the complete operation
 succeeds.
 
+CFG loading is unidirectional. CFG files are authoritative human-modifiable inputs, and the engine does
+not serialize effective state back into CFG syntax or modify source files after loading them.
+
 Until native mod packages are implemented, `enable <mod-id>;` emits a warning and has no effect. It does
 not prevent ordinary configuration assignments in the same transaction from being applied.
 
@@ -1244,22 +1249,7 @@ Local interface settings may remain unsynchronized unless a game mode explicitly
 
 Wire representation is versioned independently from the user-facing text syntax and JSON5 schema source files.
 
-## Extraction and tooling
-
-### Canonical extraction
-
-The engine can write the effective configuration using:
-
-- canonical names
-- symbolic enum and mask values
-- explicit `0b` and `0x` numeric prefixes
-- stable declaration order
-- bounded aggregate assignments where concise
-- source provenance in optional comments
-
-Extraction should favor readability. It need not minimize line count at the expense of understanding.
-
-### Schema tooling
+## Schema tooling
 
 The build should provide validation for:
 
@@ -1280,7 +1270,7 @@ The build should provide validation for:
 
 Generated documentation can list every parameter, path, type, constraint, default, enum value, mask bit, group, unit, example, and native binding.
 
-Generated C++ schema descriptors, defaults, and native accessors are committed as `src/config/generated/config.cpp`. Normal builds compile this checked-in file directly and do not build or run the generator. An opt-in CMake regeneration target uses `add_custom_command(OUTPUT ...)` with the canonical JSON5 specification and generator implementation as dependencies, so invoking the target runs the generator only when an input is newer than the generated output or the output is missing. It is not part of `ALL` and is not a dependency of normal game or test targets. CI regenerates into a temporary directory and fails if the result differs from the committed file. Generated files are never edited by hand.
+Generated C++ schema descriptors, defaults, and native accessors are committed as `src/config/generated/config.cpp`. Native builds automatically build the configuration tool and use a stamped `add_custom_command(OUTPUT ...)` rule to regenerate the committed output only when the canonical JSON5 specification or generator implementation changes. Cross builds and source trees without the vendored tool dependency compile the checked-in generated file without building or running the generator. The behavior can be disabled explicitly when only committed output is wanted. CI regenerates into a temporary directory and fails if the result differs from the committed file. Generated files are never edited by hand.
 
 ## Error handling
 
@@ -1361,10 +1351,9 @@ Errors should identify the relevant phase.
 - Add compile-time and generator-time type validation.
 - Add cross-field validation and transactional commit.
 
-### Phase 5: includes, extraction, and provenance
+### Phase 5: includes and provenance
 
 - Add include stacks and cycle detection.
-- Add canonical extraction.
 - Track the source mod, file, line, and statement responsible for each value.
 
 ### Phase 6: native mod loader

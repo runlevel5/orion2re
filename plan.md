@@ -1,9 +1,9 @@
 * Stability
-  * [ ] Long running game seems to leak memory somewhere
+  * [x] Long running game seems to leak memory somewhere
 
 * Code cleanups
 
-  * [ ] Add helpers to work with pops instead of using raw bit operations
+  * [x] Add helpers to work with pops instead of using raw bit operations
 
 * Networking
 
@@ -25,3 +25,19 @@
 * Sound
 
   * [X] Popping sound in intro movie - libsmacker sound buffer underrun. Fixed by taking care of inconsistent frame decoding.
+
+* Mod packages
+
+  * [ ] Define and validate JSON5 mod manifests with stable identity, versions, engine compatibility, dependencies, conflicts, ordering, configuration entry points, resources, and capabilities.
+  * [ ] Discover packages by stable ID and resolve dependencies, conflicts, cycles, version constraints, and deterministic load order.
+  * [ ] Make `enable <mod-id>;` load package configuration and resources as one transaction.
+  * [ ] Add transactional VFS layering so failed package validation, configuration loading, or resource mounting leaves the prior state active.
+  * [ ] Add fixtures and integration tests for valid, malformed, incompatible, cyclic, conflicting, and rollback cases.
+
+* Save-game and multiplayer serialization
+
+  * [ ] Define versioned save-game and multiplayer representations independently from CFG syntax, JSON5 schema layout, C++ memory layout, and declaration order.
+  * [ ] Serialize deterministic configuration by stable identity together with enabled package versions, resource identity, and engine versions.
+  * [ ] Define missing-field defaults, optional-field skipping, explicit migrations, and configuration restoration before dependent save sections.
+  * [ ] Synchronize deterministic gameplay configuration and resource identity while keeping approved interface settings local.
+  * [ ] Add compatibility fixtures and diagnostics for save migrations, package or resource mismatches, and multiplayer configuration differences.

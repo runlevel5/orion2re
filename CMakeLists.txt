@@ -103,7 +103,15 @@ option(ORION2RE_ENABLE_ASAN "Enable AddressSanitizer for supported debug builds"
 option(ORION2RE_RELEASE_DEBUG_INFO "Emit debug info for non-Debug MSVC builds" OFF)
 option(ORION2RE_BUILD_GAME "Build the SDL game executable" ON)
 option(ORION2RE_BUILD_TESTS "Build tests" OFF)
-option(ORION2RE_BUILD_CONFIG_TOOL "Build configuration validation and generation tools" OFF)
+set(ORION2RE_BUILD_CONFIG_TOOL_DEFAULT OFF)
+if(NOT CMAKE_CROSSCOMPILING AND
+   EXISTS "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.h" AND
+   EXISTS "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.c")
+    set(ORION2RE_BUILD_CONFIG_TOOL_DEFAULT ON)
+endif()
+option(ORION2RE_BUILD_CONFIG_TOOL
+       "Build configuration tools and regenerate bindings when their inputs change"
+       ${ORION2RE_BUILD_CONFIG_TOOL_DEFAULT})
 option(ORION2RE_ENFORCE_ORIGINAL_STRUCT_SIZES "Require structures to retain their original game sizes" OFF)
 option(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL "Exclude runtime executables from the default all target" ${ORION2RE_BUILD_TESTS})
 
@@ -248,7 +256,6 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
     set(ORION2RE_CONFIG_GENERATED_STAMP "${CMAKE_CURRENT_BINARY_DIR}/config-generated.stamp")
     add_custom_command(
         OUTPUT "${ORION2RE_CONFIG_GENERATED_STAMP}"
-        BYPRODUCTS ${ORION2RE_CONFIG_GENERATED_FILES}
         COMMAND $<TARGET_FILE:config-tool> generate
             "${ORION2RE_CONFIG_SCHEMA}"
             "${ORION2RE_CONFIG_GENERATED_DIR}"
@@ -261,7 +268,12 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
     )
 
     add_custom_target(config-regenerate
+        ALL
         DEPENDS "${ORION2RE_CONFIG_GENERATED_STAMP}"
+    )
+
+    set_source_files_properties(${ORION2RE_CONFIG_GENERATED_FILES} PROPERTIES
+        OBJECT_DEPENDS "${ORION2RE_CONFIG_GENERATED_STAMP}"
     )
 
     add_custom_target(config-generated-check
