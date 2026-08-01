@@ -1,0 +1,449 @@
+# Mass workflow
+
+## Instructions
+
+Migrate raw game-domain literals in the claimed file to the verified enum constants in `src/game/orion2_consts.h`. This is a naming-only refactor: preserve behavior, storage widths, signedness, serialized layouts, control flow, and table order.
+
+### Approved domains
+
+Replace a literal only when the surrounding field, parameter, array, switch, comparison, or bit operation proves that it belongs to one of these domains:
+
+- `WEAPON_FIRING_ARC`: `NONE`, `FORWARD`, `FORWARD_EXTENDED`, `BACK_EXTENDED`, `REAR`, `ALL_SECTORS`, and `360`.
+- `WEAPON_NATURAL_FLAG`: all natural weapon-property bits, including the two `AI_` metadata bits.
+- `GAME_DIFFICULTY`, `GALAXY_AGE`, `GALAXY_SIZE`, and their count sentinels.
+- `GOVERNMENT` and `STOCK_RACE`.
+- `CREW_QUALITY` and `LEADER_TYPE`.
+- `SPECIAL_CATEGORY` and `TECH_APPLICATION_TYPE`.
+- `PLANET_GROUP` and `MAPGEN_SATELLITE`.
+- `AI_SPECIAL_ITEM`, `AI_SHIP_DESIGN_THEME`, and `AI_SHIP_SPECIAL_THEME`.
+- Newly added fixed-range sentinels: `ECON_COUNT`, `MINERAL_RESOURCE_COUNT`, `PLANET_CLIMATE_COUNT`, `PLANET_GRAVITY_COUNT`, `PLANET_SIZE_COUNT`, `SHIP_TYPE_COUNT`, `STAR_CLASS_COUNT`, and `SYSTEM_SPECIAL_COUNT`.
+- `TECH_FIELD_INVALID` where `-1` specifically means no technology field.
+
+Use the exact constant names and values already declared in `src/game/orion2_consts.h`; do not add, rename, renumber, or alias enum members during this workflow.
+
+### Context rules
+
+- Treat numeric equality as insufficient evidence. Verify the semantic domain from the accessed field, called function, declaration, table, or nearby control flow before replacing a literal.
+- Preserve both 360-degree firing-arc encodings. Use `WEAPON_FIRING_ARC_ALL_SECTORS` for the tactical `0x0F` all-sector mask and `WEAPON_FIRING_ARC_360` for the design-screen `0x10` choice. Never collapse or interchange them.
+- Use `WEAPON_NATURAL_FLAG_*` only for natural weapon-property masks such as `natural_mods`; do not substitute them for installed or available `WEAPON_MOD_FLAG_*` values merely because bit positions match.
+- Use `STOCK_RACE_*` only for indexes into the 13-entry stock-race tables. Do not apply it to player indexes, ownership, packed population race values, Android/native values, or custom-race selection values.
+- Use `MAPGEN_SATELLITE_*` only for map-generation satellite choices 0 through 4. Do not replace companion-star spectral encodings 5 through 9, `PLANET_TYPE` values, or generic orbit indexes.
+- Use `AI_SPECIAL_ITEM_*` only for `s_spcl::type` and values directly derived from that field; `SPECIAL` and `WEAPON` IDs remain separate domains.
+- Use the AI ship theme constants only for `ship_design_theme` and `ship_special_theme` values, not AI design table classes or allocation percentages.
+- Use count sentinels only as complete-domain bounds or extents. Do not replace unrelated quantities that happen to equal a count.
+- Prefer the named zero member when zero is an actual domain value. Do not replace zero used for initialization, false, arithmetic, a null terminator, or an unrelated sentinel.
+- Preserve casts required by the destination storage type. Do not change struct field types, function signatures, save/network read-write widths, or binary layouts.
+- Existing correct enum usages may be left unchanged. Replace every proven raw code occurrence in the claimed file, including decimal and hexadecimal spellings. Do not edit comments solely to replace numeric text.
+
+### Explicit exclusions
+
+Do not enumize or guess any of the following:
+
+- `s_leader_data::status`.
+- Generic race, player, owner, packed-population, Android/native, or custom-race values.
+- Building categories 0 through 7.
+- Technology application `ai_group`, technology field `ai_group`, `unk_class`, or other unknown technology fields.
+- AI design allocation percentages, disabled `-1` allocation sentinels, or AI design table classes.
+- Special exclusion lists as masks.
+- Orbit indexes, random-roll dimensions, array dimensions that are not complete approved domains, or other numeric quantities.
+
+Do not edit JSON5 schemas, generated configuration code, tests, documentation, `todo.md`, `plan.md`, or `files.md`. Do not perform spelling cleanup, type redesign, formatting-only changes, comment rewrites, or unrelated magic-number replacement.
+
+### Per-file verification
+
+- Search the claimed file for all approved field names and raw decimal or hexadecimal values in their immediate semantic context.
+- Review each edit against `src/game/orion2_consts.h` and confirm the numeric value is unchanged.
+- Search the claimed file again for stale raw literals in proven approved domains; leave ambiguous cases unchanged and mention them in the workflow result.
+- Run `git diff --check` after edits. Do not run the full build or full test suite for each claimed file; final integration verification will be performed after the queue is complete.
+
+## Files
+
+[X] src/game/advciv.cpp
+[ ] src/game/advciv.h
+[ ] src/game/aibomb.cpp
+[ ] src/game/aibomb.h
+[ ] src/game/aibuild.cpp
+[ ] src/game/aibuild.h
+[ ] src/game/aidata.cpp
+[ ] src/game/aidata.h
+[ ] src/game/aidesign.cpp
+[ ] src/game/aidesign.h
+[ ] src/game/aidudes.cpp
+[ ] src/game/aidudes.h
+[ ] src/game/aileader.cpp
+[ ] src/game/aileader.h
+[ ] src/game/aimove.cpp
+[ ] src/game/aimove.h
+[ ] src/game/aipower.cpp
+[ ] src/game/aipower.h
+[ ] src/game/aistage.cpp
+[ ] src/game/aistage.h
+[ ] src/game/aitech.cpp
+[ ] src/game/aitech.h
+[ ] src/game/allocate.cpp
+[ ] src/game/allocate.h
+[ ] src/game/angle.cpp
+[ ] src/game/angle.h
+[ ] src/game/animate.cpp
+[ ] src/game/animate.h
+[ ] src/game/antarans.cpp
+[ ] src/game/antarans.h
+[ ] src/game/antaroom.cpp
+[ ] src/game/antaroom.h
+[ ] src/game/beams.cpp
+[ ] src/game/beams.h
+[ ] src/game/bill.cpp
+[ ] src/game/bill.h
+[ ] src/game/billhelp.cpp
+[ ] src/game/billhelp.h
+[ ] src/game/bitmap.cpp
+[ ] src/game/bitmap.h
+[ ] src/game/bolt.cpp
+[ ] src/game/bolt.h
+[ ] src/game/bomb.cpp
+[ ] src/game/bomb.h
+[ ] src/game/buffer.cpp
+[ ] src/game/buffer.h
+[ ] src/game/capture.cpp
+[ ] src/game/capture.h
+[ ] src/game/chat.cpp
+[ ] src/game/chat.h
+[ ] src/game/clipped.cpp
+[ ] src/game/clipped.h
+[ ] src/game/cmbtai.cpp
+[ ] src/game/cmbtai.h
+[ ] src/game/cmbtdrw1.cpp
+[ ] src/game/cmbtdrw1.h
+[ ] src/game/cmbtfir2.cpp
+[ ] src/game/cmbtfir2.h
+[ ] src/game/cmbtfire.cpp
+[ ] src/game/cmbtfire.h
+[ ] src/game/cmbtmis.cpp
+[ ] src/game/cmbtmis.h
+[ ] src/game/cmbtmov1.cpp
+[ ] src/game/cmbtmov1.h
+[ ] src/game/cmbtspec.cpp
+[ ] src/game/cmbtspec.h
+[ ] src/game/colbcach.cpp
+[ ] src/game/colbcach.h
+[ ] src/game/colbldg.cpp
+[ ] src/game/colbldg.h
+[ ] src/game/colbomb.cpp
+[ ] src/game/colbomb.h
+[ ] src/game/colcalc.cpp
+[ ] src/game/colcalc.h
+[ ] src/game/colcalc_main.cpp
+[ ] src/game/coldraw.cpp
+[ ] src/game/coldraw.h
+[ ] src/game/colgcbt.cpp
+[ ] src/game/colgcbt.h
+[ ] src/game/colland.cpp
+[ ] src/game/colland.h
+[ ] src/game/colmove.cpp
+[ ] src/game/colmove.h
+[ ] src/game/colonize.cpp
+[ ] src/game/colonize.h
+[ ] src/game/colony.cpp
+[ ] src/game/colony.h
+[ ] src/game/colony_main.cpp
+[ ] src/game/colrefit.cpp
+[ ] src/game/colrefit.h
+[ ] src/game/colsum.cpp
+[ ] src/game/colsum.h
+[ ] src/game/colsysdi.cpp
+[ ] src/game/colsysdi.h
+[ ] src/game/colxport.cpp
+[ ] src/game/colxport.h
+[ ] src/game/combat.cpp
+[ ] src/game/combat.h
+[ ] src/game/combat1.cpp
+[ ] src/game/combat1.h
+[ ] src/game/combfind.cpp
+[ ] src/game/combfind.h
+[ ] src/game/combinit.cpp
+[ ] src/game/combinit.h
+[ ] src/game/compat.cpp
+[ ] src/game/compat.h
+[ ] src/game/consts.h
+[ ] src/game/contact.cpp
+[ ] src/game/contact.h
+[ ] src/game/council.cpp
+[ ] src/game/council.h
+[ ] src/game/deps.h
+[ ] src/game/desbox.cpp
+[ ] src/game/desbox.h
+[ ] src/game/design.cpp
+[ ] src/game/design.h
+[ ] src/game/design_main.cpp
+[ ] src/game/dip_scrn.cpp
+[ ] src/game/dip_scrn.h
+[ ] src/game/dip_scrn_main.cpp
+[ ] src/game/diplodef.cpp
+[ ] src/game/diplodef.h
+[ ] src/game/diplomac.cpp
+[ ] src/game/diplomac.h
+[ ] src/game/dos.cpp
+[ ] src/game/dos.h
+[ ] src/game/draw.cpp
+[ ] src/game/draw.h
+[ ] src/game/eric.cpp
+[ ] src/game/eric.h
+[ ] src/game/erichelp.cpp
+[ ] src/game/erichelp.h
+[ ] src/game/ericnet.cpp
+[ ] src/game/ericnet.h
+[ ] src/game/estrings.cpp
+[ ] src/game/estrings.h
+[ ] src/game/evanhelp.cpp
+[ ] src/game/evanhelp.h
+[ ] src/game/events.cpp
+[ ] src/game/events.h
+[ ] src/game/exitm.cpp
+[ ] src/game/exitm.h
+[ ] src/game/fade.cpp
+[ ] src/game/fade.h
+[ ] src/game/fakebuts.cpp
+[ ] src/game/fakebuts.h
+[ ] src/game/farload.cpp
+[ ] src/game/farload.h
+[ ] src/game/fields.cpp
+[ ] src/game/fields.h
+[ ] src/game/fieldsav.cpp
+[ ] src/game/fieldsav.h
+[ ] src/game/file_ani.cpp
+[ ] src/game/file_ani.h
+[ ] src/game/filedef.cpp
+[ ] src/game/filedef.h
+[ ] src/game/firepts.cpp
+[ ] src/game/firepts.h
+[ ] src/game/flcqueue.cpp
+[ ] src/game/flcqueue.h
+[ ] src/game/fleetpop.cpp
+[ ] src/game/fleetpop.h
+[ ] src/game/flt.cpp
+[ ] src/game/flt.h
+[ ] src/game/flt1.cpp
+[ ] src/game/flt1.h
+[ ] src/game/flt2.cpp
+[ ] src/game/flt2.h
+[ ] src/game/fmtpara.cpp
+[ ] src/game/fmtpara.h
+[ ] src/game/fontdraw.cpp
+[ ] src/game/fontdraw.h
+[ ] src/game/fonts.cpp
+[ ] src/game/fonts.h
+[ ] src/game/gendraw.cpp
+[ ] src/game/gendraw.h
+[ ] src/game/geo.cpp
+[ ] src/game/geo.h
+[ ] src/game/global.cpp
+[ ] src/game/global.h
+[ ] src/game/graphics.cpp
+[ ] src/game/graphics.h
+[ ] src/game/haccess.cpp
+[ ] src/game/haccess.h
+[ ] src/game/harold.cpp
+[ ] src/game/harold.h
+[ ] src/game/homegen.cpp
+[ ] src/game/homegen.h
+[ ] src/game/hotpop.cpp
+[ ] src/game/hotpop.h
+[ ] src/game/info.cpp
+[ ] src/game/info.h
+[ ] src/game/init.cpp
+[ ] src/game/init.h
+[ ] src/game/initgame.cpp
+[ ] src/game/initgame.h
+[ ] src/game/initship.cpp
+[ ] src/game/initship.h
+[ ] src/game/invasion.cpp
+[ ] src/game/invasion.h
+[ ] src/game/jim.cpp
+[ ] src/game/jim.h
+[ ] src/game/ken.cpp
+[ ] src/game/ken.h
+[ ] src/game/key.cpp
+[ ] src/game/key.h
+[ ] src/game/lbx_types.h
+[ ] src/game/line.cpp
+[ ] src/game/line.h
+[ ] src/game/list.cpp
+[ ] src/game/list.h
+[ ] src/game/loader.cpp
+[ ] src/game/loader.h
+[ ] src/game/loadsave.cpp
+[ ] src/game/loadsave.h
+[ ] src/game/lostship.cpp
+[ ] src/game/lostship.h
+[ ] src/game/mainmenu.cpp
+[ ] src/game/mainmenu.h
+[ ] src/game/mainpups.cpp
+[ ] src/game/mainpups.h
+[ ] src/game/mainscr.cpp
+[ ] src/game/mainscr.h
+[ ] src/game/mainscr2.cpp
+[ ] src/game/mainscr2.h
+[ ] src/game/mainscr_main.cpp
+[ ] src/game/maintain.cpp
+[ ] src/game/maintain.h
+[ ] src/game/map_scale.h
+[ ] src/game/mapgen.cpp
+[ ] src/game/mapgen.h
+[ ] src/game/misc.cpp
+[ ] src/game/misc.h
+[ ] src/game/mouse.cpp
+[ ] src/game/mouse.h
+[ ] src/game/movebox.cpp
+[ ] src/game/movebox.h
+[ ] src/game/mox.cpp
+[ ] src/game/mox.h
+[ ] src/game/mox2.cpp
+[ ] src/game/mox2.h
+[ ] src/game/msg.cpp
+[ ] src/game/msg.h
+[ ] src/game/msg_queue.cpp
+[ ] src/game/msg_queue.h
+[ ] src/game/multplay.cpp
+[ ] src/game/multplay.h
+[ ] src/game/namestar.cpp
+[ ] src/game/namestar.h
+[ ] src/game/netadapter.cpp
+[ ] src/game/netadapter.h
+[ ] src/game/netcode.cpp
+[ ] src/game/netcode.h
+[ ] src/game/netmox.cpp
+[ ] src/game/netmox.h
+[ ] src/game/netproto.cpp
+[ ] src/game/netproto.h
+[ ] src/game/netstart.cpp
+[ ] src/game/netstart.h
+[ ] src/game/netstrat.cpp
+[ ] src/game/netstrat.h
+[ ] src/game/netturn.cpp
+[ ] src/game/netturn.h
+[ ] src/game/newgame.cpp
+[ ] src/game/newgame.h
+[ ] src/game/newpup.cpp
+[ ] src/game/newpup.h
+[ ] src/game/newtech.cpp
+[ ] src/game/newtech.h
+[ ] src/game/nextturn.cpp
+[ ] src/game/nextturn.h
+[ ] src/game/npcdiplo.cpp
+[ ] src/game/npcdiplo.h
+[ ] src/game/ocpolpup.cpp
+[ ] src/game/ocpolpup.h
+[ ] src/game/officer.cpp
+[ ] src/game/officer.h
+[ ] src/game/orion2.h
+[ ] src/game/orion2_consts.h
+[ ] src/game/orion2_str.h
+[ ] src/game/palette.cpp
+[ ] src/game/palette.h
+[ ] src/game/palstore.cpp
+[ ] src/game/palstore.h
+[ ] src/game/paragrph.cpp
+[ ] src/game/paragrph.h
+[ ] src/game/platform.cpp
+[ ] src/game/platform.h
+[ ] src/game/plntsum.cpp
+[ ] src/game/plntsum.h
+[ ] src/game/pop.h
+[ ] src/game/racecust.cpp
+[ ] src/game/racecust.h
+[ ] src/game/raceopt.cpp
+[ ] src/game/raceopt.h
+[ ] src/game/racerprt.cpp
+[ ] src/game/racerprt.h
+[ ] src/game/racescrn.cpp
+[ ] src/game/racescrn.h
+[ ] src/game/racesel.cpp
+[ ] src/game/racesel.h
+[ ] src/game/random.cpp
+[ ] src/game/random.h
+[ ] src/game/reduce.cpp
+[ ] src/game/reduce.h
+[ ] src/game/regions.cpp
+[ ] src/game/regions.h
+[ ] src/game/remap.cpp
+[ ] src/game/remap.h
+[ ] src/game/replace.cpp
+[ ] src/game/replace.h
+[ ] src/game/report.cpp
+[ ] src/game/report.h
+[ ] src/game/russ.cpp
+[ ] src/game/russ.h
+[ ] src/game/savegame.cpp
+[ ] src/game/savegame.h
+[ ] src/game/science.cpp
+[ ] src/game/science.h
+[ ] src/game/score.cpp
+[ ] src/game/score.h
+[ ] src/game/scroll.cpp
+[ ] src/game/scroll.h
+[ ] src/game/serialization.cpp
+[ ] src/game/serialization.h
+[ ] src/game/settings.h
+[ ] src/game/settler.cpp
+[ ] src/game/settler.h
+[ ] src/game/setvesa.cpp
+[ ] src/game/setvesa.h
+[ ] src/game/shear.cpp
+[ ] src/game/shear.h
+[ ] src/game/shipmove.cpp
+[ ] src/game/shipmove.h
+[ ] src/game/ships.cpp
+[ ] src/game/ships.h
+[ ] src/game/shipstak.cpp
+[ ] src/game/shipstak.h
+[ ] src/game/sizes.h
+[ ] src/game/smack.cpp
+[ ] src/game/smack.h
+[ ] src/game/smckplay.cpp
+[ ] src/game/smckplay.h
+[ ] src/game/sound.cpp
+[ ] src/game/sound.h
+[ ] src/game/sound_types.h
+[ ] src/game/special.cpp
+[ ] src/game/special.h
+[ ] src/game/spy.cpp
+[ ] src/game/spy.h
+[ ] src/game/string.cpp
+[ ] src/game/string.h
+[ ] src/game/strings.cpp
+[ ] src/game/strings.h
+[ ] src/game/struct.cpp
+[ ] src/game/struct.h
+[ ] src/game/swap.cpp
+[ ] src/game/swap.h
+[ ] src/game/sys.cpp
+[ ] src/game/sys.h
+[ ] src/game/sysfont.cpp
+[ ] src/game/sysfont.h
+[ ] src/game/tech.cpp
+[ ] src/game/tech.h
+[ ] src/game/techdata.cpp
+[ ] src/game/techdata.h
+[ ] src/game/techinit.cpp
+[ ] src/game/techinit.h
+[ ] src/game/textbox.cpp
+[ ] src/game/textbox.h
+[ ] src/game/time.cpp
+[ ] src/game/time.h
+[ ] src/game/timer.cpp
+[ ] src/game/timer.h
+[ ] src/game/trade.cpp
+[ ] src/game/trade.h
+[ ] src/game/turnsum.cpp
+[ ] src/game/turnsum.h
+[ ] src/game/types.h
+[ ] src/game/vfs.cpp
+[ ] src/game/vfs.h
+[ ] src/game/vfs_detail.h
+[ ] src/game/vfs_file.cpp
+[ ] src/game/vfs_lbx.cpp
+[ ] src/game/vfs_path.cpp
+[ ] src/game/vfs_zip.cpp
+[ ] src/game/video.cpp
+[ ] src/game/video.h
+[ ] src/game/video_scan_bounds.h
