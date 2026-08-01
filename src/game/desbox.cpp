@@ -1194,7 +1194,7 @@ namespace DESBOX {
             uint16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
 
             for (int16_t mod_idx = 1; mod_idx < WEAPON_MOD_COUNT; mod_idx++) {
-                if (mod_idx == WEAPON_MOD_EMMISIONS_GUIDANCE) {
+                if (mod_idx == WEAPON_MOD_EMISSIONS_GUIDANCE) {
                     if (TECHDATA::_weapons[weapon_idx].type == WEAPON_TYPE_MISSILE &&
                         MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_EMISSIONS_GUIDANCE_SYSTEM] == TECH_RESEARCH_STATUS_RESEARCHED) {
                         New_Mod_Space_(static_cast<uint8_t>(mod_idx));

@@ -1645,8 +1645,8 @@ namespace DESIGN {
             return;
         }
 
-        if ((flags & WEAPON_MOD_FLAG_POINT_DEFENCE) != 0) {
-            int16_t index = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_POINT_DEFENCE, WEAPON_MOD_COUNT);
+        if ((flags & WEAPON_MOD_FLAG_POINT_DEFENSE) != 0) {
+            int16_t index = MISC::Bit_Value_To_Num_(WEAPON_MOD_FLAG_POINT_DEFENSE, WEAPON_MOD_COUNT);
             *bonus1_out += TECHDATA::_weapon_modifications[index].cost;
             *bonus2_out += TECHDATA::_weapon_modifications[index].space;
         }
@@ -1885,7 +1885,7 @@ namespace DESIGN {
             if (specials & WEAPON_MOD_FLAG_OVERLOADED) {
                 min_damage = (min_damage * 150) / 100;
                 max_damage = (max_damage * 150) / 100;
-            } else if (specials & WEAPON_MOD_FLAG_POINT_DEFENCE) {
+            } else if (specials & WEAPON_MOD_FLAG_POINT_DEFENSE) {
                 min_damage = (min_damage * 50 + 50) / 100;
                 max_damage = (max_damage * 50) / 100;
                 if (max_damage < min_damage) {

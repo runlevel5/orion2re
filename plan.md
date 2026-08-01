@@ -5,6 +5,10 @@
 
   * [x] Add helpers to work with pops instead of using raw bit operations
 
+* Configuration
+
+  * [ ] Expose the galaxy star-count soft limit as a configuration variable, validate it against the compile-time `MAX_STARS` capacity, and use it consistently in map generation and new-game setup.
+
 * Networking
 
   * [ ] Add a server-side handshake timeout so accepted TCP clients must send HELLO promptly or be disconnected.

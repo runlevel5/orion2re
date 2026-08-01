@@ -31,13 +31,6 @@ static_assert(SHIP_LOCATION_LIMIT - 1 <= INT16_MAX, "encoded ship locations do n
 static_assert(MAX_SHIPS <= SHIP_NODE_UI_TAG_BASE, "encoded UI ship nodes overlap real ship-node indices");
 static_assert(SHIP_NODE_UI_TAG_BASE + MAX_SHIPS - 1 <= INT16_MAX, "encoded UI ship nodes do not fit in int16_t");
 
-#define GALAXY_SIZE_MAXIMUM 4
-#if MAX_STARS > ORIGINAL_MAX_STARS
-#define GALAXY_SIZE_COUNT 5
-#else
-#define GALAXY_SIZE_COUNT 4
-#endif
-
 #define COMBAT_GRID_WIDTH 81
 #define COMBAT_GRID_HEIGHT 68
 #define COMBAT_GRID_VIEW_WIDTH 32

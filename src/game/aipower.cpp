@@ -7,7 +7,7 @@ namespace AIPOWER {
         if ((modification_flags & WEAPON_MOD_FLAG_HEAVY_MOUNT) != 0) {
             total_space = (int16_t)(TECHDATA::_weapon_modifications[WEAPON_MOD_HEAVY_MOUNT].space + 100);
         }
-        if ((modification_flags & WEAPON_MOD_FLAG_POINT_DEFENCE) != 0) {
+        if ((modification_flags & WEAPON_MOD_FLAG_POINT_DEFENSE) != 0) {
             total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_POINT_DEFENSE].space);
         }
         if ((modification_flags & WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION) != 0) {
@@ -32,7 +32,7 @@ namespace AIPOWER {
             total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_FAST].space);
         }
         if ((modification_flags & WEAPON_MOD_FLAG_EMISSION_GUIDANCE) != 0) {
-            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_EMMISIONS_GUIDANCE].space);
+            total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_EMISSIONS_GUIDANCE].space);
         }
         if ((modification_flags & WEAPON_MOD_FLAG_OVERLOADED) != 0) {
             total_space = (int16_t)(total_space + TECHDATA::_weapon_modifications[WEAPON_MOD_OVERLOADED].space);
@@ -115,7 +115,7 @@ namespace AIPOWER {
                 int16_t damage = TECHDATA::_weapons[weapon_type].max_damage;
                 if (slot_specials & WEAPON_MOD_FLAG_HEAVY_MOUNT) {
                     damage += (int16_t)(((damage * 5 + 5) * 10) / 100);
-                } else if (slot_specials & WEAPON_MOD_FLAG_POINT_DEFENCE) {
+                } else if (slot_specials & WEAPON_MOD_FLAG_POINT_DEFENSE) {
                     damage = (int16_t)(((damage * 5 + 5) * 10) / 100);
                 }
 

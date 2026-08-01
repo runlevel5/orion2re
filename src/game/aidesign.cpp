@@ -299,8 +299,8 @@ namespace aidesign {
 
             uint16_t avail = TECHDATA::_weapons[w_id].available_mods;
 
-            weapon_mods[i] = (weapon_mods[i] + WEAPON_MOD_FLAG_POINT_DEFENCE) & avail;
-            if ((weapon_mods[i] & WEAPON_MOD_FLAG_POINT_DEFENCE) == 0) {
+            weapon_mods[i] = (weapon_mods[i] + WEAPON_MOD_FLAG_POINT_DEFENSE) & avail;
+            if ((weapon_mods[i] & WEAPON_MOD_FLAG_POINT_DEFENSE) == 0) {
                 weapon_mods[i] = 0;
             }
 
@@ -330,7 +330,7 @@ namespace aidesign {
         if (MOX::_settings.game_difficulty < 2) {
             int16_t idx1 = weapon_count - 1;
             while (idx1 >= 0) {
-                if ((TECHDATA::_weapons[weapon_id[idx1]].available_mods & WEAPON_MOD_FLAG_POINT_DEFENCE) != 0) {
+                if ((TECHDATA::_weapons[weapon_id[idx1]].available_mods & WEAPON_MOD_FLAG_POINT_DEFENSE) != 0) {
                     break;
                 }
                 idx1--;
@@ -341,7 +341,7 @@ namespace aidesign {
                 *spec0 = 0;
             } else {
                 *type0 = weapon_id[idx1];
-                *spec0 = WEAPON_MOD_FLAG_POINT_DEFENCE;
+                *spec0 = WEAPON_MOD_FLAG_POINT_DEFENSE;
             }
 
             *type1 = weapon_id[weapon_count - 1];
@@ -364,7 +364,7 @@ namespace aidesign {
             }
         } else {
             if (weapon_count == 1) {
-                if ((TECHDATA::_weapons[weapon_id[0]].available_mods & WEAPON_MOD_FLAG_POINT_DEFENCE) == 0) {
+                if ((TECHDATA::_weapons[weapon_id[0]].available_mods & WEAPON_MOD_FLAG_POINT_DEFENSE) == 0) {
                     *type0 = 0;
                 } else {
                     *type0 = weapon_id[0];
@@ -652,7 +652,7 @@ namespace aidesign {
             &types[2], &specials[2], &arcs[2]
         );
 
-        specials[0] |= WEAPON_MOD_FLAG_POINT_DEFENCE;
+        specials[0] |= WEAPON_MOD_FLAG_POINT_DEFENSE;
         specials[2] |= WEAPON_MOD_FLAG_HEAVY_MOUNT;
 
         int16_t weapon_type = types[weapon_class];
