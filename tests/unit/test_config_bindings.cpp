@@ -100,10 +100,8 @@ DOCTEST_TEST_CASE("write sets apply to temporary state before explicit commit") 
 
     config::s_config_state base_state;
     config::Read_Current_State(&base_state);
-    config::s_config_state candidate_state;
-    config::Initialize_Defaults(&candidate_state);
-    DOCTEST_REQUIRE(config::Apply_Write_Set(
-        &write_set, &base_state, &candidate_state, &diagnostic));
+    config::s_config_state candidate_state = base_state;
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&write_set, &candidate_state, &diagnostic));
 
     DOCTEST_CHECK_FALSE(candidate_state.values[0].bool_value);
     DOCTEST_CHECK(candidate_state.values[1].integer_value == 75);
@@ -131,7 +129,10 @@ DOCTEST_TEST_CASE("transaction commits complete write sets and later writes win"
     DOCTEST_REQUIRE(Append_Decoded_(
         "music_volume = 10; music_volume = 90; sound_effects_enabled = true;",
         &write_set, &diagnostic));
-    DOCTEST_REQUIRE(config::Apply_Transaction(&write_set, &diagnostic));
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Read_Current_State(&state));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&write_set, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
 
     DOCTEST_CHECK(MOX::_settings.music_on == 1);
     DOCTEST_CHECK(MOX::_settings.music_level == 90);
@@ -162,13 +163,12 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
         3, config::CONFIG_VALUE_INT8, 101));
 
     DOCTEST_CHECK_FALSE(config::Apply_Write_Set(
-        &write_set, &base_state, &candidate_state, &diagnostic));
+        &write_set, &candidate_state, &diagnostic));
     DOCTEST_CHECK(States_Equal_(candidate_state, original_candidate));
     DOCTEST_CHECK(diagnostic.message ==
                   "typed write range error for sound_effects_volume");
     DOCTEST_CHECK(diagnostic.location.source == "forged.cfg");
 
-    DOCTEST_CHECK_FALSE(config::Apply_Transaction(&write_set, &diagnostic));
     DOCTEST_CHECK(MOX::_settings.music_on == 1);
     DOCTEST_CHECK(MOX::_settings.music_level == 40);
     DOCTEST_CHECK(MOX::_settings.sound_fx_on == 1);
@@ -176,7 +176,8 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
 
     write_set.writes.back() = Invalid_Write_(
         3, config::CONFIG_VALUE_BOOL, 0);
-    DOCTEST_CHECK_FALSE(config::Apply_Transaction(&write_set, &diagnostic));
+    DOCTEST_CHECK_FALSE(config::Apply_Write_Set(
+        &write_set, &candidate_state, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
                   "typed write mismatch for sound_effects_volume");
     DOCTEST_CHECK(MOX::_settings.music_level == 40);

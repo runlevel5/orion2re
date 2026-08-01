@@ -23,7 +23,6 @@
       bind_root: {
         header: "game/mox.h",
         symbol: "MOX::_settings",
-        cpp_type: "s_settings",
       },
       bind: ["music_on"],
     },
@@ -42,7 +41,6 @@
       bind_root: {
         header: "game/mox.h",
         symbol: "MOX::_settings",
-        cpp_type: "s_settings",
       },
       bind: ["music_level"],
     },
@@ -56,7 +54,6 @@
       bind_root: {
         header: "game/mox.h",
         symbol: "MOX::_settings",
-        cpp_type: "s_settings",
       },
       bind: ["sound_fx_on"],
     },
@@ -75,7 +72,6 @@
       bind_root: {
         header: "game/mox.h",
         symbol: "MOX::_settings",
-        cpp_type: "s_settings",
       },
       bind: ["sound_fx_level"],
     },

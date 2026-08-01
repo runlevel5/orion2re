@@ -138,18 +138,14 @@ bool Initialize_Defaults(s_config_state* state);
 bool Read_Current_State(s_config_state* state);
 bool Read_State_Value(const s_config_state* state, t_variable_id variable_id,
                       s_typed_value* value);
-bool Apply_Write_Set(const s_config_write_set* write_set,
-                     const s_config_state* base_state,
-                     s_config_state* candidate_state,
+bool Apply_Write_Set(const s_config_write_set* write_set, s_config_state* state,
                      s_cfg_diagnostic* diagnostic);
-bool Apply_Transaction(const s_config_write_set* write_set,
-                       s_cfg_diagnostic* diagnostic);
 bool Commit_State(const s_config_state* state);
 
 namespace generated {
 
 bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value);
-bool Set_Value(t_variable_id variable_id, const s_typed_value* value);
+void Set_Value(t_variable_id variable_id, const s_typed_value* value);
 bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value);
 
 }

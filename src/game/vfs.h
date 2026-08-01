@@ -19,6 +19,8 @@ namespace vfs {
     int32_t ftell(s_vfs_file* file);
     int32_t fclose(s_vfs_file* file);
 
+    int8_t Canonicalize_Asset_Path(const char* path, char* canonical_path,
+                                   size_t canonical_path_size);
     int8_t Resolve_Read_Path_No_Zip(const char* path, char* resolved_path, size_t resolved_path_size);
     int8_t File_Exists(const char* path);
 }

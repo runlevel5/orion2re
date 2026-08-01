@@ -16,7 +16,7 @@
       group: "interface",
       type: "bool",
       default: true,
-      bind_root: { header: "fixture.h", symbol: "fixture", cpp_type: "s_fixture" },
+      bind_root: { header: "fixture.h", symbol: "fixture" },
       bind: ["enabled"],
     },
     signed_value: {
@@ -26,7 +26,7 @@
       type: "int8",
       constraints: { min: -10, max: 10 },
       default: -2,
-      bind_root: { header: "fixture.h", symbol: "fixture", cpp_type: "s_fixture" },
+      bind_root: { header: "fixture.h", symbol: "fixture" },
       bind: ["signed_value"],
     },
     captain_name: {
@@ -36,7 +36,7 @@
       type: "string",
       constraints: { min_length: 1, max_length: 8, encoding: "cp850" },
       default: "Grüße",
-      bind_root: { header: "fixture.h", symbol: "fixture", cpp_type: "s_fixture" },
+      bind_root: { header: "fixture.h", symbol: "fixture" },
       bind: ["captain_name"],
     },
   },

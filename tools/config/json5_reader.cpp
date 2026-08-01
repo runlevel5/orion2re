@@ -1,39 +1,13 @@
 #include "json5_reader.h"
 
 #include <cmath>
-#include <cstdio>
-#include <cstring>
 
+#include "file_util.h"
 #include "yyjson.h"
 
 namespace config::tool {
 namespace {
     constexpr size_t CONFIG_JSON_MAX_DEPTH = 64;
-
-    bool Read_File_(const char* path, std::string* source, std::string* diagnostic) {
-        FILE* file = std::fopen(path, "rb");
-        if (file == nullptr) {
-            *diagnostic = std::string(path) + ": unable to open file";
-            return false;
-        }
-
-        char buffer[4096];
-        while (true) {
-            const size_t count = std::fread(buffer, 1, sizeof(buffer), file);
-            source->append(buffer, count);
-            if (count != sizeof(buffer)) {
-                if (std::ferror(file) != 0) {
-                    std::fclose(file);
-                    *diagnostic = std::string(path) + ": unable to read file";
-                    return false;
-                }
-                break;
-            }
-        }
-
-        std::fclose(file);
-        return true;
-    }
 
     bool Convert_Value_(yyjson_val* input, size_t depth, const char* path,
                         s_json_value* output, std::string* diagnostic) {
@@ -105,7 +79,8 @@ namespace {
 
 bool Read_Json5_File(const char* path, s_json_value* value, std::string* diagnostic) {
     std::string source;
-    if (!Read_File_(path, &source, diagnostic)) {
+    if (!Read_File(path, &source)) {
+        *diagnostic = std::string(path) + ": unable to read file";
         return false;
     }
 

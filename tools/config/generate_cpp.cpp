@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <filesystem>
 
+#include "file_util.h"
+
 namespace config::tool {
 namespace {
     const char* const GENERATED_FILES[] = {
@@ -35,42 +37,6 @@ namespace {
         }
         output += '"';
         return output;
-    }
-
-    bool Read_File_(const std::string& path, std::string* content) {
-        FILE* file = std::fopen(path.c_str(), "rb");
-        if (file == nullptr) {
-            return false;
-        }
-        char buffer[4096];
-        while (true) {
-            const size_t count = std::fread(buffer, 1, sizeof(buffer), file);
-            content->append(buffer, count);
-            if (count != sizeof(buffer)) {
-                const bool success = std::ferror(file) == 0;
-                std::fclose(file);
-                return success;
-            }
-        }
-    }
-
-    bool Write_If_Different_(const std::string& path, const std::string& content,
-                             std::string* diagnostic) {
-        std::string existing;
-        if (Read_File_(path, &existing) && existing == content) {
-            return true;
-        }
-        FILE* file = std::fopen(path.c_str(), "wb");
-        if (file == nullptr) {
-            *diagnostic = path + ": unable to open generated output";
-            return false;
-        }
-        const bool success = std::fwrite(content.data(), 1, content.size(), file) == content.size() &&
-                             std::fclose(file) == 0;
-        if (!success) {
-            *diagnostic = path + ": unable to write generated output";
-        }
-        return success;
     }
 
     const char* Cpp_Type_(e_primitive_type type) {
@@ -137,32 +103,15 @@ namespace {
     }
 
     std::string Native_Target_(const s_parameter& parameter, size_t index) {
-        if (index < parameter.native_targets.size()) {
-            return parameter.native_targets[index];
-        }
-        return parameter.binding.symbol + "." + parameter.binding.members[index];
+        return parameter.native_targets[index];
     }
 
     std::string Source_(const s_schema* schema) {
         std::string output =
             "// Generated from specs/config/main.json5. Do not edit.\n"
             "#include \"config/config_runtime.h\"\n\n";
-        std::vector<std::string> headers;
-        for (const s_parameter& parameter : schema->parameters) {
-            bool found = false;
-            for (const std::string& header : headers) {
-                if (header == parameter.binding.header) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                headers.push_back(parameter.binding.header);
-                output += "#include \"" + parameter.binding.header + "\"\n";
-            }
-        }
         output +=
-            "\nnamespace config {\n\n"
+            "namespace config {\n\n"
             "const s_group_descriptor groups[] = {\n";
         for (const s_group& group : schema->groups) {
             output += "    { " + Cpp_String_(group.id) + ", " + Cpp_String_(group.metadata.title) +
@@ -290,7 +239,7 @@ namespace {
             "    switch (variable_id) {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
             const s_parameter& parameter = schema->parameters[index];
-            output += "    case " + std::to_string(index) + ":\n"
+            output += "    case " + std::to_string(index) + ": // " + parameter.path + "\n"
                       "        value->type = " + Cpp_Type_(parameter.type) + ";\n";
             if (parameter.type == PRIMITIVE_BOOL) {
                 output += "        value->bool_value = " + Default_Value_(parameter) + ";\n";
@@ -311,10 +260,7 @@ namespace {
             "    }\n"
             "    return false;\n"
             "}\n\n"
-            "bool Set_Value(t_variable_id variable_id, const s_typed_value* value) {\n"
-            "    if (value == nullptr) {\n"
-            "        return false;\n"
-            "    }\n"
+            "void Set_Value(t_variable_id variable_id, const s_typed_value* value) {\n"
             "    switch (variable_id) {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
             const s_parameter& parameter = schema->parameters[index];
@@ -322,11 +268,9 @@ namespace {
             const char* value = parameter.type == PRIMITIVE_BOOL ? "value->bool_value" :
                                 parameter.type == PRIMITIVE_STRING ? "value->string_value.c_str()" :
                                 "value->integer_value";
-            output += "    case " + std::to_string(index) + ":\n";
+            output += "    case " + std::to_string(index) + ": // " + parameter.path + "\n";
             if (parameter.type == PRIMITIVE_STRING) {
-                const size_t target_count = parameter.native_targets.empty() ? 1 :
-                                            parameter.native_targets.size();
-                for (size_t target = 0; target < target_count; ++target) {
+                for (size_t target = 0; target < parameter.native_targets.size(); ++target) {
                     const std::string destination = Native_Target_(parameter, target);
                     output += "        strlcpy(" + destination +
                               ", value->string_value.c_str(), sizeof(" + destination + "));\n";
@@ -343,16 +287,11 @@ namespace {
                     output += "        " + Native_Target_(parameter, target) + " = (" +
                               Native_Type_(parameter.type) + ")" + value + ";\n";
                 }
-                if (parameter.native_targets.empty()) {
-                    output += "        " + native + " = (" + Native_Type_(parameter.type) +
-                              ")" + value + ";\n";
-                }
             }
-            output += "        return true;\n";
+            output += "        return;\n";
         }
         output +=
             "    }\n"
-            "    return false;\n"
             "}\n\n"
             "bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value) {\n"
             "    if (value == nullptr) {\n"
@@ -363,7 +302,7 @@ namespace {
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
             const s_parameter& parameter = schema->parameters[index];
             const std::string native = Native_Target_(parameter, 0);
-            output += "    case " + std::to_string(index) + ":\n"
+            output += "    case " + std::to_string(index) + ": // " + parameter.path + "\n"
                       "        value->type = " + Cpp_Type_(parameter.type) + ";\n";
             if (parameter.type == PRIMITIVE_BOOL) {
                 output += "        value->bool_value = (bool)" + native + ";\n";
@@ -395,8 +334,8 @@ bool Generate_Cpp(const s_schema* schema, const char* output_directory,
         *diagnostic = std::string(output_directory) + ": unable to create output directory";
         return false;
     }
-    return Write_If_Different_(Join_Path_(output_directory, "config.cpp"),
-                               Source_(schema), diagnostic);
+    const std::string output_path = Join_Path_(output_directory, "config.cpp");
+    return Write_File_If_Different(output_path.c_str(), Source_(schema), diagnostic);
 }
 
 bool Check_Generated_Cpp(const s_schema* schema, const char* committed_directory,
@@ -409,11 +348,11 @@ bool Check_Generated_Cpp(const s_schema* schema, const char* committed_directory
         std::string actual;
         const std::string committed_path = Join_Path_(committed_directory, name);
         const std::string temporary_path = Join_Path_(temporary_directory, name);
-        if (!Read_File_(committed_path, &expected)) {
+        if (!Read_File(committed_path.c_str(), &expected)) {
             *diagnostic = committed_path + ": generated file is missing";
             return false;
         }
-        if (!Read_File_(temporary_path, &actual) || expected != actual) {
+        if (!Read_File(temporary_path.c_str(), &actual) || expected != actual) {
             *diagnostic = committed_path + ": generated file is stale";
             return false;
         }

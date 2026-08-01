@@ -93,7 +93,7 @@ The adapter is not a general serialization framework and does not use yyjson's w
 - Generated files use deterministic order and formatting.
 - Generated files are never edited by hand.
 - Generated APIs expose concrete structs and functions, not templates.
-- Normal builds compile checked-in generated files and do not execute the generator.
+- Native builds with configuration tooling available regenerate checked-in output when the canonical schema or generator changes. Cross builds and builds without the tool dependency compile the checked-in output directly.
 
 ## Dependency policy
 

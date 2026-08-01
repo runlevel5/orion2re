@@ -58,6 +58,7 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
         SOURCES
             tests/unit/test_config_schema.cpp
         PRODUCTION_SOURCES
+            tools/config/file_util.cpp
             tools/config/generate_cpp.cpp
             tools/config/json5_reader.cpp
             tools/config/schema_model.cpp

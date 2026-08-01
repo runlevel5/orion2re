@@ -1,8 +1,6 @@
 // Generated from specs/config/main.json5. Do not edit.
 #include "config/config_runtime.h"
 
-#include "game/mox.h"
-
 namespace config {
 
 const s_group_descriptor groups[] = {
@@ -43,19 +41,19 @@ bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
     }
     *value = {};
     switch (variable_id) {
-    case 0:
+    case 0: // music_enabled
         value->type = CONFIG_VALUE_BOOL;
         value->bool_value = true;
         return true;
-    case 1:
+    case 1: // music_volume
         value->type = CONFIG_VALUE_INT8;
         value->integer_value = 50;
         return true;
-    case 2:
+    case 2: // sound_effects_enabled
         value->type = CONFIG_VALUE_BOOL;
         value->bool_value = true;
         return true;
-    case 3:
+    case 3: // sound_effects_volume
         value->type = CONFIG_VALUE_INT8;
         value->integer_value = 50;
         return true;
@@ -63,25 +61,21 @@ bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
     return false;
 }
 
-bool Set_Value(t_variable_id variable_id, const s_typed_value* value) {
-    if (value == nullptr) {
-        return false;
-    }
+void Set_Value(t_variable_id variable_id, const s_typed_value* value) {
     switch (variable_id) {
-    case 0:
+    case 0: // music_enabled
         MOX::_settings.music_on = (uint8_t)value->bool_value;
-        return true;
-    case 1:
+        return;
+    case 1: // music_volume
         MOX::_settings.music_level = (int8_t)value->integer_value;
-        return true;
-    case 2:
+        return;
+    case 2: // sound_effects_enabled
         MOX::_settings.sound_fx_on = (uint8_t)value->bool_value;
-        return true;
-    case 3:
+        return;
+    case 3: // sound_effects_volume
         MOX::_settings.sound_fx_level = (int8_t)value->integer_value;
-        return true;
+        return;
     }
-    return false;
 }
 
 bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value) {
@@ -90,19 +84,19 @@ bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value) {
     }
     *value = {};
     switch (variable_id) {
-    case 0:
+    case 0: // music_enabled
         value->type = CONFIG_VALUE_BOOL;
         value->bool_value = (bool)MOX::_settings.music_on;
         return true;
-    case 1:
+    case 1: // music_volume
         value->type = CONFIG_VALUE_INT8;
         value->integer_value = (int64_t)MOX::_settings.music_level;
         return true;
-    case 2:
+    case 2: // sound_effects_enabled
         value->type = CONFIG_VALUE_BOOL;
         value->bool_value = (bool)MOX::_settings.sound_fx_on;
         return true;
-    case 3:
+    case 3: // sound_effects_volume
         value->type = CONFIG_VALUE_INT8;
         value->integer_value = (int64_t)MOX::_settings.sound_fx_level;
         return true;

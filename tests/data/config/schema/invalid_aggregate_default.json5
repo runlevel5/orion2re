@@ -14,7 +14,7 @@
       title: "Pair",
       description: "Incomplete record default fixture.",
       group: "gameplay",
-      bind_root: { header: "fixture.h", symbol: "fixture", cpp_type: "s_fixture" },
+      bind_root: { header: "fixture.h", symbol: "fixture" },
       type: {
         kind: "record",
         fields: [

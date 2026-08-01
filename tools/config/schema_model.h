@@ -60,8 +60,6 @@ struct s_constraints {
 struct s_binding {
     std::string header;
     std::string symbol;
-    std::string cpp_type;
-    std::vector<std::string> members;
 };
 
 struct s_group {

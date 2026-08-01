@@ -1,8 +1,5 @@
 #include "config_loader.h"
 
-#include <cctype>
-#include <climits>
-#include <cstdio>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,6 +11,7 @@ namespace config {
 namespace {
     constexpr size_t CONFIG_MAX_INCLUDE_DEPTH = 64;
     constexpr size_t CONFIG_MAX_FILE_SIZE = 16 * 1024 * 1024;
+    constexpr size_t CONFIG_MAX_PATH = 1024;
 
     struct s_include_frame {
         std::string path;
@@ -32,57 +30,12 @@ namespace {
         return false;
     }
 
-    bool Is_Absolute_(const std::string& path) {
-        return !path.empty() && (path.front() == '/' || path.front() == '\\' ||
-               (path.size() >= 2 && std::isalpha(static_cast<uint8_t>(path[0])) != 0 &&
-                path[1] == ':'));
-    }
-
-    bool Normalize_Path_(const std::string& path, std::string* normalized) {
-        if (path.empty() || Is_Absolute_(path)) {
+    bool Canonicalize_Path_(const std::string& path, std::string* canonical) {
+        char buffer[CONFIG_MAX_PATH];
+        if (vfs::Canonicalize_Asset_Path(path.c_str(), buffer, sizeof(buffer)) == 0) {
             return false;
         }
-        std::vector<std::string> parts;
-        size_t start = 0;
-        while (start <= path.size()) {
-            size_t end = start;
-            while (end < path.size() && path[end] != '/' && path[end] != '\\') {
-                ++end;
-            }
-            const std::string part = path.substr(start, end - start);
-            if (part.empty() || part == ".") {
-            } else if (part == "..") {
-                if (parts.empty()) {
-                    return false;
-                }
-                parts.pop_back();
-            } else {
-                if (part.find(':') != std::string::npos) {
-                    return false;
-                }
-                std::string canonical_part = part;
-                for (char& character : canonical_part) {
-                    if (character >= 'A' && character <= 'Z') {
-                        character = static_cast<char>(character - 'A' + 'a');
-                    }
-                }
-                parts.push_back(std::move(canonical_part));
-            }
-            if (end == path.size()) {
-                break;
-            }
-            start = end + 1;
-        }
-        if (parts.empty()) {
-            return false;
-        }
-        normalized->clear();
-        for (size_t index = 0; index < parts.size(); ++index) {
-            if (index != 0) {
-                normalized->push_back('/');
-            }
-            *normalized += parts[index];
-        }
+        *canonical = buffer;
         return true;
     }
 
@@ -96,7 +49,7 @@ namespace {
         const std::string directory = Directory_(current_path);
         const std::string combined = directory.empty() ? token.value :
                                      directory + "/" + token.value;
-        return Normalize_Path_(combined, resolved);
+        return Canonicalize_Path_(combined, resolved);
     }
 
     bool Read_File_(s_loader* loader, const std::string& path,
@@ -162,13 +115,6 @@ namespace {
             if (statement.kind == CFG_STATEMENT_STOP) {
                 break;
             }
-            if (statement.kind == CFG_STATEMENT_ENABLE) {
-                std::fprintf(stderr,
-                             "configuration warning: %s:%u:%u: ignoring deferred enable '%s'\n",
-                             statement.location.source.c_str(), statement.location.line,
-                             statement.location.column, statement.argument.value.c_str());
-                continue;
-            }
             if (statement.kind == CFG_STATEMENT_INCLUDE) {
                 std::string include_path;
                 if (!Resolve_Include_(path, statement.argument, &include_path)) {
@@ -197,7 +143,7 @@ bool Load_Config_File(const char* entry_path, const char* package_id,
     }
     *diagnostic = {};
     std::string normalized_entry;
-    if (!Normalize_Path_(entry_path, &normalized_entry)) {
+    if (!Canonicalize_Path_(entry_path, &normalized_entry)) {
         diagnostic->location.source = entry_path;
         diagnostic->message = "invalid configuration entry path";
         return false;

@@ -114,6 +114,57 @@ namespace vfs {
         return file->ops->close(file);
     }
 
+    int8_t Canonicalize_Asset_Path(const char* path, char* canonical_path,
+                                   size_t canonical_path_size) {
+        char normalized_path[vfs_detail::VFS_MAX_PATH];
+        if (!vfs_detail::Normalize_Asset_Path_(path, normalized_path,
+                                               sizeof(normalized_path))) {
+            return 0;
+        }
+        char collapsed_path[vfs_detail::VFS_MAX_PATH];
+        size_t collapsed_length = 0;
+        size_t start = 0;
+        while (normalized_path[start] != '\0') {
+            size_t end = start;
+            while (normalized_path[end] != '\0' && normalized_path[end] != '/') {
+                ++end;
+            }
+            const size_t part_length = end - start;
+            if (part_length == 1 && normalized_path[start] == '.') {
+            } else if (part_length == 2 && normalized_path[start] == '.' &&
+                       normalized_path[start + 1] == '.') {
+                if (collapsed_length == 0) {
+                    return 0;
+                }
+                while (collapsed_length > 0 && collapsed_path[collapsed_length - 1] != '/') {
+                    --collapsed_length;
+                }
+                if (collapsed_length > 0) {
+                    --collapsed_length;
+                }
+            } else if (part_length != 0) {
+                const size_t separator_length = collapsed_length == 0 ? 0 : 1;
+                if (collapsed_length + separator_length + part_length >=
+                    sizeof(collapsed_path)) {
+                    return 0;
+                }
+                if (separator_length != 0) {
+                    collapsed_path[collapsed_length++] = '/';
+                }
+                memcpy(collapsed_path + collapsed_length, normalized_path + start,
+                       part_length);
+                collapsed_length += part_length;
+            }
+            start = normalized_path[end] == '\0' ? end : end + 1;
+        }
+        if (collapsed_length == 0) {
+            return 0;
+        }
+        collapsed_path[collapsed_length] = '\0';
+        return vfs_detail::Build_Asset_Key_(collapsed_path, canonical_path,
+                                            canonical_path_size) ? 1 : 0;
+    }
+
     int8_t Resolve_Read_Path_No_Zip(const char* path, char* resolved_path, size_t resolved_path_size) {
         return vfs_detail::Resolve_Read_Path_No_Zip_(path, resolved_path, resolved_path_size) ? 1 : 0;
     }

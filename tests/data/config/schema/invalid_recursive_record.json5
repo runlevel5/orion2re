@@ -20,7 +20,7 @@
       title: "Value",
       description: "Recursive record fixture.",
       group: "gameplay",
-      bind_root: { header: "fixture.h", symbol: "fixture", cpp_type: "s_fixture" },
+      bind_root: { header: "fixture.h", symbol: "fixture" },
       type: "recursive",
       bind: ["value"],
     },

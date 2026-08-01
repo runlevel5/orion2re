@@ -1,8 +1,9 @@
 #include "generate_docs.h"
 
 #include <algorithm>
-#include <cstdio>
 #include <filesystem>
+
+#include "file_util.h"
 
 namespace config::tool {
 namespace {
@@ -53,37 +54,6 @@ namespace {
         return path;
     }
 
-    bool Write_If_Different_(const char* path, const std::string& content,
-                             std::string* diagnostic) {
-        std::string existing;
-        FILE* input = std::fopen(path, "rb");
-        if (input != nullptr) {
-            char buffer[4096];
-            while (true) {
-                const size_t count = std::fread(buffer, 1, sizeof(buffer), input);
-                existing.append(buffer, count);
-                if (count != sizeof(buffer)) {
-                    break;
-                }
-            }
-            std::fclose(input);
-            if (existing == content) {
-                return true;
-            }
-        }
-        FILE* output = std::fopen(path, "wb");
-        if (output == nullptr) {
-            *diagnostic = std::string(path) + ": unable to write documentation";
-            return false;
-        }
-        const bool wrote = std::fwrite(content.data(), 1, content.size(), output) == content.size();
-        const bool closed = std::fclose(output) == 0;
-        if (!wrote || !closed) {
-            *diagnostic = std::string(path) + ": unable to write documentation";
-            return false;
-        }
-        return true;
-    }
 }
 
 bool Generate_Documentation(const s_schema* schema, const char* output_path,
@@ -150,15 +120,11 @@ bool Generate_Documentation(const s_schema* schema, const char* output_path,
             output += "- Units: " + parameter.metadata.units + "\n";
         }
         output += "- Native binding: `";
-        if (!parameter.native_targets.empty()) {
-            for (size_t index = 0; index < parameter.native_targets.size(); ++index) {
-                if (index != 0) {
-                    output += "`, `";
-                }
-                output += parameter.native_targets[index];
+        for (size_t index = 0; index < parameter.native_targets.size(); ++index) {
+            if (index != 0) {
+                output += "`, `";
             }
-        } else {
-            output += parameter.binding.symbol + "." + parameter.binding.members.front();
+            output += parameter.native_targets[index];
         }
         output += "` from `" + parameter.binding.header + "`\n\n";
         if (!parameter.metadata.remarks.empty()) {
@@ -168,7 +134,7 @@ bool Generate_Documentation(const s_schema* schema, const char* output_path,
             output += "```text\n" + example + "\n```\n\n";
         }
     }
-    return Write_If_Different_(output_path, output, diagnostic);
+    return Write_File_If_Different(output_path, output, diagnostic);
 }
 
 }

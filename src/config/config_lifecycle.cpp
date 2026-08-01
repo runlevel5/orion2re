@@ -1,7 +1,5 @@
 #include "config_lifecycle.h"
 
-#include <cstdio>
-
 #include "config/config_decode.h"
 
 namespace config {
@@ -12,16 +10,20 @@ namespace {
         diagnostic->message = message;
         return false;
     }
+
+    void Reset_Metadata_(s_effective_config* effective) {
+        effective->provenance.clear();
+        effective->provenance.resize(variable_count);
+        effective->prior_values.clear();
+        effective->prior_values.resize(variable_count);
+    }
 }
 
 bool Initialize_Effective_Config(s_effective_config* effective) {
     if (effective == nullptr || !Initialize_Defaults(&effective->state)) {
         return false;
     }
-    effective->provenance.clear();
-    effective->provenance.resize(variable_count);
-    effective->prior_values.clear();
-    effective->prior_values.resize(variable_count);
+    Reset_Metadata_(effective);
     return true;
 }
 
@@ -29,10 +31,7 @@ bool Read_Effective_Native_Config(s_effective_config* effective) {
     if (effective == nullptr || !Read_Current_State(&effective->state)) {
         return false;
     }
-    effective->provenance.clear();
-    effective->provenance.resize(variable_count);
-    effective->prior_values.clear();
-    effective->prior_values.resize(variable_count);
+    Reset_Metadata_(effective);
     return true;
 }
 
@@ -62,10 +61,6 @@ bool Apply_Config_Document(const s_cfg_document* document, const char* package_i
                          diagnostic);
         }
         if (statement.kind == CFG_STATEMENT_ENABLE) {
-            std::fprintf(stderr,
-                         "configuration warning: %s:%u:%u: ignoring deferred enable '%s'\n",
-                         statement.location.source.c_str(), statement.location.line,
-                         statement.location.column, statement.argument.value.c_str());
             continue;
         }
 
@@ -73,24 +68,28 @@ bool Apply_Config_Document(const s_cfg_document* document, const char* package_i
         if (!Decode_Assignment(&statement, &statement_writes, diagnostic)) {
             return false;
         }
+        std::vector<s_prior_value> statement_prior_values;
+        statement_prior_values.reserve(statement_writes.writes.size());
         for (s_config_write& write : statement_writes.writes) {
             const size_t variable_index = write.variable_id;
 
-            s_prior_value prior;
+            statement_prior_values.emplace_back();
+            s_prior_value& prior = statement_prior_values.back();
             if (!Read_State_Value(&candidate_state, write.variable_id, &prior.value)) {
                 return Fail_(write.provenance, "configuration state accessor is missing", diagnostic);
             }
             prior.provenance = candidate_provenance[variable_index];
+        }
 
-            s_config_write_set one_write;
-            one_write.writes.push_back(write);
-            s_config_state next_state;
-            if (!Apply_Write_Set(&one_write, &candidate_state, &next_state, diagnostic)) {
-                return false;
-            }
-            candidate_state = next_state;
-            candidate_prior_values[variable_index].push_back(std::move(prior));
+        if (!Apply_Write_Set(&statement_writes, &candidate_state, diagnostic)) {
+            return false;
+        }
 
+        for (size_t write_index = 0; write_index < statement_writes.writes.size(); ++write_index) {
+            const s_config_write& write = statement_writes.writes[write_index];
+            const size_t variable_index = write.variable_id;
+            candidate_prior_values[variable_index].push_back(
+                std::move(statement_prior_values[write_index]));
             s_value_provenance provenance;
             provenance.has_override = true;
             provenance.package_id = package_id;

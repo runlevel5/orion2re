@@ -728,7 +728,6 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
       bind_root: {
         header: "game/ships.h",
         symbol: "SHIPDATA::_guardian_design",
-        cpp_type: "s_ship_design",
       },
       type: {
         kind: "record",
@@ -783,8 +782,8 @@ The `amount` field demonstrates a declarative replicated write. The schema says 
 
 Bindings are structured member paths, not arbitrary source expressions. The generator may support only a small set of declarative binding operations:
 
-- include the declared native header
-- resolve the declared root symbol and expected C++ type
+- retain the declared native header for generated builds that do not use the project precompiled header
+- resolve the declared root symbol
 - bind one logical leaf to one native field
 - bind one leaf to several native fields
 - bind an array to a native fixed-size array
@@ -796,7 +795,7 @@ If changing a setting requires procedural behavior, the preferred design is to s
 
 Derived caches and resources may be rebuilt by explicit configuration lifecycle services after a successful transaction. Those services are engine code, not field mappings.
 
-Generated code must compile against the declared native headers and types. It contains only accessors to get a variable's default value, set its native value, and get its current native value, using simple casts between typed configuration values and native fields. Schema descriptors, path lookup, validation, candidate state, transactions, and lifecycle behavior belong to the handwritten configuration runtime rather than generated code.
+Generated code must compile against the declared native bindings. Native headers remain schema metadata so generated files can include them if the project moves away from its shared precompiled header; current generated code relies on that precompiled header. It contains only accessors to get a variable's default value, set its native value, and get its current native value, using simple casts between typed configuration values and native fields. Schema descriptors, path lookup, validation, candidate state, and lifecycle behavior belong to the handwritten configuration runtime rather than generated code.
 
 ## Strong typing policy
 
@@ -854,7 +853,6 @@ For example, the design-screen CLEAR button behavior has a local three-value enu
       bind_root: {
         header: "game/config.h",
         symbol: "config::clear_button_computer",
-        cpp_type: "uint8_t",
       },
       type: {
         kind: "enum",
@@ -1061,8 +1059,8 @@ succeeds.
 CFG loading is unidirectional. CFG files are authoritative human-modifiable inputs, and the engine does
 not serialize effective state back into CFG syntax or modify source files after loading them.
 
-Until native mod packages are implemented, `enable <mod-id>;` emits a warning and has no effect. It does
-not prevent ordinary configuration assignments in the same transaction from being applied.
+Until native mod packages are implemented, `enable <mod-id>;` has no effect. It does not prevent ordinary
+configuration assignments in the same operation from being applied.
 
 ### Stage 1: lexical parser
 
@@ -1270,7 +1268,7 @@ The build should provide validation for:
 
 Generated documentation can list every parameter, path, type, constraint, default, enum value, mask bit, group, unit, example, and native binding.
 
-Generated C++ schema descriptors, defaults, and native accessors are committed as `src/config/generated/config.cpp`. Native builds automatically build the configuration tool and use a stamped `add_custom_command(OUTPUT ...)` rule to regenerate the committed output only when the canonical JSON5 specification or generator implementation changes. Cross builds and source trees without the vendored tool dependency compile the checked-in generated file without building or running the generator. The behavior can be disabled explicitly when only committed output is wanted. CI regenerates into a temporary directory and fails if the result differs from the committed file. Generated files are never edited by hand.
+Generated C++ schema descriptors, defaults, and native accessors are committed as `src/config/generated/config.cpp`. Native builds automatically build the configuration tool and use a stamped `add_custom_command(OUTPUT ...)` rule to regenerate the committed output only when the canonical JSON5 specification or generator implementation changes. The generator writes only when content changes. Cross builds and source trees without the vendored tool dependency compile the checked-in generated file without building or running the generator. The behavior can be disabled explicitly when only committed output is wanted. CI regenerates into a temporary directory and fails if the result differs from the committed file. Generated files are never edited by hand.
 
 ## Error handling
 
@@ -1380,8 +1378,6 @@ Errors should identify the relevant phase.
 
 ## Open decisions
 
-- Exact JSON5 parser/library or whether to implement the required subset in-tree.
-- Exact quoted-string escape rules for canonical files.
 - Whether whole-record assignment may omit trailing values without warnings.
 - Exact regular-expression dialect and string-length unit.
 - Which interface settings belong in saves or multiplayer synchronization.

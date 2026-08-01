@@ -220,6 +220,8 @@ add_library(orion2re_lz4 STATIC
 
 set(ORION2RE_CONFIG_TOOL_SOURCES
     tools/config/config_tool.cpp
+    tools/config/file_util.cpp
+    tools/config/file_util.h
     tools/config/generate_cpp.cpp
     tools/config/generate_cpp.h
     tools/config/generate_docs.cpp
@@ -256,6 +258,7 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
     set(ORION2RE_CONFIG_GENERATED_STAMP "${CMAKE_CURRENT_BINARY_DIR}/config-generated.stamp")
     add_custom_command(
         OUTPUT "${ORION2RE_CONFIG_GENERATED_STAMP}"
+        BYPRODUCTS ${ORION2RE_CONFIG_GENERATED_FILES}
         COMMAND $<TARGET_FILE:config-tool> generate
             "${ORION2RE_CONFIG_SCHEMA}"
             "${ORION2RE_CONFIG_GENERATED_DIR}"

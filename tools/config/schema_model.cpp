@@ -318,34 +318,6 @@ namespace {
         return true;
     }
 
-    bool Binding_(const s_json_value* parameter, const std::string& path, s_binding* binding,
-                  std::string* diagnostic) {
-        const s_json_value* root = Member_(parameter, "bind_root");
-        const s_json_value* members = Member_(parameter, "bind");
-        if (root == nullptr || !Has_Only_Members_(root, {"header", "symbol", "cpp_type"}, path + ".bind_root", diagnostic) ||
-            !Required_String_(root, "header", path + ".bind_root", &binding->header, diagnostic) ||
-            !Required_String_(root, "symbol", path + ".bind_root", &binding->symbol, diagnostic) ||
-            !Required_String_(root, "cpp_type", path + ".bind_root", &binding->cpp_type, diagnostic)) {
-            return false;
-        }
-        if (members == nullptr || members->kind != JSON_ARRAY || members->values.empty()) {
-            *diagnostic = path + ".bind: expected a non-empty member-path array";
-            return false;
-        }
-        for (const s_json_value& member : members->values) {
-            if (member.kind != JSON_STRING || member.string_value.empty()) {
-                *diagnostic = path + ".bind: expected non-empty member names";
-                return false;
-            }
-            binding->members.push_back(member.string_value);
-        }
-        if (binding->members.size() != 1) {
-            *diagnostic = path + ".bind: the primitive bootstrap supports one direct native member";
-            return false;
-        }
-        return true;
-    }
-
     bool Group_(const std::string& id, const s_json_value* value, const std::string& root,
                 s_group* group, std::string* diagnostic) {
         const std::string path = root + ".groups." + id;
@@ -360,77 +332,6 @@ namespace {
             return false;
         }
         group->id = id;
-        return true;
-    }
-
-    bool Parameter_(const std::string& id, const s_json_value* value, const std::string& root,
-                    s_parameter* parameter, std::string* diagnostic) {
-        const std::string path = root + ".parameters." + id;
-        if (!Canonical_Name_(id)) {
-            *diagnostic = path + ": parameter names must use lower_snake_case";
-            return false;
-        }
-        if (!Has_Only_Members_(value, {"title", "description", "remarks", "units", "examples", "group", "type", "constraints", "default", "bind_root", "bind"}, path, diagnostic) ||
-            !Metadata_(value, path, &parameter->metadata, diagnostic) ||
-            !Required_String_(value, "group", path, &parameter->group, diagnostic)) {
-            return false;
-        }
-        std::string type_name;
-        if (!Required_String_(value, "type", path, &type_name, diagnostic) ||
-            !Primitive_(type_name, &parameter->type)) {
-            *diagnostic = path + ".type: expected a built-in explicit-width primitive";
-            return false;
-        }
-        if (!Constraints_(Member_(value, "constraints"), path + ".constraints", parameter->type,
-                          &parameter->constraints, diagnostic) ||
-            !Binding_(value, path, &parameter->binding, diagnostic)) {
-            return false;
-        }
-
-        const s_json_value* default_value = Member_(value, "default");
-        if (default_value == nullptr) {
-            *diagnostic = path + ".default: every writable parameter requires a default";
-            return false;
-        }
-        if (parameter->type == PRIMITIVE_BOOL) {
-            if (default_value->kind != JSON_BOOL) {
-                *diagnostic = path + ".default: expected a boolean";
-                return false;
-            }
-            parameter->default_bool = default_value->bool_value;
-        } else if (parameter->type == PRIMITIVE_STRING) {
-            if (default_value->kind != JSON_STRING) {
-                *diagnostic = path + ".default: expected a string";
-                return false;
-            }
-            const size_t length = Encoded_Length_(default_value->string_value);
-            if (length == SIZE_MAX) {
-                *diagnostic = path + ".default: string contains text not representable in CP850";
-                return false;
-            }
-            if ((parameter->constraints.has_min_length && length < parameter->constraints.min_length) ||
-                (parameter->constraints.has_max_length && length > parameter->constraints.max_length)) {
-                *diagnostic = path + ".default: CP850 byte length violates constraints";
-                return false;
-            }
-            parameter->default_string = default_value->string_value;
-        } else {
-            int64_t primitive_min = 0;
-            int64_t primitive_max = 0;
-            if (!Integer_(default_value, &parameter->default_integer)) {
-                *diagnostic = path + ".default: expected an integer";
-                return false;
-            }
-            Primitive_Range_(parameter->type, &primitive_min, &primitive_max);
-            const int64_t minimum = parameter->constraints.has_min ? parameter->constraints.min : primitive_min;
-            const int64_t maximum = parameter->constraints.has_max ? parameter->constraints.max : primitive_max;
-            if (parameter->default_integer < minimum || parameter->default_integer > maximum) {
-                *diagnostic = path + ".default: integer violates type or field constraints";
-                return false;
-            }
-        }
-
-        parameter->path = id;
         return true;
     }
 
@@ -884,10 +785,13 @@ namespace {
                 return false;
             }
             const size_t length = Encoded_Length_(value->string_value);
-            if (length == SIZE_MAX ||
-                (type.constraints.has_min_length && length < type.constraints.min_length) ||
+            if (length == SIZE_MAX) {
+                *diagnostic = path + ": string contains text not representable in CP850";
+                return false;
+            }
+            if ((type.constraints.has_min_length && length < type.constraints.min_length) ||
                 (type.constraints.has_max_length && length > type.constraints.max_length)) {
-                *diagnostic = path + ": string violates encoding or length constraints";
+                *diagnostic = path + ": string violates length constraints";
                 return false;
             }
             parameter->default_string = value->string_value;
@@ -1213,19 +1117,27 @@ namespace {
         const std::string path = root_path + ".parameters." + id;
         s_metadata metadata;
         std::string group;
-        if (!Canonical_Name_(id) || !Metadata_(value, path, &metadata, diagnostic) ||
+        if (!Canonical_Name_(id)) {
+            *diagnostic = path + ": parameter names must use lower_snake_case";
+            return false;
+        }
+        if (!Has_Only_Members_(value,
+                               {"title", "description", "remarks", "units", "examples",
+                                "group", "type", "constraints", "default", "bind_root", "bind"},
+                               path, diagnostic) ||
+            !Metadata_(value, path, &metadata, diagnostic) ||
             !Required_String_(value, "group", path, &group, diagnostic)) {
             return false;
         }
         s_binding binding;
         const s_json_value* bind_root = Member_(value, "bind_root");
         if (bind_root == nullptr ||
+            !Has_Only_Members_(bind_root, {"header", "symbol"},
+                               path + ".bind_root", diagnostic) ||
             !Required_String_(bind_root, "header", path + ".bind_root",
                               &binding.header, diagnostic) ||
             !Required_String_(bind_root, "symbol", path + ".bind_root",
-                              &binding.symbol, diagnostic) ||
-            !Required_String_(bind_root, "cpp_type", path + ".bind_root",
-                              &binding.cpp_type, diagnostic)) {
+                              &binding.symbol, diagnostic)) {
             return false;
         }
         std::vector<std::string> bases = {binding.symbol};
@@ -1255,6 +1167,10 @@ const char* Primitive_Name(e_primitive_type type) {
 }
 
 bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* diagnostic) {
+    if (path == nullptr || schema == nullptr || diagnostic == nullptr) {
+        return false;
+    }
+    s_schema loaded;
     s_json_value root;
     if (!Read_Json5_File(path, &root, diagnostic)) {
         return false;
@@ -1285,34 +1201,21 @@ bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* d
     }
 
     for (size_t index = 0; index < groups->member_names.size(); ++index) {
-        schema->groups.emplace_back();
+        loaded.groups.emplace_back();
         if (!Group_(groups->member_names[index], &groups->values[index], schema_path,
-                    &schema->groups.back(), diagnostic)) {
+                    &loaded.groups.back(), diagnostic)) {
             return false;
         }
     }
     for (size_t index = 0; index < parameters->member_names.size(); ++index) {
         const s_json_value& parameter_value = parameters->values[index];
-        const s_json_value* type_value = Member_(&parameter_value, "type");
-        e_primitive_type primitive = PRIMITIVE_BOOL;
-        const bool primitive_bootstrap = type_value != nullptr &&
-            type_value->kind == JSON_STRING && Primitive_(type_value->string_value, &primitive) &&
-            types->values.empty() && records->values.empty();
-        if (primitive_bootstrap) {
-            schema->parameters.emplace_back();
-            if (!Parameter_(parameters->member_names[index], &parameter_value, schema_path,
-                            &schema->parameters.back(), diagnostic)) {
-                return false;
-            }
-        } else if (!Rich_Parameter_(&root, parameters->member_names[index],
-                                    &parameter_value, schema_path, schema, diagnostic)) {
+        if (!Rich_Parameter_(&root, parameters->member_names[index],
+                             &parameter_value, schema_path, &loaded, diagnostic)) {
             return false;
         }
         bool group_found = false;
-        for (const s_group& group : schema->groups) {
-            const std::string parameter_group = primitive_bootstrap ?
-                schema->parameters.back().group :
-                Member_(&parameter_value, "group")->string_value;
+        for (const s_group& group : loaded.groups) {
+            const std::string& parameter_group = loaded.parameters.back().group;
             if (group.id == parameter_group) {
                 group_found = true;
                 break;
@@ -1326,6 +1229,7 @@ bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* d
             return false;
         }
     }
+    *schema = std::move(loaded);
     return true;
 }
 

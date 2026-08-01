@@ -67,6 +67,10 @@ DOCTEST_TEST_CASE("primitive schema preserves declaration order and normalizes C
     DOCTEST_CHECK(schema.parameters[1].constraints.min == -10);
     DOCTEST_CHECK(schema.parameters[1].constraints.max == 10);
     DOCTEST_CHECK(schema.parameters[2].default_string == "Grüße");
+    DOCTEST_REQUIRE(schema.nodes.size() == 3);
+    DOCTEST_CHECK(schema.nodes[0].parameter == 0);
+    DOCTEST_CHECK(schema.nodes[1].parameter == 1);
+    DOCTEST_CHECK(schema.nodes[2].parameter == 2);
     const std::string encoded = config::tool::Encode_Game_String(schema.parameters[2].default_string);
     DOCTEST_REQUIRE(encoded.size() == 5);
     DOCTEST_CHECK(static_cast<uint8_t>(encoded[2]) == 0x81);

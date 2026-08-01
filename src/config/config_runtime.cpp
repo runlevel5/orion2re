@@ -179,38 +179,22 @@ bool Read_State_Value(const s_config_state* state, t_variable_id variable_id,
     return true;
 }
 
-bool Apply_Write_Set(const s_config_write_set* write_set,
-                     const s_config_state* base_state,
-                     s_config_state* candidate_state,
+bool Apply_Write_Set(const s_config_write_set* write_set, s_config_state* state,
                      s_cfg_diagnostic* diagnostic) {
-    if (write_set == nullptr || base_state == nullptr || candidate_state == nullptr ||
-        diagnostic == nullptr || base_state->values.size() != variable_count) {
+    if (write_set == nullptr || state == nullptr || diagnostic == nullptr ||
+        state->values.size() != variable_count) {
         return false;
     }
     *diagnostic = {};
-    s_config_state temporary = *base_state;
     for (const s_config_write& write : write_set->writes) {
         if (!Validate_Write_(&write, diagnostic)) {
             return false;
         }
-        temporary.values[write.variable_id] = write.value;
     }
-    *candidate_state = std::move(temporary);
+    for (const s_config_write& write : write_set->writes) {
+        state->values[write.variable_id] = write.value;
+    }
     return true;
-}
-
-bool Apply_Transaction(const s_config_write_set* write_set,
-                       s_cfg_diagnostic* diagnostic) {
-    s_config_state base_state;
-    s_config_state candidate_state;
-    if (!Read_Current_State(&base_state)) {
-        diagnostic->message = "unable to read current configuration state";
-        return false;
-    }
-    if (!Apply_Write_Set(write_set, &base_state, &candidate_state, diagnostic)) {
-        return false;
-    }
-    return Commit_State(&candidate_state);
 }
 
 bool Commit_State(const s_config_state* state) {
@@ -223,9 +207,7 @@ bool Commit_State(const s_config_state* state) {
         }
     }
     for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
-        if (!generated::Set_Value(variable_id, &state->values[variable_id])) {
-            return false;
-        }
+        generated::Set_Value(variable_id, &state->values[variable_id]);
     }
     return true;
 }
