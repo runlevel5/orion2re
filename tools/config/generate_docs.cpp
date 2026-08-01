@@ -1,5 +1,6 @@
 #include "generate_docs.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <filesystem>
 
@@ -27,6 +28,29 @@ namespace {
         case SCALAR_PRIMITIVE: return Primitive_Name(parameter.type);
         }
         return Primitive_Name(parameter.type);
+    }
+
+    std::string Node_Path_(const s_schema* schema, size_t node_index) {
+        std::vector<std::string> components;
+        while (node_index != UINT32_MAX) {
+            const s_node& node = schema->nodes[node_index];
+            if (!node.id.empty()) {
+                components.push_back(node.id);
+            } else if (node.parent != UINT32_MAX &&
+                       schema->nodes[node.parent].kind == NODE_ARRAY) {
+                components.push_back(std::to_string(node.external_index));
+            }
+            node_index = node.parent;
+        }
+        std::reverse(components.begin(), components.end());
+        std::string path;
+        for (const std::string& component : components) {
+            if (!path.empty()) {
+                path += ".";
+            }
+            path += component;
+        }
+        return path;
     }
 
     bool Write_If_Different_(const char* path, const std::string& content,
@@ -86,6 +110,29 @@ bool Generate_Documentation(const s_schema* schema, const char* output_path,
                   (group.synchronize ? std::string("yes") : std::string("no")) + "`\n\n";
     }
     output += "## Parameters\n\n";
+    bool has_index_aliases = false;
+    for (const s_node& node : schema->nodes) {
+        has_index_aliases = has_index_aliases || !node.index_aliases.empty();
+    }
+    if (has_index_aliases) {
+        output += "### Array index aliases\n\n";
+        for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            const s_node& node = schema->nodes[node_index];
+            if (node.index_aliases.empty()) {
+                continue;
+            }
+            output += "- `" + Node_Path_(schema, node_index) + "`: ";
+            for (size_t index = 0; index < node.index_aliases.size(); ++index) {
+                if (index != 0) {
+                    output += ", ";
+                }
+                output += "`" + node.index_aliases[index].name + "` = `" +
+                          std::to_string(node.index_aliases[index].value) + "`";
+            }
+            output += "\n";
+        }
+        output += "\n";
+    }
     for (const s_parameter& parameter : schema->parameters) {
         output += "### " + parameter.metadata.title + " (`" + parameter.path + "`)\n\n" +
                   parameter.metadata.description + "\n\n" +

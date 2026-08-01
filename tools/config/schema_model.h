@@ -98,6 +98,7 @@ struct s_node {
     e_node_kind kind = NODE_SCALAR;
     uint32_t parent = UINT32_MAX;
     int32_t external_index = 0;
+    std::vector<s_symbol> index_aliases;
     uint32_t first_parameter = UINT32_MAX;
     uint32_t last_parameter = UINT32_MAX;
     uint32_t parameter = UINT32_MAX;

@@ -36,6 +36,9 @@ namespace {
         {"battle_scanner", 5},
         {"damper_field", 7},
     };
+    const config::s_array_index_alias_descriptor ARRAY_INDEX_ALIASES[] = {
+        {21, "plasma_cannon", 11},
+    };
 
     config::s_variable_descriptor Variable_(const char* name,
                                             config::e_value_type type) {
@@ -53,7 +56,7 @@ namespace {
     }
 
     const config::s_runtime_schema* Aggregate_Schema_() {
-        static config::s_variable_descriptor variables[16];
+        static config::s_variable_descriptor variables[17];
         static bool initialized = false;
         if (!initialized) {
             const char* names[] = {
@@ -65,6 +68,7 @@ namespace {
                 "guardian.weapon.2.ammo", "guardian.weapon.2.amount",
                 "guardian.special.1", "guardian.special.2", "guardian.special.3",
                 "guardian.label", "guardian.reduction",
+                "weapon.11.available_mods",
             };
             const config::e_value_type types[] = {
                 config::CONFIG_VALUE_UINT8,
@@ -76,8 +80,9 @@ namespace {
                 config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_UINT8,
                 config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_STRING,
                 config::CONFIG_VALUE_RATIO,
+                config::CONFIG_VALUE_UINT16,
             };
-            for (size_t index = 0; index < 16; ++index) {
+            for (size_t index = 0; index < 17; ++index) {
                 variables[index] = Variable_(names[index], types[index]);
             }
             for (size_t index : {size_t(1), size_t(6)}) {
@@ -144,9 +149,14 @@ namespace {
             {"", config::CONFIG_NODE_SCALAR, 15, 3, 13, 13, 13},
             {"label", config::CONFIG_NODE_SCALAR, 0, 0, 14, 14, 14},
             {"reduction", config::CONFIG_NODE_SCALAR, 0, 0, 15, 15, 15},
+            {"weapon", config::CONFIG_NODE_ARRAY, config::CONFIG_NO_NODE, 0, 16, 16, config::CONFIG_NO_VARIABLE},
+            {"", config::CONFIG_NODE_RECORD, 21, 11, 16, 16, config::CONFIG_NO_VARIABLE},
+            {"available_mods", config::CONFIG_NODE_SCALAR, 22, 0, 16, 16, 16},
         };
         static const config::s_runtime_schema schema = {
-            nodes, sizeof(nodes) / sizeof(nodes[0]), variables, 16,
+            nodes, sizeof(nodes) / sizeof(nodes[0]), variables, 17,
+            ARRAY_INDEX_ALIASES,
+            sizeof(ARRAY_INDEX_ALIASES) / sizeof(ARRAY_INDEX_ALIASES[0]),
         };
         return &schema;
     }
@@ -338,6 +348,33 @@ DOCTEST_TEST_CASE("record and array assignments follow declaration order and bou
     DOCTEST_REQUIRE(writes.writes.size() == 10);
     DOCTEST_CHECK(writes.writes[5].canonical_path == "guardian.weapon.2.type");
     DOCTEST_CHECK(writes.writes[5].value.integer_value == 4);
+}
+
+DOCTEST_TEST_CASE("enum-backed array aliases resolve to numeric canonical paths") {
+    config::s_config_write_set numeric;
+    config::s_config_write_set keyed;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "weapon 11 available_mods = 0x202;", &numeric, &diagnostic));
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "weapon plasma_cannon available_mods = 0x202;", &keyed, &diagnostic));
+    DOCTEST_REQUIRE(numeric.writes.size() == 1);
+    DOCTEST_REQUIRE(keyed.writes.size() == 1);
+    DOCTEST_CHECK(keyed.writes[0].variable_id == numeric.writes[0].variable_id);
+    DOCTEST_CHECK(keyed.writes[0].canonical_path == numeric.writes[0].canonical_path);
+    DOCTEST_CHECK(keyed.writes[0].canonical_path == "weapon.11.available_mods");
+    DOCTEST_CHECK(keyed.writes[0].value.integer_value == numeric.writes[0].value.integer_value);
+
+    DOCTEST_CHECK_FALSE(Decode_Aggregate_(
+        "weapon plasma_cannon available_mods = 1 2;", &keyed, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+                  "value 2 exceeds selected configuration object "
+                  "'weapon.11.available_mods'");
+
+    DOCTEST_CHECK_FALSE(Decode_Aggregate_(
+        "weapon unknown_weapon available_mods = 1;", &keyed, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+                  "unknown configuration variable 'weapon.unknown_weapon'");
 }
 
 DOCTEST_TEST_CASE("scalar starts and skips remain within the nearest aggregate") {

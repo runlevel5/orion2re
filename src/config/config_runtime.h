@@ -93,11 +93,19 @@ struct s_schema_node_descriptor {
     t_variable_id variable_id;
 };
 
+struct s_array_index_alias_descriptor {
+    uint32_t array_node;
+    const char* name;
+    int32_t external_index;
+};
+
 struct s_runtime_schema {
     const s_schema_node_descriptor* nodes;
     size_t node_count;
     const s_variable_descriptor* variables;
     size_t variable_count;
+    const s_array_index_alias_descriptor* array_index_aliases;
+    size_t array_index_alias_count;
 };
 
 struct s_config_state {
@@ -114,6 +122,8 @@ extern const s_variable_descriptor variables[];
 extern const size_t variable_count;
 extern const s_schema_node_descriptor schema_nodes[];
 extern const size_t schema_node_count;
+extern const s_array_index_alias_descriptor* const array_index_aliases;
+extern const size_t array_index_alias_count;
 
 constexpr uint32_t CONFIG_NO_NODE = UINT32_MAX;
 constexpr t_variable_id CONFIG_NO_VARIABLE = UINT32_MAX;

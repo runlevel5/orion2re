@@ -97,6 +97,8 @@ const s_runtime_schema* Get_Runtime_Schema() {
         schema_node_count,
         variables,
         variable_count,
+        array_index_aliases,
+        array_index_alias_count,
     };
     return &schema;
 }

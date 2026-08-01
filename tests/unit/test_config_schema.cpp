@@ -46,6 +46,11 @@ DOCTEST_TEST_CASE("aggregate schema normalizes traversal leaves defaults and nat
     DOCTEST_CHECK(schema.nodes[2].kind == config::tool::NODE_ARRAY);
     DOCTEST_CHECK(schema.nodes[2].first_parameter == 1);
     DOCTEST_CHECK(schema.nodes[2].last_parameter == 8);
+    DOCTEST_REQUIRE(schema.nodes[2].index_aliases.size() == 2);
+    DOCTEST_CHECK(schema.nodes[2].index_aliases[0].name == "primary");
+    DOCTEST_CHECK(schema.nodes[2].index_aliases[0].value == 1);
+    DOCTEST_CHECK(schema.nodes[2].index_aliases[1].name == "secondary");
+    DOCTEST_CHECK(schema.nodes[2].index_aliases[1].value == 2);
 }
 
 DOCTEST_TEST_SUITE("configuration schema") {
@@ -82,6 +87,9 @@ DOCTEST_TEST_CASE("schema diagnostics reject malformed and unsupported declarati
         {"invalid_recursive_record.json5", "recursive aggregate value type"},
         {"invalid_mask.json5", "flags must be single positive bits"},
         {"invalid_ratio_binding.json5", "ratio leaves require numerator and denominator targets"},
+        {"invalid_array_index_type.json5", "index_type: expected an enum type"},
+        {"invalid_array_index_range.json5",
+         "index_type.outside: value is outside the array's external index range"},
     };
 
     for (const s_case& test_case : cases) {
@@ -120,6 +128,30 @@ DOCTEST_TEST_CASE("C++ generation is byte-for-byte deterministic") {
     DOCTEST_CHECK(first_content.find("decltype") == std::string::npos);
     DOCTEST_CHECK(first_content.find("static_assert") == std::string::npos);
     DOCTEST_CHECK(first_content.find("CONFIG_PARAMETER_") == std::string::npos);
+
+    std::filesystem::remove_all(root);
+}
+
+DOCTEST_TEST_CASE("C++ generation emits array aliases only for path resolution") {
+    config::tool::s_schema schema;
+    std::string diagnostic;
+    DOCTEST_REQUIRE(Load_("valid_aggregates.json5", &schema, &diagnostic));
+
+    const std::filesystem::path root = std::filesystem::temp_directory_path() /
+                                       "orion2re-config-alias-test";
+    std::filesystem::remove_all(root);
+    DOCTEST_REQUIRE(config::tool::Generate_Cpp(
+        &schema, root.string().c_str(), &diagnostic));
+
+    std::ifstream generated_file(root / "config.cpp", std::ios::binary);
+    const std::string generated((std::istreambuf_iterator<char>(generated_file)),
+                                std::istreambuf_iterator<char>());
+    DOCTEST_CHECK(generated.find(
+        "{ 2, \"primary\", 1 }") != std::string::npos);
+    DOCTEST_CHECK(generated.find(
+        "{ 2, \"secondary\", 2 }") != std::string::npos);
+    DOCTEST_CHECK(generated.find("guardian.weapon.primary") == std::string::npos);
+    DOCTEST_CHECK(generated.find("guardian.weapon.secondary") == std::string::npos);
 
     std::filesystem::remove_all(root);
 }

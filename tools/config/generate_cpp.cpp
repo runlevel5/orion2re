@@ -226,7 +226,30 @@ namespace {
         output +=
             "};\n\n"
             "const size_t variable_count = sizeof(variables) / sizeof(variables[0]);\n\n"
-            "const s_schema_node_descriptor schema_nodes[] = {\n";
+            "";
+        size_t array_index_alias_count = 0;
+        for (const s_node& node : schema->nodes) {
+            array_index_alias_count += node.index_aliases.size();
+        }
+        if (array_index_alias_count != 0) {
+            output += "static const s_array_index_alias_descriptor generated_array_index_aliases[] = {\n";
+            for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+                for (const s_symbol& alias : schema->nodes[node_index].index_aliases) {
+                    output += "    { " + std::to_string(node_index) + ", " +
+                              Cpp_String_(alias.name) + ", " +
+                              std::to_string(alias.value) + " },\n";
+                }
+            }
+            output +=
+                "};\n\n"
+                "const s_array_index_alias_descriptor* const array_index_aliases = "
+                "generated_array_index_aliases;\n\n";
+        } else {
+            output += "const s_array_index_alias_descriptor* const array_index_aliases = nullptr;\n\n";
+        }
+        output += "const size_t array_index_alias_count = " +
+                  std::to_string(array_index_alias_count) + ";\n\n";
+        output += "const s_schema_node_descriptor schema_nodes[] = {\n";
         if (schema->nodes.empty()) {
             for (size_t index = 0; index < schema->parameters.size(); ++index) {
                 const s_parameter& parameter = schema->parameters[index];

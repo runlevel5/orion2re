@@ -151,7 +151,7 @@ Bootstrap scalar progress:
 - [x] Extend resolution, traversal, and typed decoding to records, arrays, aliases, enums, masks, ratios, strings, and aggregate skips.
 
 - [x] Resolve raw path tokens through records and numeric array indexes. Keyed collections are out of scope.
-- [ ] Add enum-backed semantic aliases for array indexes: validate `index_type`, emit alias metadata, resolve names to numeric external indexes, and test that alias and numeric paths select the same leaves and boundaries.
+- [x] Add enum-backed semantic aliases for array indexes: validate `index_type`, emit alias metadata, resolve names to numeric external indexes, and test that alias and numeric paths select the same leaves and boundaries.
 - [x] Enforce index bases and produce canonical resolved paths.
 - [x] Return the selected node, first writable leaf, nearest valid traversal boundary, and remaining writable leaves.
 - [x] Implement depth-first declaration-order traversal exactly as specified in `docs/config.md`.

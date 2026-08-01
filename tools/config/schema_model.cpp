@@ -1127,6 +1127,7 @@ namespace {
             int64_t index_base = 1;
             const s_json_value* count_value = Member_(type.aggregate, "count");
             const s_json_value* index_value = Member_(type.aggregate, "index_base");
+            const s_json_value* index_type_value = Member_(type.aggregate, "index_type");
             const s_json_value* element = Member_(type.aggregate, "element");
             if (count_value == nullptr || !Integer_(count_value, &count) || count <= 0 ||
                 count > INT32_MAX || element == nullptr || element->kind != JSON_OBJECT ||
@@ -1135,6 +1136,40 @@ namespace {
                 index_base + count - 1 > INT32_MAX) {
                 *diagnostic = schema_path + ": invalid array count, index base, or element";
                 return false;
+            }
+            if (index_type_value != nullptr) {
+                if (index_type_value->kind != JSON_STRING) {
+                    *diagnostic = schema_path + ".index_type: expected an enum type name";
+                    return false;
+                }
+                const s_json_value* index_type_declaration = nullptr;
+                if (!Find_Named_(root, "types", index_type_value->string_value,
+                                 &index_type_declaration)) {
+                    *diagnostic = schema_path + ".index_type: unknown type '" +
+                                  index_type_value->string_value + "'";
+                    return false;
+                }
+                std::vector<std::string> index_stack;
+                s_resolved_type index_type;
+                if (!Resolve_Type_(root, index_type_declaration,
+                                   schema_path + ".index_type", &index_stack,
+                                   &index_type, diagnostic)) {
+                    return false;
+                }
+                if (index_type.node_kind != NODE_SCALAR ||
+                    index_type.scalar_kind != SCALAR_ENUM) {
+                    *diagnostic = schema_path + ".index_type: expected an enum type";
+                    return false;
+                }
+                const int64_t last_index = index_base + count - 1;
+                for (const s_symbol& alias : index_type.values) {
+                    if (alias.value < index_base || alias.value > last_index) {
+                        *diagnostic = schema_path + ".index_type." + alias.name +
+                                      ": value is outside the array's external index range";
+                        return false;
+                    }
+                }
+                schema->nodes[node_index].index_aliases = index_type.values;
             }
             if (local_default != nullptr &&
                 (local_default->kind != JSON_ARRAY ||

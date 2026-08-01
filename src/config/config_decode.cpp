@@ -384,16 +384,31 @@ namespace {
     }
 
     uint32_t Find_Child_(const s_runtime_schema* schema, uint32_t parent,
-                         const s_cfg_token& token) {
+                         const s_cfg_token& token, int32_t* resolved_index) {
+        bool has_index = false;
+        int32_t external_index = 0;
+        if (schema->nodes[parent].kind == CONFIG_NODE_ARRAY) {
+            has_index = Parse_Index_(token, &external_index);
+            if (!has_index && token.kind == CFG_TOKEN_IDENTIFIER) {
+                for (size_t index = 0; index < schema->array_index_alias_count; ++index) {
+                    const s_array_index_alias_descriptor& alias =
+                        schema->array_index_aliases[index];
+                    if (alias.array_node == parent && token.value == alias.name) {
+                        external_index = alias.external_index;
+                        has_index = true;
+                        break;
+                    }
+                }
+            }
+        }
         for (uint32_t index = 0; index < schema->node_count; ++index) {
             const s_schema_node_descriptor& node = schema->nodes[index];
             if (node.parent != parent) {
                 continue;
             }
             if (schema->nodes[parent].kind == CONFIG_NODE_ARRAY) {
-                int32_t external_index = 0;
-                if (Parse_Index_(token, &external_index) &&
-                    node.external_index == external_index) {
+                if (has_index && node.external_index == external_index) {
+                    *resolved_index = external_index;
                     return index;
                 }
             } else if (token.kind == CFG_TOKEN_IDENTIFIER && token.value == node.id) {
@@ -442,16 +457,20 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
     }
     for (size_t path_index = 1; path_index < statement->path.size(); ++path_index) {
         const s_cfg_token& token = statement->path[path_index];
-        canonical_path += "." + token.value;
         if (schema->nodes[selected].kind == CONFIG_NODE_SCALAR) {
+            canonical_path += "." + token.value;
             return Fail_(root.location, "unknown configuration variable '" + canonical_path + "'",
                          write_set, diagnostic);
         }
-        selected = Find_Child_(schema, selected, token);
+        const bool array_selector = schema->nodes[selected].kind == CONFIG_NODE_ARRAY;
+        int32_t resolved_index = 0;
+        selected = Find_Child_(schema, selected, token, &resolved_index);
         if (selected == CONFIG_NO_NODE) {
+            canonical_path += "." + token.value;
             return Fail_(token.location, "unknown configuration variable '" + canonical_path + "'",
                          write_set, diagnostic);
         }
+        canonical_path += "." + (array_selector ? std::to_string(resolved_index) : token.value);
     }
     if (statement->values.empty()) {
         return Fail_(statement->location, "assignment requires a value", write_set, diagnostic);

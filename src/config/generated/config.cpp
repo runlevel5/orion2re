@@ -20,6 +20,10 @@ const s_variable_descriptor variables[] = {
 
 const size_t variable_count = sizeof(variables) / sizeof(variables[0]);
 
+const s_array_index_alias_descriptor* const array_index_aliases = nullptr;
+
+const size_t array_index_alias_count = 0;
+
 const s_schema_node_descriptor schema_nodes[] = {
     { "music_enabled", CONFIG_NODE_SCALAR, CONFIG_NO_NODE, 0, 0, 0, 0 },
     { "music_volume", CONFIG_NODE_SCALAR, CONFIG_NO_NODE, 0, 1, 1, 1 },

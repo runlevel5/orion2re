@@ -20,6 +20,11 @@
       reject_unknown_numeric: true,
       values: { none: 0, mass_driver: 4, plasma_cannon: 11 },
     },
+    weapon_slot_index: {
+      kind: "enum",
+      base_type: "uint8",
+      values: { primary: 1, secondary: 2 },
+    },
     weapon_arc: {
       kind: "mask",
       base_type: "uint8",
@@ -64,6 +69,7 @@
               kind: "array",
               count: 2,
               index_base: 1,
+              index_type: "weapon_slot_index",
               element: { type: "weapon_slot" },
             },
             default: [
