@@ -133,6 +133,123 @@ DOCTEST_TEST_CASE("vfs raw filesystem backend opens and reads files from the con
     DOCTEST_CHECK(vfs::fclose(file) == 0);
 }
 
+DOCTEST_TEST_CASE("vfs reads loose shared data ahead of original raw assets") {
+    test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
+    test_dir.Write_File("shared.dat", "original");
+    test_dir.Write_File(test_vfs_detail::fs::path("data") / "shared.dat", "shared");
+
+    const std::string base_path = test_dir.root_path().string();
+    DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+
+    s_vfs_file* file = vfs::fopen("shared.dat", "rb");
+    DOCTEST_REQUIRE(file != nullptr);
+    std::array<char, 16> buffer{};
+    DOCTEST_CHECK(vfs::fread(buffer.data(), 1, 6, file) == 6);
+    DOCTEST_CHECK(std::string(buffer.data(), 6) == "shared");
+    DOCTEST_CHECK(vfs::fclose(file) == 0);
+}
+
+DOCTEST_TEST_CASE("staged directory package projects data and keeps private files namespaced") {
+    test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
+    test_dir.Write_File(test_vfs_detail::fs::path("data") / "mods" / "sample" /
+                        "mod.json5", "manifest");
+    test_dir.Write_File(test_vfs_detail::fs::path("data") / "mods" / "sample" /
+                        "data" / "music" / "theme.dat", "package-theme");
+
+    const std::string base_path = test_dir.root_path().string();
+    DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+    s_vfs_mount_transaction* transaction = vfs::Begin_Mount_Transaction();
+    DOCTEST_REQUIRE(transaction != nullptr);
+    std::string diagnostic;
+    DOCTEST_REQUIRE(vfs::Stage_Package_Mount(transaction, "sample", &diagnostic) == 1);
+    DOCTEST_CHECK(vfs::File_Exists("mods/sample/mod.json5") == 1);
+    DOCTEST_CHECK(vfs::File_Exists("mod.json5") == 0);
+    DOCTEST_CHECK(vfs::File_Exists("music/theme.dat") == 1);
+
+    vfs::Discard_Mount_Transaction(transaction);
+    DOCTEST_CHECK(vfs::File_Exists("mods/sample/mod.json5") == 0);
+    DOCTEST_CHECK(vfs::File_Exists("music/theme.dat") == 0);
+}
+
+DOCTEST_TEST_CASE("private package paths cannot be supplied by non-package VFS sources") {
+    test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
+    test_dir.Write_File(test_vfs_detail::fs::path("data") / "overrides" / "mods" /
+                        "sample" / "mod.json5", "override");
+    test_dir.Write_File(test_vfs_detail::fs::path("mods") / "sample" / "mod.json5",
+                        "raw");
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "base.zip", {
+        {"mods/sample/mod.json5", "shared-zip"},
+    });
+
+    const std::string base_path = test_dir.root_path().string();
+    DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+    DOCTEST_CHECK(vfs::File_Exists("mods/sample/mod.json5") == 0);
+    DOCTEST_CHECK(vfs::fopen("mods/sample/mod.json5", "rb") == nullptr);
+}
+
+DOCTEST_TEST_CASE("committed directory package order gives the first mount precedence") {
+    test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
+    test_dir.Write_File(test_vfs_detail::fs::path("data") / "mods" / "first" /
+                        "data" / "priority.dat", "first");
+    test_dir.Write_File(test_vfs_detail::fs::path("data") / "mods" / "second" /
+                        "data" / "priority.dat", "second");
+
+    const std::string base_path = test_dir.root_path().string();
+    DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+    s_vfs_mount_transaction* transaction = vfs::Begin_Mount_Transaction();
+    DOCTEST_REQUIRE(transaction != nullptr);
+    std::string diagnostic;
+    DOCTEST_REQUIRE(vfs::Stage_Package_Mount(transaction, "first", &diagnostic) == 1);
+    DOCTEST_REQUIRE(vfs::Stage_Package_Mount(transaction, "second", &diagnostic) == 1);
+    DOCTEST_REQUIRE(vfs::Commit_Mount_Transaction(transaction) == 1);
+
+    s_vfs_file* file = vfs::fopen("priority.dat", "rb");
+    DOCTEST_REQUIRE(file != nullptr);
+    std::array<char, 16> buffer{};
+    DOCTEST_CHECK(vfs::fread(buffer.data(), 1, 5, file) == 5);
+    DOCTEST_CHECK(std::string(buffer.data(), 5) == "first");
+    DOCTEST_CHECK(vfs::fclose(file) == 0);
+}
+
+DOCTEST_TEST_CASE("staged ZIP package exposes private root and public data projection") {
+    test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "mods" / "archive.zip", {
+        {"mod.json5", "manifest"},
+        {"config/main.cfg", "music_volume = 60;"},
+        {"data/voices/alert.dat", "archive-alert"},
+    });
+
+    const std::string base_path = test_dir.root_path().string();
+    DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+    s_vfs_mount_transaction* transaction = vfs::Begin_Mount_Transaction();
+    DOCTEST_REQUIRE(transaction != nullptr);
+    std::string diagnostic;
+    DOCTEST_REQUIRE(vfs::Stage_Package_Mount(transaction, "archive", &diagnostic) == 1);
+    DOCTEST_CHECK(vfs::File_Exists("mods/archive/mod.json5") == 1);
+    DOCTEST_CHECK(vfs::File_Exists("mods/archive/config/main.cfg") == 1);
+    DOCTEST_CHECK(vfs::File_Exists("voices/alert.dat") == 1);
+    DOCTEST_CHECK(vfs::File_Exists("config/main.cfg") == 0);
+    vfs::Discard_Mount_Transaction(transaction);
+}
+
+DOCTEST_TEST_CASE("package mount rejects ambiguous directory and ZIP forms without changing lookup") {
+    test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
+    test_dir.Write_File(test_vfs_detail::fs::path("data") / "mods" / "duplicate" /
+                        "mod.json5", "directory");
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "mods" /
+                            "duplicate.zip", {{"mod.json5", "archive"}});
+
+    const std::string base_path = test_dir.root_path().string();
+    DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+    s_vfs_mount_transaction* transaction = vfs::Begin_Mount_Transaction();
+    DOCTEST_REQUIRE(transaction != nullptr);
+    std::string diagnostic;
+    DOCTEST_CHECK(vfs::Stage_Package_Mount(transaction, "duplicate", &diagnostic) == 0);
+    DOCTEST_CHECK(diagnostic == "package 'duplicate' has both directory and ZIP forms");
+    vfs::Discard_Mount_Transaction(transaction);
+    DOCTEST_CHECK(vfs::File_Exists("mods/duplicate/mod.json5") == 0);
+}
+
 DOCTEST_TEST_CASE("vfs gives data overrides precedence over raw files") {
     test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
     test_dir.Write_File("voices.dat", "raw");
@@ -253,7 +370,7 @@ DOCTEST_TEST_CASE("vfs rejects write capable modes and out of range seeks") {
 
 DOCTEST_TEST_CASE("vfs opens zip-backed assets and supports backward seek by recreating the stream") {
     test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
-    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "10-assets.zip", {
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "base.zip", {
         {"music/theme.dat", "zip-theme"},
     });
 
@@ -273,31 +390,33 @@ DOCTEST_TEST_CASE("vfs opens zip-backed assets and supports backward seek by rec
     DOCTEST_CHECK(vfs::fclose(file) == 0);
 }
 
-DOCTEST_TEST_CASE("vfs prefers lexicographically earlier zip files over later zips and raw files") {
+DOCTEST_TEST_CASE("vfs loads only data base zip and ignores other shared zip files") {
     test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
     test_dir.Write_File("intro.dat", "raw-intro");
-    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "20-later.zip", {
-        {"intro.dat", "later"},
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "ignored.zip", {
+        {"intro.dat", "ignored"},
+        {"ignored-only.dat", "ignored"},
     });
-    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "10-earlier.zip", {
-        {"intro.dat", "earlier"},
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "base.zip", {
+        {"intro.dat", "base"},
     });
 
     const std::string base_path = test_dir.root_path().string();
     DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+    DOCTEST_CHECK(vfs::File_Exists("ignored-only.dat") == 0);
 
     s_vfs_file* file = vfs::fopen("intro.dat", "rb");
     DOCTEST_REQUIRE(file != nullptr);
 
     std::array<char, 16> buffer{};
-    DOCTEST_CHECK(vfs::fread(buffer.data(), 1, 7, file) == 7);
-    DOCTEST_CHECK(std::string(buffer.data(), 7) == "earlier");
+    DOCTEST_CHECK(vfs::fread(buffer.data(), 1, 4, file) == 4);
+    DOCTEST_CHECK(std::string(buffer.data(), 4) == "base");
     DOCTEST_CHECK(vfs::fclose(file) == 0);
 }
 
 DOCTEST_TEST_CASE("vfs loose overrides still win over zip-backed assets") {
     test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
-    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "10-assets.zip", {
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "base.zip", {
         {"voices/alert.dat", "zip-alert"},
     });
     test_dir.Write_File(test_vfs_detail::fs::path("data") / "overrides" / "voices" / "alert.dat", "loose-alert");
@@ -316,7 +435,7 @@ DOCTEST_TEST_CASE("vfs loose overrides still win over zip-backed assets") {
 
 DOCTEST_TEST_CASE("vfs resolves zip entry paths case-insensitively") {
     test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
-    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "10-assets.zip", {
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "base.zip", {
         {"MUSIC/THEME.DAT", "zip-theme"},
     });
 
@@ -363,7 +482,7 @@ DOCTEST_TEST_CASE("vfs fopen_lbx prefers per-entry loose override over whole lbx
     std::string whole_zip_lbx_contents((std::istreambuf_iterator<char>(whole_zip_lbx)), std::istreambuf_iterator<char>());
     DOCTEST_REQUIRE(!whole_zip_lbx_contents.empty());
 
-    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "10-whole.zip", {
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "base.zip", {
         {"TEST.LBX", whole_zip_lbx_contents},
     });
     test_dir.Write_File(test_vfs_detail::fs::path("data") / "overrides" / "TEST.LBX" / "001", "entry-override");
@@ -390,7 +509,7 @@ DOCTEST_TEST_CASE("vfs fopen_lbx falls back to whole lbx replacement from zip") 
     std::string zip_lbx_contents((std::istreambuf_iterator<char>(zip_lbx)), std::istreambuf_iterator<char>());
     DOCTEST_REQUIRE(!zip_lbx_contents.empty());
 
-    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "10-assets.zip", {
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "base.zip", {
         {"TEST.LBX", zip_lbx_contents},
     });
 
@@ -415,7 +534,7 @@ DOCTEST_TEST_CASE("vfs fopen_lbx prefers zip per-entry override over whole lbx z
     std::string zip_lbx_contents((std::istreambuf_iterator<char>(zip_lbx)), std::istreambuf_iterator<char>());
     DOCTEST_REQUIRE(!zip_lbx_contents.empty());
 
-    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "10-assets.zip", {
+    test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "base.zip", {
         {"TEST2.LBX", zip_lbx_contents},
         {"TEST2.LBX/001", "zip-entry-override"},
     });

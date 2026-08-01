@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "config/cfg_parser.h"
+#include "config/mod_manager.h"
 #include "game/vfs.h"
 
 namespace config {
@@ -133,6 +134,20 @@ namespace {
         loader->stack.pop_back();
         return true;
     }
+
+    bool Load_Document_(const std::string& entry_path, s_cfg_document* document,
+                        s_cfg_diagnostic* diagnostic) {
+        s_loader loader;
+        loader.diagnostic = diagnostic;
+        s_source_location entry_location;
+        entry_location.source = entry_path;
+        if (!Load_Recursive_(&loader, entry_path, entry_location)) {
+            return false;
+        }
+        *document = std::move(loader.flattened);
+        return true;
+    }
+
 }
 
 bool Load_Config_File(const char* entry_path, const char* package_id,
@@ -149,14 +164,12 @@ bool Load_Config_File(const char* entry_path, const char* package_id,
         return false;
     }
 
-    s_loader loader;
-    loader.diagnostic = diagnostic;
-    s_source_location entry_location;
-    entry_location.source = normalized_entry;
-    if (!Load_Recursive_(&loader, normalized_entry, entry_location)) {
+    s_cfg_document document;
+    if (!Load_Document_(normalized_entry, &document, diagnostic)) {
         return false;
     }
-    return Apply_Config_Document(&loader.flattened, package_id, effective, diagnostic);
+    return Apply_Config_With_Mods(document, package_id, effective, diagnostic,
+                                  Load_Document_);
 }
 
 bool Load_Startup_Config(const char* entry_path, const char* package_id,

@@ -69,12 +69,13 @@ DOCTEST_TEST_CASE("include enable and stop statements retain arguments") {
         "include balance/weapons.cfg;\n"
         "include \"local files/interface.cfg\";\n"
         "enable example-balance.mod;\n"
+        "enable ver150;\n"
         "stop;\n";
     config::s_cfg_document document;
     config::s_cfg_diagnostic diagnostic;
 
     DOCTEST_REQUIRE(Parse_(source, &document, &diagnostic));
-    DOCTEST_REQUIRE(document.statements.size() == 4);
+    DOCTEST_REQUIRE(document.statements.size() == 5);
     DOCTEST_CHECK(document.statements[0].kind == config::CFG_STATEMENT_INCLUDE);
     DOCTEST_CHECK(document.statements[0].argument.kind == config::CFG_TOKEN_PATH);
     DOCTEST_CHECK(document.statements[0].argument.value == "balance/weapons.cfg");
@@ -83,7 +84,9 @@ DOCTEST_TEST_CASE("include enable and stop statements retain arguments") {
     DOCTEST_CHECK(document.statements[1].argument.value == "local files/interface.cfg");
     DOCTEST_CHECK(document.statements[2].kind == config::CFG_STATEMENT_ENABLE);
     DOCTEST_CHECK(document.statements[2].argument.value == "example-balance.mod");
-    DOCTEST_CHECK(document.statements[3].kind == config::CFG_STATEMENT_STOP);
+    DOCTEST_CHECK(document.statements[3].kind == config::CFG_STATEMENT_ENABLE);
+    DOCTEST_CHECK(document.statements[3].argument.value == "ver150");
+    DOCTEST_CHECK(document.statements[4].kind == config::CFG_STATEMENT_STOP);
 }
 
 DOCTEST_TEST_CASE("comments and multiline assignments preserve one-based locations") {
@@ -125,6 +128,7 @@ DOCTEST_TEST_CASE("syntax failures report their phase and clear partial output")
         {"captain = \"unterminated", "unterminated string", 1, 11},
         {"first = 1;\nsecond = 2", "unterminated assignment; expected ';'", 2, 1},
         {"enable;", "enable requires a mod ID", 1, 1},
+        {"enable 150;", "enable requires a symbolic package ID", 1, 8},
         {"include;", "include requires a path", 1, 1},
         {"stop now;", "expected ';'", 1, 6},
     };

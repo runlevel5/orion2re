@@ -485,7 +485,8 @@ namespace {
             return false;
         }
         if (statement->argument.kind != CFG_TOKEN_IDENTIFIER) {
-            return Fail_(parser, statement->argument.location, "enable requires a symbolic mod ID");
+            return Fail_(parser, statement->argument.location,
+                         "enable requires a symbolic package ID");
         }
         return Read_Semicolon_(parser, statement->location);
     }

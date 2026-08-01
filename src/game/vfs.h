@@ -3,12 +3,25 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <string>
+#include <vector>
+
 struct s_vfs_file;
+struct s_vfs_mount_transaction;
 
 namespace vfs {
     int8_t Init(const char* base_path);
     void Shutdown();
     int8_t Set_Raw_Fallback_Path(const char* path);
+
+    s_vfs_mount_transaction* Begin_Mount_Transaction();
+    int8_t Stage_Package_Mount(s_vfs_mount_transaction* transaction,
+                               const char* package_id, std::string* diagnostic);
+    int8_t Order_Package_Mounts(s_vfs_mount_transaction* transaction,
+                                const std::vector<std::string>& package_ids,
+                                std::string* diagnostic);
+    int8_t Commit_Mount_Transaction(s_vfs_mount_transaction* transaction);
+    void Discard_Mount_Transaction(s_vfs_mount_transaction* transaction);
 
     s_vfs_file* fopen(const char* path, const char* mode);
     s_vfs_file* fopen_lbx(const char* lbx_name, int32_t entry_idx);

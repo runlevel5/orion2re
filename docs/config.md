@@ -1050,7 +1050,7 @@ Because declaration order controls terse traversal, field reordering can break e
 ### Base configuration lifecycle
 
 At startup, the engine creates a candidate state from generated logical defaults and then looks for
-`orion2re.cfg` at the game directory's VFS root. A missing file is not an error and leaves the generated
+`orion2re.cfg` at the VFS root. The normal physical location is `data/orion2re.cfg`. A missing file is not an error and leaves the generated
 defaults unchanged. If the file exists, its complete include graph is parsed, resolved, decoded, and
 validated against that candidate. Invalid syntax, paths, values, includes, or bindings are fatal startup
 errors. Defaults and overrides are committed to native state together only after the complete operation
@@ -1059,8 +1059,14 @@ succeeds.
 CFG loading is unidirectional. CFG files are authoritative human-modifiable inputs, and the engine does
 not serialize effective state back into CFG syntax or modify source files after loading them.
 
-Until native mod packages are implemented, `enable <mod-id>;` has no effect. It does not prevent ordinary
-configuration assignments in the same operation from being applied.
+Configuration assignments and `enable` requests are accumulated before package configuration is applied.
+Any failure while reading configuration, manifests, dependencies, or resources is fatal during startup and
+is reported with its source location and diagnostic message.
+
+Every complete configuration load, including a reload, creates a new candidate from generated defaults and
+then processes the base configuration and enabled packages anew. A successful reload replaces the prior
+effective configuration, provenance, override history, and package layers. A failed reload leaves all prior
+native values and package layers active.
 
 ### Stage 1: lexical parser
 
@@ -1103,6 +1109,11 @@ Cross-field validators inspect the complete candidate state. Examples include:
 
 After validation, the transaction commits and affected subsystems rebuild declared derived state.
 
+Package graph resolution and activation are implemented by the mod manager, separately from CFG file and
+include loading. The configuration loader supplies flattened, source-located documents; the mod manager
+owns manifest loading, dependencies, priority, staged VFS mounts, reverse package application, and the
+combined commit.
+
 ## Configuration groups and lifecycle
 
 Every parameter belongs to a group, for example:
@@ -1139,6 +1150,36 @@ Optional includes are not supported. Every `include` target is required: a missi
 
 ## Native mod packages
 
+### Shared data layout
+
+Project-owned data is kept under one `data/` directory:
+
+```text
+data/
+  orion2re.cfg
+  overrides/
+  base.zip
+  mods/
+    <package>/
+      mod.json5
+      config/
+      data/
+    <package>.zip
+```
+
+A package is either the directory `data/mods/<package>/` or the archive
+`data/mods/<package>.zip`. Defining both forms is an error. Package names and manifest IDs use the same
+stable identifier and must match. The loader does not scan for or catalog installed packages:
+`enable <package>;` resolves that package path directly, and declared dependencies are resolved the same
+way. Package IDs use symbolic identifiers, so source-owned compatibility packages use names such as
+`ver150` and statements such as `enable ver150;`.
+
+Directory and archive packages have identical logical contents. The package root is privately exposed at
+`mods/<package>/`, allowing the loader to read `mods/<package>/mod.json5` and package-relative configuration.
+The package's `data/` child is additionally projected onto the public VFS root. Therefore both
+`data/mods/example/data/music/theme.dat` and the archive entry `data/music/theme.dat` provide the virtual
+asset `music/theme.dat`. Files outside the package `data/` child cannot override public game assets.
+
 ### Manifest
 
 Each mod has a JSON5 manifest containing at least:
@@ -1151,10 +1192,8 @@ Each mod has a JSON5 manifest containing at least:
 - conflicts
 - load ordering constraints
 - configuration entry point
-- resource roots or archives
-- declared capabilities
 
-The manifest is separate from the CFG entry point because package discovery and dependency resolution happen before game configuration can be applied. The loader must know a package's stable ID, version, requirements, dependencies, conflicts, resource roots, and entry point before it can establish load order or resolve package-relative files.
+The manifest is separate from the CFG entry point because dependency resolution happens before game configuration can be applied. The loader must know a package's stable ID, version, requirements, dependencies, conflicts, and entry point before it can establish load order or resolve package-relative files.
 
 Keeping this metadata in ordinary configuration variables would require partially executing every installed mod merely to discover it, would allow includes to overwrite package identity, and would create a cycle between resource mounting and configuration parsing. A JSON5 manifest is directly inspectable by launchers, package managers, multiplayer compatibility checks, and dependency tools without loading the game configuration schema.
 
@@ -1180,11 +1219,14 @@ Example direction:
   load_after: ["base_game"],
 
   config: "config/main.cfg",
-  resources: [
-    { path: "resources", mount: "/" },
-  ],
 }
 ```
+
+Versions use `major.minor.patch`. The engine version is `1.60.0`; `1.31.0` identifies the final original
+developer release, while `1.50.26` identifies the latest release in the earlier community patch line.
+Manifest ranges are conjunctions of exact versions or the comparators `=`, `<`, `<=`, `>`, and `>=`.
+Engine semantic compatibility is separate from the build-date identity still used by legacy multiplayer
+packets.
 
 ### `enable` semantics
 
@@ -1194,7 +1236,7 @@ enable example_balance_mod;
 
 performs the following operation:
 
-1. Resolve the manifest by stable ID.
+1. Resolve `data/mods/example_balance_mod/` or `data/mods/example_balance_mod.zip` directly.
 2. Validate engine compatibility.
 3. Resolve dependencies and ordering.
 4. Detect cycles and conflicts.
@@ -1207,9 +1249,24 @@ performs the following operation:
 
 If any step fails, the mod is not partially enabled.
 
+`enable` order defines priority. The first enabled package has the highest priority. Package configuration
+is therefore applied in reverse priority order, making the first package apply last. VFS package layers are
+searched in priority order, making that same first package the first resource source checked. A package has
+higher priority than its dependencies, and a shared dependency is loaded only once. A `load_after`
+constraint requires the declaring package to have higher priority than the named active package.
+
 ### Resource layering
 
-Mods provide resources through VFS layers. Higher-priority mods may override lower-priority paths according to deterministic ordering.
+Mods provide resources through staged VFS layers. A directory package's physical `data/` child and an
+archive package's `data/` entry prefix both become the virtual VFS root. Preparing a layer validates and
+indexes it without committing it. Configuration loading can read the staged view, after which all package
+layers and configuration values are committed together or discarded together.
+
+Within the base VFS, lookup proceeds through loose `data/overrides/`, enabled package layers, the optional
+`data/base.zip`, loose `data/`, original install files, and the optional raw fallback. `base.zip` is the
+only archive implicitly mounted; other ZIP files under `data/` are ignored. This preserves one packaged
+base-override layer without creating a second filename-ordered mod mechanism. Package layers use explicit
+`enable` priority.
 
 Diagnostics should be able to answer:
 
@@ -1219,6 +1276,17 @@ Diagnostics should be able to answer:
 - whether multiplayer peers have the same deterministic resource set
 
 The native model uses package resource mounts rather than binary-era per-file substitution parameters.
+
+### Source-owned supported mods
+
+Supported compatibility packages live under `data/mods/<package>/` in the source tree. The initial
+`data/mods/ver150/` package is the home for native backports of community patch 1.50 behavior. Its manifest
+version is `1.50.26`; restored configuration and resources are added to that package as backports land.
+
+CMake target `package-supported-mods` creates distributable package archives under the build tree at
+`data/mods/<package>.zip`. When `ORION2RE_GAME_DIR` is configured, target `deploy-supported-mods` copies
+those archives to the target game's `data/mods/` directory. Packaging does not enable a mod; activation
+still requires an explicit `enable` statement.
 
 ## Save games and multiplayer
 

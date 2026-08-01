@@ -125,6 +125,8 @@ orion2re_add_unit_test(test_config_loader
         src/config/config_decode.cpp
         src/config/config_lifecycle.cpp
         src/config/config_loader.cpp
+        src/config/mod_manifest.cpp
+        src/config/mod_manager.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
         src/game/compat.cpp
@@ -133,11 +135,15 @@ orion2re_add_unit_test(test_config_loader
         src/game/vfs_lbx.cpp
         src/game/vfs_path.cpp
         src/game/vfs_zip.cpp
+        vendors/yyjson/src/yyjson.c
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
     LIBRARIES
         miniz
     LINK_SDL
+)
+target_include_directories(test_config_loader PRIVATE
+    "${ORION2RE_VENDORED_YYJSON_DIR}/src"
 )
 
 orion2re_add_unit_test(test_pop_helpers

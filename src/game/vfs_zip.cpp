@@ -5,6 +5,8 @@
 #include <algorithm>
 
 namespace vfs_detail {
+    s_vfs_mount_transaction* g_vfs_staged_transaction = nullptr;
+
     const s_vfs_backend_ops g_vfs_zip_file_ops = {
         Zip_File_Read_,
         Zip_File_Size_,
@@ -36,14 +38,16 @@ namespace vfs_detail {
     }
 
     bool Create_Zip_Iter_State_(s_vfs_zip_file_stream* zip_stream) {
-        mz_zip_archive* archive;
-
-        if (zip_stream == nullptr || zip_stream->archive_index >= g_vfs_state.zip_archives.size()) {
+        if (zip_stream == nullptr) {
             return false;
         }
 
-        archive = &g_vfs_state.zip_archives[zip_stream->archive_index].archive;
-        zip_stream->iter_state = mz_zip_reader_extract_iter_new(archive, zip_stream->file_index, 0);
+        mz_zip_archive* archive = Get_Zip_Archive_(zip_stream->entry);
+        if (archive == nullptr) {
+            return false;
+        }
+        zip_stream->iter_state = mz_zip_reader_extract_iter_new(
+            archive, zip_stream->entry.file_index, 0);
         return zip_stream->iter_state != nullptr;
     }
 
@@ -67,6 +71,80 @@ namespace vfs_detail {
         }
 
         return true;
+    }
+
+    bool Find_Package_Zip_Entry_(const char* asset_path, s_vfs_zip_entry* zip_entry) {
+        s_vfs_zip_cache_entry lookup_entry{};
+        if (!Build_Asset_Key_(asset_path, lookup_entry.asset_key, sizeof(lookup_entry.asset_key))) {
+            return false;
+        }
+
+        const auto find_in_layers = [&](const std::vector<s_vfs_package_layer>& layers,
+                                        bool staged) {
+            for (size_t layer_index = 0; layer_index < layers.size(); ++layer_index) {
+                const std::vector<s_vfs_zip_cache_entry>& entries = layers[layer_index].zip_entries;
+                auto it = std::lower_bound(entries.begin(), entries.end(), lookup_entry,
+                                           Compare_Zip_Cache_Entries_);
+                if (it != entries.end() && strcmp(it->asset_key, lookup_entry.asset_key) == 0) {
+                    if (zip_entry != nullptr) {
+                        *zip_entry = it->entry;
+                        zip_entry->package_entry = true;
+                        zip_entry->staged = staged;
+                        zip_entry->package_layer = static_cast<uint32_t>(layer_index);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        if (g_vfs_staged_transaction != nullptr &&
+            find_in_layers(g_vfs_staged_transaction->layers, true)) {
+            return true;
+        }
+        if (g_vfs_staged_transaction != nullptr) {
+            return false;
+        }
+        return find_in_layers(g_vfs_state.package_layers, false);
+    }
+
+    mz_zip_archive* Get_Zip_Archive_(const s_vfs_zip_entry& zip_entry) {
+        if (!zip_entry.package_entry) {
+            if (zip_entry.archive_index >= g_vfs_state.zip_archives.size()) {
+                return nullptr;
+            }
+            return &g_vfs_state.zip_archives[zip_entry.archive_index].archive;
+        }
+
+        std::vector<s_vfs_package_layer>* layers = nullptr;
+        if (zip_entry.staged) {
+            if (g_vfs_staged_transaction == nullptr) {
+                return nullptr;
+            }
+            layers = &g_vfs_staged_transaction->layers;
+        } else {
+            layers = &g_vfs_state.package_layers;
+        }
+        if (zip_entry.package_layer >= layers->size()) {
+            return nullptr;
+        }
+        s_vfs_package_layer& layer = (*layers)[zip_entry.package_layer];
+        return layer.zip_archive == nullptr ? nullptr : &layer.zip_archive->archive;
+    }
+
+    void Close_Package_Layers_(std::vector<s_vfs_package_layer>* layers) {
+        if (layers == nullptr) {
+            return;
+        }
+        for (s_vfs_package_layer& layer : *layers) {
+            if (layer.archive_open && layer.zip_archive != nullptr) {
+                mz_zip_reader_end(&layer.zip_archive->archive);
+                layer.archive_open = false;
+            }
+            delete layer.zip_archive;
+            layer.zip_archive = nullptr;
+        }
+        layers->clear();
     }
 
     bool Find_Zip_Entry_(const char* asset_path, s_vfs_zip_entry* zip_entry) {
@@ -126,109 +204,42 @@ namespace vfs_detail {
         cache_entry->entry.archive_index = archive_index;
         cache_entry->entry.file_index = file_index;
         cache_entry->entry.uncompressed_size = (int32_t)file_stat.m_uncomp_size;
+        cache_entry->entry.package_entry = false;
+        cache_entry->entry.staged = false;
+        cache_entry->entry.package_layer = 0;
         return true;
     }
 
-    SDL_EnumerationResult SDLCALL Collect_Zip_Paths_(void* userdata, const char* dirname, const char* fname) {
-        s_vfs_zip_scan_result* scan_result = (s_vfs_zip_scan_result*)userdata;
-        char full_path[VFS_MAX_PATH];
-        char extension[VFS_MAX_PATH];
-        const char* file_extension;
-
-        if (scan_result == nullptr || dirname == nullptr || fname == nullptr) {
-            return SDL_ENUM_FAILURE;
+    bool Load_Base_Zip_() {
+        char candidate_path[VFS_MAX_PATH];
+        char archive_path[VFS_MAX_PATH];
+        if (!Build_Candidate_Path_(g_vfs_state.base_path, "", VFS_BASE_ZIP_PATH,
+                                   candidate_path, sizeof(candidate_path))) {
+            return false;
         }
-
-        file_extension = strrchr(fname, '.');
-        if (file_extension == nullptr) {
-            return SDL_ENUM_CONTINUE;
-        }
-
-        if (strlcpy(extension, file_extension, sizeof(extension)) >= sizeof(extension)) {
-            scan_result->failed = true;
-            return SDL_ENUM_FAILURE;
-        }
-
-        for (size_t i = 0; extension[i] != '\0'; ++i) {
-            extension[i] = (char)SDL_tolower((unsigned char)extension[i]);
-        }
-
-        if (strcmp(extension, ".zip") != 0) {
-            return SDL_ENUM_CONTINUE;
-        }
-
-        if (snprintf(full_path, sizeof(full_path), "%s/%s", dirname, fname) >= (int)sizeof(full_path)) {
-            scan_result->failed = true;
-            return SDL_ENUM_FAILURE;
-        }
-
-        scan_result->zip_paths.emplace_back(full_path);
-        return SDL_ENUM_CONTINUE;
-    }
-
-    bool Scan_Zip_Archives_() {
-        char data_directory[VFS_MAX_PATH];
-        s_vfs_zip_scan_result scan_result{};
-
-        if (!Build_Candidate_Path_(g_vfs_state.base_path, "", VFS_ZIP_DIRECTORY, data_directory, sizeof(data_directory))) {
+        if (!Resolve_Candidate_Path_(candidate_path, archive_path, sizeof(archive_path))) {
             return true;
         }
 
-        if (!SDL_EnumerateDirectory(data_directory, Collect_Zip_Paths_, &scan_result)) {
-            SDL_PathInfo path_info;
-            if (!SDL_GetPathInfo(data_directory, &path_info) || path_info.type != SDL_PATHTYPE_DIRECTORY) {
-                return true;
-            }
-
+        g_vfs_state.zip_archives.emplace_back();
+        s_vfs_zip_archive& zip_archive = g_vfs_state.zip_archives.back();
+        memset(&zip_archive.archive, 0, sizeof(zip_archive.archive));
+        if (strlcpy(zip_archive.archive_path, archive_path,
+                    sizeof(zip_archive.archive_path)) >= sizeof(zip_archive.archive_path) ||
+            !mz_zip_reader_init_file(&zip_archive.archive, zip_archive.archive_path, 0)) {
+            Close_Zip_Archives_();
             return false;
         }
 
-        if (scan_result.failed || scan_result.zip_paths.empty()) {
-            if (scan_result.failed) {
-                return false;
-            }
-
-            return true;
-        }
-
-        std::sort(scan_result.zip_paths.begin(), scan_result.zip_paths.end(), [](const std::string& lhs, const std::string& rhs) {
-            const int file_name_compare = strcasecmp(Get_File_Name_(lhs.c_str()), Get_File_Name_(rhs.c_str()));
-            if (file_name_compare != 0) {
-                return file_name_compare < 0;
-            }
-
-            return strcasecmp(lhs.c_str(), rhs.c_str()) < 0;
-        });
-
-        g_vfs_state.zip_archives.reserve(scan_result.zip_paths.size());
-        for (size_t i = 0; i < scan_result.zip_paths.size(); ++i) {
-            mz_uint total_files;
-
-            g_vfs_state.zip_archives.emplace_back();
-            s_vfs_zip_archive& zip_archive = g_vfs_state.zip_archives.back();
-
-            memset(&zip_archive.archive, 0, sizeof(zip_archive.archive));
-            if (strlcpy(zip_archive.archive_path, scan_result.zip_paths[i].c_str(), sizeof(zip_archive.archive_path)) >= sizeof(zip_archive.archive_path)) {
-                Close_Zip_Archives_();
-                return false;
-            }
-
-            if (!mz_zip_reader_init_file(&zip_archive.archive, zip_archive.archive_path, 0)) {
-                Close_Zip_Archives_();
-                return false;
-            }
-
-            total_files = mz_zip_reader_get_num_files(&zip_archive.archive);
-            for (mz_uint file_index = 0; file_index < total_files; ++file_index) {
-                s_vfs_zip_cache_entry cache_entry{};
-
-                if (Read_Zip_File_Entry_(&zip_archive.archive, (uint32_t)i, file_index, &cache_entry)) {
-                    g_vfs_state.zip_entries.push_back(cache_entry);
-                }
+        const mz_uint total_files = mz_zip_reader_get_num_files(&zip_archive.archive);
+        for (mz_uint file_index = 0; file_index < total_files; ++file_index) {
+            s_vfs_zip_cache_entry cache_entry{};
+            if (Read_Zip_File_Entry_(&zip_archive.archive, 0, file_index, &cache_entry)) {
+                g_vfs_state.zip_entries.push_back(cache_entry);
             }
         }
-
-        std::sort(g_vfs_state.zip_entries.begin(), g_vfs_state.zip_entries.end(), Compare_Zip_Cache_Entries_);
+        std::sort(g_vfs_state.zip_entries.begin(), g_vfs_state.zip_entries.end(),
+                  Compare_Zip_Cache_Entries_);
         return true;
     }
 
@@ -236,8 +247,7 @@ namespace vfs_detail {
         s_vfs_zip_file_stream* zip_stream = new s_vfs_zip_file_stream{};
         s_vfs_file* vfs_file;
 
-        zip_stream->archive_index = zip_entry.archive_index;
-        zip_stream->file_index = zip_entry.file_index;
+        zip_stream->entry = zip_entry;
         if (!Create_Zip_Iter_State_(zip_stream)) {
             delete zip_stream;
             return nullptr;

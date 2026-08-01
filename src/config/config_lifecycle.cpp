@@ -35,22 +35,22 @@ bool Read_Effective_Native_Config(s_effective_config* effective) {
     return true;
 }
 
-bool Apply_Config_Document(const s_cfg_document* document, const char* package_id,
-                           s_effective_config* effective, s_cfg_diagnostic* diagnostic) {
-    if (document == nullptr || package_id == nullptr || effective == nullptr || diagnostic == nullptr) {
+bool Apply_Config_Document_To_Candidate(const s_cfg_document* document,
+                                        const char* package_id,
+                                        s_effective_config* candidate,
+                                        s_cfg_diagnostic* diagnostic) {
+    if (document == nullptr || package_id == nullptr || candidate == nullptr ||
+        diagnostic == nullptr) {
         return false;
     }
     *diagnostic = {};
-    if (effective->state.values.size() != variable_count ||
-        effective->provenance.size() != variable_count ||
-        effective->prior_values.size() != variable_count) {
+    if (candidate->state.values.size() != variable_count ||
+        candidate->provenance.size() != variable_count ||
+        candidate->prior_values.size() != variable_count) {
         diagnostic->message = "effective configuration is not initialized";
         return false;
     }
 
-    s_config_state candidate_state = effective->state;
-    std::vector<s_value_provenance> candidate_provenance = effective->provenance;
-    std::vector<std::vector<s_prior_value>> candidate_prior_values = effective->prior_values;
     for (size_t statement_index = 0; statement_index < document->statements.size(); ++statement_index) {
         const s_cfg_statement& statement = document->statements[statement_index];
         if (statement.kind == CFG_STATEMENT_STOP) {
@@ -75,20 +75,20 @@ bool Apply_Config_Document(const s_cfg_document* document, const char* package_i
 
             statement_prior_values.emplace_back();
             s_prior_value& prior = statement_prior_values.back();
-            if (!Read_State_Value(&candidate_state, write.variable_id, &prior.value)) {
+            if (!Read_State_Value(&candidate->state, write.variable_id, &prior.value)) {
                 return Fail_(write.provenance, "configuration state accessor is missing", diagnostic);
             }
-            prior.provenance = candidate_provenance[variable_index];
+            prior.provenance = candidate->provenance[variable_index];
         }
 
-        if (!Apply_Write_Set(&statement_writes, &candidate_state, diagnostic)) {
+        if (!Apply_Write_Set(&statement_writes, &candidate->state, diagnostic)) {
             return false;
         }
 
         for (size_t write_index = 0; write_index < statement_writes.writes.size(); ++write_index) {
             const s_config_write& write = statement_writes.writes[write_index];
             const size_t variable_index = write.variable_id;
-            candidate_prior_values[variable_index].push_back(
+            candidate->prior_values[variable_index].push_back(
                 std::move(statement_prior_values[write_index]));
             s_value_provenance provenance;
             provenance.has_override = true;
@@ -97,17 +97,30 @@ bool Apply_Config_Document(const s_cfg_document* document, const char* package_i
             provenance.statement = statement.statement_number != 0 ?
                                    statement.statement_number :
                                    static_cast<uint32_t>(statement_index + 1);
-            candidate_provenance[variable_index] = std::move(provenance);
+            candidate->provenance[variable_index] = std::move(provenance);
         }
     }
 
-    if (!Commit_State(&candidate_state)) {
+    return true;
+}
+
+bool Apply_Config_Document(const s_cfg_document* document, const char* package_id,
+                           s_effective_config* effective, s_cfg_diagnostic* diagnostic) {
+    if (document == nullptr || package_id == nullptr || effective == nullptr ||
+        diagnostic == nullptr) {
+        return false;
+    }
+    s_effective_config candidate = *effective;
+    if (!Apply_Config_Document_To_Candidate(document, package_id, &candidate,
+                                            diagnostic)) {
+        return false;
+    }
+
+    if (!Commit_State(&candidate.state)) {
         diagnostic->message = "unable to commit configuration state";
         return false;
     }
-    effective->state = candidate_state;
-    effective->provenance = std::move(candidate_provenance);
-    effective->prior_values = std::move(candidate_prior_values);
+    *effective = std::move(candidate);
     return true;
 }
 

@@ -74,6 +74,22 @@ tools/run-tests.sh
 
 For the full preset list and per-platform details, see `CMakePresets.json`.
 
+Supported source-owned mods are stored under `data/mods/`. Build their distributable ZIP archives with:
+
+```sh
+cmake --build --preset win32-debug --target package-supported-mods
+```
+
+Archives are written under the build tree at `data/mods/<package>.zip`. When
+`ORION2RE_GAME_DIR` is configured, deploy them to the target game directory with:
+
+```sh
+cmake --build --preset win32-debug --target deploy-supported-mods
+```
+
+The game does not enable deployed mods automatically. Add `enable <package>;` to
+`data/orion2re.cfg`, for example `enable ver150;` for the source-owned community patch package.
+
 Random-sequence mismatches log every recorded original caller and captured local caller, including absolute addresses and executable-relative RVAs for symbol lookup.
 
 Example release build:

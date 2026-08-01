@@ -1,0 +1,11 @@
+{
+  id: "ver150",
+  name: "Community Patch 1.50",
+  version: "1.50.26",
+
+  requires: {
+    engine: ">=1.60.0 <2.0.0",
+  },
+
+  config: "config/main.cfg",
+}

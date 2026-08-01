@@ -93,6 +93,8 @@ if(MSVC)
 endif()
 
 set(ORION2RE_GAME_DIR "" CACHE PATH "Optional game directory used for runtime output and debugger working directory")
+set(ORION2RE_SUPPORTED_MODS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/mods")
+set(ORION2RE_PACKAGED_MODS_DIR "${CMAKE_CURRENT_BINARY_DIR}/data/mods")
 
 set(ORION2RE_LOCAL_CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/cmake/local-user.cmake")
 if(EXISTS "${ORION2RE_LOCAL_CONFIG}")
@@ -120,6 +122,15 @@ if(ORION2RE_BUILD_CONFIG_TOOL AND
     NOT EXISTS "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.c"))
     message(FATAL_ERROR
         "Configuration tooling requires the yyjson submodule at vendors/yyjson. "
+        "Run 'git submodule update --init vendors/yyjson' and ensure it is pinned to ${ORION2RE_VENDORED_YYJSON_COMMIT}."
+    )
+endif()
+
+if((ORION2RE_BUILD_GAME OR ORION2RE_BUILD_TESTS) AND
+   (NOT EXISTS "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.h" OR
+    NOT EXISTS "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.c"))
+    message(FATAL_ERROR
+        "Runtime mod loading requires the yyjson submodule at vendors/yyjson. "
         "Run 'git submodule update --init vendors/yyjson' and ensure it is pinned to ${ORION2RE_VENDORED_YYJSON_COMMIT}."
     )
 endif()
@@ -316,6 +327,49 @@ if(ORION2RE_BUILD_GAME)
     )
 endif()
 
+set(ORION2RE_SUPPORTED_MOD_ARCHIVES)
+file(GLOB ORION2RE_SUPPORTED_MOD_IDS CONFIGURE_DEPENDS
+    RELATIVE "${ORION2RE_SUPPORTED_MODS_DIR}"
+    "${ORION2RE_SUPPORTED_MODS_DIR}/*"
+)
+foreach(ORION2RE_SUPPORTED_MOD_ID IN LISTS ORION2RE_SUPPORTED_MOD_IDS)
+    set(ORION2RE_SUPPORTED_MOD_SOURCE
+        "${ORION2RE_SUPPORTED_MODS_DIR}/${ORION2RE_SUPPORTED_MOD_ID}")
+    if(IS_DIRECTORY "${ORION2RE_SUPPORTED_MOD_SOURCE}")
+        set(ORION2RE_SUPPORTED_MOD_ARCHIVE
+            "${ORION2RE_PACKAGED_MODS_DIR}/${ORION2RE_SUPPORTED_MOD_ID}.zip")
+        file(GLOB_RECURSE ORION2RE_SUPPORTED_MOD_FILES CONFIGURE_DEPENDS
+            "${ORION2RE_SUPPORTED_MOD_SOURCE}/*"
+        )
+        add_custom_command(
+            OUTPUT "${ORION2RE_SUPPORTED_MOD_ARCHIVE}"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${ORION2RE_PACKAGED_MODS_DIR}"
+            COMMAND ${CMAKE_COMMAND} -E tar cf "${ORION2RE_SUPPORTED_MOD_ARCHIVE}"
+                --format=zip -- .
+            WORKING_DIRECTORY "${ORION2RE_SUPPORTED_MOD_SOURCE}"
+            DEPENDS ${ORION2RE_SUPPORTED_MOD_FILES}
+            VERBATIM
+        )
+        list(APPEND ORION2RE_SUPPORTED_MOD_ARCHIVES
+            "${ORION2RE_SUPPORTED_MOD_ARCHIVE}")
+    endif()
+endforeach()
+add_custom_target(package-supported-mods
+    DEPENDS ${ORION2RE_SUPPORTED_MOD_ARCHIVES}
+)
+
+if(ORION2RE_GAME_DIR)
+    add_custom_target(deploy-supported-mods
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "${ORION2RE_GAME_DIR}/data/mods"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${ORION2RE_SUPPORTED_MOD_ARCHIVES}
+            "${ORION2RE_GAME_DIR}/data/mods"
+        DEPENDS package-supported-mods
+        VERBATIM
+    )
+endif()
+
 set(ORION2RE_ROUTER_SOURCES
     src/network/router_cli.cpp
     src/network/router_core.cpp
@@ -330,6 +384,7 @@ if(ORION2RE_BUILD_GAME)
         "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smacker.c"
         "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_bitstream.c"
         "${ORION2RE_VENDORED_LIBSMACKER_DIR}/smk_hufftree.c"
+        "${ORION2RE_VENDORED_YYJSON_DIR}/src/yyjson.c"
     )
 
     if(ORION2RE_EXCLUDE_RUNTIME_FROM_ALL)
@@ -345,6 +400,7 @@ if(ORION2RE_BUILD_GAME)
     target_include_directories(orion2re PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
         "${ORION2RE_VENDORED_LIBSMACKER_DIR}"
+        "${ORION2RE_VENDORED_YYJSON_DIR}/src"
     )
 
     target_precompile_headers(orion2re PRIVATE

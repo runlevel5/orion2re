@@ -3,10 +3,13 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <utility>
+#include <vector>
 
 #include "config/config_loader.h"
 #include "doctest/doctest.h"
 #include "game/vfs.h"
+#include "miniz.h"
 
 namespace {
     namespace fs = std::filesystem;
@@ -40,6 +43,23 @@ namespace {
             DOCTEST_REQUIRE(output.good());
         }
 
+        void Write_Zip(const fs::path& relative_path,
+                       const std::vector<std::pair<std::string, std::string>>& entries) const {
+            const fs::path full_path = root_path_ / relative_path;
+            fs::create_directories(full_path.parent_path());
+            mz_zip_archive archive{};
+            mz_zip_zero_struct(&archive);
+            DOCTEST_REQUIRE(mz_zip_writer_init_file(
+                &archive, full_path.string().c_str(), 0) == MZ_TRUE);
+            for (const auto& entry : entries) {
+                DOCTEST_REQUIRE(mz_zip_writer_add_mem(
+                    &archive, entry.first.c_str(), entry.second.data(),
+                    entry.second.size(), MZ_BEST_COMPRESSION) == MZ_TRUE);
+            }
+            DOCTEST_REQUIRE(mz_zip_writer_finalize_archive(&archive) == MZ_TRUE);
+            DOCTEST_REQUIRE(mz_zip_writer_end(&archive) == MZ_TRUE);
+        }
+
       private:
         fs::path root_path_;
     };
@@ -49,6 +69,31 @@ namespace {
         MOX::_settings.music_level = 50;
         MOX::_settings.sound_fx_on = 1;
         MOX::_settings.sound_fx_level = 50;
+    }
+
+    std::string Manifest_(const std::string& id, const std::string& extra = {}) {
+        return "{\n"
+               "  id: \"" + id + "\",\n"
+               "  name: \"" + id + "\",\n"
+               "  version: \"1.0.0\",\n"
+               "  requires: { engine: \">=1.60.0 <2.0.0\" },\n"
+               "  config: \"config/main.cfg\",\n" +
+               extra +
+               "}\n";
+    }
+
+    std::string Read_Vfs_Text_(const char* path) {
+        s_vfs_file* file = vfs::fopen(path, "rb");
+        DOCTEST_REQUIRE(file != nullptr);
+        const int32_t size = vfs::fsize(file);
+        DOCTEST_REQUIRE(size >= 0);
+        std::string result(static_cast<size_t>(size), '\0');
+        if (!result.empty()) {
+            DOCTEST_REQUIRE(vfs::fread(result.data(), 1, result.size(), file) ==
+                            result.size());
+        }
+        DOCTEST_REQUIRE(vfs::fclose(file) == 0);
+        return result;
     }
 }
 
@@ -193,7 +238,7 @@ DOCTEST_TEST_CASE("invalid include paths cannot escape the VFS root") {
     DOCTEST_CHECK(diagnostic.message == "invalid include path '/outside.cfg'");
 }
 
-DOCTEST_TEST_CASE("deferred enable in an include graph is ignored") {
+DOCTEST_TEST_CASE("missing enabled package is an error and rolls back configuration") {
     s_config_test_directory files;
     files.Write("main.cfg",
         "music_volume = 80;\n"
@@ -204,10 +249,406 @@ DOCTEST_TEST_CASE("deferred enable in an include graph is ignored") {
     config::Read_Effective_Native_Config(&effective);
     config::s_cfg_diagnostic diagnostic;
 
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message == "package not found: 'balance_mod'");
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
+    DOCTEST_CHECK(MOX::_settings.music_level == 50);
+}
+
+DOCTEST_TEST_CASE("first enable wins configuration and VFS resource precedence") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable first;\nenable second;\n");
+    files.Write(fs::path("data") / "mods" / "first" / "mod.json5",
+                Manifest_("first"));
+    files.Write(fs::path("data") / "mods" / "first" / "config" / "main.cfg",
+                "music_volume = 81;\n");
+    files.Write(fs::path("data") / "mods" / "first" / "data" / "priority.dat",
+                "first");
+    files.Write(fs::path("data") / "mods" / "second" / "mod.json5",
+                Manifest_("second"));
+    files.Write(fs::path("data") / "mods" / "second" / "config" / "main.cfg",
+                "music_volume = 62;\n");
+    files.Write(fs::path("data") / "mods" / "second" / "data" / "priority.dat",
+                "second");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 80);
-    DOCTEST_CHECK(MOX::_settings.music_level == 80);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 81);
+    DOCTEST_CHECK(MOX::_settings.music_level == 81);
+    DOCTEST_CHECK(Read_Vfs_Text_("priority.dat") == "first");
+    DOCTEST_CHECK(effective.provenance[1].package_id == "first");
+}
+
+DOCTEST_TEST_CASE("supported community patch package ID can be enabled") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable ver150;\n");
+    files.Write(fs::path("data") / "mods" / "ver150" / "mod.json5",
+                Manifest_("ver150"));
+    files.Write(fs::path("data") / "mods" / "ver150" / "config" / "main.cfg",
+                "music_volume = 76;\n");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 76);
+    DOCTEST_CHECK(effective.provenance[1].package_id == "ver150");
+}
+
+DOCTEST_TEST_CASE("direct dependency is loaded once below its package") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable parent;\n");
+    files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
+                Manifest_("parent",
+                    "  dependencies: [{ id: \"shared\", version: \">=1.0.0\" }],\n"));
+    files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg",
+                "music_volume = 77;\n");
+    files.Write(fs::path("data") / "mods" / "shared" / "mod.json5",
+                Manifest_("shared"));
+    files.Write(fs::path("data") / "mods" / "shared" / "config" / "main.cfg",
+                "music_volume = 55;\nsound_effects_volume = 42;\n");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 77);
+    DOCTEST_CHECK(effective.state.values[3].integer_value == 42);
+    DOCTEST_CHECK(effective.provenance[1].package_id == "parent");
+    DOCTEST_CHECK(effective.provenance[3].package_id == "shared");
+}
+
+DOCTEST_TEST_CASE("later explicit enable outranks dependencies of an earlier package") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable parent;\nenable explicit_mod;\n");
+    files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
+                Manifest_("parent",
+                    "  dependencies: [{ id: \"dependency\", version: \"1.0.0\" }],\n"));
+    files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg",
+                "music_enabled = false;\n");
+    files.Write(fs::path("data") / "mods" / "dependency" / "mod.json5",
+                Manifest_("dependency"));
+    files.Write(fs::path("data") / "mods" / "dependency" / "config" / "main.cfg",
+                "music_volume = 51;\n");
+    files.Write(fs::path("data") / "mods" / "dependency" / "data" / "priority.dat",
+                "dependency");
+    files.Write(fs::path("data") / "mods" / "explicit_mod" / "mod.json5",
+                Manifest_("explicit_mod"));
+    files.Write(fs::path("data") / "mods" / "explicit_mod" / "config" / "main.cfg",
+                "music_volume = 69;\n");
+    files.Write(fs::path("data") / "mods" / "explicit_mod" / "data" / "priority.dat",
+                "explicit");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 69);
+    DOCTEST_CHECK(effective.provenance[1].package_id == "explicit_mod");
+    DOCTEST_CHECK(Read_Vfs_Text_("priority.dat") == "explicit");
+}
+
+DOCTEST_TEST_CASE("nested enable resolves a package and preserves parent priority") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable parent;\n");
+    files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
+                Manifest_("parent"));
+    files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg",
+                "enable nested;\nmusic_volume = 79;\n");
+    files.Write(fs::path("data") / "mods" / "nested" / "mod.json5",
+                Manifest_("nested"));
+    files.Write(fs::path("data") / "mods" / "nested" / "config" / "main.cfg",
+                "music_volume = 58;\n");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 79);
+}
+
+DOCTEST_TEST_CASE("ZIP package manifest config and data use projected virtual paths") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable zipped;\n");
+    files.Write_Zip(fs::path("data") / "mods" / "zipped.zip", {
+        {"mod.json5", Manifest_("zipped")},
+        {"config/main.cfg", "music_volume = 73;\n"},
+        {"data/zipped.dat", "zip-resource"},
+    });
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 73);
+    DOCTEST_CHECK(Read_Vfs_Text_("zipped.dat") == "zip-resource");
+}
+
+DOCTEST_TEST_CASE("incompatible engine manifest fails with semantic version diagnostic") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable future;\n");
+    files.Write(fs::path("data") / "mods" / "future" / "mod.json5",
+        "{ id: \"future\", name: \"Future\", version: \"1.0.0\",\n"
+        "  requires: { engine: \">=2.0.0\" }, config: \"config/main.cfg\" }\n");
+    files.Initialize_Vfs();
+    config::s_effective_config effective;
+    config::Initialize_Effective_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+        "package requires engine '>=2.0.0' but this engine is 1.60.0");
+    DOCTEST_CHECK(diagnostic.location.source == "mods/future/mod.json5");
+}
+
+DOCTEST_TEST_CASE("dependency cycle fails without committing configuration or resources") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "music_volume = 88;\nenable alpha;\n");
+    files.Write(fs::path("data") / "mods" / "alpha" / "mod.json5",
+                Manifest_("alpha",
+                    "  dependencies: [{ id: \"beta\", version: \"1.0.0\" }],\n"));
+    files.Write(fs::path("data") / "mods" / "alpha" / "config" / "main.cfg", "");
+    files.Write(fs::path("data") / "mods" / "alpha" / "data" / "failed.dat", "bad");
+    files.Write(fs::path("data") / "mods" / "beta" / "mod.json5",
+                Manifest_("beta",
+                    "  dependencies: [{ id: \"alpha\", version: \"1.0.0\" }],\n"));
+    files.Write(fs::path("data") / "mods" / "beta" / "config" / "main.cfg", "");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+        "mod dependency cycle: alpha -> beta -> alpha");
+    DOCTEST_CHECK(MOX::_settings.music_level == 50);
+    DOCTEST_CHECK(vfs::File_Exists("failed.dat") == 0);
+}
+
+DOCTEST_TEST_CASE("conflicting packages fail atomically") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable alpha;\nenable beta;\n");
+    files.Write(fs::path("data") / "mods" / "alpha" / "mod.json5",
+                Manifest_("alpha", "  conflicts: [\"beta\"],\n"));
+    files.Write(fs::path("data") / "mods" / "alpha" / "config" / "main.cfg", "");
+    files.Write(fs::path("data") / "mods" / "beta" / "mod.json5",
+                Manifest_("beta"));
+    files.Write(fs::path("data") / "mods" / "beta" / "config" / "main.cfg", "");
+    files.Initialize_Vfs();
+    config::s_effective_config effective;
+    config::Initialize_Effective_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+        "package 'alpha' conflicts with active package 'beta'");
+}
+
+DOCTEST_TEST_CASE("optional missing dependency is skipped but an installed one is validated") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable parent;\n");
+    files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
+                Manifest_("parent",
+                    "  optional_dependencies: [{ id: \"optional\", version: \">=2.0.0\" }],\n"));
+    files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg",
+                "music_volume = 64;\n");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(MOX::_settings.music_level == 64);
+}
+
+DOCTEST_TEST_CASE("dependency version mismatch is fatal") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable parent;\n");
+    files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
+                Manifest_("parent",
+                    "  dependencies: [{ id: \"old\", version: \">=2.0.0\" }],\n"));
+    files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg", "");
+    files.Write(fs::path("data") / "mods" / "old" / "mod.json5", Manifest_("old"));
+    files.Write(fs::path("data") / "mods" / "old" / "config" / "main.cfg", "");
+    files.Initialize_Vfs();
+    config::s_effective_config effective;
+    config::Initialize_Effective_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+        "package 'old' version 1.0.0 does not satisfy '>=2.0.0'");
+}
+
+DOCTEST_TEST_CASE("malformed duplicate and mismatched manifests report distinct errors") {
+    s_config_test_directory files;
+    files.Write("malformed.cfg", "enable malformed;\n");
+    files.Write("duplicate.cfg", "enable duplicate;\n");
+    files.Write("mismatch.cfg", "enable mismatch;\n");
+    files.Write("capabilities.cfg", "enable obsolete;\n");
+    files.Write(fs::path("data") / "mods" / "malformed" / "mod.json5", "{ id:");
+    files.Write(fs::path("data") / "mods" / "duplicate" / "mod.json5",
+        "{ id: \"duplicate\", id: \"duplicate\", name: \"Duplicate\",\n"
+        "  version: \"1.0.0\", requires: { engine: \"1.60.0\" },\n"
+        "  config: \"config/main.cfg\" }\n");
+    files.Write(fs::path("data") / "mods" / "mismatch" / "mod.json5",
+        "{ id: \"other\", name: \"Other\", version: \"1.0.0\",\n"
+        "  requires: { engine: \"1.60.0\" }, config: \"config/main.cfg\" }\n");
+    files.Write(fs::path("data") / "mods" / "obsolete" / "mod.json5",
+        "{ id: \"obsolete\", name: \"Obsolete\", version: \"1.0.0\",\n"
+        "  requires: { engine: \"1.60.0\" }, config: \"config/main.cfg\",\n"
+        "  capabilities: [\"configuration\"] }\n");
+    files.Initialize_Vfs();
+    config::s_effective_config effective;
+    config::Initialize_Effective_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "malformed.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message.find("invalid mod manifest:") == 0);
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "duplicate.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message == "duplicate manifest property 'id'");
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "mismatch.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+        "manifest ID 'other' does not match package 'mismatch'");
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "capabilities.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message == "unknown manifest property 'capabilities'");
+}
+
+DOCTEST_TEST_CASE("load after constraint rejects contradictory explicit priority") {
+    s_config_test_directory files;
+    files.Write("main.cfg", "enable first;\nenable second;\n");
+    files.Write(fs::path("data") / "mods" / "first" / "mod.json5",
+                Manifest_("first"));
+    files.Write(fs::path("data") / "mods" / "first" / "config" / "main.cfg", "");
+    files.Write(fs::path("data") / "mods" / "second" / "mod.json5",
+                Manifest_("second", "  load_after: [\"first\"],\n"));
+    files.Write(fs::path("data") / "mods" / "second" / "config" / "main.cfg", "");
+    files.Initialize_Vfs();
+    config::s_effective_config effective;
+    config::Initialize_Effective_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "main.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message == "package 'second' must load after 'first'");
+}
+
+DOCTEST_TEST_CASE("failed reload preserves previously committed package layers and values") {
+    s_config_test_directory files;
+    files.Write("valid.cfg", "enable stable;\n");
+    files.Write("invalid.cfg", "enable broken;\n");
+    files.Write(fs::path("data") / "mods" / "stable" / "mod.json5",
+                Manifest_("stable"));
+    files.Write(fs::path("data") / "mods" / "stable" / "config" / "main.cfg",
+                "music_volume = 74;\n");
+    files.Write(fs::path("data") / "mods" / "stable" / "data" / "stable.dat", "stable");
+    files.Write(fs::path("data") / "mods" / "broken" / "mod.json5",
+                Manifest_("broken"));
+    files.Write(fs::path("data") / "mods" / "broken" / "config" / "main.cfg",
+                "music_volume = 101;\n");
+    files.Write(fs::path("data") / "mods" / "broken" / "data" / "broken.dat", "broken");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "valid.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(Read_Vfs_Text_("stable.dat") == "stable");
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "invalid.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(MOX::_settings.music_level == 74);
+    DOCTEST_CHECK(Read_Vfs_Text_("stable.dat") == "stable");
+    DOCTEST_CHECK(vfs::File_Exists("broken.dat") == 0);
+}
+
+DOCTEST_TEST_CASE("successful reload rebuilds configuration and package layers from defaults") {
+    s_config_test_directory files;
+    files.Write("modded.cfg", "enable stable;\n");
+    files.Write("plain.cfg", "sound_effects_volume = 31;\n");
+    files.Write(fs::path("data") / "mods" / "stable" / "mod.json5",
+                Manifest_("stable"));
+    files.Write(fs::path("data") / "mods" / "stable" / "config" / "main.cfg",
+                "music_volume = 74;\n");
+    files.Write(fs::path("data") / "mods" / "stable" / "data" / "stable.dat", "stable");
+    files.Initialize_Vfs();
+    Set_Native_Defaults_();
+    config::s_effective_config effective;
+    config::Read_Effective_Native_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "modded.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(MOX::_settings.music_level == 74);
+    DOCTEST_CHECK(Read_Vfs_Text_("stable.dat") == "stable");
+
+    DOCTEST_REQUIRE(config::Load_Config_File(
+        "plain.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(MOX::_settings.music_level == 50);
+    DOCTEST_CHECK(MOX::_settings.sound_fx_level == 31);
+    DOCTEST_CHECK(vfs::File_Exists("stable.dat") == 0);
+    DOCTEST_CHECK_FALSE(effective.provenance[1].has_override);
+    DOCTEST_CHECK(effective.prior_values[1].empty());
+}
+
+DOCTEST_TEST_CASE("ambiguous package forms and unsafe ZIP paths are fatal") {
+    s_config_test_directory files;
+    files.Write("ambiguous.cfg", "enable ambiguous;\n");
+    files.Write("unsafe.cfg", "enable unsafe;\n");
+    files.Write(fs::path("data") / "mods" / "ambiguous" / "mod.json5",
+                Manifest_("ambiguous"));
+    files.Write_Zip(fs::path("data") / "mods" / "ambiguous.zip",
+                    {{"mod.json5", Manifest_("ambiguous")}});
+    files.Write_Zip(fs::path("data") / "mods" / "unsafe.zip", {
+        {"mod.json5", Manifest_("unsafe")},
+        {"../outside.dat", "unsafe"},
+    });
+    files.Initialize_Vfs();
+    config::s_effective_config effective;
+    config::Initialize_Effective_Config(&effective);
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "ambiguous.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+        "package 'ambiguous' has both directory and ZIP forms");
+    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+        "unsafe.cfg", "base_game", &effective, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+        "unsafe path in package ZIP: '../outside.dat'");
 }
 
 DOCTEST_TEST_CASE("startup config uses defaults when absent") {

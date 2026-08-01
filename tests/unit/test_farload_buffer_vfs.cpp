@@ -140,7 +140,7 @@ DOCTEST_TEST_CASE("farload library data reads structured records from whole-LBX 
 
     test_dir.Write_Lbx_File("ZIPSRC.LBX", {structured_entry});
     std::string zip_lbx = test_farload_buffer_detail::Read_File_Contents(test_dir.root_path() / "ZIPSRC.LBX");
-    test_dir.Write_Zip_File(test_farload_buffer_detail::fs::path("data") / "10-struct.zip", {
+    test_dir.Write_Zip_File(test_farload_buffer_detail::fs::path("data") / "base.zip", {
         {"TESTDATA.LBX", zip_lbx},
     });
 
@@ -159,7 +159,7 @@ DOCTEST_TEST_CASE("buffer farload library uses vfs lbx entry resolution") {
 
     test_dir.Write_Lbx_File("BUFFERZIP.LBX", {"zip-entry"});
     std::string zip_lbx = test_farload_buffer_detail::Read_File_Contents(test_dir.root_path() / "BUFFERZIP.LBX");
-    test_dir.Write_Zip_File(test_farload_buffer_detail::fs::path("data") / "10-buffer.zip", {
+    test_dir.Write_Zip_File(test_farload_buffer_detail::fs::path("data") / "base.zip", {
         {"BUFFER.LBX", zip_lbx},
     });
 

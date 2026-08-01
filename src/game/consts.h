@@ -1,5 +1,7 @@
 #pragma once
 
+#include "version.h"
+
 #define BITMAP(bit_count) (((bit_count) + 7) / 8)
 
 #define MAX_PLAYERS 8
@@ -43,8 +45,8 @@ static_assert(SHIP_NODE_UI_TAG_BASE + MAX_SHIPS - 1 <= INT16_MAX, "encoded UI sh
 #define COMBAT_GRID_VIEW_MAX_X (COMBAT_GRID_VIEW_WIDTH - 1)
 #define COMBAT_GRID_VIEW_MAX_Y (COMBAT_GRID_VIEW_HEIGHT - 1)
 
-inline constexpr char GAME_VERSION[] = "1.31-re";
-inline constexpr char GAME_VERSION_LABEL[] = "Version 1.31-re";
+inline constexpr const char* GAME_VERSION = orion2re::ENGINE_VERSION;
+inline constexpr char GAME_VERSION_LABEL[] = "Version 1.60.0";
 inline constexpr char GAME_BUILD_DATE[] = "May 31 2026";
 
 //#define FULLSCREEN

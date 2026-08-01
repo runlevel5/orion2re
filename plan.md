@@ -28,11 +28,14 @@
 
 * Mod packages
 
-  * [ ] Define and validate JSON5 mod manifests with stable identity, versions, engine compatibility, dependencies, conflicts, ordering, configuration entry points, resources, and capabilities.
-  * [ ] Discover packages by stable ID and resolve dependencies, conflicts, cycles, version constraints, and deterministic load order.
-  * [ ] Make `enable <mod-id>;` load package configuration and resources as one transaction.
-  * [ ] Add transactional VFS layering so failed package validation, configuration loading, or resource mounting leaves the prior state active.
-  * [ ] Add fixtures and integration tests for valid, malformed, incompatible, cyclic, conflicting, and rollback cases.
+  * [x] Define and validate JSON5 mod manifests with stable identity, versions, engine compatibility, dependencies, conflicts, ordering, and configuration entry points.
+  * [x] Resolve packages directly by stable ID and resolve dependencies, conflicts, cycles, version constraints, and deterministic load order without package discovery.
+  * [x] Make `enable <mod-id>;` load package configuration and resources as one transaction.
+  * [x] Add transactional VFS layering so failed package validation, configuration loading, or resource mounting leaves the prior state active.
+  * [x] Add fixtures and integration tests for valid, malformed, incompatible, cyclic, conflicting, and rollback cases.
+  * [x] Separate mod graph management and activation from CFG file and include loading.
+  * [x] Replace implicit `data/*.zip` mod scanning with the single optional base layer `data/base.zip`.
+  * [x] Add source-owned supported mod packages and CMake archive/deployment targets, beginning with `data/mods/ver150/`.
 
 * Save-game and multiplayer serialization
 

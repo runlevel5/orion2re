@@ -3,22 +3,6 @@
 #include "vfs_detail.h"
 
 namespace vfs_detail {
-    const char* Get_File_Name_(const char* path) {
-        const char* slash = strrchr(path, '/');
-        const char* backslash = strrchr(path, '\\');
-        const char* file_name = path;
-
-        if (slash != nullptr && slash + 1 > file_name) {
-            file_name = slash + 1;
-        }
-
-        if (backslash != nullptr && backslash + 1 > file_name) {
-            file_name = backslash + 1;
-        }
-
-        return file_name;
-    }
-
     bool Is_Read_Only_Mode_(const char* mode) {
         if (mode == nullptr || mode[0] != 'r') {
             return false;
@@ -141,6 +125,63 @@ namespace vfs_detail {
         return false;
     }
 
+    bool Resolve_Data_Asset_Path_(const char* asset_path, char* resolved_path, size_t resolved_path_size) {
+        char candidate_path[VFS_MAX_PATH];
+
+        if (strncasecmp(asset_path, "mods/", 5) == 0) {
+            return false;
+        }
+
+        if (Build_Candidate_Path_(g_vfs_state.base_path, VFS_DATA_PATH, asset_path,
+                                  candidate_path, sizeof(candidate_path)) &&
+            Resolve_Candidate_Path_(candidate_path, resolved_path, resolved_path_size)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool Resolve_Package_Asset_Path_(const char* asset_path, char* resolved_path,
+                                     size_t resolved_path_size) {
+        const auto resolve_layers = [&](const std::vector<s_vfs_package_layer>& layers) {
+            const bool private_path = strncasecmp(asset_path, "mods/", 5) == 0;
+            for (const s_vfs_package_layer& layer : layers) {
+                if (layer.is_archive) {
+                    continue;
+                }
+
+                std::string relative_path;
+                const std::string private_prefix = "mods/" + layer.package_id + "/";
+                if (strncasecmp(asset_path, private_prefix.c_str(), private_prefix.size()) == 0) {
+                    relative_path.assign(asset_path + private_prefix.size());
+                } else if (private_path) {
+                    continue;
+                } else {
+                    relative_path = "data/";
+                    relative_path += asset_path;
+                }
+
+                char candidate_path[VFS_MAX_PATH];
+                if (Build_Candidate_Path_(layer.source_path.c_str(), "", relative_path.c_str(),
+                                          candidate_path, sizeof(candidate_path)) &&
+                    Resolve_Candidate_Path_(candidate_path, resolved_path, resolved_path_size)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        extern s_vfs_mount_transaction* g_vfs_staged_transaction;
+        if (g_vfs_staged_transaction != nullptr &&
+            resolve_layers(g_vfs_staged_transaction->layers)) {
+            return true;
+        }
+        if (g_vfs_staged_transaction != nullptr) {
+            return false;
+        }
+        return resolve_layers(g_vfs_state.package_layers);
+    }
+
     bool Resolve_Raw_Asset_Path_(const char* asset_path, char* resolved_path, size_t resolved_path_size) {
         char candidate_path[VFS_MAX_PATH];
 
@@ -169,7 +210,20 @@ namespace vfs_detail {
             return false;
         }
 
+        if (strncasecmp(asset_path, "mods/", 5) == 0) {
+            return Resolve_Package_Asset_Path_(asset_path, resolved_path,
+                                               resolved_path_size);
+        }
+
         if (Resolve_Override_Asset_Path_(asset_path, resolved_path, resolved_path_size)) {
+            return true;
+        }
+
+        if (Resolve_Package_Asset_Path_(asset_path, resolved_path, resolved_path_size)) {
+            return true;
+        }
+
+        if (Resolve_Data_Asset_Path_(asset_path, resolved_path, resolved_path_size)) {
             return true;
         }
 
