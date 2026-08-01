@@ -67,7 +67,7 @@ Deliverable: a short decision record appended to this file, with every choice re
 
 - [x] Write the top-level contract for types, records, groups, and parameters without a schema-version field.
 - [x] Define built-in explicit-width primitives: `bool`, signed and unsigned 8/16/32-bit integers, and `string`.
-- [ ] Define normalized node representations for aliases, enums, masks, ratios, records, arrays, inline types, parameters, metadata, constraints, defaults, groups, and bindings.
+- [x] Define normalized node representations for aliases, enums, masks, ratios, records, arrays, inline types, parameters, metadata, constraints, defaults, groups, and bindings.
 - [x] Specify declaration-order preservation as part of the public traversal contract.
 - [x] Specify required metadata and the inheritance/ambiguity rules for `title`, `description`, `remarks`, `units`, and `examples`.
 - [x] Specify structured native bindings for the bootstrap's root header, symbol, C++ type, and direct member paths. Replicated targets, fixed arrays, and index-base conversion remain deferred with aggregate types.
@@ -85,13 +85,13 @@ Deliverable: a minimal canonical schema for basic scalar variables that contains
 - [x] Convert yyjson syntax-error byte offsets to file/line/column with `yyjson_locate_pos`; report semantic validation failures with file and canonical schema path because successful yyjson values do not retain source offsets.
 - [x] Keep invalid-Unicode support disabled and reject `NaN`/`Infinity`; do not use the full `YYJSON_READ_JSON5` convenience flag when it enables syntax outside the schema contract.
 - [x] Do not expose `yyjson_doc` or `yyjson_val` outside the build-tool adapter and schema model.
-- [ ] Normalize named and inline types into one internal model without losing declaration order.
-- [ ] Resolve references and reject duplicate names, unknown types, recursive value layouts, invalid array sizes, and unsupported schema shapes.
-- [ ] Validate aliases and field constraints so fields may narrow but never broaden referenced types.
-- [ ] Validate enum base types, numeric ranges, duplicate values, and unknown-numeric policy.
-- [ ] Validate mask values, independent bits, composites, unknown bits, and canonical declaration order.
-- [ ] Normalize and validate ratios, string/path constraints, record defaults, exact-array defaults, repeated element defaults, and complete default coverage.
-- [ ] Reject overlapping aggregate and descendant defaults and defaults that fail the same type rules as CFG input.
+- [x] Normalize named and inline types into one internal model without losing declaration order.
+- [x] Resolve references and reject duplicate fields and values, unknown types, recursive value layouts, invalid array sizes, and unsupported schema shapes.
+- [x] Validate aliases and field constraints so fields may narrow but never broaden referenced types.
+- [x] Validate enum base types, numeric ranges, duplicate values, and unknown-numeric policy.
+- [x] Validate mask values, independent bits, composites, unknown bits, and canonical declaration order.
+- [x] Normalize and validate ratios, CP850 string constraints, record defaults, exact-array defaults, repeated element defaults, and complete default coverage. Path aliases and named string formats remain deferred until required.
+- [x] Reject overlapping aggregate and descendant defaults and defaults that fail the same type rules as CFG input.
 - [x] Validate metadata requirements, group references, and canonical-path in-memory identities for the primitive bootstrap.
 - [x] Validate binding structure without pretending to resolve C++ members; compiler-backed binding checks are added in Step 7.
 - [x] Emit deterministic diagnostics with file and schema path, plus line and column for syntax errors.
@@ -118,7 +118,7 @@ Deliverable: normal and cross-compiled builds use checked-in generated C++ witho
 ## Step 5: generate schema IDs, descriptors, defaults, and documentation
 
 - [x] Generate canonical-path C++ identifiers and typed descriptors for the initial schema slice.
-- [ ] Generate leaf order, parent relationships, index metadata, writable status, and stable serialization identity needed by path resolution.
+- [x] Generate leaf order, parent relationships, index metadata, writable status, and canonical names needed by path resolution. Persisted serialization remains deferred.
 - [x] Generate normalized typed scalar defaults without native expression strings.
 - [x] Generate declaration-ordered tables for canonical parameter names and groups; enum and mask tables remain deferred with those types.
 - [x] Generate Markdown containing every bootstrap parameter, path, type, constraint, default, group, unit, example, and native binding.
@@ -148,17 +148,18 @@ Bootstrap scalar progress:
 - [x] Enforce the one-leaf scalar boundary, reject overflow and skips-only assignments, and clear temporary writes on every failure.
 - [x] Produce typed temporary scalar writes containing the canonical-path identity and source provenance.
 - [x] Add focused tests for lookup, type mismatch, range validation, scalar overflow, unknown paths, provenance, and atomic failure.
-- [ ] Extend resolution, traversal, and typed decoding to records, arrays, aliases, enums, masks, ratios, strings, and aggregate skips when those schema shapes are introduced.
+- [x] Extend resolution, traversal, and typed decoding to records, arrays, aliases, enums, masks, ratios, strings, and aggregate skips.
 
-- [ ] Resolve raw path tokens through records, arrays, and any approved keyed collections.
-- [ ] Enforce index bases and produce a canonical resolved path.
-- [ ] Return the selected node, first writable leaf, nearest valid traversal boundary, and remaining writable leaves.
-- [ ] Implement depth-first declaration-order traversal exactly as specified in `docs/config.md`.
-- [ ] Implement scalar-root, scalar-record-field, scalar-array-element, record, array, row, and whole-table boundary rules.
-- [ ] Decode every RHS token against its current leaf, including enum names/numbers, masks, ratios, integers, strings, and skips.
-- [ ] Reject overflow before writes, and reject statements containing only skips.
-- [ ] Produce an immutable temporary write set containing stable field identity, resolved indexes, typed value, and provenance.
-- [ ] Add exhaustive table-driven tests for scalar starts, records, arrays, nested arrays, partial updates, skips, boundaries, and overflow diagnostics.
+- [x] Resolve raw path tokens through records and numeric array indexes. Keyed collections are out of scope.
+- [ ] Add enum-backed semantic aliases for array indexes: validate `index_type`, emit alias metadata, resolve names to numeric external indexes, and test that alias and numeric paths select the same leaves and boundaries.
+- [x] Enforce index bases and produce canonical resolved paths.
+- [x] Return the selected node, first writable leaf, nearest valid traversal boundary, and remaining writable leaves.
+- [x] Implement depth-first declaration-order traversal exactly as specified in `docs/config.md`.
+- [x] Implement scalar-root, scalar-record-field, scalar-array-element, record, array, row, and whole-table boundary rules.
+- [x] Decode every RHS token against its current leaf, including enum names/numbers, masks, ratios, integers, strings, and skips.
+- [x] Reject overflow before writes, and reject statements containing only skips.
+- [x] Produce a temporary write set containing canonical identity, build-local variable ID, typed value, and provenance.
+- [x] Add focused table-driven tests for scalar starts, records, arrays, nested aggregates, partial updates, skips, boundaries, and overflow diagnostics.
 
 Deliverable: complete statements resolve and validate atomically without accessing live game state.
 
@@ -189,6 +190,8 @@ Bootstrap lifecycle progress:
 - [x] Decode a complete CFG document into temporary typed state and commit effective and native state only after every applicable statement succeeds.
 - [x] Make `stop;` end the current document and leave `include` and `enable` execution to their dedicated loader steps.
 - [x] Preserve effective state, native state, current provenance, and prior-value history when any document statement fails.
+- [x] Initialize startup from generated defaults, optionally apply VFS-root `orion2re.cfg`, and commit defaults plus overrides once. A missing file uses defaults; any other load error is fatal.
+- [x] Log and ignore `enable` statements until native package activation is implemented.
 
 Deliverable: effective configuration is explainable, extractable, reload-controlled, and deterministic.
 

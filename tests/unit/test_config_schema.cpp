@@ -18,6 +18,36 @@ namespace {
     }
 }
 
+DOCTEST_TEST_CASE("aggregate schema normalizes traversal leaves defaults and native targets") {
+    config::tool::s_schema schema;
+    std::string diagnostic;
+
+    DOCTEST_REQUIRE(Load_("valid_aggregates.json5", &schema, &diagnostic));
+    DOCTEST_REQUIRE(schema.parameters.size() == 11);
+    DOCTEST_CHECK(schema.parameters[0].path == "guardian.appearance");
+    DOCTEST_CHECK(schema.parameters[1].path == "guardian.weapon.1.type");
+    DOCTEST_CHECK(schema.parameters[1].scalar_kind == config::tool::SCALAR_ENUM);
+    DOCTEST_CHECK(schema.parameters[1].default_integer == 11);
+    DOCTEST_CHECK(schema.parameters[2].scalar_kind == config::tool::SCALAR_MASK);
+    DOCTEST_CHECK(schema.parameters[2].default_integer == 15);
+    DOCTEST_CHECK(schema.parameters[4].native_targets.size() == 2);
+    DOCTEST_CHECK(schema.parameters[4].native_targets[0] ==
+                  "fixture.weapons[0].amount");
+    DOCTEST_CHECK(schema.parameters[4].native_targets[1] ==
+                  "fixture.weapons[0].current_amount");
+    DOCTEST_CHECK(schema.parameters[9].default_string == "Grüße");
+    DOCTEST_CHECK(schema.parameters[10].default_ratio_numerator == 1);
+    DOCTEST_CHECK(schema.parameters[10].default_ratio_denominator == 3);
+
+    DOCTEST_REQUIRE(schema.nodes.size() == 15);
+    DOCTEST_CHECK(schema.nodes[0].kind == config::tool::NODE_RECORD);
+    DOCTEST_CHECK(schema.nodes[0].first_parameter == 0);
+    DOCTEST_CHECK(schema.nodes[0].last_parameter == 10);
+    DOCTEST_CHECK(schema.nodes[2].kind == config::tool::NODE_ARRAY);
+    DOCTEST_CHECK(schema.nodes[2].first_parameter == 1);
+    DOCTEST_CHECK(schema.nodes[2].last_parameter == 8);
+}
+
 DOCTEST_TEST_SUITE("configuration schema") {
 
 DOCTEST_TEST_CASE("primitive schema preserves declaration order and normalizes CP850 defaults") {
@@ -48,6 +78,10 @@ DOCTEST_TEST_CASE("schema diagnostics reject malformed and unsupported declarati
         {"unknown_property.json5", "unknown property 'format'"},
         {"invalid_default.json5", "integer violates type or field constraints"},
         {"invalid_unicode.json5", "not representable in CP850"},
+        {"invalid_aggregate_default.json5", "record default is missing field 'right'"},
+        {"invalid_recursive_record.json5", "recursive aggregate value type"},
+        {"invalid_mask.json5", "flags must be single positive bits"},
+        {"invalid_ratio_binding.json5", "ratio leaves require numerator and denominator targets"},
     };
 
     for (const s_case& test_case : cases) {

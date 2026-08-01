@@ -156,7 +156,7 @@ DOCTEST_TEST_CASE("stop terminates the current document before later statements"
     DOCTEST_CHECK(MOX::_settings.music_level == 70);
 }
 
-DOCTEST_TEST_CASE("include and enable remain loader operations and roll back the document") {
+DOCTEST_TEST_CASE("include remains a loader operation and deferred enable is ignored") {
     config::s_effective_config effective;
     config::Initialize_Effective_Config(&effective);
     config::s_cfg_diagnostic diagnostic;
@@ -168,11 +168,10 @@ DOCTEST_TEST_CASE("include and enable remain loader operations and roll back the
                   "include execution requires the configuration loader");
     DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
 
-    DOCTEST_CHECK_FALSE(Apply_(
+    DOCTEST_REQUIRE(Apply_(
         "music_volume = 70; enable balance_mod;",
         "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(diagnostic.message == "enable execution requires the mod loader");
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 70);
 }
 
 DOCTEST_TEST_CASE("canonical extraction follows schema order and round trips") {

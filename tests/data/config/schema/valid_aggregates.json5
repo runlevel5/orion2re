@@ -1,0 +1,91 @@
+{
+  groups: {
+    gameplay: {
+      title: "Gameplay",
+      description: "Deterministic gameplay settings.",
+      save: true,
+      synchronize: true,
+    },
+  },
+  types: {
+    weapon_count: {
+      kind: "alias",
+      type: "uint8",
+      constraints: { min: 0, max: 99 },
+    },
+    weapon_id: {
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: { none: 0, mass_driver: 4, plasma_cannon: 11 },
+    },
+    weapon_arc: {
+      kind: "mask",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_bits: true,
+      values: { none: 0, all: 15 },
+      flags: { forward: 1, aft: 2, left: 4, right: 8 },
+    },
+    ratio16: {
+      kind: "ratio",
+      component_type: "int16",
+    },
+  },
+  records: {
+    weapon_slot: {
+      fields: [
+        { id: "type", type: "weapon_id", bind: ["type"] },
+        { id: "arc", type: "weapon_arc", bind: ["arc"] },
+        { id: "ammo", type: "uint8", bind: ["ammo"] },
+        { id: "amount", type: "weapon_count", bind: ["amount", "current_amount"] },
+      ],
+    },
+  },
+  parameters: {
+    guardian: {
+      title: "Guardian",
+      description: "Aggregate schema fixture.",
+      group: "gameplay",
+      bind_root: {
+        header: "fixture.h",
+        symbol: "fixture",
+        cpp_type: "s_fixture",
+      },
+      type: {
+        kind: "record",
+        fields: [
+          { id: "appearance", type: "uint8", default: 2, bind: ["appearance"] },
+          {
+            id: "weapon",
+            bind: ["weapons"],
+            type: {
+              kind: "array",
+              count: 2,
+              index_base: 1,
+              element: { type: "weapon_slot" },
+            },
+            default: [
+              { type: "plasma_cannon", arc: "all", ammo: 0, amount: 2 },
+              { type: "mass_driver", arc: "forward,aft", ammo: 0, amount: 10 },
+            ],
+          },
+          {
+            id: "label",
+            type: "string",
+            constraints: { min_length: 1, max_length: 8, encoding: "cp850" },
+            default: "Grüße",
+            bind: ["label"],
+          },
+          {
+            id: "reduction",
+            type: "ratio16",
+            default: "2/6",
+            bind: ["reduction_numerator", "reduction_denominator"],
+          },
+        ],
+      },
+    },
+  },
+}

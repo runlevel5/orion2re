@@ -37,7 +37,27 @@ namespace {
             diagnostic->message = "typed write mismatch for " + std::string(variable->name);
             return false;
         }
-        if (variable->type == CONFIG_VALUE_BOOL || variable->type == CONFIG_VALUE_STRING) {
+        if (variable->type == CONFIG_VALUE_BOOL) {
+            return true;
+        }
+        if (variable->type == CONFIG_VALUE_STRING) {
+            const size_t length = write->value.string_value.size();
+            if ((variable->has_min_length && length < variable->min_length) ||
+                (variable->has_max_length && length > variable->max_length)) {
+                return Fail_(write, "typed write string length error", diagnostic);
+            }
+            return true;
+        }
+        if (variable->type == CONFIG_VALUE_RATIO) {
+            int64_t minimum = 0;
+            int64_t maximum = 0;
+            Primitive_Range_(variable->ratio_component_type, &minimum, &maximum);
+            if (write->value.ratio_denominator <= 0 ||
+                write->value.ratio_numerator < minimum ||
+                write->value.ratio_numerator > maximum ||
+                write->value.ratio_denominator > maximum) {
+                return Fail_(write, "typed write ratio component error", diagnostic);
+            }
             return true;
         }
 
@@ -51,8 +71,34 @@ namespace {
             diagnostic->message = "typed write range error for " + std::string(variable->name);
             return false;
         }
+        if (variable->scalar_kind == CONFIG_SCALAR_ENUM &&
+            variable->reject_unknown_numeric) {
+            bool found = false;
+            for (size_t index = 0; index < variable->value_count; ++index) {
+                found = found || variable->values[index].value == write->value.integer_value;
+            }
+            if (!found) {
+                return Fail_(write, "typed write unknown enum value", diagnostic);
+            }
+        }
+        if (variable->scalar_kind == CONFIG_SCALAR_MASK &&
+            variable->reject_unknown_numeric &&
+            (static_cast<uint64_t>(write->value.integer_value) &
+             ~variable->known_bits) != 0) {
+            return Fail_(write, "typed write unknown mask bits", diagnostic);
+        }
         return true;
     }
+}
+
+const s_runtime_schema* Get_Runtime_Schema() {
+    static const s_runtime_schema schema = {
+        schema_nodes,
+        schema_node_count,
+        variables,
+        variable_count,
+    };
+    return &schema;
 }
 
 const s_variable_descriptor* Get_Variable(t_variable_id variable_id) {
@@ -92,26 +138,34 @@ bool Resolve_Write_Path(s_config_write* write, s_cfg_diagnostic* diagnostic) {
     return true;
 }
 
-void Initialize_Defaults(s_config_state* state) {
+bool Initialize_Defaults(s_config_state* state) {
+    if (state == nullptr) {
+        return false;
+    }
     state->values.clear();
     state->values.resize(variable_count);
     for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
         if (!generated::Get_Default_Value(variable_id, &state->values[variable_id])) {
             state->values.clear();
-            return;
+            return false;
         }
     }
+    return true;
 }
 
-void Read_Current_State(s_config_state* state) {
+bool Read_Current_State(s_config_state* state) {
+    if (state == nullptr) {
+        return false;
+    }
     state->values.clear();
     state->values.resize(variable_count);
     for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
         if (!generated::Get_Current_Value(variable_id, &state->values[variable_id])) {
             state->values.clear();
-            return;
+            return false;
         }
     }
+    return true;
 }
 
 bool Read_State_Value(const s_config_state* state, t_variable_id variable_id,
@@ -147,7 +201,10 @@ bool Apply_Transaction(const s_config_write_set* write_set,
                        s_cfg_diagnostic* diagnostic) {
     s_config_state base_state;
     s_config_state candidate_state;
-    Read_Current_State(&base_state);
+    if (!Read_Current_State(&base_state)) {
+        diagnostic->message = "unable to read current configuration state";
+        return false;
+    }
     if (!Apply_Write_Set(write_set, &base_state, &candidate_state, diagnostic)) {
         return false;
     }

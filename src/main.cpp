@@ -2,6 +2,8 @@
 
 #include <SDL3/SDL_main.h>
 
+#include "config/config_loader.h"
+
 #if defined(_WIN32)
 #include <process.h>
 #else
@@ -130,6 +132,29 @@ int main(int argc, char** argv) {
         Shutdown_Game_Log_();
         return -1;
     }
+
+    config::s_effective_config effective_config;
+    config::s_cfg_diagnostic config_diagnostic;
+    bool config_loaded = false;
+    if (!config::Load_Startup_Config("orion2re.cfg", "base_game", &effective_config,
+                                     &config_loaded, &config_diagnostic)) {
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                        "configuration: %s:%u:%u: %s",
+                        config_diagnostic.location.source.empty() ?
+                            "orion2re.cfg" : config_diagnostic.location.source.c_str(),
+                        config_diagnostic.location.line,
+                        config_diagnostic.location.column,
+                        config_diagnostic.message.c_str());
+        vfs::Shutdown();
+        if (current_directory != nullptr) {
+            SDL_free(current_directory);
+        }
+        Shutdown_Game_Log_();
+        return -1;
+    }
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                config_loaded ? "configuration: loaded orion2re.cfg" :
+                                "configuration: orion2re.cfg not found; using defaults");
 
     size_t command_line_length = 0;
     for (int i = 1; i < argc; ++i) {

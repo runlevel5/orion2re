@@ -22,5 +22,9 @@ struct s_config_write_set {
 
 bool Decode_Assignment(const s_cfg_statement* statement, s_config_write_set* write_set,
                        s_cfg_diagnostic* diagnostic);
+bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
+                                   const s_runtime_schema* schema,
+                                   s_config_write_set* write_set,
+                                   s_cfg_diagnostic* diagnostic);
 
 }

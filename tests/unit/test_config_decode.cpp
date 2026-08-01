@@ -8,6 +8,149 @@
 #include "doctest/doctest.h"
 
 namespace {
+    const config::s_symbol_descriptor WEAPON_VALUES[] = {
+        {"none", 0},
+        {"plasma_cannon", 11},
+        {"mass_driver", 4},
+    };
+    const config::s_symbol_descriptor ARC_VALUES[] = {
+        {"none", 0},
+        {"all", 15},
+    };
+    const config::s_symbol_descriptor ARC_FLAGS[] = {
+        {"forward", 1},
+        {"aft", 2},
+        {"left", 4},
+        {"right", 8},
+    };
+    const config::s_symbol_descriptor MOD_VALUES[] = {
+        {"none", 0},
+    };
+    const config::s_symbol_descriptor MOD_FLAGS[] = {
+        {"heavy", 2},
+        {"eccm", 0x200},
+    };
+    const config::s_symbol_descriptor SPECIAL_VALUES[] = {
+        {"none", 0},
+        {"augmented_engines", 1},
+        {"battle_scanner", 5},
+        {"damper_field", 7},
+    };
+
+    config::s_variable_descriptor Variable_(const char* name,
+                                            config::e_value_type type) {
+        config::s_variable_descriptor variable = {};
+        variable.name = name;
+        variable.title = name;
+        variable.description = "fixture";
+        variable.remarks = "";
+        variable.units = "";
+        variable.group = "fixture";
+        variable.type = type;
+        variable.scalar_kind = config::CONFIG_SCALAR_PRIMITIVE;
+        variable.ratio_component_type = config::CONFIG_VALUE_INT16;
+        return variable;
+    }
+
+    const config::s_runtime_schema* Aggregate_Schema_() {
+        static config::s_variable_descriptor variables[16];
+        static bool initialized = false;
+        if (!initialized) {
+            const char* names[] = {
+                "guardian.appearance",
+                "guardian.weapon.1.type", "guardian.weapon.1.arc",
+                "guardian.weapon.1.mods", "guardian.weapon.1.ammo",
+                "guardian.weapon.1.amount", "guardian.weapon.2.type",
+                "guardian.weapon.2.arc", "guardian.weapon.2.mods",
+                "guardian.weapon.2.ammo", "guardian.weapon.2.amount",
+                "guardian.special.1", "guardian.special.2", "guardian.special.3",
+                "guardian.label", "guardian.reduction",
+            };
+            const config::e_value_type types[] = {
+                config::CONFIG_VALUE_UINT8,
+                config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_UINT8,
+                config::CONFIG_VALUE_UINT16, config::CONFIG_VALUE_UINT8,
+                config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_UINT8,
+                config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_UINT16,
+                config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_UINT8,
+                config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_UINT8,
+                config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_STRING,
+                config::CONFIG_VALUE_RATIO,
+            };
+            for (size_t index = 0; index < 16; ++index) {
+                variables[index] = Variable_(names[index], types[index]);
+            }
+            for (size_t index : {size_t(1), size_t(6)}) {
+                variables[index].scalar_kind = config::CONFIG_SCALAR_ENUM;
+                variables[index].values = WEAPON_VALUES;
+                variables[index].value_count = 3;
+                variables[index].allow_numeric = true;
+                variables[index].reject_unknown_numeric = true;
+            }
+            for (size_t index : {size_t(2), size_t(7)}) {
+                variables[index].scalar_kind = config::CONFIG_SCALAR_MASK;
+                variables[index].values = ARC_VALUES;
+                variables[index].value_count = 2;
+                variables[index].flags = ARC_FLAGS;
+                variables[index].flag_count = 4;
+                variables[index].allow_numeric = true;
+                variables[index].reject_unknown_numeric = true;
+                variables[index].known_bits = 15;
+            }
+            for (size_t index : {size_t(3), size_t(8)}) {
+                variables[index].scalar_kind = config::CONFIG_SCALAR_MASK;
+                variables[index].values = MOD_VALUES;
+                variables[index].value_count = 1;
+                variables[index].flags = MOD_FLAGS;
+                variables[index].flag_count = 2;
+                variables[index].allow_numeric = true;
+                variables[index].reject_unknown_numeric = true;
+                variables[index].known_bits = 0x202;
+            }
+            for (size_t index = 11; index <= 13; ++index) {
+                variables[index].scalar_kind = config::CONFIG_SCALAR_ENUM;
+                variables[index].values = SPECIAL_VALUES;
+                variables[index].value_count = 4;
+                variables[index].allow_numeric = true;
+                variables[index].reject_unknown_numeric = true;
+            }
+            variables[14].has_min_length = true;
+            variables[14].has_max_length = true;
+            variables[14].min_length = 1;
+            variables[14].max_length = 8;
+            variables[15].scalar_kind = config::CONFIG_SCALAR_RATIO;
+            initialized = true;
+        }
+
+        static const config::s_schema_node_descriptor nodes[] = {
+            {"guardian", config::CONFIG_NODE_RECORD, config::CONFIG_NO_NODE, 0, 0, 15, config::CONFIG_NO_VARIABLE},
+            {"appearance", config::CONFIG_NODE_SCALAR, 0, 0, 0, 0, 0},
+            {"weapon", config::CONFIG_NODE_ARRAY, 0, 0, 1, 10, config::CONFIG_NO_VARIABLE},
+            {"", config::CONFIG_NODE_RECORD, 2, 1, 1, 5, config::CONFIG_NO_VARIABLE},
+            {"type", config::CONFIG_NODE_SCALAR, 3, 0, 1, 1, 1},
+            {"arc", config::CONFIG_NODE_SCALAR, 3, 0, 2, 2, 2},
+            {"mods", config::CONFIG_NODE_SCALAR, 3, 0, 3, 3, 3},
+            {"ammo", config::CONFIG_NODE_SCALAR, 3, 0, 4, 4, 4},
+            {"amount", config::CONFIG_NODE_SCALAR, 3, 0, 5, 5, 5},
+            {"", config::CONFIG_NODE_RECORD, 2, 2, 6, 10, config::CONFIG_NO_VARIABLE},
+            {"type", config::CONFIG_NODE_SCALAR, 9, 0, 6, 6, 6},
+            {"arc", config::CONFIG_NODE_SCALAR, 9, 0, 7, 7, 7},
+            {"mods", config::CONFIG_NODE_SCALAR, 9, 0, 8, 8, 8},
+            {"ammo", config::CONFIG_NODE_SCALAR, 9, 0, 9, 9, 9},
+            {"amount", config::CONFIG_NODE_SCALAR, 9, 0, 10, 10, 10},
+            {"special", config::CONFIG_NODE_ARRAY, 0, 0, 11, 13, config::CONFIG_NO_VARIABLE},
+            {"", config::CONFIG_NODE_SCALAR, 15, 1, 11, 11, 11},
+            {"", config::CONFIG_NODE_SCALAR, 15, 2, 12, 12, 12},
+            {"", config::CONFIG_NODE_SCALAR, 15, 3, 13, 13, 13},
+            {"label", config::CONFIG_NODE_SCALAR, 0, 0, 14, 14, 14},
+            {"reduction", config::CONFIG_NODE_SCALAR, 0, 0, 15, 15, 15},
+        };
+        static const config::s_runtime_schema schema = {
+            nodes, sizeof(nodes) / sizeof(nodes[0]), variables, 16,
+        };
+        return &schema;
+    }
+
     bool Parse_Assignment_(const char* source, config::s_cfg_statement* statement) {
         config::s_cfg_document document;
         config::s_cfg_diagnostic diagnostic;
@@ -26,6 +169,14 @@ namespace {
             return false;
         }
         return config::Decode_Assignment(&statement, write_set, diagnostic);
+    }
+
+    bool Decode_Aggregate_(const char* source, config::s_config_write_set* write_set,
+                           config::s_cfg_diagnostic* diagnostic) {
+        config::s_cfg_statement statement;
+        return Parse_Assignment_(source, &statement) &&
+               config::Decode_Assignment_With_Schema(
+                   &statement, Aggregate_Schema_(), write_set, diagnostic);
     }
 
     void Add_Sentinel_(config::s_config_write_set* write_set) {
@@ -167,6 +318,72 @@ DOCTEST_TEST_CASE("non-assignment statements are rejected atomically") {
                                                   &write_set, &diagnostic));
     DOCTEST_CHECK(diagnostic.message == "expected an assignment statement");
     DOCTEST_CHECK(write_set.writes.empty());
+}
+
+DOCTEST_TEST_CASE("record and array assignments follow declaration order and boundaries") {
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "guardian weapon 1 = plasma_cannon all heavy 0 2;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 5);
+    DOCTEST_CHECK(writes.writes[0].canonical_path == "guardian.weapon.1.type");
+    DOCTEST_CHECK(writes.writes[0].value.integer_value == 11);
+    DOCTEST_CHECK(writes.writes[1].value.integer_value == 15);
+    DOCTEST_CHECK(writes.writes[2].value.integer_value == 2);
+    DOCTEST_CHECK(writes.writes[4].value.integer_value == 2);
+
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "guardian weapon = plasma_cannon all heavy 0 2 mass_driver forward none 0 10;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 10);
+    DOCTEST_CHECK(writes.writes[5].canonical_path == "guardian.weapon.2.type");
+    DOCTEST_CHECK(writes.writes[5].value.integer_value == 4);
+}
+
+DOCTEST_TEST_CASE("scalar starts and skips remain within the nearest aggregate") {
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "guardian weapon 1 mods = heavy,eccm - 4;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 2);
+    DOCTEST_CHECK(writes.writes[0].canonical_path == "guardian.weapon.1.mods");
+    DOCTEST_CHECK(writes.writes[0].value.integer_value == 0x202);
+    DOCTEST_CHECK(writes.writes[1].canonical_path == "guardian.weapon.1.amount");
+    DOCTEST_CHECK(writes.writes[1].value.integer_value == 4);
+
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "guardian special 2 = battle_scanner damper_field;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 2);
+    DOCTEST_CHECK(writes.writes[0].canonical_path == "guardian.special.2");
+    DOCTEST_CHECK(writes.writes[1].canonical_path == "guardian.special.3");
+
+    DOCTEST_CHECK_FALSE(Decode_Aggregate_(
+        "guardian weapon 1 mods = heavy 0 2 4;", &writes, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+                  "value 4 exceeds selected configuration object 'guardian.weapon.1.mods'");
+    DOCTEST_CHECK(writes.writes.empty());
+}
+
+DOCTEST_TEST_CASE("semantic scalars decode enums masks strings and normalized ratios") {
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "guardian label = \"Grüße\" 2/6;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 2);
+    DOCTEST_REQUIRE(writes.writes[0].value.string_value.size() == 5);
+    DOCTEST_CHECK(static_cast<uint8_t>(writes.writes[0].value.string_value[2]) == 0x81);
+    DOCTEST_CHECK(writes.writes[1].value.ratio_numerator == 1);
+    DOCTEST_CHECK(writes.writes[1].value.ratio_denominator == 3);
+
+    DOCTEST_CHECK_FALSE(Decode_Aggregate_(
+        "guardian weapon 1 type = 99;", &writes, &diagnostic));
+    DOCTEST_CHECK(writes.writes.empty());
+    DOCTEST_CHECK_FALSE(Decode_Aggregate_(
+        "guardian weapon 1 mods = 0x4000;", &writes, &diagnostic));
+    DOCTEST_CHECK(writes.writes.empty());
+    DOCTEST_CHECK_FALSE(Decode_Aggregate_(
+        "guardian reduction = 1/0;", &writes, &diagnostic));
+    DOCTEST_CHECK(writes.writes.empty());
 }
 
 }

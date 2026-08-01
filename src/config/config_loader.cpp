@@ -163,9 +163,11 @@ namespace {
                 break;
             }
             if (statement.kind == CFG_STATEMENT_ENABLE) {
-                loader->stack.pop_back();
-                return Fail_(loader, statement.location,
-                             "enable execution requires the mod loader");
+                std::fprintf(stderr,
+                             "configuration warning: %s:%u:%u: ignoring deferred enable '%s'\n",
+                             statement.location.source.c_str(), statement.location.line,
+                             statement.location.column, statement.argument.value.c_str());
+                continue;
             }
             if (statement.kind == CFG_STATEMENT_INCLUDE) {
                 std::string include_path;
@@ -209,6 +211,33 @@ bool Load_Config_File(const char* entry_path, const char* package_id,
         return false;
     }
     return Apply_Config_Document(&loader.flattened, package_id, effective, diagnostic);
+}
+
+bool Load_Startup_Config(const char* entry_path, const char* package_id,
+                         s_effective_config* effective, bool* loaded,
+                         s_cfg_diagnostic* diagnostic) {
+    if (entry_path == nullptr || package_id == nullptr || effective == nullptr ||
+        loaded == nullptr || diagnostic == nullptr) {
+        return false;
+    }
+    *loaded = false;
+    *diagnostic = {};
+    if (!Initialize_Effective_Config(effective)) {
+        diagnostic->message = "unable to initialize configuration defaults";
+        return false;
+    }
+    if (vfs::File_Exists(entry_path) == 0) {
+        if (!Commit_State(&effective->state)) {
+            diagnostic->message = "unable to commit configuration defaults";
+            return false;
+        }
+        return true;
+    }
+    if (!Load_Config_File(entry_path, package_id, effective, diagnostic)) {
+        return false;
+    }
+    *loaded = true;
+    return true;
 }
 
 }

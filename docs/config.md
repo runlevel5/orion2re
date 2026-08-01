@@ -158,13 +158,27 @@ building automated_factory cost
 weapon plasma_cannon available_mods
 ```
 
-Record fields use stable symbolic names. Arrays use explicit numeric indexes. External indexes are one-based unless a schema node explicitly declares another base.
+Record fields use stable symbolic names. Arrays use explicit numeric indexes or schema-declared semantic aliases for those indexes. External indexes are one-based unless a schema node explicitly declares another base.
 
 The parser retains raw path tokens. The schema decides whether a token is:
 
 - a record field
 - an array index
-- a symbolic key in a keyed collection
+- a keyed alias for an array index
+
+A keyed array alias does not introduce a new collection type. It gives a stable semantic name to an existing numeric position in a native table. For example, if `plasma_cannon` has value 11 in the array's declared index enum, then:
+
+```text
+weapon plasma_cannon available_mods
+```
+
+resolves exactly as:
+
+```text
+weapon 11 available_mods
+```
+
+Both forms select the same array element, traversal begins at the same leaf, and all normal array boundary rules apply. Numeric selectors remain accepted when `index_type` is present. Canonical paths and generated native bindings use the numeric index, so the alias is not a second identity for the element.
 
 ### Value syntax
 
@@ -386,7 +400,7 @@ The JSON5 documents define:
 - masks and their stable bit values
 - ratios and strings
 - reusable records
-- arrays and index bases
+- arrays, index bases, and optional enum-backed keyed aliases for numeric indexes
 - parameter roots
 - defaults
 - declaration and traversal order
@@ -402,6 +416,24 @@ The documents do not contain:
 - arbitrary pointer arithmetic
 - embedded scripts
 - instruction bytes
+
+### Keyed array aliases
+
+An array may declare `index_type` as a reference to an enum whose names are accepted as keyed aliases for its external indexes:
+
+```json5
+{
+  kind: "array",
+  count: 64,
+  index_base: 0,
+  index_type: "weapon_id",
+  element: { type: "weapon_definition" },
+}
+```
+
+`index_type` must resolve to an enum. The array's external index range is `index_base` through `index_base + count - 1`, inclusive, and every value in the index enum must fall within that range. Each enum name becomes a keyed alias for the external index equal to its numeric value. The enum may be sparse; array positions without a declared enum name remain addressable by number.
+
+`index_type` affects only path resolution and generated documentation. It does not change array size, element order, defaults, traversal, native indexing, or serialization identity. Schema validation rejects a non-enum `index_type`, an unknown type, duplicate enum names or values, and enum values outside the array's external index range. Generated descriptors retain the alias-to-external-index mapping, while resolved and persisted canonical paths use the decimal numeric index.
 
 ### Documentation metadata
 
@@ -999,7 +1031,7 @@ Canonical names should:
 - avoid embedded indexes such as `weapon_1_type`
 - remain stable once published
 
-There is no legacy alias layer for old 1.50 field names or flattened positions. Numeric selectors are reserved for actual arrays and keyed numeric collections.
+There is no legacy alias layer for old 1.50 field names or flattened positions. Numeric selectors and their semantic aliases are reserved for actual arrays.
 
 ### Change review
 
@@ -1015,6 +1047,18 @@ Because declaration order controls terse traversal, field reordering can break e
 
 ## Parsing and application architecture
 
+### Base configuration lifecycle
+
+At startup, the engine creates a candidate state from generated logical defaults and then looks for
+`orion2re.cfg` at the game directory's VFS root. A missing file is not an error and leaves the generated
+defaults unchanged. If the file exists, its complete include graph is parsed, resolved, decoded, and
+validated against that candidate. Invalid syntax, paths, values, includes, or bindings are fatal startup
+errors. Defaults and overrides are committed to native state together only after the complete operation
+succeeds.
+
+Until native mod packages are implemented, `enable <mod-id>;` emits a warning and has no effect. It does
+not prevent ordinary configuration assignments in the same transaction from being applied.
+
 ### Stage 1: lexical parser
 
 The parser produces source-located statements containing:
@@ -1029,7 +1073,7 @@ It handles comments, quoting, escapes, semicolons, and includes no game-specific
 
 ### Stage 2: path resolution
 
-Configuration runtime code resolves the path through generated record, array, and keyed-collection descriptors. It returns:
+Configuration runtime code resolves the path through generated record and array descriptors. Array descriptors with an `index_type` translate a keyed alias to its declared numeric external index before selecting the element. Resolution returns:
 
 - selected node
 - first writable leaf and traversal boundary
@@ -1088,7 +1132,7 @@ Paths resolve relative to the current file or package according to the path type
 
 `stop;` ends only the current file and returns to its includer.
 
-Optional includes may be supported explicitly, but absence should never be inferred from a malformed file. Missing and invalid are different outcomes.
+Optional includes are not supported. Every `include` target is required: a missing file and an invalid file are distinct fatal errors, and neither is silently ignored.
 
 ## Native mod packages
 
@@ -1225,6 +1269,7 @@ The build should provide validation for:
 - invalid defaults
 - invalid native binding paths
 - array-size mismatches
+- invalid array index types or aliases outside the array's external index range
 - missing, overlapping, or invalid defaults
 - exact array defaults with the wrong length
 - replicated targets with incompatible types
@@ -1253,6 +1298,7 @@ Errors should identify the relevant phase.
 - unknown parameter or field
 - indexing a non-array
 - missing or out-of-range array index
+- unknown keyed array alias
 
 ### Sequential decode errors
 
@@ -1302,7 +1348,7 @@ Errors should identify the relevant phase.
 
 ### Phase 3: bounded traversal
 
-- Resolve records and arrays.
+- Resolve records, numeric array indexes, and semantic aliases supplied by array index enums.
 - Implement the boundary rules in this document.
 - Implement scalar-start traversal within the nearest containing aggregate.
 - Decode complete statements atomically.
@@ -1347,9 +1393,7 @@ Errors should identify the relevant phase.
 
 - Exact JSON5 parser/library or whether to implement the required subset in-tree.
 - Exact quoted-string escape rules for canonical files.
-- Whether optional include syntax is retained or replaced with an explicit statement form.
 - Whether whole-record assignment may omit trailing values without warnings.
-- Whether explicit array ranges are needed after whole-array assignment and skips are available.
 - Exact regular-expression dialect and string-length unit.
 - Which interface settings belong in saves or multiplayer synchronization.
 - Whether unknown deterministic resource files are rejected or merely excluded from identity hashes.

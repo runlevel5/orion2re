@@ -83,6 +83,7 @@ namespace {
         case PRIMITIVE_INT32: return "CONFIG_VALUE_INT32";
         case PRIMITIVE_UINT32: return "CONFIG_VALUE_UINT32";
         case PRIMITIVE_STRING: return "CONFIG_VALUE_STRING";
+        case PRIMITIVE_RATIO: return "CONFIG_VALUE_RATIO";
         }
         return "CONFIG_VALUE_BOOL";
     }
@@ -97,6 +98,7 @@ namespace {
         case PRIMITIVE_INT32: return "int32_t";
         case PRIMITIVE_UINT32: return "uint32_t";
         case PRIMITIVE_STRING: return "const char*";
+        case PRIMITIVE_RATIO: return "void";
         }
         return "uint8_t";
     }
@@ -108,7 +110,37 @@ namespace {
         if (parameter.type == PRIMITIVE_STRING) {
             return Cpp_String_(parameter.default_string);
         }
+        if (parameter.type == PRIMITIVE_RATIO) {
+            return std::to_string(parameter.default_ratio_numerator) + "/" +
+                   std::to_string(parameter.default_ratio_denominator);
+        }
         return std::to_string(parameter.default_integer);
+    }
+
+    const char* Scalar_Kind_(e_scalar_kind kind) {
+        switch (kind) {
+        case SCALAR_PRIMITIVE: return "CONFIG_SCALAR_PRIMITIVE";
+        case SCALAR_ENUM: return "CONFIG_SCALAR_ENUM";
+        case SCALAR_MASK: return "CONFIG_SCALAR_MASK";
+        case SCALAR_RATIO: return "CONFIG_SCALAR_RATIO";
+        }
+        return "CONFIG_SCALAR_PRIMITIVE";
+    }
+
+    const char* Node_Kind_(e_node_kind kind) {
+        switch (kind) {
+        case NODE_SCALAR: return "CONFIG_NODE_SCALAR";
+        case NODE_RECORD: return "CONFIG_NODE_RECORD";
+        case NODE_ARRAY: return "CONFIG_NODE_ARRAY";
+        }
+        return "CONFIG_NODE_SCALAR";
+    }
+
+    std::string Native_Target_(const s_parameter& parameter, size_t index) {
+        if (index < parameter.native_targets.size()) {
+            return parameter.native_targets[index];
+        }
+        return parameter.binding.symbol + "." + parameter.binding.members[index];
     }
 
     std::string Source_(const s_schema* schema) {
@@ -140,9 +172,35 @@ namespace {
         }
         output +=
             "};\n\n"
-            "const size_t group_count = sizeof(groups) / sizeof(groups[0]);\n\n"
-            "const s_variable_descriptor variables[] = {\n";
-        for (const s_parameter& parameter : schema->parameters) {
+            "const size_t group_count = sizeof(groups) / sizeof(groups[0]);\n\n";
+        for (size_t index = 0; index < schema->parameters.size(); ++index) {
+            const s_parameter& parameter = schema->parameters[index];
+            if (!parameter.values.empty()) {
+                output += "static const s_symbol_descriptor variable_" +
+                          std::to_string(index) + "_values[] = {\n";
+                for (const s_symbol& symbol : parameter.values) {
+                    output += "    { " + Cpp_String_(symbol.name) + ", " +
+                              std::to_string(symbol.value) + " },\n";
+                }
+                output += "};\n\n";
+            }
+            if (!parameter.flags.empty()) {
+                output += "static const s_symbol_descriptor variable_" +
+                          std::to_string(index) + "_flags[] = {\n";
+                for (const s_symbol& symbol : parameter.flags) {
+                    output += "    { " + Cpp_String_(symbol.name) + ", " +
+                              std::to_string(symbol.value) + " },\n";
+                }
+                output += "};\n\n";
+            }
+        }
+        output += "const s_variable_descriptor variables[] = {\n";
+        for (size_t index = 0; index < schema->parameters.size(); ++index) {
+            const s_parameter& parameter = schema->parameters[index];
+            const std::string values = parameter.values.empty() ? "nullptr" :
+                                       "variable_" + std::to_string(index) + "_values";
+            const std::string flags = parameter.flags.empty() ? "nullptr" :
+                                      "variable_" + std::to_string(index) + "_flags";
             output += "    { " + Cpp_String_(parameter.path) + ", " +
                       Cpp_String_(parameter.metadata.title) + ", " +
                       Cpp_String_(parameter.metadata.description) + ", " +
@@ -152,11 +210,53 @@ namespace {
                       (parameter.constraints.has_min ? "true" : "false") + ", " +
                       (parameter.constraints.has_max ? "true" : "false") + ", " +
                       std::to_string(parameter.constraints.min) + ", " +
-                      std::to_string(parameter.constraints.max) + " },\n";
+                      std::to_string(parameter.constraints.max) +
+                      ", " + Scalar_Kind_(parameter.scalar_kind) + ", " + values +
+                      ", " + std::to_string(parameter.values.size()) + ", " + flags +
+                      ", " + std::to_string(parameter.flags.size()) +
+                      ", " + (parameter.allow_numeric ? "true" : "false") +
+                      ", " + (parameter.reject_unknown_numeric ? "true" : "false") +
+                      ", " + std::to_string(parameter.known_bits) +
+                      ", " + (parameter.constraints.has_min_length ? "true" : "false") +
+                      ", " + (parameter.constraints.has_max_length ? "true" : "false") +
+                      ", " + std::to_string(parameter.constraints.min_length) +
+                      ", " + std::to_string(parameter.constraints.max_length) +
+                      ", " + Cpp_Type_(parameter.ratio_component_type) + " },\n";
         }
         output +=
             "};\n\n"
             "const size_t variable_count = sizeof(variables) / sizeof(variables[0]);\n\n"
+            "const s_schema_node_descriptor schema_nodes[] = {\n";
+        if (schema->nodes.empty()) {
+            for (size_t index = 0; index < schema->parameters.size(); ++index) {
+                const s_parameter& parameter = schema->parameters[index];
+                output += "    { " + Cpp_String_(parameter.path) +
+                          ", CONFIG_NODE_SCALAR, CONFIG_NO_NODE, 0, " +
+                          std::to_string(index) + ", " + std::to_string(index) +
+                          ", " + std::to_string(index) + " },\n";
+            }
+        } else {
+            for (const s_node& node : schema->nodes) {
+                const std::string parent = node.parent == UINT32_MAX ? "CONFIG_NO_NODE" :
+                                           std::to_string(node.parent);
+                const std::string first = node.first_parameter == UINT32_MAX ?
+                                          "CONFIG_NO_VARIABLE" :
+                                          std::to_string(node.first_parameter);
+                const std::string last = node.last_parameter == UINT32_MAX ?
+                                         "CONFIG_NO_VARIABLE" :
+                                         std::to_string(node.last_parameter);
+                const std::string parameter = node.parameter == UINT32_MAX ?
+                                              "CONFIG_NO_VARIABLE" :
+                                              std::to_string(node.parameter);
+                output += "    { " + Cpp_String_(node.id) + ", " +
+                          Node_Kind_(node.kind) + ", " + parent + ", " +
+                          std::to_string(node.external_index) + ", " + first +
+                          ", " + last + ", " + parameter + " },\n";
+            }
+        }
+        output +=
+            "};\n\n"
+            "const size_t schema_node_count = sizeof(schema_nodes) / sizeof(schema_nodes[0]);\n\n"
             "}\n"
             "\nnamespace config::generated {\n\n"
             "bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {\n"
@@ -174,6 +274,11 @@ namespace {
             } else if (parameter.type == PRIMITIVE_STRING) {
                 output += "        value->string_value = " +
                           Cpp_String_(Encode_Game_String(parameter.default_string)) + ";\n";
+            } else if (parameter.type == PRIMITIVE_RATIO) {
+                output += "        value->ratio_numerator = " +
+                          std::to_string(parameter.default_ratio_numerator) + ";\n"
+                          "        value->ratio_denominator = " +
+                          std::to_string(parameter.default_ratio_denominator) + ";\n";
             } else {
                 output += "        value->integer_value = " + Default_Value_(parameter) + ";\n";
             }
@@ -190,14 +295,37 @@ namespace {
             "    switch (variable_id) {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
             const s_parameter& parameter = schema->parameters[index];
-            const std::string native = parameter.binding.symbol + "." +
-                                       parameter.binding.members.front();
+            const std::string native = Native_Target_(parameter, 0);
             const char* value = parameter.type == PRIMITIVE_BOOL ? "value->bool_value" :
                                 parameter.type == PRIMITIVE_STRING ? "value->string_value.c_str()" :
                                 "value->integer_value";
-            output += "    case " + std::to_string(index) + ":\n"
-                      "        " + native + " = (" + Native_Type_(parameter.type) + ")" + value + ";\n"
-                      "        return true;\n";
+            output += "    case " + std::to_string(index) + ":\n";
+            if (parameter.type == PRIMITIVE_STRING) {
+                const size_t target_count = parameter.native_targets.empty() ? 1 :
+                                            parameter.native_targets.size();
+                for (size_t target = 0; target < target_count; ++target) {
+                    const std::string destination = Native_Target_(parameter, target);
+                    output += "        strlcpy(" + destination +
+                              ", value->string_value.c_str(), sizeof(" + destination + "));\n";
+                }
+            } else if (parameter.type == PRIMITIVE_RATIO) {
+                output += "        " + native + " = (" +
+                          Native_Type_(parameter.ratio_component_type) +
+                          ")value->ratio_numerator;\n"
+                          "        " + Native_Target_(parameter, 1) + " = (" +
+                          Native_Type_(parameter.ratio_component_type) +
+                          ")value->ratio_denominator;\n";
+            } else {
+                for (size_t target = 0; target < parameter.native_targets.size(); ++target) {
+                    output += "        " + Native_Target_(parameter, target) + " = (" +
+                              Native_Type_(parameter.type) + ")" + value + ";\n";
+                }
+                if (parameter.native_targets.empty()) {
+                    output += "        " + native + " = (" + Native_Type_(parameter.type) +
+                              ")" + value + ";\n";
+                }
+            }
+            output += "        return true;\n";
         }
         output +=
             "    }\n"
@@ -211,14 +339,17 @@ namespace {
             "    switch (variable_id) {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
             const s_parameter& parameter = schema->parameters[index];
-            const std::string native = parameter.binding.symbol + "." +
-                                       parameter.binding.members.front();
+            const std::string native = Native_Target_(parameter, 0);
             output += "    case " + std::to_string(index) + ":\n"
                       "        value->type = " + Cpp_Type_(parameter.type) + ";\n";
             if (parameter.type == PRIMITIVE_BOOL) {
                 output += "        value->bool_value = (bool)" + native + ";\n";
             } else if (parameter.type == PRIMITIVE_STRING) {
                 output += "        value->string_value = (const char*)" + native + ";\n";
+            } else if (parameter.type == PRIMITIVE_RATIO) {
+                output += "        value->ratio_numerator = (int64_t)" + native + ";\n"
+                          "        value->ratio_denominator = (int64_t)" +
+                          Native_Target_(parameter, 1) + ";\n";
             } else {
                 output += "        value->integer_value = (int64_t)" + native + ";\n";
             }

@@ -1,10 +1,15 @@
 #include "config_decode.h"
 
 #include <climits>
+#include <cstdlib>
+#include <numeric>
 #include <utility>
 
 namespace config {
 namespace {
+    void Primitive_Range_(e_value_type type, int64_t* minimum, int64_t* maximum);
+    bool Parse_Integer_(const std::string& text, int64_t* value);
+
     bool Fail_(const s_source_location& location, const std::string& message,
                s_config_write_set* write_set, s_cfg_diagnostic* diagnostic) {
         write_set->writes.clear();
@@ -23,8 +28,251 @@ namespace {
         case CONFIG_VALUE_INT32: return "int32";
         case CONFIG_VALUE_UINT32: return "uint32";
         case CONFIG_VALUE_STRING: return "string";
+        case CONFIG_VALUE_RATIO: return "ratio";
         }
         return "unknown";
+    }
+
+    const s_symbol_descriptor* Find_Symbol_(const s_symbol_descriptor* symbols,
+                                            size_t count, const std::string& name) {
+        for (size_t index = 0; index < count; ++index) {
+            if (name == symbols[index].name) {
+                return &symbols[index];
+            }
+        }
+        return nullptr;
+    }
+
+    bool Decode_Utf8_(const std::string& text, size_t* offset, uint32_t* codepoint) {
+        const uint8_t first = static_cast<uint8_t>(text[*offset]);
+        if (first < 0x80) {
+            *codepoint = first;
+            ++*offset;
+            return true;
+        }
+        size_t count = 0;
+        uint32_t value = 0;
+        if ((first & 0xE0) == 0xC0) {
+            count = 2;
+            value = first & 0x1F;
+        } else if ((first & 0xF0) == 0xE0) {
+            count = 3;
+            value = first & 0x0F;
+        } else if ((first & 0xF8) == 0xF0) {
+            count = 4;
+            value = first & 0x07;
+        } else {
+            return false;
+        }
+        if (*offset + count > text.size()) {
+            return false;
+        }
+        for (size_t index = 1; index < count; ++index) {
+            const uint8_t next = static_cast<uint8_t>(text[*offset + index]);
+            if ((next & 0xC0) != 0x80) {
+                return false;
+            }
+            value = value << 6 | (next & 0x3F);
+        }
+        *offset += count;
+        *codepoint = value;
+        return true;
+    }
+
+    bool Append_Cp850_(uint32_t codepoint, std::string* output) {
+        static const uint16_t extended[] = {
+            0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7,
+            0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x00EE, 0x00EC, 0x00C4, 0x00C5,
+            0x00C9, 0x00E6, 0x00C6, 0x00F4, 0x00F6, 0x00F2, 0x00FB, 0x00F9,
+            0x00FF, 0x00D6, 0x00DC, 0x00F8, 0x00A3, 0x00D8, 0x00D7, 0x0192,
+            0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x00AA, 0x00BA,
+            0x00BF, 0x00AE, 0x00AC, 0x00BD, 0x00BC, 0x00A1, 0x00AB, 0x00BB,
+            0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x00C1, 0x00C2, 0x00C0,
+            0x00A9, 0x2563, 0x2551, 0x2557, 0x255D, 0x00A2, 0x00A5, 0x2510,
+            0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x00E3, 0x00C3,
+            0x255A, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256C, 0x00A4,
+            0x00F0, 0x00D0, 0x00CA, 0x00CB, 0x00C8, 0x0131, 0x00CD, 0x00CE,
+            0x00CF, 0x2518, 0x250C, 0x2588, 0x2584, 0x00A6, 0x00CC, 0x2580,
+            0x00D3, 0x00DF, 0x00D4, 0x00D2, 0x00F5, 0x00D5, 0x00B5, 0x00FE,
+            0x00DE, 0x00DA, 0x00DB, 0x00D9, 0x00FD, 0x00DD, 0x00AF, 0x00B4,
+            0x00AD, 0x00B1, 0x2017, 0x00BE, 0x00B6, 0x00A7, 0x00F7, 0x00B8,
+            0x00B0, 0x00A8, 0x00B7, 0x00B9, 0x00B3, 0x00B2, 0x25A0, 0x00A0,
+        };
+        if (codepoint < 0x80) {
+            output->push_back(static_cast<char>(codepoint));
+            return true;
+        }
+        for (size_t index = 0; index < sizeof(extended) / sizeof(extended[0]); ++index) {
+            if (extended[index] == codepoint) {
+                output->push_back(static_cast<char>(0x80 + index));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool Decode_String_(const s_variable_descriptor* variable,
+                        const s_cfg_token& token, s_typed_value* value,
+                        std::string* expected) {
+        if (token.kind != CFG_TOKEN_STRING) {
+            return false;
+        }
+        size_t offset = 0;
+        while (offset < token.value.size()) {
+            uint32_t codepoint = 0;
+            if (!Decode_Utf8_(token.value, &offset, &codepoint) ||
+                !Append_Cp850_(codepoint, &value->string_value)) {
+                *expected = "a CP850-representable string";
+                return false;
+            }
+        }
+        const size_t length = value->string_value.size();
+        if ((variable->has_min_length && length < variable->min_length) ||
+            (variable->has_max_length && length > variable->max_length)) {
+            *expected = "a string with CP850 byte length ";
+            *expected += variable->has_min_length ? std::to_string(variable->min_length) : "0";
+            *expected += "..";
+            *expected += variable->has_max_length ? std::to_string(variable->max_length) :
+                                                    "unbounded";
+            return false;
+        }
+        return true;
+    }
+
+    bool Decode_Integer_(const s_variable_descriptor* variable,
+                         const s_cfg_token& token, int64_t* integer,
+                         std::string* expected) {
+        if (token.kind != CFG_TOKEN_INTEGER || !Parse_Integer_(token.value, integer)) {
+            return false;
+        }
+        int64_t primitive_minimum = 0;
+        int64_t primitive_maximum = 0;
+        Primitive_Range_(variable->type, &primitive_minimum, &primitive_maximum);
+        const int64_t minimum = variable->has_min ? variable->min : primitive_minimum;
+        const int64_t maximum = variable->has_max ? variable->max : primitive_maximum;
+        if (*integer < minimum || *integer > maximum) {
+            *expected += " in range " + std::to_string(minimum) + ".." +
+                         std::to_string(maximum);
+            return false;
+        }
+        return true;
+    }
+
+    bool Decode_Enum_(const s_variable_descriptor* variable,
+                      const s_cfg_token& token, s_typed_value* value,
+                      std::string* expected) {
+        if (token.kind == CFG_TOKEN_IDENTIFIER) {
+            const s_symbol_descriptor* symbol = Find_Symbol_(
+                variable->values, variable->value_count, token.value);
+            if (symbol == nullptr) {
+                *expected = "a declared " + *expected + " value";
+                return false;
+            }
+            value->integer_value = symbol->value;
+            return true;
+        }
+        if (!variable->allow_numeric ||
+            !Decode_Integer_(variable, token, &value->integer_value, expected)) {
+            return false;
+        }
+        if (variable->reject_unknown_numeric) {
+            for (size_t index = 0; index < variable->value_count; ++index) {
+                if (variable->values[index].value == value->integer_value) {
+                    return true;
+                }
+            }
+            *expected = "a declared numeric " + *expected + " value";
+            return false;
+        }
+        return true;
+    }
+
+    bool Decode_Mask_(const s_variable_descriptor* variable,
+                      const s_cfg_token& token, s_typed_value* value,
+                      std::string* expected) {
+        if (token.kind == CFG_TOKEN_INTEGER) {
+            if (!variable->allow_numeric ||
+                !Decode_Integer_(variable, token, &value->integer_value, expected)) {
+                return false;
+            }
+        } else if (token.kind == CFG_TOKEN_IDENTIFIER) {
+            const s_symbol_descriptor* symbol = Find_Symbol_(
+                variable->values, variable->value_count, token.value);
+            if (symbol == nullptr) {
+                symbol = Find_Symbol_(variable->flags, variable->flag_count, token.value);
+            }
+            if (symbol == nullptr) {
+                *expected = "a declared " + *expected + " value";
+                return false;
+            }
+            value->integer_value = symbol->value;
+        } else if (token.kind == CFG_TOKEN_MASK) {
+            value->integer_value = 0;
+            size_t start = 0;
+            while (start < token.value.size()) {
+                const size_t comma = token.value.find(',', start);
+                const size_t end = comma == std::string::npos ? token.value.size() : comma;
+                const std::string name = token.value.substr(start, end - start);
+                const s_symbol_descriptor* flag = Find_Symbol_(
+                    variable->flags, variable->flag_count, name);
+                if (flag == nullptr) {
+                    *expected = "declared mask flags";
+                    return false;
+                }
+                value->integer_value |= flag->value;
+                start = end + 1;
+            }
+        } else {
+            return false;
+        }
+        if (variable->reject_unknown_numeric &&
+            (static_cast<uint64_t>(value->integer_value) & ~variable->known_bits) != 0) {
+            *expected = "a mask containing only declared bits";
+            return false;
+        }
+        return true;
+    }
+
+    bool Decode_Ratio_(const s_variable_descriptor* variable,
+                       const s_cfg_token& token, s_typed_value* value,
+                       std::string* expected) {
+        std::string numerator_text = token.value;
+        std::string denominator_text = "1";
+        if (token.kind == CFG_TOKEN_RATIO) {
+            const size_t slash = token.value.find('/');
+            numerator_text = token.value.substr(0, slash);
+            denominator_text = token.value.substr(slash + 1);
+        } else if (token.kind != CFG_TOKEN_INTEGER) {
+            return false;
+        }
+        if (!Parse_Integer_(numerator_text, &value->ratio_numerator) ||
+            !Parse_Integer_(denominator_text, &value->ratio_denominator) ||
+            value->ratio_denominator == 0 || value->ratio_numerator == INT64_MIN ||
+            value->ratio_denominator == INT64_MIN) {
+            *expected = "a ratio with a nonzero denominator";
+            return false;
+        }
+        if (value->ratio_denominator < 0) {
+            value->ratio_numerator = -value->ratio_numerator;
+            value->ratio_denominator = -value->ratio_denominator;
+        }
+        const int64_t divisor = std::gcd(value->ratio_numerator,
+                                         value->ratio_denominator);
+        value->ratio_numerator /= divisor;
+        value->ratio_denominator /= divisor;
+        if (value->ratio_numerator == 0) {
+            value->ratio_denominator = 1;
+        }
+        int64_t minimum = 0;
+        int64_t maximum = 0;
+        Primitive_Range_(variable->ratio_component_type, &minimum, &maximum);
+        if (value->ratio_numerator < minimum || value->ratio_numerator > maximum ||
+            value->ratio_denominator < minimum || value->ratio_denominator > maximum) {
+            *expected = "a ratio whose normalized components fit " +
+                        std::string(Type_Name_(variable->ratio_component_type));
+            return false;
+        }
+        return true;
     }
 
     void Primitive_Range_(e_value_type type, int64_t* minimum, int64_t* maximum) {
@@ -110,35 +358,62 @@ namespace {
                        std::string* expected) {
         value->type = variable->type;
         *expected = Type_Name_(variable->type);
+        if (variable->scalar_kind == CONFIG_SCALAR_ENUM) {
+            return Decode_Enum_(variable, token, value, expected);
+        }
+        if (variable->scalar_kind == CONFIG_SCALAR_MASK) {
+            return Decode_Mask_(variable, token, value, expected);
+        }
+        if (variable->scalar_kind == CONFIG_SCALAR_RATIO) {
+            return Decode_Ratio_(variable, token, value, expected);
+        }
         if (variable->type == CONFIG_VALUE_BOOL) {
             return Decode_Bool_(token, value);
         }
         if (variable->type == CONFIG_VALUE_STRING) {
-            if (token.kind != CFG_TOKEN_STRING) {
-                return false;
-            }
-            value->string_value = token.value;
-            return true;
+            return Decode_String_(variable, token, value, expected);
         }
-        if (token.kind != CFG_TOKEN_INTEGER || !Parse_Integer_(token.value, &value->integer_value)) {
-            return false;
-        }
+        return Decode_Integer_(variable, token, &value->integer_value, expected);
+    }
 
-        int64_t primitive_minimum = 0;
-        int64_t primitive_maximum = 0;
-        Primitive_Range_(variable->type, &primitive_minimum, &primitive_maximum);
-        const int64_t minimum = variable->has_min ? variable->min : primitive_minimum;
-        const int64_t maximum = variable->has_max ? variable->max : primitive_maximum;
-        if (value->integer_value < minimum || value->integer_value > maximum) {
-            *expected += " in range " + std::to_string(minimum) + ".." + std::to_string(maximum);
-            return false;
+    bool Parse_Index_(const s_cfg_token& token, int32_t* value) {
+        int64_t parsed = 0;
+        return token.kind == CFG_TOKEN_INTEGER && Parse_Integer_(token.value, &parsed) &&
+               parsed >= INT32_MIN && parsed <= INT32_MAX &&
+               (*value = static_cast<int32_t>(parsed), true);
+    }
+
+    uint32_t Find_Child_(const s_runtime_schema* schema, uint32_t parent,
+                         const s_cfg_token& token) {
+        for (uint32_t index = 0; index < schema->node_count; ++index) {
+            const s_schema_node_descriptor& node = schema->nodes[index];
+            if (node.parent != parent) {
+                continue;
+            }
+            if (schema->nodes[parent].kind == CONFIG_NODE_ARRAY) {
+                int32_t external_index = 0;
+                if (Parse_Index_(token, &external_index) &&
+                    node.external_index == external_index) {
+                    return index;
+                }
+            } else if (token.kind == CFG_TOKEN_IDENTIFIER && token.value == node.id) {
+                return index;
+            }
         }
-        return true;
+        return CONFIG_NO_NODE;
     }
 }
 
 bool Decode_Assignment(const s_cfg_statement* statement, s_config_write_set* write_set,
                        s_cfg_diagnostic* diagnostic) {
+    return Decode_Assignment_With_Schema(statement, Get_Runtime_Schema(), write_set,
+                                         diagnostic);
+}
+
+bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
+                                   const s_runtime_schema* schema,
+                                   s_config_write_set* write_set,
+                                   s_cfg_diagnostic* diagnostic) {
     if (statement == nullptr || write_set == nullptr || diagnostic == nullptr) {
         return false;
     }
@@ -152,46 +427,88 @@ bool Decode_Assignment(const s_cfg_statement* statement, s_config_write_set* wri
     }
 
     const s_cfg_token& root = statement->path.front();
-    std::string canonical_path;
-    for (const s_cfg_token& path_token : statement->path) {
-        if (!canonical_path.empty()) {
-            canonical_path += '.';
+    uint32_t selected = CONFIG_NO_NODE;
+    for (uint32_t index = 0; index < schema->node_count; ++index) {
+        if (schema->nodes[index].parent == CONFIG_NO_NODE &&
+            root.value == schema->nodes[index].id) {
+            selected = index;
+            break;
         }
-        canonical_path += path_token.value;
     }
-    t_variable_id variable_id = 0;
-    if (!Find_Variable(canonical_path.data(), canonical_path.size(), &variable_id)) {
+    std::string canonical_path = root.value;
+    if (selected == CONFIG_NO_NODE) {
         return Fail_(root.location, "unknown configuration variable '" + canonical_path + "'",
                      write_set, diagnostic);
     }
-    const s_variable_descriptor* variable = Get_Variable(variable_id);
+    for (size_t path_index = 1; path_index < statement->path.size(); ++path_index) {
+        const s_cfg_token& token = statement->path[path_index];
+        canonical_path += "." + token.value;
+        if (schema->nodes[selected].kind == CONFIG_NODE_SCALAR) {
+            return Fail_(root.location, "unknown configuration variable '" + canonical_path + "'",
+                         write_set, diagnostic);
+        }
+        selected = Find_Child_(schema, selected, token);
+        if (selected == CONFIG_NO_NODE) {
+            return Fail_(token.location, "unknown configuration variable '" + canonical_path + "'",
+                         write_set, diagnostic);
+        }
+    }
     if (statement->values.empty()) {
         return Fail_(statement->location, "assignment requires a value", write_set, diagnostic);
     }
-    if (statement->values.size() > 1) {
-        return Fail_(statement->values[1].location,
-                     "value 2 exceeds scalar parameter '" + root.value + "'",
+    const s_schema_node_descriptor& selected_node = schema->nodes[selected];
+    uint32_t boundary = selected;
+    if (selected_node.kind == CONFIG_NODE_SCALAR && selected_node.parent != CONFIG_NO_NODE) {
+        boundary = selected_node.parent;
+    }
+    const t_variable_id first_variable = selected_node.first_variable;
+    const t_variable_id last_variable = schema->nodes[boundary].last_variable;
+    if (first_variable == CONFIG_NO_VARIABLE || first_variable > last_variable) {
+        return Fail_(root.location, "selected configuration object has no writable values",
+                     write_set, diagnostic);
+    }
+    const size_t available = static_cast<size_t>(last_variable - first_variable) + 1;
+    if (statement->values.size() > available) {
+        if (selected_node.kind == CONFIG_NODE_SCALAR &&
+            selected_node.parent == CONFIG_NO_NODE) {
+            return Fail_(statement->values[available].location,
+                         "value " + std::to_string(available + 1) +
+                         " exceeds scalar parameter '" + canonical_path + "'",
+                         write_set, diagnostic);
+        }
+        return Fail_(statement->values[available].location,
+                     "value " + std::to_string(available + 1) +
+                     " exceeds selected configuration object '" + canonical_path + "'",
                      write_set, diagnostic);
     }
 
-    const s_cfg_token& token = statement->values.front();
-    if (token.kind == CFG_TOKEN_SKIP) {
-        return Fail_(token.location, "an assignment containing only skips has no effect",
+    bool has_write = false;
+    for (size_t value_index = 0; value_index < statement->values.size(); ++value_index) {
+        const s_cfg_token& token = statement->values[value_index];
+        if (token.kind == CFG_TOKEN_SKIP) {
+            continue;
+        }
+        const t_variable_id variable_id = first_variable +
+                                          static_cast<t_variable_id>(value_index);
+        const s_variable_descriptor* variable = &schema->variables[variable_id];
+        s_config_write write;
+        write.variable_id = variable_id;
+        write.canonical_path = variable->name;
+        write.provenance = token.location;
+        std::string expected;
+        if (!Decode_Value_(variable, token, &write.value, &expected)) {
+            return Fail_(token.location, "invalid value '" + token.raw + "' for '" +
+                         std::string(variable->name) + "'; expected " + expected,
+                         write_set, diagnostic);
+        }
+        write_set->writes.push_back(std::move(write));
+        has_write = true;
+    }
+    if (!has_write) {
+        return Fail_(statement->values.front().location,
+                     "an assignment containing only skips has no effect",
                      write_set, diagnostic);
     }
-
-    s_config_write write;
-    write.canonical_path = variable->name;
-    write.provenance = token.location;
-    std::string expected;
-    if (!Decode_Value_(variable, token, &write.value, &expected)) {
-        return Fail_(token.location, "invalid value '" + token.raw + "' for '" +
-                     canonical_path + "'; expected " + expected, write_set, diagnostic);
-    }
-    if (!Resolve_Write_Path(&write, diagnostic)) {
-        return false;
-    }
-    write_set->writes.push_back(std::move(write));
     return true;
 }
 

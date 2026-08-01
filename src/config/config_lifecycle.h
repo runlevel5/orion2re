@@ -27,8 +27,8 @@ struct s_effective_config {
     std::vector<std::vector<s_prior_value>> prior_values;
 };
 
-void Initialize_Effective_Config(s_effective_config* effective);
-void Read_Effective_Native_Config(s_effective_config* effective);
+bool Initialize_Effective_Config(s_effective_config* effective);
+bool Read_Effective_Native_Config(s_effective_config* effective);
 bool Apply_Config_Document(const s_cfg_document* document, const char* package_id,
                            s_effective_config* effective, s_cfg_diagnostic* diagnostic);
 bool Extract_Canonical_Config(const s_effective_config* effective, bool include_provenance,

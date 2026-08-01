@@ -193,7 +193,7 @@ DOCTEST_TEST_CASE("invalid include paths cannot escape the VFS root") {
     DOCTEST_CHECK(diagnostic.message == "invalid include path '/outside.cfg'");
 }
 
-DOCTEST_TEST_CASE("enable in an include graph remains a mod-loader operation") {
+DOCTEST_TEST_CASE("deferred enable in an include graph is ignored") {
     s_config_test_directory files;
     files.Write("main.cfg",
         "music_volume = 80;\n"
@@ -204,11 +204,76 @@ DOCTEST_TEST_CASE("enable in an include graph remains a mod-loader operation") {
     config::Read_Effective_Native_Config(&effective);
     config::s_cfg_diagnostic diagnostic;
 
-    DOCTEST_CHECK_FALSE(config::Load_Config_File(
+    DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(diagnostic.message == "enable execution requires the mod loader");
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
+    DOCTEST_CHECK(effective.state.values[1].integer_value == 80);
+    DOCTEST_CHECK(MOX::_settings.music_level == 80);
+}
+
+DOCTEST_TEST_CASE("startup config uses defaults when absent") {
+    s_config_test_directory files;
+    files.Initialize_Vfs();
+    MOX::_settings.music_on = 0;
+    MOX::_settings.music_level = 1;
+    MOX::_settings.sound_fx_on = 0;
+    MOX::_settings.sound_fx_level = 2;
+    config::s_effective_config effective;
+    config::s_cfg_diagnostic diagnostic;
+    bool loaded = true;
+
+    DOCTEST_REQUIRE(config::Load_Startup_Config(
+        "orion2re.cfg", "base_game", &effective, &loaded, &diagnostic));
+    DOCTEST_CHECK_FALSE(loaded);
+    DOCTEST_CHECK(MOX::_settings.music_on == 1);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
+    DOCTEST_CHECK(MOX::_settings.sound_fx_on == 1);
+    DOCTEST_CHECK(MOX::_settings.sound_fx_level == 50);
+}
+
+DOCTEST_TEST_CASE("invalid startup config preserves native state") {
+    s_config_test_directory files;
+    files.Write("orion2re.cfg",
+        "music_volume = 80;\n"
+        "sound_effects_volume = 101;\n");
+    files.Initialize_Vfs();
+    MOX::_settings.music_on = 0;
+    MOX::_settings.music_level = 7;
+    MOX::_settings.sound_fx_on = 0;
+    MOX::_settings.sound_fx_level = 9;
+    config::s_effective_config effective;
+    config::s_cfg_diagnostic diagnostic;
+    bool loaded = true;
+
+    DOCTEST_CHECK_FALSE(config::Load_Startup_Config(
+        "orion2re.cfg", "base_game", &effective, &loaded, &diagnostic));
+    DOCTEST_CHECK_FALSE(loaded);
+    DOCTEST_CHECK(diagnostic.location.source == "orion2re.cfg");
+    DOCTEST_CHECK(diagnostic.location.line == 2);
+    DOCTEST_CHECK(MOX::_settings.music_on == 0);
+    DOCTEST_CHECK(MOX::_settings.music_level == 7);
+    DOCTEST_CHECK(MOX::_settings.sound_fx_on == 0);
+    DOCTEST_CHECK(MOX::_settings.sound_fx_level == 9);
+}
+
+DOCTEST_TEST_CASE("valid startup config commits defaults and overrides together") {
+    s_config_test_directory files;
+    files.Write("orion2re.cfg", "music_volume = 75;\n");
+    files.Initialize_Vfs();
+    MOX::_settings.music_on = 0;
+    MOX::_settings.music_level = 7;
+    MOX::_settings.sound_fx_on = 0;
+    MOX::_settings.sound_fx_level = 9;
+    config::s_effective_config effective;
+    config::s_cfg_diagnostic diagnostic;
+    bool loaded = false;
+
+    DOCTEST_REQUIRE(config::Load_Startup_Config(
+        "orion2re.cfg", "base_game", &effective, &loaded, &diagnostic));
+    DOCTEST_CHECK(loaded);
+    DOCTEST_CHECK(MOX::_settings.music_on == 1);
+    DOCTEST_CHECK(MOX::_settings.music_level == 75);
+    DOCTEST_CHECK(MOX::_settings.sound_fx_on == 1);
+    DOCTEST_CHECK(MOX::_settings.sound_fx_level == 50);
 }
 
 }
