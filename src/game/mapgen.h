@@ -17,7 +17,7 @@ namespace MAPGEN {
     extern char _fill_msg[36];
     extern int16_t _fill_msg_ctr;
     extern int8_t _first_time_map_is_generated;
-    extern uint8_t _special_count[SYSTEM_SPECIAL_ORION_STAR + 1];
+    extern uint8_t _special_count[SYSTEM_SPECIAL_COUNT];
     extern uint32_t _n_stars;
     extern uint32_t _n_planets;
     extern int16_t _t_roll;

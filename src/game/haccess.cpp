@@ -623,7 +623,7 @@ namespace HACCESS {
             if (planet_idx != -1) {
                 s_planet_data* planet = &MOX::_planet[planet_idx];
 
-                if (planet->planet_type == 3 /* PLANET_TYPE_ORION */) {
+                if (planet->planet_type == PLANET_TYPE_PLANET) {
                     int16_t colony_idx = planet->colony_index;
 
                     if (colony_idx != -1) {

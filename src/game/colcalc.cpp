@@ -8,10 +8,10 @@ namespace COLCALC {
     };
 
     int8_t _minerals_per_mine[8] = {1, 2, 3, 5, 8, 0, 0, 0};
-    int8_t _climate_maintenance_modifiers[10] = {50, 25, 0, 25, 0, 0, 0, 0, 0, 0};
-    int8_t _morale_lookup_table[8] = {-4, -4, -4, 0, 0, 0, 0, 0};
-    int8_t _non_capital_morale_lookup[8] = {-10, -7, -4, 0, 0, 0, 0, 0};
-    int8_t _barracks_morale_lookup[8] = {4, 4, 4, 4, 0, 0, 0, 0};
+    int8_t _climate_maintenance_modifiers[PLANET_CLIMATE_COUNT] = {50, 25, 0, 25, 0, 0, 0, 0, 0, 0};
+    int8_t _morale_lookup_table[GOVERNMENT_COUNT] = {-4, -4, -4, 0, 0, 0, 0, 0};
+    int8_t _non_capital_morale_lookup[GOVERNMENT_COUNT] = {-10, -7, -4, 0, 0, 0, 0, 0};
+    int8_t _barracks_morale_lookup[GOVERNMENT_COUNT] = {4, 4, 4, 4, 0, 0, 0, 0};
     int8_t _colony_job_production_difficulty_lookup[8] = {-10, 0, 10, 20, 40, 0, 0, 0};
 
     char* _government_morale_msg;
@@ -49,10 +49,10 @@ namespace COLCALC {
     uint8_t _colony_calc_industry_type;
     int8_t _colony_calc_industry_cache[10];
 
-    int8_t _assimilation_rate_by_government[8] = {30, 60, 30, 60, 60, 120, 12, 16};
+    int8_t _assimilation_rate_by_government[GOVERNMENT_COUNT] = {30, 60, 30, 60, 60, 120, 12, 16};
 
     int8_t _difficulty_bc_lookup_table[8] = {0, 0, 1, 2, 3, 0, 0, 0};
-    int8_t _size_climate_max_pop_lookup[10] = {25, 25, 25, 25, 25, 25, 40, 60, 80, 100};
+    int8_t _size_climate_max_pop_lookup[PLANET_CLIMATE_COUNT] = {25, 25, 25, 25, 25, 25, 40, 60, 80, 100};
     char* _government_bonus_msg;
     char* _produced_by_farmers_msg;
     char* _produced_by_workers_msg;
@@ -1071,8 +1071,7 @@ namespace COLCALC {
     uint8_t __cdecl Leader_At_Anomaly_(s_leader_data* leader) {
         uint8_t result = 0;
 
-        // Status 1 = Active/At Location, Type 1 = Scientist? (Context dependent)
-        if (leader->status == 1 && leader->eta == 0 && leader->type == 1) {
+        if (leader->status == 1 && leader->eta == 0 && leader->type == LEADER_TYPE_COLONY) {
             if (EVENTS::Event_Check_Space_Anomaly_At_Star_(leader->location) != 0) {
                 result = 1;
             }
@@ -1203,7 +1202,7 @@ namespace COLCALC {
                 return false;
 
             case TECH_APP_CONFEDERATION:
-                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 0) {
+                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_FEUDAL) {
                     return false;
                 }
                 break;
@@ -1212,19 +1211,19 @@ namespace COLCALC {
                 return (bool)MOX::_settings.xenons_exist;
 
             case TECH_APP_FEDERATION:
-                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 4) {
+                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_DEMOCRACY) {
                     return false;
                 }
                 break;
 
             case TECH_APP_GALACTIC_UNIFICATION:
-                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 6) {
+                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_UNIFICATION) {
                     return false;
                 }
                 break;
 
             case TECH_APP_IMPERIUM:
-                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 2) {
+                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_DICTATORSHIP) {
                     return false;
                 }
                 break;
@@ -1240,7 +1239,7 @@ namespace COLCALC {
                     return false;
                 }
 
-                if (TECHDATA::_technology_applications[tech_app].tech_field_id == -1) {
+                if (TECHDATA::_technology_applications[tech_app].tech_field_id == TECH_FIELD_INVALID) {
                     return false;
                 }
                 break;
@@ -1422,13 +1421,13 @@ namespace COLCALC {
 
     int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type) {
         switch (govt_type) {
-            case 1:
+            case GOVERNMENT_CONFEDERATION:
                 return TECH_APP_CONFEDERATION;
-            case 3:
+            case GOVERNMENT_IMPERIUM:
                 return TECH_APP_IMPERIUM;
-            case 5:
+            case GOVERNMENT_FEDERATION:
                 return TECH_APP_FEDERATION;
-            case 7:
+            case GOVERNMENT_GALACTIC_UNIFICATION:
                 return TECH_APP_GALACTIC_UNIFICATION;
             default:
                 return 0;
@@ -1632,11 +1631,11 @@ namespace COLCALC {
                 switch (planet->climate) {
                     case PLANET_CLIMATE_TUNDRA:
                     case PLANET_CLIMATE_SWAMP:
-                        bonus_base = MOX::_food_per_farmer_table[8];
+                        bonus_base = MOX::_food_per_farmer_table[PLANET_CLIMATE_TERRAN];
                         break;
                     case PLANET_CLIMATE_OCEAN:
                     case PLANET_CLIMATE_TERRAN:
-                        bonus_base = MOX::_food_per_farmer_table[9];
+                        bonus_base = MOX::_food_per_farmer_table[PLANET_CLIMATE_GAIA];
                         break;
                     default:
                         has_bonus = false;
@@ -2523,13 +2522,13 @@ namespace COLCALC {
 
         switch (product_id) {
             case COLONY_PRODUCTION_OUTPOST_SHIP:
-                return Ship_Type_Cost_For_Player_(4, colony->owner);
+                return Ship_Type_Cost_For_Player_(SHIP_TYPE_OUTPOST, colony->owner);
 
             case COLONY_PRODUCTION_COLONY_SHIP:
-                return Ship_Type_Cost_For_Player_(1, colony->owner);
+                return Ship_Type_Cost_For_Player_(SHIP_TYPE_COLONY, colony->owner);
 
             case COLONY_PRODUCTION_TRANSPORT_SHIP:
-                return Ship_Type_Cost_For_Player_(2, colony->owner);
+                return Ship_Type_Cost_For_Player_(SHIP_TYPE_TRANSPORT, colony->owner);
 
             case COLONY_PRODUCTION_SPY:
                 return 100;
@@ -2724,7 +2723,7 @@ namespace COLCALC {
                 leader->status = -2 /* STATUS_RELEASED? */;
                 leader->eta = 0;
                 if (leader->location != -1) {
-                    if (leader->type == 0 /* LEADER_TYPE_SHIP */) {
+                    if (leader->type == LEADER_TYPE_SHIP) {
                         MOX::_ship[leader->location].officer_index = -1;
                     } else {
                         MOX::_star[leader->location].officer_index[player_idx] = -1;
@@ -3405,7 +3404,7 @@ namespace COLCALC {
             uint32_t pop_record = *pop_record_ptr;
             const uint32_t pop_owner = (pop_record & 0x70u) >> 4;
 
-            if (MOX::_player[pop_owner].traits[TRAIT_CURRENT_GOVERNMENT] == 0) {
+            if (MOX::_player[pop_owner].traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_FEUDAL) {
                 *pop_record_ptr = (((owner_bits ^ pop_record) & 0x70u) ^ pop_record);
             }
         }

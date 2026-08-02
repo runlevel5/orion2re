@@ -452,16 +452,16 @@ namespace ADVCIV {
             bool player_satisfied = false;
             for (int16_t j = 0; j < MOX::_planet_count && !player_satisfied; ++j) {
                 if (_planet_selected_flag[j] == i) {
-                    int8_t generated_special = 0;
+                    int8_t generated_special = SYSTEM_SPECIAL_NO_SPECIAL;
                     uint8_t targets[3];
-                    targets[0] = (uint8_t)(4 - MOX::_planet[j].size);
-                    int32_t climate_diff = 8 - MOX::_planet[j].climate;
+                    targets[0] = (uint8_t)(PLANET_SIZE_HUGE - MOX::_planet[j].size);
+                    int32_t climate_diff = PLANET_CLIMATE_TERRAN - MOX::_planet[j].climate;
                     targets[1] = (climate_diff < 0) ? 0 : (uint8_t)climate_diff;
-                    targets[2] = (uint8_t)(4 - MOX::_planet[j].mineral_class);
+                    targets[2] = (uint8_t)(MINERAL_RESOURCE_ULTRA_RICH - MOX::_planet[j].mineral_class);
 
                     if (player_special_count[i] < player_special_count[best_player_idx] &&
-                        MOX::_planet[j].planet_special == 0 &&
-                        MOX::_star[MOX::_planet[j].star_index].system_special == 0)
+                        MOX::_planet[j].planet_special == SYSTEM_SPECIAL_NO_SPECIAL &&
+                        MOX::_star[MOX::_planet[j].star_index].system_special == SYSTEM_SPECIAL_NO_SPECIAL)
                     {
                         if (!(MOX::_player[i].home_planet_id == j && MOX::_player[i].traits[TRAIT_ANCIENT_HOME_WORLD] != 0)) {
                             int16_t attempts = 0;
@@ -471,13 +471,13 @@ namespace ADVCIV {
                                 if (generated_special == SYSTEM_SPECIAL_GEM_DEPOSITS || generated_special == SYSTEM_SPECIAL_GOLD_DEPOSITS || generated_special == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
                                     attempts = 100;
                                 } else {
-                                    generated_special = 0;
+                                    generated_special = SYSTEM_SPECIAL_NO_SPECIAL;
                                 }
                                 attempts++;
                             } while (attempts < 100);
                         }
 
-                        if (generated_special > 0) {
+                        if (generated_special > SYSTEM_SPECIAL_NO_SPECIAL) {
                             MOX::_planet[j].planet_special = generated_special;
                             player_special_count[i]++;
                             MOX::_star[MOX::_planet[j].star_index].system_special = generated_special;
@@ -488,7 +488,7 @@ namespace ADVCIV {
                         }
                     }
 
-                    if (generated_special == 0) {
+                    if (generated_special == SYSTEM_SPECIAL_NO_SPECIAL) {
                         for (int16_t k = 0; k < 6 && !player_satisfied; ++k) {
                             int8_t twiddle_result = Twiddle_Planet_(j, targets);
                             if (twiddle_result != 0) {

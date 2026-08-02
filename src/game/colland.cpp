@@ -64,7 +64,7 @@ namespace COLLAND {
 
         fonts::Print_(0x14, 0x78, MOX::_planet_gravity_string[planet->gravity_class]);
 
-        if (planet->planet_special != 0) {
+        if (planet->planet_special != SYSTEM_SPECIAL_NO_SPECIAL) {
             char* special_str = MOX::_planet_special_string[planet->planet_special];
             char* fmt_special = ESTRINGS::E_Strings_(0x46 /* ESTR_S1 */);
             snprintf(buffer, sizeof(buffer), fmt_special, special_str);

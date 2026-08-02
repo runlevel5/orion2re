@@ -4,7 +4,7 @@
 namespace RACESEL {
 
 static bool Is_Valid_Last_Race_Base_Race_(uint8_t race_idx) {
-    return race_idx < 13;
+    return race_idx < STOCK_RACE_COUNT;
 }
 
 int16_t _custom_flag;
@@ -134,7 +134,7 @@ void __cdecl Reload_Race_Selection_Screen_() {
 
     allocate::Push_Block_(MOX::_screen_seg);
 
-    for (int i = 0; i < 13; ++i) {
+    for (int i = STOCK_RACE_ALKARI; i < STOCK_RACE_COUNT; ++i) {
         _race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, i, 1, TRAIT_COUNT);
         RUSS::Mox_Update_();
     }
@@ -142,7 +142,7 @@ void __cdecl Reload_Race_Selection_Screen_() {
     FILE* file = fopen_case("lastrace.rac", "rb");
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
-        _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, 12, 1, TRAIT_COUNT);
+        _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_("RACESTUF.LBX", 7, MOX::_screen_seg, STOCK_RACE_TRILARIAN, 1, TRAIT_COUNT);
 
         // Overwrite template with saved race data
         fread(_race_specials[13], TRAIT_COUNT, 1, file);
@@ -178,11 +178,11 @@ int16_t Race_Selection_Screen_(s_player* plr) {
     fonts::Load_Palette_(9, 0, 0xFF);
     
     _custom_flag = 0;
-    _displayed_race = 3;
+    _displayed_race = STOCK_RACE_ELERIAN;
     for (int i = 0; i < 14; ++i) {
         _race_button_status[i] = 0;
     }
-    _race_button_status[3] = 1;
+    _race_button_status[STOCK_RACE_ELERIAN] = 1;
     
     Reload_Race_Selection_Screen_();
     RACESEL::Set_Race_Select_Help_();
@@ -223,13 +223,13 @@ int16_t Race_Selection_Screen_(s_player* plr) {
             _displayed_race = _old_race;
         }
         
-        for (int i = 0; i < 13; ++i) {
+        for (int i = STOCK_RACE_ALKARI; i < STOCK_RACE_COUNT; ++i) {
             if (input_field == field_ids[i] && _race_flag[i] == 0) {
                 uint8_t can_request =
                     (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_((uint8_t)i);
                 
                 if (!can_request) {
-                    KEN::Ken_Get_Text_Message_(72 /* 0x48 */, msg_buffer, sizeof(msg_buffer));
+                    KEN::Ken_Get_Text_Message_(72, msg_buffer, sizeof(msg_buffer));
                     GENDRAW::Message_Box_(msg_buffer);
                     video::Set_Page_Back_();
                     auto anim = (s_animation_header*)buffer::Buffer_Reload_("RACEOPT.LBX", 0, MOX::_global_cache_seg);
@@ -317,7 +317,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                             animate::Draw_(0, 0, anim);
                             video::Copy_Back_To_Off_();
                             if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_("\x1B");
-                            for (int j = 0; j < 13; ++j) {
+                            for (int j = 0; j < STOCK_RACE_COUNT; ++j) {
                                 field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", _race_button[j], &_race_button_status[j], "", 40);
                             }
                             field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", _race_button[13], &_race_button_status[13], "", 40);
@@ -338,7 +338,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                 return 0;
             }
             _custom_flag = 0;
-            fields::Clear_Fields_Above_(field_ids[12]);
+            fields::Clear_Fields_Above_(field_ids[STOCK_RACE_TRILARIAN]);
             field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", _race_button[13], &_race_button_status[13], "", 40);
         }
         
@@ -346,7 +346,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
             FILE* race_file = fopen_case("lastrace.rac", "rb");
             if (_custom_flag == 0) {
                 _custom_flag = 1;
-                fields::Clear_Fields_Above_(field_ids[12]);
+                fields::Clear_Fields_Above_(field_ids[STOCK_RACE_TRILARIAN]);
                 if (!race_file) {
                     field_ids[13] = -1000;
                 } else {
@@ -400,7 +400,7 @@ int16_t Race_Selection_Screen_(s_player* plr) {
                         animate::Draw_(0, 0, anim);
                         video::Copy_Back_To_Off_();
                         if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_("\x1B");
-                        for (int j = 0; j < 13; ++j) {
+                        for (int j = 0; j < STOCK_RACE_COUNT; ++j) {
                             field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", _race_button[j], &_race_button_status[j], "", 40);
                         }
                         field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, "", _race_button[13], &_race_button_status[13], "", 40);

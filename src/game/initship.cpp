@@ -377,7 +377,7 @@ namespace INITSHIP {
         design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
         design->speed = 1;
 
-        design->ship_weapon[0].firing_arc = 1;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[0].specials = 0;
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 2;
@@ -388,7 +388,7 @@ namespace INITSHIP {
         design->ship_weapon[1].ammo = 0;
         design->ship_weapon[1].count = 1;
         design->ship_weapon[1].current_count = 1;
-        design->ship_weapon[1].firing_arc = 15;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[1].type = 24;
 
         design->armor_type = ARMOR_XENTRONIUM_ARMOR;
@@ -397,7 +397,7 @@ namespace INITSHIP {
         struct_::Set_Bit_Field_(design->special_device_flags, 7);
         struct_::Set_Bit_Field_(design->special_device_flags, 24);
 
-        if (MOX::_settings.game_difficulty > 2) {
+        if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
             struct_::Set_Bit_Field_(design->special_device_flags, 9);
         }
 
@@ -425,7 +425,7 @@ namespace INITSHIP {
         design->ship_weapon[0].type = 4;
         design->ship_weapon[0].count = 3;
         design->ship_weapon[0].current_count = 3;
-        design->ship_weapon[0].firing_arc = 1;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[0].specials = 0;
         design->ship_weapon[0].ammo = 0;
 
@@ -433,7 +433,7 @@ namespace INITSHIP {
         design->ship_weapon[1].type = 4;
         design->ship_weapon[1].count = 1;
         design->ship_weapon[1].current_count = 1;
-        design->ship_weapon[1].firing_arc = 1;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[1].specials = 2;
         design->ship_weapon[1].ammo = 0;
 
@@ -441,16 +441,16 @@ namespace INITSHIP {
         design->ship_weapon[2].type = 24;
         design->ship_weapon[2].count = 1;
         design->ship_weapon[2].current_count = 1;
-        design->ship_weapon[2].firing_arc = 15;
+        design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[2].specials = 0;
         design->ship_weapon[2].ammo = 10;
 
         struct_::Set_Bit_Field_(design->special_device_flags, 7);
         struct_::Set_Bit_Field_(design->special_device_flags, 24);
 
-        if (MOX::_settings.game_difficulty > 3) {
+        if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_HARD) {
             struct_::Set_Bit_Field_(design->special_device_flags, 21);
-        } else if (MOX::_settings.game_difficulty > 2) {
+        } else if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
             struct_::Set_Bit_Field_(design->special_device_flags, 9);
         }
 
@@ -473,34 +473,34 @@ namespace INITSHIP {
         design->ship_weapon[0].type = 4;
         design->speed = 1;
         design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].firing_arc = 1;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 10;
         design->ship_weapon[0].current_count = 10;
 
         design->ship_weapon[1].type = 4;
-        design->ship_weapon[1].firing_arc = 1;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->size = SHIP_SIZE_HUGE;
         design->ship_weapon[1].ammo = 0;
         design->ship_weapon[1].count = 4;
         design->armor_type = ARMOR_XENTRONIUM_ARMOR;
         design->ship_weapon[1].current_count = 4;
 
-        design->ship_weapon[2].firing_arc = 1;
+        design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[2].specials = 0;
         design->ship_weapon[2].ammo = 10;
         design->ftl_type = DRIVE_HYPER_DRIVE;
         design->ship_weapon[2].count = 15;
         design->ship_weapon[2].current_count = 15;
 
-        design->ship_weapon[3].firing_arc = 15;
+        design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[3].specials = 0;
         design->ship_weapon[3].ammo = 0;
         design->ship_weapon[3].count = 2;
         design->ship_weapon[3].current_count = 2;
 
         design->ship_weapon[4].type = 4;
-        design->ship_weapon[4].firing_arc = 1;
+        design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[4].specials = 4;
         design->ship_weapon[4].ammo = 0;
         design->ship_weapon[4].count = 10;
@@ -508,7 +508,7 @@ namespace INITSHIP {
 
         design->ship_weapon[1].specials = 2;
         design->ship_weapon[5].specials = 0;
-        design->ship_weapon[5].firing_arc = 1;
+        design->ship_weapon[5].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[2].type = 24;
         design->ship_weapon[3].type = 13;
         design->ship_weapon[5].type = 11;
@@ -522,14 +522,14 @@ namespace INITSHIP {
         struct_::Set_Bit_Field_(design->special_device_flags, 26);
 
         switch (MOX::_settings.game_difficulty) {
-            case 1:
+            case GAME_DIFFICULTY_EASY:
                 struct_::Set_Bit_Field_(design->special_device_flags, 9);
                 break;
-            case 2:
+            case GAME_DIFFICULTY_AVERAGE:
                 struct_::Set_Bit_Field_(design->special_device_flags, 21);
                 break;
-            case 3:
-            case 4:
+            case GAME_DIFFICULTY_HARD:
+            case GAME_DIFFICULTY_IMPOSSIBLE:
                 struct_::Set_Bit_Field_(design->special_device_flags, 38);
                 break;
             default:
@@ -557,46 +557,46 @@ namespace INITSHIP {
         design->ship_weapon[0].type = 4;
         design->ship_weapon[0].count = 4;
         design->ship_weapon[0].current_count = 4;
-        design->ship_weapon[0].firing_arc = 1;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[0].specials = 0;
         design->ship_weapon[0].ammo = 0;
 
         design->ship_weapon[1].type = 4;
         design->ship_weapon[1].count = 2;
         design->ship_weapon[1].current_count = 2;
-        design->ship_weapon[1].firing_arc = 1;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[1].specials = 2;
         design->ship_weapon[1].ammo = 0;
 
         design->ship_weapon[2].type = 24 /* 0x18 */;
         design->ship_weapon[2].count = 5;
         design->ship_weapon[2].current_count = 5;
-        design->ship_weapon[2].firing_arc = 15 /* 0x0F */;
+        design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[2].specials = 0;
         design->ship_weapon[2].ammo = 10 /* 0x0A */;
 
         design->ship_weapon[3].type = 13 /* 0x0D */;
         design->ship_weapon[3].count = 2;
         design->ship_weapon[3].current_count = 2;
-        design->ship_weapon[3].firing_arc = 15 /* 0x0F */;
+        design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[3].specials = 0;
         design->ship_weapon[3].ammo = 0;
 
         design->ship_weapon[4].type = 31 /* 0x1F */;
         design->ship_weapon[4].count = 3;
         design->ship_weapon[4].current_count = 3;
-        design->ship_weapon[4].firing_arc = 15 /* 0x0F */;
+        design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[4].specials = 0;
         design->ship_weapon[4].ammo = 0;
 
         struct_::Set_Bit_Field_(design->special_device_flags, 7);
         struct_::Set_Bit_Field_(design->special_device_flags, 24 /* 0x18 */);
 
-        if (MOX::_settings.game_difficulty == 2) {
+        if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_AVERAGE) {
             struct_::Set_Bit_Field_(design->special_device_flags, 9);
-        } else if (MOX::_settings.game_difficulty == 3) {
+        } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
             struct_::Set_Bit_Field_(design->special_device_flags, 21 /* 0x15 */);
-        } else if (MOX::_settings.game_difficulty == 4) {
+        } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
             struct_::Set_Bit_Field_(design->special_device_flags, 38 /* 0x26 */);
         }
 
@@ -622,52 +622,52 @@ namespace INITSHIP {
         design->ship_weapon[0].type = 4;
         design->ship_weapon[0].count = 20;
         design->ship_weapon[0].current_count = 20;
-        design->ship_weapon[0].firing_arc = 1;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[0].ammo = 0;
 
         design->ship_weapon[1].type = 4;
         design->ship_weapon[1].count = 5;
         design->ship_weapon[1].current_count = 5;
-        design->ship_weapon[1].firing_arc = 1;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[1].specials = 2;
         design->ship_weapon[1].ammo = 0;
 
         design->ship_weapon[2].type = 24;
         design->ship_weapon[2].count = 30;
         design->ship_weapon[2].current_count = 30;
-        design->ship_weapon[2].firing_arc = 1;
+        design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[2].ammo = 10;
 
         design->ship_weapon[3].type = 13;
         design->ship_weapon[3].count = 3;
         design->ship_weapon[3].current_count = 3;
-        design->ship_weapon[3].firing_arc = 15;
+        design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[3].ammo = 0;
 
         design->ship_weapon[4].type = 4;
         design->ship_weapon[4].count = 20;
         design->ship_weapon[4].current_count = 20;
-        design->ship_weapon[4].firing_arc = 1;
+        design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[4].specials = 4;
         design->ship_weapon[4].ammo = 0;
 
         design->ship_weapon[5].type = 11;
         design->ship_weapon[5].count = 5;
         design->ship_weapon[5].current_count = 5;
-        design->ship_weapon[5].firing_arc = 1;
+        design->ship_weapon[5].firing_arc = WEAPON_FIRING_ARC_FORWARD;
         design->ship_weapon[5].specials = 2;
         design->ship_weapon[5].ammo = 0;
 
         design->ship_weapon[6].type = 37;
         design->ship_weapon[6].count = 1;
         design->ship_weapon[6].current_count = 1;
-        design->ship_weapon[6].firing_arc = 15;
+        design->ship_weapon[6].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[6].ammo = 0;
 
         design->ship_weapon[7].type = 37;
         design->ship_weapon[7].count = 12;
         design->ship_weapon[7].current_count = 12;
-        design->ship_weapon[7].firing_arc = 15;
+        design->ship_weapon[7].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[7].ammo = 0;
 
         struct_::Set_Bit_Field_(design->special_device_flags, 7);
@@ -676,15 +676,15 @@ namespace INITSHIP {
         struct_::Set_Bit_Field_(design->special_device_flags, 26);
 
         switch (MOX::_settings.game_difficulty) {
-        case 0:
+        case GAME_DIFFICULTY_TUTOR:
             struct_::Set_Bit_Field_(design->special_device_flags, 9);
             break;
-        case 1:
+        case GAME_DIFFICULTY_EASY:
             struct_::Set_Bit_Field_(design->special_device_flags, 21);
             break;
-        case 2:
-        case 3:
-        case 4:
+        case GAME_DIFFICULTY_AVERAGE:
+        case GAME_DIFFICULTY_HARD:
+        case GAME_DIFFICULTY_IMPOSSIBLE:
             struct_::Set_Bit_Field_(design->special_device_flags, 38);
             break;
         }
@@ -1160,7 +1160,7 @@ namespace INITSHIP {
             design->ship_weapon[weapon_count].type = (int8_t)best_weapon;
             design->ship_weapon[weapon_count].count = (int8_t)count;
             design->ship_weapon[weapon_count].current_count = (int8_t)count;
-            design->ship_weapon[weapon_count].firing_arc = 0x10;
+            design->ship_weapon[weapon_count].firing_arc = WEAPON_FIRING_ARC_360;
             design->ship_weapon[weapon_count].specials = 0;
             design->ship_weapon[weapon_count].ammo = 0x5;
             weapon_count = 1;
@@ -1172,7 +1172,7 @@ namespace INITSHIP {
             design->ship_weapon[weapon_count].type = (int8_t)best_weapon;
             design->ship_weapon[weapon_count].count = (int8_t)count;
             design->ship_weapon[weapon_count].current_count = (int8_t)count;
-            design->ship_weapon[weapon_count].firing_arc = 0x10;
+            design->ship_weapon[weapon_count].firing_arc = WEAPON_FIRING_ARC_360;
             design->ship_weapon[weapon_count].specials = 0;
             design->ship_weapon[weapon_count].ammo = 0x5;
             weapon_count++;
@@ -1184,7 +1184,7 @@ namespace INITSHIP {
             design->ship_weapon[weapon_count].type = (int8_t)best_weapon;
             design->ship_weapon[weapon_count].count = (int8_t)count;
             design->ship_weapon[weapon_count].current_count = (int8_t)count;
-            design->ship_weapon[weapon_count].firing_arc = 0x10;
+            design->ship_weapon[weapon_count].firing_arc = WEAPON_FIRING_ARC_360;
             design->ship_weapon[weapon_count].specials = 0;
             design->ship_weapon[weapon_count].ammo = 0x5;
             weapon_count++;
@@ -1196,7 +1196,7 @@ namespace INITSHIP {
             design->ship_weapon[weapon_count].type = (int8_t)best_weapon;
             design->ship_weapon[weapon_count].count = (int8_t)count;
             design->ship_weapon[weapon_count].current_count = (int8_t)count;
-            design->ship_weapon[weapon_count].firing_arc = 0x10;
+            design->ship_weapon[weapon_count].firing_arc = WEAPON_FIRING_ARC_360;
             design->ship_weapon[weapon_count].specials = 0;
             design->ship_weapon[weapon_count].ammo = 0xA;
         }
@@ -1343,8 +1343,7 @@ int16_t __cdecl Best_Beam_To_Hit_Special_(int16_t player_idx) {
             // Check if the player has researched the tech associated with this special device
             // 3 usually corresponds to the application being learned/available
             if (MOX::_player[player_idx].tech_applications[spec.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                // Check if special belongs to the correct category (1 = beam accuracy)
-                if (spec.category == 1) {
+                if (spec.category == SPECIAL_CATEGORY_BEAM_ACCURACY) {
                     if (spec.strategic > max_bonus) {
                         max_bonus = spec.strategic;
                         best_special_idx = special_idx;
@@ -1367,8 +1366,7 @@ int16_t __cdecl Best_Beam_Damage_Special_(int16_t player_idx) {
 
             // Check if player has fully researched the tech for this special device
             if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                // Check if the device is categorized as a beam damage special (2 or 7)
-                if (special.category == 2 || special.category == 7) {
+                if (special.category == SPECIAL_CATEGORY_BEAM_DAMAGE || special.category == SPECIAL_CATEGORY_BEAM_MISSILE_DAMAGE) {
                     if (max_bonus < special.strategic) {
                         best_idx = i;
                         max_bonus = special.strategic;
@@ -1391,8 +1389,7 @@ int16_t __cdecl Best_Beam_Defense_Special_(int16_t player_idx) {
 
             // Check if the player has researched the technology for this special device
             if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                // Category 3 and 6 represent beam defense enhancements
-                if (special.category == 3 || special.category == 6) {
+                if (special.category == SPECIAL_CATEGORY_BEAM_DEFENSE || special.category == SPECIAL_CATEGORY_BEAM_MISSILE_DEFENSE) {
                     if (special.strategic > max_bonus) {
                         best_special_idx = i;
                         max_bonus = special.strategic;
@@ -1422,8 +1419,7 @@ int16_t __cdecl Best_Missile_Defense_Special_(int16_t player_idx) {
             // Check if the player has researched the tech application associated with this special
             // Value 3 typically indicates the tech application is known/learned.
             if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                // Category 4 and 6 represent missile defense systems (e.g., Jammer, Lightning Field)
-                if (special.category == 4 || special.category == 6) {
+                if (special.category == SPECIAL_CATEGORY_MISSILE_DEFENSE || special.category == SPECIAL_CATEGORY_BEAM_MISSILE_DEFENSE) {
                     if (special.strategic > best_bonus) {
                         best_bonus = special.strategic;
                         best_special_idx = special_idx;
@@ -1456,7 +1452,7 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->weapons[0].weapon_id = 4;
     ship->weapons[0].count = 2;
-    ship->weapons[0].arc = 1;
+    ship->weapons[0].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[0].specials = 0;
     ship->weapons[0].ammo = -1;
     ship->weapons[0].active = 1;
@@ -1469,11 +1465,11 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     struct_::Set_Bit_Field_(ship->special_device_flags, 7);
     struct_::Set_Bit_Field_(ship->special_device_flags, 24);
-    if (MOX::_settings.game_difficulty > 2) {
+    if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
         struct_::Set_Bit_Field_(ship->special_device_flags, 9);
     }
 
-    ship->crew_quality = 3;
+    ship->crew_quality = CREW_QUALITY_ELITE;
     ship->officer_idx = -1;
     ship->marine_count = (uint8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
@@ -1511,7 +1507,7 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     // Initialize weapon slot 0
     ship->weapons[0].weapon_id = 4;
     ship->weapons[0].count = 3;
-    ship->weapons[0].arc = 1;
+    ship->weapons[0].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[0].specials = 0;
     ship->weapons[0].ammo = -1;
     ship->weapons[0].active = 1;
@@ -1521,7 +1517,7 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     // Initialize weapon slot 1
     ship->weapons[1].weapon_id = 4;
     ship->weapons[1].count = 1;
-    ship->weapons[1].arc = 1;
+    ship->weapons[1].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[1].specials = 2;
     ship->weapons[1].ammo = -1;
     ship->weapons[1].active = 1;
@@ -1531,7 +1527,7 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     // Initialize weapon slot 2
     ship->weapons[2].weapon_id = 24 /* BEAM_STING_RAY */;
     ship->weapons[2].count = 1;
-    ship->weapons[2].arc = 15;
+    ship->weapons[2].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[2].specials = 0;
     ship->weapons[2].ammo = 10;
     ship->weapons[2].active = 1;
@@ -1546,13 +1542,13 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     struct_::Set_Bit_Field_(ship->special_device_flags, 7);
     struct_::Set_Bit_Field_(ship->special_device_flags, 24);
 
-    if (MOX::_settings.game_difficulty >= 4) {
+    if (MOX::_settings.game_difficulty >= GAME_DIFFICULTY_IMPOSSIBLE) {
         struct_::Set_Bit_Field_(ship->special_device_flags, 21);
-    } else if (MOX::_settings.game_difficulty >= 3) {
+    } else if (MOX::_settings.game_difficulty >= GAME_DIFFICULTY_HARD) {
         struct_::Set_Bit_Field_(ship->special_device_flags, 9);
     }
 
-    ship->crew_quality = 3;
+    ship->crew_quality = CREW_QUALITY_ELITE;
     ship->officer_idx = -1;
     ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
@@ -1632,7 +1628,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
 
     ship->weapons[0].weapon_id = 4;
     ship->weapons[0].count = 4;
-    ship->weapons[0].arc = 1;
+    ship->weapons[0].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[0].specials = 0;
     ship->weapons[0].ammo = -1;
     ship->weapons[0].active = 1;
@@ -1641,7 +1637,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
 
     ship->weapons[1].weapon_id = 4;
     ship->weapons[1].count = 2;
-    ship->weapons[1].arc = 1;
+    ship->weapons[1].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[1].specials = 2;
     ship->weapons[1].ammo = -1;
     ship->weapons[1].active = 1;
@@ -1650,7 +1646,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
 
     ship->weapons[2].weapon_id = 24 /* WEAPON_DEATH_RAY */;
     ship->weapons[2].count = 5;
-    ship->weapons[2].arc = 15 /* ARC_360 */;
+    ship->weapons[2].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[2].specials = 0;
     ship->weapons[2].ammo = 10;
     ship->weapons[2].active = 1;
@@ -1659,7 +1655,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
 
     ship->weapons[3].weapon_id = 13 /* WEAPON_PARTICLE_BEAM */;
     ship->weapons[3].count = 2;
-    ship->weapons[3].arc = 15 /* ARC_360 */;
+    ship->weapons[3].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[3].specials = 0;
     ship->weapons[3].ammo = -1;
     ship->weapons[3].active = 1;
@@ -1668,7 +1664,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
 
     ship->weapons[4].weapon_id = 31 /* WEAPON_SPATIAL_COMPRESSOR */;
     ship->weapons[4].count = 3;
-    ship->weapons[4].arc = 15 /* ARC_360 */;
+    ship->weapons[4].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[4].specials = 0;
     ship->weapons[4].ammo = -1;
     ship->weapons[4].active = 1;
@@ -1682,15 +1678,15 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
     struct_::Set_Bit_Field_(ship->special_device_flags, 7 /* SDEVICE_QUANTUM_DETONATOR */);
     struct_::Set_Bit_Field_(ship->special_device_flags, 24 /* SDEVICE_ANTARAN_DAMPER */);
 
-    if (MOX::_settings.game_difficulty == 2 /* DIFFICULTY_AVERAGE */) {
+    if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_AVERAGE) {
         struct_::Set_Bit_Field_(ship->special_device_flags, 9 /* SDEVICE_DISPLACEMENT_DEVICE */);
-    } else if (MOX::_settings.game_difficulty == 3 /* DIFFICULTY_HARD */) {
+    } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
         struct_::Set_Bit_Field_(ship->special_device_flags, 21 /* SDEVICE_REFLECTION_FIELD */);
-    } else if (MOX::_settings.game_difficulty == 4 /* DIFFICULTY_IMPOSSIBLE */) {
+    } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
         struct_::Set_Bit_Field_(ship->special_device_flags, 38 /* SDEVICE_LIGHT_BENDER */);
     }
 
-    ship->crew_quality = 3;
+    ship->crew_quality = CREW_QUALITY_ELITE;
     ship->officer_idx = -1;
     ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
@@ -1728,7 +1724,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     // Setup weapon slots
     ship->weapons[0].weapon_id = 4;
     ship->weapons[0].count = 6;
-    ship->weapons[0].arc = 1;
+    ship->weapons[0].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[0].specials = 0;
     ship->weapons[0].ammo = -1;
     ship->weapons[0].active = 1;
@@ -1737,7 +1733,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->weapons[1].weapon_id = 4;
     ship->weapons[1].count = 2;
-    ship->weapons[1].arc = 1;
+    ship->weapons[1].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[1].specials = 2;
     ship->weapons[1].ammo = -1;
     ship->weapons[1].active = 1;
@@ -1746,7 +1742,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->weapons[2].weapon_id = 24;
     ship->weapons[2].count = 15;
-    ship->weapons[2].arc = 15;
+    ship->weapons[2].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[2].specials = 0;
     ship->weapons[2].ammo = 10;
     ship->weapons[2].active = 1;
@@ -1755,7 +1751,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->weapons[3].weapon_id = 13;
     ship->weapons[3].count = 2;
-    ship->weapons[3].arc = 15;
+    ship->weapons[3].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[3].specials = 0;
     ship->weapons[3].ammo = -1;
     ship->weapons[3].active = 1;
@@ -1764,7 +1760,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->weapons[4].weapon_id = 4;
     ship->weapons[4].count = 8;
-    ship->weapons[4].arc = 1;
+    ship->weapons[4].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[4].specials = 4;
     ship->weapons[4].ammo = -1;
     ship->weapons[4].active = 1;
@@ -1773,7 +1769,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->weapons[5].weapon_id = 11;
     ship->weapons[5].count = 2;
-    ship->weapons[5].arc = 1;
+    ship->weapons[5].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[5].specials = 0;
     ship->weapons[5].ammo = -1;
     ship->weapons[5].active = 1;
@@ -1791,21 +1787,21 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     struct_::Set_Bit_Field_(ship->special_device_flags, 26);
 
     switch (MOX::_settings.game_difficulty) {
-    case 1:
+    case GAME_DIFFICULTY_EASY:
         struct_::Set_Bit_Field_(ship->special_device_flags, 9);
         break;
-    case 2:
+    case GAME_DIFFICULTY_AVERAGE:
         struct_::Set_Bit_Field_(ship->special_device_flags, 21 /* 0x15 */);
         break;
-    case 3:
-    case 4:
+    case GAME_DIFFICULTY_HARD:
+    case GAME_DIFFICULTY_IMPOSSIBLE:
         struct_::Set_Bit_Field_(ship->special_device_flags, 38 /* 0x26 */);
         break;
     default:
         break;
     }
 
-    ship->crew_quality = 3;
+    ship->crew_quality = CREW_QUALITY_ELITE;
     ship->officer_idx = -1;
     ship->marine_count = (uint8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
@@ -1843,7 +1839,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     // Slot 0
     ship->weapons[0].weapon_id = 4;
     ship->weapons[0].count = 10;
-    ship->weapons[0].arc = 1;
+    ship->weapons[0].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[0].specials = 0;
     ship->weapons[0].ammo = -1;
     ship->weapons[0].active = 1;
@@ -1853,7 +1849,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     // Slot 1
     ship->weapons[1].weapon_id = 4;
     ship->weapons[1].count = 2;
-    ship->weapons[1].arc = 1;
+    ship->weapons[1].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[1].specials = 2;
     ship->weapons[1].ammo = -1;
     ship->weapons[1].active = 1;
@@ -1863,7 +1859,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     // Slot 2
     ship->weapons[2].weapon_id = 24;
     ship->weapons[2].count = 20;
-    ship->weapons[2].arc = 15;
+    ship->weapons[2].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[2].specials = 0;
     ship->weapons[2].ammo = 10;
     ship->weapons[2].active = 1;
@@ -1873,7 +1869,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     // Slot 3
     ship->weapons[3].weapon_id = 13;
     ship->weapons[3].count = 3;
-    ship->weapons[3].arc = 15;
+    ship->weapons[3].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[3].specials = 0;
     ship->weapons[3].ammo = -1;
     ship->weapons[3].active = 1;
@@ -1883,7 +1879,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     // Slot 4
     ship->weapons[4].weapon_id = 4;
     ship->weapons[4].count = 15;
-    ship->weapons[4].arc = 1;
+    ship->weapons[4].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[4].specials = 4;
     ship->weapons[4].ammo = -1;
     ship->weapons[4].active = 1;
@@ -1893,7 +1889,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     // Slot 5
     ship->weapons[5].weapon_id = 11;
     ship->weapons[5].count = 2;
-    ship->weapons[5].arc = 1;
+    ship->weapons[5].arc = WEAPON_FIRING_ARC_FORWARD;
     ship->weapons[5].specials = 2;
     ship->weapons[5].ammo = -1;
     ship->weapons[5].active = 1;
@@ -1903,7 +1899,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     // Slot 6
     ship->weapons[6].weapon_id = 37;
     ship->weapons[6].count = 1;
-    ship->weapons[6].arc = 15;
+    ship->weapons[6].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[6].specials = 0;
     ship->weapons[6].ammo = -1;
     ship->weapons[6].active = 1;
@@ -1913,7 +1909,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     // Slot 7
     ship->weapons[7].weapon_id = 31;
     ship->weapons[7].count = 6;
-    ship->weapons[7].arc = 15;
+    ship->weapons[7].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[7].specials = 0;
     ship->weapons[7].ammo = -1;
     ship->weapons[7].active = 1;
@@ -1929,15 +1925,15 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
 
     uint16_t difficulty_bit = 0;
     switch (MOX::_settings.game_difficulty) {
-        case 0:
+        case GAME_DIFFICULTY_TUTOR:
             difficulty_bit = 9;
             break;
-        case 1:
+        case GAME_DIFFICULTY_EASY:
             difficulty_bit = 21;
             break;
-        case 2:
-        case 3:
-        case 4:
+        case GAME_DIFFICULTY_AVERAGE:
+        case GAME_DIFFICULTY_HARD:
+        case GAME_DIFFICULTY_IMPOSSIBLE:
             difficulty_bit = 38;
             break;
         default:
@@ -1948,7 +1944,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
         struct_::Set_Bit_Field_(ship->special_device_flags, difficulty_bit);
     }
 
-    ship->crew_quality = 3;
+    ship->crew_quality = CREW_QUALITY_ELITE;
     ship->officer_idx = -1;
     ship->marine_count = (uint8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = ARMOR_XENTRONIUM_ARMOR;
@@ -1978,35 +1974,35 @@ void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
     design->ship_weapon[0].type = 11;
     design->ship_weapon[0].count = 2;
     design->ship_weapon[0].current_count = 2;
-    design->ship_weapon[0].firing_arc = 15;
+    design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     design->ship_weapon[0].specials = 2;
     design->ship_weapon[0].ammo = 0;
 
     design->ship_weapon[1].type = 4;
     design->ship_weapon[1].count = 10;
     design->ship_weapon[1].current_count = 10;
-    design->ship_weapon[1].firing_arc = 15;
+    design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     design->ship_weapon[1].specials = 4;
     design->ship_weapon[1].ammo = 0;
 
     design->ship_weapon[2].type = 20;
     design->ship_weapon[2].count = 1;
     design->ship_weapon[2].current_count = 1;
-    design->ship_weapon[2].firing_arc = 15;
+    design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     design->ship_weapon[2].specials = 0x4500;
     design->ship_weapon[2].ammo = 0;
 
     design->ship_weapon[3].type = 20;
     design->ship_weapon[3].count = 1;
     design->ship_weapon[3].current_count = 1;
-    design->ship_weapon[3].firing_arc = 15;
+    design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     design->ship_weapon[3].specials = 0x4500;
     design->ship_weapon[3].ammo = 0;
 
     design->ship_weapon[4].type = 13;
     design->ship_weapon[4].count = 2;
     design->ship_weapon[4].current_count = 2;
-    design->ship_weapon[4].firing_arc = 15;
+    design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     design->ship_weapon[4].specials = 0;
     design->ship_weapon[4].ammo = 0;
 
@@ -2041,11 +2037,11 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large) {
         design->computer_type = COMPUTER_OPTRONIC_COMPUTER;
         design->armor_type = ARMOR_NO_ARMOR;
         design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].firing_arc = 15;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 2;
         design->ship_weapon[0].current_count = 2;
-        design->ship_weapon[1].firing_arc = 15;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->speed = 1;
         design->ship_weapon[1].specials = 0;
         design->ship_weapon[1].count = 5;
@@ -2067,7 +2063,7 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large) {
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 1;
         design->ship_weapon[0].current_count = 1;
-        design->ship_weapon[0].firing_arc = 15;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->picture_num = 20;
         design->ship_weapon[0].type = 45;
         int16_t best_drive = Best_Warp_Drive_(10);
@@ -2094,12 +2090,12 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
         design->size = SHIP_SIZE_TITAN;
         int16_t best_drive = Best_Warp_Drive_(11);
         design->ftl_type = (int8_t)best_drive;
-        design->ship_weapon[0].firing_arc = 15;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[0].ammo = 0;
         design->speed = 1;
         design->ship_weapon[0].count = 1;
         design->ship_weapon[0].current_count = 1;
-        design->ship_weapon[1].firing_arc = 15;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[1].ammo = 10;
         design->ship_weapon[1].count = 5;
         design->ship_weapon[1].current_count = 5;
@@ -2115,11 +2111,11 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
         design->ftl_type = DRIVE_NO_DRIVE;
         design->ship_weapon[0].specials = 0;
         design->speed = 0;
-        design->ship_weapon[0].firing_arc = 15;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 1;
         design->ship_weapon[0].current_count = 1;
-        design->ship_weapon[1].firing_arc = 15;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->size = SHIP_SIZE_LARGE;
         design->ship_weapon[1].ammo = 10;
         design->ship_weapon[1].specials = 0;
@@ -2152,14 +2148,14 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster)
         design->ftl_type = (int8_t)Best_Warp_Drive_(12);
 
         design->ship_weapon[0].type = 0x29;
-        design->ship_weapon[0].firing_arc = 15;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[0].specials = 4;
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 20;
         design->ship_weapon[0].current_count = 20;
 
         design->ship_weapon[1].type = 0x28;
-        design->ship_weapon[1].firing_arc = 15;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[1].specials = 0x4000;
         design->ship_weapon[1].ammo = 0;
         design->ship_weapon[1].count = 1;
@@ -2174,14 +2170,14 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster)
         design->size = SHIP_SIZE_LARGE;
 
         design->ship_weapon[0].type = 0x29;
-        design->ship_weapon[0].firing_arc = 15;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[0].specials = 4;
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 8;
         design->ship_weapon[0].current_count = 8;
 
         design->ship_weapon[1].type = 0x28;
-        design->ship_weapon[1].firing_arc = 15;
+        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[1].specials = 0;
         design->ship_weapon[1].ammo = 0;
         design->ship_weapon[1].count = 1;
@@ -2224,7 +2220,7 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 2;
         design->ship_weapon[0].current_count = 2;
-        design->ship_weapon[0].firing_arc = 15 /* ARC_360 */;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
 
         design->picture_num = 11;
         design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size] + 8;
@@ -2243,7 +2239,7 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 1;
         design->ship_weapon[0].current_count = 1;
-        design->ship_weapon[0].firing_arc = 15 /* ARC_360 */;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
 
         design->picture_num = 23;
         // Lookup uses Best_Warp_Drive directly regardless of ftl_type field
@@ -2269,7 +2265,7 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster) 
         design->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(14);
         design->speed = 1;
         design->ship_weapon[0].type = 43;
-        design->ship_weapon[0].firing_arc = 15;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[0].specials = 2;
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 5;
@@ -2281,7 +2277,7 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster) 
         design->armor_type = (int8_t)INITSHIP::Best_Armor_(14);
         design->speed = 0;
         design->ship_weapon[0].type = 43;
-        design->ship_weapon[0].firing_arc = 15;
+        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         design->ship_weapon[0].specials = 0;
         design->ship_weapon[0].ammo = 0;
         design->ship_weapon[0].count = 3;
@@ -2354,42 +2350,42 @@ void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
     design->ftl_type = DRIVE_INTERPHASED_DRIVE;
 
     design->ship_weapon[0].type = 4;
-    design->ship_weapon[0].firing_arc = 1;
+    design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
     design->ship_weapon[0].specials = 2;
     design->ship_weapon[0].ammo = 0;
     design->ship_weapon[0].count = 4;
     design->ship_weapon[0].current_count = 4;
 
     design->ship_weapon[1].type = 11;
-    design->ship_weapon[1].firing_arc = 1;
+    design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
     design->ship_weapon[1].specials = 2;
     design->ship_weapon[1].ammo = 0;
     design->ship_weapon[1].count = 2;
     design->ship_weapon[1].current_count = 2;
 
     design->ship_weapon[2].type = 4;
-    design->ship_weapon[2].firing_arc = 1;
+    design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_FORWARD;
     design->ship_weapon[2].specials = 0;
     design->ship_weapon[2].ammo = 0;
     design->ship_weapon[2].count = 10;
     design->ship_weapon[2].current_count = 10;
 
     design->ship_weapon[3].type = 13;
-    design->ship_weapon[3].firing_arc = 15;
+    design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     design->ship_weapon[3].specials = 0;
     design->ship_weapon[3].ammo = 0;
     design->ship_weapon[3].count = 2;
     design->ship_weapon[3].current_count = 2;
 
     design->ship_weapon[4].type = 4;
-    design->ship_weapon[4].firing_arc = 1;
+    design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_FORWARD;
     design->ship_weapon[4].specials = 4;
     design->ship_weapon[4].ammo = 0;
     design->ship_weapon[4].count = 10;
     design->ship_weapon[4].current_count = 10;
 
     design->ship_weapon[5].type = 24;
-    design->ship_weapon[5].firing_arc = 1;
+    design->ship_weapon[5].firing_arc = WEAPON_FIRING_ARC_FORWARD;
     design->ship_weapon[5].specials = 0;
     design->ship_weapon[5].ammo = 10;
     design->ship_weapon[5].count = 15;
@@ -2431,7 +2427,7 @@ int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
             if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 const int8_t category = TECHDATA::_specials[special_idx].category;
 
-                if ((category == 5 || category == 7) &&
+                if ((category == SPECIAL_CATEGORY_MISSILE_DAMAGE || category == SPECIAL_CATEGORY_BEAM_MISSILE_DAMAGE) &&
                     best_strategic_value < TECHDATA::_specials[special_idx].strategic) {
                     best_special_idx = special_idx;
                     best_strategic_value = TECHDATA::_specials[special_idx].strategic;

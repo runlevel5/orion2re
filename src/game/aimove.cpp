@@ -142,7 +142,7 @@ namespace AIMOVE {
         RUSS::Mox_Update_();
         if ((*AIDATA::_ai_player_info)[_i_ai].prev_n_contacts ==
             (*AIDATA::_ai_player_info)[_i_ai].n_contacts ||
-            MOX::_settings.game_difficulty == 0) {
+            MOX::_settings.game_difficulty == GAME_DIFFICULTY_TUTOR) {
             Move_To_Unexplored_Stars_();
         }
 
@@ -247,7 +247,7 @@ namespace AIMOVE {
                 if ((((*AIDATA::_star_in_extended_range_of_player)[i] >> (uint8_t)_i_ai) & 1) != 0 &&
                     ((MOX::_star[i].visited >> (uint8_t)_i_ai) & 1) == 0 &&
                     star_flags_0[i] == 0 &&
-                    (MOX::_settings.game_difficulty != 0 || MOX::_star[i].has_colony == 0)) {
+                    (MOX::_settings.game_difficulty != GAME_DIFFICULTY_TUTOR || MOX::_star[i].has_colony == 0)) {
                     
                     int32_t best_ship_idx = -1;
                     int16_t best_star = -1;
@@ -1176,9 +1176,9 @@ namespace AIMOVE {
                     int16_t loc = ship->location;
                     if (loc < MAX_STARS) {
                         RUSS::Mox_Update_();
-                        if (MOX::_settings.game_difficulty > 0) {
+                        if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_TUTOR) {
                             if (((MOX::_star[loc].has_colony >> ai_shift) & 1) != 0) {
-                                if (MOX::_settings.game_difficulty >= 2 || _p_ai->objectives == PLAYER_OBJECTIVE_MILITARIST) {
+                                if (MOX::_settings.game_difficulty >= GAME_DIFFICULTY_AVERAGE || _p_ai->objectives == PLAYER_OBJECTIVE_MILITARIST) {
                                     int16_t ship_idx = i;
                                     for (int j = 4; j >= 0; j--) {
                                         int16_t planet_idx = MOX::_star[loc].planet_index[j];
@@ -1416,8 +1416,8 @@ namespace AIMOVE {
                 (*AIDATA::_ai_star_info)[star_idx].per_player[AIMOVE::_i_ai].enemy_enroute_or_threat == 0 &&
                 AIMOVE::Star_Has_Monster_(star_idx) == 0)
             {
-                if (MOX::_settings.game_difficulty >= 2 ||
-                    (MOX::_settings.game_difficulty >= 1 && AIMOVE::_p_ai->objectives == PLAYER_OBJECTIVE_EXPANSIONIST) ||
+                if (MOX::_settings.game_difficulty >= GAME_DIFFICULTY_AVERAGE ||
+                    (MOX::_settings.game_difficulty >= GAME_DIFFICULTY_EASY && AIMOVE::_p_ai->objectives == PLAYER_OBJECTIVE_EXPANSIONIST) ||
                     (((*AIDATA::_star_in_range_of_player)[star_idx] >> AIMOVE::_i_ai) & 1) != 0)
                 {
                     AIMOVE::Get_Best_Unescorted_Colony_Ship_(my_colony_ships, &num_my_colony_ships, star_idx);
@@ -2720,7 +2720,7 @@ namespace AIMOVE {
         *out_target_star = -1;
 
         if ((*AIDATA::_i_all_combat_ships)[player_id][star_idx] != -1 &&
-            MOX::_settings.game_difficulty > 1) {
+            MOX::_settings.game_difficulty > GAME_DIFFICULTY_EASY) {
             int8_t flee_stars[MAX_STARS * ENEMY_STRENGTH_TURN_WINDOW];
 
             s_attack_info attack_info;

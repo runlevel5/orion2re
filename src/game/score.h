@@ -61,7 +61,7 @@ namespace SCORE {
 
     extern int16_t _entry_to_flash;
 
-    extern char _difficulty_string[5][15];
+    extern char _difficulty_string[GAME_DIFFICULTY_COUNT][15];
 
     /** Returns the hall-of-fame file version, or 0 if the file cannot be read. */
     int16_t __cdecl HOF_Version_Number_();

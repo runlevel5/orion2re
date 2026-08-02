@@ -232,9 +232,9 @@ namespace SAVEGAME {
             writer->Write_Uint8_(colony->climate);
             writer->Write_Int16_(colony->ground_strength);
             writer->Write_Int16_(colony->space_strength);
-            Write_Int16_Array_(writer, colony->production, 4);
+            Write_Int16_Array_(writer, colony->production, ECON_COUNT);
             writer->Write_Bytes_(colony->maintenance, sizeof(colony->maintenance));
-            Write_Int16_Array_(writer, colony->imports, 4);
+            Write_Int16_Array_(writer, colony->imports, ECON_COUNT);
             writer->Write_Int8_(colony->n_industry_recyclers);
             writer->Write_Uint8_(colony->food2_needed_for_our_empire);
             writer->Write_Uint8_(colony->food2_needed_for_assimilated);
@@ -285,9 +285,9 @@ namespace SAVEGAME {
             colony->climate = reader->Read_Uint8_();
             colony->ground_strength = reader->Read_Int16_();
             colony->space_strength = reader->Read_Int16_();
-            Read_Int16_Array_(reader, colony->production, 4);
+            Read_Int16_Array_(reader, colony->production, ECON_COUNT);
             reader->Read_Bytes_(colony->maintenance, sizeof(colony->maintenance));
-            Read_Int16_Array_(reader, colony->imports, 4);
+            Read_Int16_Array_(reader, colony->imports, ECON_COUNT);
             colony->n_industry_recyclers = reader->Read_Int8_();
             colony->food2_needed_for_our_empire = reader->Read_Uint8_();
             colony->food2_needed_for_assimilated = reader->Read_Uint8_();

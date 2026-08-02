@@ -976,7 +976,7 @@ namespace AIDATA {
      * and strategic range to existing colonies.
      */
     int16_t __cdecl Proximity_Worth_To_Player_(s_colony* colony, s_player* evaluating_player) {
-        if (MOX::_settings.game_difficulty == 0) {
+        if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_TUTOR) {
             return 0;
         }
 
@@ -1069,7 +1069,7 @@ namespace AIDATA {
                         s_star_data* s = &MOX::_star[i];
 
                         if (i == dest_star_idx || (s->spectral_class != STAR_CLASS_BLACK_HOLE &&
-                            s->system_special != 9 /* Orion */ &&
+                            s->system_special != SYSTEM_SPECIAL_SPACE_MONSTER &&
                             (((s->has_colony >> player_idx) & 1) || s->has_colony == 0))) {
 
                             uint8_t dist_a_i = (uint8_t)(*_n_turns_from_to)[source_star_idx][i][player_idx];
@@ -1123,7 +1123,7 @@ namespace AIDATA {
                         if (in_range || (in_ext_range && has_stargate)) {
                             if (i == dest_star_idx || i == ship_dest_star ||
                                 (MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE &&
-                                    MOX::_star[i].system_special != 9 &&
+                                    MOX::_star[i].system_special != SYSTEM_SPECIAL_SPACE_MONSTER &&
                                     (((MOX::_star[i].has_colony >> owner) & 1) != 0 || MOX::_star[i].has_colony == 0))) {
 
                                 bool blocked = GEO::Black_Hole_Blocks_Points_(
@@ -1274,7 +1274,7 @@ namespace AIDATA {
 
         int final_worth = (worth + ((uint32_t)worth >> 31 & 0x3F)) >> 6;
 
-        if (MOX::_settings.game_difficulty >= 2 /* DIFFICULTY_NORMAL */) {
+        if (MOX::_settings.game_difficulty >= GAME_DIFFICULTY_AVERAGE) {
             int16_t proximity_worth = AIDATA::Proximity_Worth_To_Player_(colony, evaluating_player);
             final_worth += (proximity_worth + ((uint32_t)proximity_worth >> 31 & 7)) >> 3;
             if (final_worth < proximity_worth) {

@@ -33,7 +33,7 @@ namespace SHIPS {
                 break;
             }
 
-            if (MOX::_leaders[leader_idx].type == 0 && 
+            if (MOX::_leaders[leader_idx].type == LEADER_TYPE_SHIP &&
                 MOX::_leaders[leader_idx].location == ship_idx && 
                 MOX::_leaders[leader_idx].eta > 0) {
                 

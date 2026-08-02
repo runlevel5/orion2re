@@ -85,11 +85,11 @@ void __cdecl Summary_Screen_Print_Data_(void) {
 
             int16_t special_id = 0;
             char system_special = MOX::_star[star_idx].system_special;
-            if (system_special > 0 && system_special != SYSTEM_SPECIAL_ORION_STAR) {
+            if (system_special > SYSTEM_SPECIAL_NO_SPECIAL && system_special != SYSTEM_SPECIAL_ORION_STAR) {
                 special_id = static_cast<int16_t>(system_special);
             }
 
-            if (special_id > 0 && HACCESS::Special_Is_Planet_Special_(special_id)) {
+            if (special_id > SYSTEM_SPECIAL_NO_SPECIAL && HACCESS::Special_Is_Planet_Special_(special_id)) {
                 char* special_str = nullptr;
                 char special_buf[80];
 
@@ -97,7 +97,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
                     int16_t ship_idx = HAROLD::First_Ship_Orbiting_Star_(&MOX::_star[star_idx]);
                     if (ship_idx != -1) {
                         special_str = MOX::_ship[ship_idx].d.name;
-                    } else if (special_id == 10) {
+                    } else if (special_id == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
                         strlcpy(special_buf, HAROLD::H_Message_(140), sizeof(special_buf));
                         special_str = special_buf;
                     } else {
@@ -1705,7 +1705,7 @@ void Draw_Rotating_Planets_() {
                 s_planet_data* planet = &MOX::_planet[explored_planet_idx];
 
                 // Planet animation index is determined by climate type and planet size
-                int16_t anim_idx = (int16_t)planet->climate * (PLANET_SIZE_HUGE + 1) + (int16_t)planet->size;
+                int16_t anim_idx = (int16_t)planet->climate * PLANET_SIZE_COUNT + (int16_t)planet->size;
                 s_animation_header* anim = PLNTSUM::_p_rotating_planet[anim_idx];
 
                 int16_t width = animate::Get_Width_(anim);
@@ -1755,7 +1755,7 @@ void __cdecl Fill_Summary_Screen_Scroll_Bar_(void) {
 }
 
 void __cdecl Load_Planet_Pictures_() {
-    for (int16_t i = 0; i < (PLANET_CLIMATE_GAIA + 1) * (PLANET_SIZE_HUGE + 1); ++i) {
+    for (int16_t i = 0; i < PLANET_CLIMATE_COUNT * PLANET_SIZE_COUNT; ++i) {
         s_animation_header* segment = Load_Planet_Segment_(i);
         _p_rotating_planet[i] = segment;
         RUSS::Mox_Update_();
@@ -1983,7 +1983,7 @@ void Planet_Summary_Screen_() {
 
     _p_rotating_planet = (s_animation_header**)allocate::Allocate_Next_Block_(
         MOX::_screen_seg,
-        sizeof(*_p_rotating_planet) * ((PLANET_CLIMATE_GAIA + 1) * (PLANET_SIZE_HUGE + 1))
+        sizeof(*_p_rotating_planet) * (PLANET_CLIMATE_COUNT * PLANET_SIZE_COUNT)
     );
     Load_Planet_Pictures_();
     Determine_Button_Status_();

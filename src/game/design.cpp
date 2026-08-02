@@ -52,12 +52,13 @@ namespace DESIGN {
 
             int16_t rack_type = DESIGN::Weapon_Type_(d->weapon_type[i]);
             if (rack_type == 2) {
-                if (d->weapon_firing_arc[i] != 16) {
-                    d->weapon_firing_arc[i] = 16;
+                if (d->weapon_firing_arc[i] != WEAPON_FIRING_ARC_360) {
+                    d->weapon_firing_arc[i] = WEAPON_FIRING_ARC_360;
                 }
             } else {
-                if (Weapon_Needs_Racks_(d->weapon_type[i]) != 0 && (d->weapon_firing_arc[i] & 0xF) == 0) {
-                    d->weapon_firing_arc[i] = 16;
+                if (Weapon_Needs_Racks_(d->weapon_type[i]) != 0 &&
+                    (d->weapon_firing_arc[i] & WEAPON_FIRING_ARC_ALL_SECTORS) == WEAPON_FIRING_ARC_NONE) {
+                    d->weapon_firing_arc[i] = WEAPON_FIRING_ARC_360;
                 }
             }
 
@@ -459,11 +460,9 @@ namespace DESIGN {
         s_player *player = &MOX::_player[player_idx];
         int8_t govt_trait = player->traits[TRAIT_CURRENT_GOVERNMENT];
 
-        if (govt_trait == 0) {
-            // Reduction for government trait value 0
+        if (govt_trait == GOVERNMENT_FEUDAL) {
             *cost = (*cost * 2 + 2) / 3;
-        } else if (govt_trait == 1) {
-            // Reduction for government trait value 1
+        } else if (govt_trait == GOVERNMENT_CONFEDERATION) {
             *cost = (*cost + 2) / 3;
         }
     }
@@ -803,12 +802,12 @@ namespace DESIGN {
      */
     void __cdecl Check_Generic_Replacement_Fields_(int16_t clicked_field, int16_t* refresh_needed, int16_t* out_status) {
         if (_design_computer_replacement_field == clicked_field) {
-            if (N_Replacements_For_Generic_Item_(8) == 0) {
+            if (N_Replacements_For_Generic_Item_(TECH_APPLICATION_TYPE_COMPUTER) == 0) {
                 const char* msg = HAROLD::H_Message_(HESTR_050_YOU_MAY_NOT_UPGRADE_TH);
                 GENDRAW::Warning_Box_(msg);
             } else {
                 MOX::_design_screen_replacement_item = MOX::_design->computer_type;
-                MOX::_design_screen_replacement_type = 8;
+                MOX::_design_screen_replacement_type = TECH_APPLICATION_TYPE_COMPUTER;
                 _printed_cost -= MOX::_design->computer_cost;
                 DESBOX::Generic_Replacement_Box_();
                 MOX::_design->show_help = 1;
@@ -825,9 +824,9 @@ namespace DESIGN {
                 return;
             }
 
-            if (N_Replacements_For_Generic_Item_(2) != 0) {
+            if (N_Replacements_For_Generic_Item_(TECH_APPLICATION_TYPE_SHIELD) != 0) {
                 MOX::_design_screen_replacement_item = MOX::_design->shield;
-                MOX::_design_screen_replacement_type = 2;
+                MOX::_design_screen_replacement_type = TECH_APPLICATION_TYPE_SHIELD;
                 _printed_cost -= MOX::_design->shield_cost;
                 _printed_space_avail += MOX::_design->shield_space;
                 DESBOX::Generic_Replacement_Box_();
@@ -872,7 +871,7 @@ namespace DESIGN {
                     }
                 }
 
-                MOX::_design_screen_replacement_type = 3;
+                MOX::_design_screen_replacement_type = TECH_APPLICATION_TYPE_WEAPON;
                 _printed_space_avail += MOX::_design->weapon_space[design_weapon_index];
                 _printed_cost -= MOX::_design->weapon_cost[design_weapon_index];
                 MOX::_design_screen_replacement_slot = design_weapon_index;
@@ -921,7 +920,7 @@ namespace DESIGN {
                     }
                 }
 
-                MOX::_design_screen_replacement_type = 9;
+                MOX::_design_screen_replacement_type = TECH_APPLICATION_TYPE_SPECIAL;
                 _printed_space_avail += MOX::_design->special_device_space[slot_idx];
                 _printed_cost -= MOX::_design->special_device_cost[slot_idx];
                 MOX::_design_screen_replacement_slot = slot_idx;
@@ -991,7 +990,7 @@ namespace DESIGN {
         for (int i = 0; i < 8; ++i) {
             design->weapon_type[i] = 0;
             design->weapon_count[i] = 0;
-            design->weapon_firing_arc[i] = 0;
+            design->weapon_firing_arc[i] = WEAPON_FIRING_ARC_NONE;
             design->weapon_specials[i] = 0;
             design->weapon_ammo[i] = 0;
             design->weapon_cost[i] = 0;
@@ -1192,8 +1191,8 @@ namespace DESIGN {
             }
 
             if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                if ((int16_t)DESBOX::Application_Type_(app_idx) == 3) {
-                    int16_t tech_id = DESIGN::Tech_App_To_Tech_Id_(app_idx, 3);
+                if ((int16_t)DESBOX::Application_Type_(app_idx) == TECH_APPLICATION_TYPE_WEAPON) {
+                    int16_t tech_id = DESIGN::Tech_App_To_Tech_Id_(app_idx, TECH_APPLICATION_TYPE_WEAPON);
                     uint32_t space_req = DESIGN::One_Weapon_Space_(tech_id);
 
                     if ((int16_t)space_req <= DESIGN::_printed_space_avail) {
@@ -1324,7 +1323,7 @@ namespace DESIGN {
             if (found_count != 0) break;
 
             if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                if ((int16_t)DESBOX::Application_Type_(app_idx) == 9) {
+                if ((int16_t)DESBOX::Application_Type_(app_idx) == TECH_APPLICATION_TYPE_SPECIAL) {
                     bool device_fits = false;
 
                     for (int16_t special_idx = 1; special_idx < 39; ++special_idx) {
@@ -1379,14 +1378,14 @@ namespace DESIGN {
     int16_t __cdecl Tech_App_To_Tech_Id_(int16_t app_id, int16_t category) {
         int16_t result_id = -1;
 
-        if (category == 3) { // Weapon Category
+        if (category == TECH_APPLICATION_TYPE_WEAPON) {
             for (int16_t i = 0; i < WEAPON_DRAGON_BREATH; ++i) {
                 if (TECHDATA::_weapons[i].tech_app_id == app_id) {
                     result_id = i;
                     break;
                 }
             }
-        } else if (category == 9) { // Special Equipment Category
+        } else if (category == TECH_APPLICATION_TYPE_SPECIAL) {
             for (int16_t i = 0; i < 39; ++i) {
                 if (TECHDATA::_specials[i].tech_app_id == app_id) {
                     result_id = i;
@@ -1407,37 +1406,38 @@ namespace DESIGN {
         char buffer[8];
         dest_str[0] = '\0';
 
-        if (arc_flags & 0x01) {
+        if (arc_flags & WEAPON_FIRING_ARC_FORWARD) {
             KEN::Ken_Get_Text_Message_(3, buffer, 6);
             strlcat(dest_str, buffer, destination_size);
             return;
         }
 
-        if (arc_flags & 0x02) {
+        if (arc_flags & WEAPON_FIRING_ARC_FORWARD_EXTENDED) {
             KEN::Ken_Get_Text_Message_(4, buffer, 6);
             strlcat(dest_str, buffer, destination_size);
             return;
         }
 
-        if (arc_flags & 0x04) {
+        if (arc_flags & WEAPON_FIRING_ARC_BACK_EXTENDED) {
             KEN::Ken_Get_Text_Message_(6, buffer, 6);
             strlcat(dest_str, buffer, destination_size);
             return;
         }
 
-        if (arc_flags & 0x08) {
+        if (arc_flags & WEAPON_FIRING_ARC_REAR) {
             KEN::Ken_Get_Text_Message_(5, buffer, 6);
             strlcat(dest_str, buffer, destination_size);
             return;
         }
 
-        if (arc_flags & 0x10) {
+        if (arc_flags & WEAPON_FIRING_ARC_360) {
             strlcpy(dest_str, "360", destination_size);
         }
     }
 
     bool __cdecl Replacement_Exists_(int16_t application_type) {
-        int16_t replacement_count = (application_type == 2 || application_type == 5) ? 1 : 0;
+        int16_t replacement_count =
+            (application_type == TECH_APPLICATION_TYPE_SHIELD || application_type == TECH_APPLICATION_TYPE_DRIVE) ? 1 : 0;
 
         s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
 
@@ -1453,11 +1453,11 @@ namespace DESIGN {
     }
 
     int16_t __cdecl N_Replacements_For_Generic_Item_(int16_t item_type) {
-        if (item_type == 2) {
+        if (item_type == TECH_APPLICATION_TYPE_SHIELD) {
             return INITSHIP::Best_Ship_Shield_(MOX::_PLAYER_NUM);
         }
 
-        if (item_type == 8) {
+        if (item_type == TECH_APPLICATION_TYPE_COMPUTER) {
             return INITSHIP::Best_Computer_(MOX::_PLAYER_NUM);
         }
 
@@ -1606,7 +1606,7 @@ namespace DESIGN {
     int8_t __cdecl Miniaturization_Category_(int16_t tech_app) {
         auto& app = TECHDATA::_technology_applications[tech_app];
 
-        if (app.type == 3) {
+        if (app.type == TECH_APPLICATION_TYPE_WEAPON) {
             if (tech_app == TECHDATA::_weapons[WEAPON_INTERCEPTOR].tech_app_id ||
                 tech_app == TECHDATA::_weapons[WEAPON_BOMBER].tech_app_id ||
                 tech_app == TECHDATA::_weapons[WEAPON_ASSAULT_SHUTTLE].tech_app_id ||
@@ -1620,7 +1620,7 @@ namespace DESIGN {
             if (weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BEAM) {
                 return 0;
             }
-        } else if (app.type == 9) {
+        } else if (app.type == TECH_APPLICATION_TYPE_SPECIAL) {
             if (tech_app == TECHDATA::_specials[SPECIAL_AUGMENTED_ENGINES].tech_app_id ||
                 tech_app == TECHDATA::_specials[SPECIAL_REINFORCED_HULL].tech_app_id ||
                 tech_app == TECHDATA::_specials[SPECIAL_EXTENDED_FUEL_TANKS].tech_app_id ||
@@ -1653,11 +1653,11 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Get_Weapon_Mod_Space_Bonus_(int16_t flags) {
-        if ((flags & 0x0006) != 0) {
+        if ((flags & (WEAPON_FIRING_ARC_FORWARD_EXTENDED | WEAPON_FIRING_ARC_BACK_EXTENDED)) != 0) {
             return 25;
         }
 
-        if ((flags & 0x0010) != 0) {
+        if ((flags & WEAPON_FIRING_ARC_360) != 0) {
             return 50;
         }
 
@@ -1825,7 +1825,7 @@ namespace DESIGN {
 
         MOX::_design->weapon_type[last_active_slot] = 0;
         MOX::_design->weapon_count[last_active_slot] = 0;
-        MOX::_design->weapon_firing_arc[last_active_slot] = 0;
+        MOX::_design->weapon_firing_arc[last_active_slot] = WEAPON_FIRING_ARC_NONE;
         MOX::_design->weapon_specials[last_active_slot] = 0;
         MOX::_design->weapon_cost[last_active_slot] = 0;
         MOX::_design->weapon_space[last_active_slot] = 0;

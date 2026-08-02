@@ -2277,7 +2277,7 @@ namespace DIP_SCRN {
         char demand_text[80];
         int16_t result = 0;
 
-        if (demand_type == 7 /* ECON_STAR_SYSTEM */) {
+        if (demand_type == 7) {
             if (DIP_SCRN::Diplomacy_Generic_System_List_(demand_item_id, player_idx, other_player_idx, 1) != -1) {
                 result = 1;
             }

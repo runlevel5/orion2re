@@ -218,9 +218,9 @@ namespace SYS {
 
         int16_t entry_idx;
         if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
-            entry_idx = 50;
+            entry_idx = PLANET_CLIMATE_COUNT * PLANET_SIZE_COUNT;
         } else {
-            entry_idx = (int16_t)climate * 5 + (int16_t)size;
+            entry_idx = (int16_t)climate * PLANET_SIZE_COUNT + (int16_t)size;
         }
 
         *out_ptr = (s_animation_header*)buffer::Buffer_Reload_("BUFFER0.LBX", (int)entry_idx + 0x5c, MOX::_global_cache_seg);

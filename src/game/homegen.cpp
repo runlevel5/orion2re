@@ -731,9 +731,9 @@ namespace HOMEGEN {
 
     void __cdecl Upgrade_Planet_Guarded_By_Monster_(s_planet_data* planet, int16_t monster_type) {
         bool should_upgrade_climate = true;
-        uint16_t size_weights[5] = {0};
-        uint16_t mineral_weights[5] = {0};
-        uint16_t climate_weights[10] = {0};
+        uint16_t size_weights[PLANET_SIZE_COUNT] = {0};
+        uint16_t mineral_weights[MINERAL_RESOURCE_COUNT] = {0};
+        uint16_t climate_weights[PLANET_CLIMATE_COUNT] = {0};
 
         switch (monster_type) {
         case 10:
@@ -745,7 +745,7 @@ namespace HOMEGEN {
             if (planet->planet_type == PLANET_TYPE_PLANET) {
                 should_upgrade_climate = false;
             } else {
-                for (int i = 0; i < 10; ++i) climate_weights[i] = 1;
+                for (int i = 0; i < PLANET_CLIMATE_COUNT; ++i) climate_weights[i] = 1;
             }
             break;
         case 11:
@@ -774,7 +774,7 @@ namespace HOMEGEN {
             if (planet->planet_type == PLANET_TYPE_PLANET) {
                 should_upgrade_climate = false;
             } else {
-                for (int i = 0; i < 10; ++i) climate_weights[i] = 1;
+                for (int i = 0; i < PLANET_CLIMATE_COUNT; ++i) climate_weights[i] = 1;
             }
             break;
         default:
@@ -783,18 +783,18 @@ namespace HOMEGEN {
 
         planet->planet_type = PLANET_TYPE_PLANET;
 
-        int16_t new_size = RUSS::Get_Weighted_Choice_Short_(size_weights, 5);
+        int16_t new_size = RUSS::Get_Weighted_Choice_Short_(size_weights, PLANET_SIZE_COUNT);
         if ((int16_t)planet->size < new_size) {
             planet->size = (int8_t)new_size;
         }
 
-        int16_t new_minerals = RUSS::Get_Weighted_Choice_Short_(mineral_weights, 5);
+        int16_t new_minerals = RUSS::Get_Weighted_Choice_Short_(mineral_weights, MINERAL_RESOURCE_COUNT);
         if ((int16_t)planet->mineral_class < new_minerals) {
             planet->mineral_class = (int8_t)new_minerals;
         }
 
         if (should_upgrade_climate) {
-            int16_t new_climate = RUSS::Get_Weighted_Choice_Short_(climate_weights, 10);
+            int16_t new_climate = RUSS::Get_Weighted_Choice_Short_(climate_weights, PLANET_CLIMATE_COUNT);
             if ((int16_t)planet->climate < new_climate) {
                 planet->climate = (int8_t)new_climate;
             }
@@ -973,10 +973,10 @@ namespace HOMEGEN {
 
         // If no planet has the requested climate, we force one.
         while (true) {
-            int16_t valid_groups[4];
+            int16_t valid_groups[PLANET_GROUP_COUNT];
             int16_t valid_group_count = 0;
 
-            for (int16_t group_idx = 0; group_idx < 4; ++group_idx) {
+            for (int16_t group_idx = 0; group_idx < PLANET_GROUP_COUNT; ++group_idx) {
                 if (MOX::_climate_roll_table[climate_id][group_idx] > 0) {
                     valid_groups[valid_group_count++] = group_idx;
                 }
@@ -1289,7 +1289,7 @@ namespace HOMEGEN {
 
         // Update gravity class based on mineral class and planet size
         // _gravity_table is 5 columns wide (planet size categories)
-        int32_t gravity_idx = (planet->mineral_class * 5) + planet->size;
+        int32_t gravity_idx = (planet->mineral_class * PLANET_SIZE_COUNT) + planet->size;
         planet->gravity_class = MOX::_gravity_table[gravity_idx];
     }
 
@@ -1352,7 +1352,7 @@ namespace HOMEGEN {
         p->planet_type = PLANET_TYPE_PLANET;
         p->size = PLANET_SIZE_HUGE;
         p->gravity_class = PLANET_GRAVITY_NORMAL_G;
-        p->group = 2;
+        p->group = PLANET_GROUP_LIFE_SUPPORTING;
         p->climate = PLANET_CLIMATE_GAIA;
         p->mineral_class = MINERAL_RESOURCE_ULTRA_RICH;
         p->planet_special = SYSTEM_SPECIAL_ORION_STAR;

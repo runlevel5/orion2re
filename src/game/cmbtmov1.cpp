@@ -151,8 +151,8 @@ void __cdecl Wait_Until_Net_Opponent_Finished_(int16_t show_wait_message) {
             video::Set_Page_Off_();
             CMBTDRW1::Draw_Main_Combat_Screen_();
             fonts::Set_Font_Style_(3, &MOX::_combat_green);
-            KEN::Ken_Get_Text_Message_(55 /* 0x37 */, message_buffer, sizeof(message_buffer));
-            fonts::Print_(20 /* 0x14 */, 8, message_buffer);
+            KEN::Ken_Get_Text_Message_(55, message_buffer, sizeof(message_buffer));
+            fonts::Print_(20, 8, message_buffer);
             RUSS::Mox_Sync_Update_();
             timer::Release_Time_(1);
         }
@@ -225,7 +225,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
         int16_t dest_y_px = dest_y * 20;
 
         bool has_teleporter = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) != 0 ||
-                              COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x16 /* SPEC_TRANSPORTER */) != 0;
+                              COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_PHASE_SHIFTER) != 0;
 
         bool skip_normal_move = false;
 
@@ -298,7 +298,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
                 graphics::Interlaced_Fill_(401, 379, 488, 467, 0, 199);
                 CMBTDRW1::Draw_Internals_Display_(401, 379);
 
-                MOX::_last_ship_status = 666; /* 0x29A */
+                MOX::_last_ship_status = 666;
                 MOX::_draw_active_missiles = 0;
                 CMBTDRW1::Draw_Main_Combat_Screen_();
                 MOX::_draw_active_missiles = 1;
@@ -844,7 +844,7 @@ int16_t __cdecl Ship_In_Legal_Square_(int16_t ship_idx, int16_t x, int16_t y, in
 
     int16_t cell_val = MOX::_combat_grid[cell_x][cell_y];
 
-    if (cell_val == 2000 /* 0x7d0 */ || cell_val == ship_idx) {
+    if (cell_val == 2000 || cell_val == ship_idx) {
         return 1;
     }
 

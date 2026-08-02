@@ -114,22 +114,22 @@ namespace OFFICER {
                     int16_t val = skill.cost;
                     if (skill_idx == 2 || skill_idx == 3) {
                         // type 0 (Ship Officer) gets 3, type 1 (Colony Leader) gets 1
-                        val += (leader.type == 0) ? 3 : 1;
+                        val += (leader.type == LEADER_TYPE_SHIP) ? 3 : 1;
                         if (skill_idx == 3) {
-                            val += (leader.type == 0) ? 3 : 1;
+                            val += (leader.type == LEADER_TYPE_SHIP) ? 3 : 1;
                         }
                     }
                     total_value += val;
                 }
             }
 
-            if (leader.type == 0) { // Ship Officer
+            if (leader.type == LEADER_TYPE_SHIP) {
                 if (skill.skill_type == 1) {
                     if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
                         total_value += skill.cost;
                     }
                 }
-            } else if (leader.type == 1) { // Colony Leader
+            } else if (leader.type == LEADER_TYPE_COLONY) {
                 if (skill.skill_type == 2) {
                     if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
                         total_value += skill.cost;
@@ -142,7 +142,7 @@ namespace OFFICER {
             uint8_t app_idx = leader.tech_application[i];
             if (app_idx != 0) {
                 int16_t field_id = TECHDATA::_technology_applications[app_idx].tech_field_id;
-                if (field_id < 0) {
+                if (field_id <= TECH_FIELD_INVALID) {
                     // Logic from disassembly: resets total_value to 1 if field_id is invalid/negative
                     total_value = 1;
                 } else {
@@ -282,7 +282,7 @@ namespace OFFICER {
 
         OFFICER::Increase_Officer_Level_By_One_(leader_idx);
 
-        if (leader.type == 1) { // Colony Administrator
+        if (leader.type == LEADER_TYPE_COLONY) {
             int16_t star_idx = leader.location;
             if (star_idx != -1) {
                 if (leader.status == 5) { // Active/Assigned status
@@ -292,7 +292,7 @@ namespace OFFICER {
                     MOX::_star[star_idx].officer_index[player_idx] = -1;
                 }
             }
-        } else if (leader.type == 0 && player_idx != -1) { // Ship Officer
+        } else if (leader.type == LEADER_TYPE_SHIP && player_idx != -1) {
             int16_t ship_idx = leader.location;
             if (ship_idx != -1) {
                 if (HACCESS::Ship_Owner_(ship_idx) == player_idx && MOX::_ship[ship_idx].officer_index == leader_idx) {
@@ -542,14 +542,14 @@ namespace OFFICER {
     }
 
     bool Is_Fleet_Officer_Screen_() {
-        return MOX::_officer_scrn_type == 0;
+        return MOX::_officer_scrn_type == LEADER_TYPE_SHIP;
     }
 
     void __cdecl Check_For_Colony_Calculation_Update_() {
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data& leader = MOX::_leaders[i];
 
-            if (leader.type == 1) {
+            if (leader.type == LEADER_TYPE_COLONY) {
                 int16_t original_star_id = MOX::_officers_original_star_id[i];
 
                 if (leader.location != original_star_id && leader.status == 0) {
@@ -830,7 +830,7 @@ namespace OFFICER {
             animate::Draw_(is_fleet_screen ? 156 : 10, 11, seg);
         }
 
-        bool type_not_one = MOX::_officer_scrn_type != 1;
+        bool type_not_one = MOX::_officer_scrn_type != LEADER_TYPE_COLONY;
         animate::Set_Animation_Frame_(MOX::_officer_ship_ldrs_button_seg, type_not_one);
         animate::Draw_(160, 10, MOX::_officer_ship_ldrs_button_seg);
 
@@ -890,13 +890,13 @@ namespace OFFICER {
         ERIC::Fast_Fade_Out_();
 
         if (MOX::_previous_screen == SCREEN_COLONY) {
-            MOX::_officer_scrn_type = 1;
+            MOX::_officer_scrn_type = LEADER_TYPE_COLONY;
             if (MOX::_temp_star_handle > -1) {
                 MOX::_small_ship_stack_ptr = MOX::_temp_star_handle;
             }
         }
         if (MOX::_officer_scrn_type == -1) {
-            MOX::_officer_scrn_type = 0;
+            MOX::_officer_scrn_type = LEADER_TYPE_SHIP;
         }
 
         Reload_Officer_Screen_Pictures_();
@@ -1138,13 +1138,13 @@ namespace OFFICER {
             if (_officer_button_mode == -1) {
                 bool screen_toggle = false;
                 if (colony_view_btn == input) {
-                    if (MOX::_officer_scrn_type != 1) {
-                        MOX::_officer_scrn_type = 1;
+                    if (MOX::_officer_scrn_type != LEADER_TYPE_COLONY) {
+                        MOX::_officer_scrn_type = LEADER_TYPE_COLONY;
                         screen_toggle = true;
                     }
                 } else if (fleet_view_btn == input) {
-                    if (MOX::_officer_scrn_type != 0) {
-                        MOX::_officer_scrn_type = 0;
+                    if (MOX::_officer_scrn_type != LEADER_TYPE_SHIP) {
+                        MOX::_officer_scrn_type = LEADER_TYPE_SHIP;
                         screen_toggle = true;
                     }
                 }
@@ -1164,7 +1164,7 @@ namespace OFFICER {
             if (needs_help_reset != 0) {
                 needs_help_reset = 0;
                 EVANHELP::Set_Officer_Screen_Help_();
-                if (MOX::_officer_scrn_type == 0) {
+                if (MOX::_officer_scrn_type == LEADER_TYPE_SHIP) {
                     OFFICER::Initialize_Scroll_Bar_(MOX::_scroll_bar);
                 }
             }
@@ -1487,7 +1487,7 @@ namespace OFFICER {
         s_leader_data& leader = MOX::_leaders[officer_idx];
         int16_t location = leader.location;
 
-        if (leader.type == 0 /* SHIP_OFFICER */) {
+        if (leader.type == LEADER_TYPE_SHIP) {
             if (location > -1 && location < static_cast<int16_t>(MOX::_NUM_SHIPS)) {
                 // Remove leader reference from the ship
                 MOX::_ship[location].officer_index = -1;
@@ -1530,7 +1530,7 @@ namespace OFFICER {
         Set_Officer_To_Player_(leader_idx, player_idx, 1);
 
         // If officer type is 0 (Ship Officer), check for Galactic Lore skills
-        if (MOX::_leaders[leader_idx].type == 0) {
+        if (MOX::_leaders[leader_idx].type == LEADER_TYPE_SHIP) {
             bool has_lore = Officer_Has_Special_Skill_(player_idx, leader_idx, 0x12 /* SKILL_GALACTIC_LORE_1 */);
             if (!has_lore) {
                 has_lore = Officer_Has_Special_Skill_(player_idx, leader_idx, 0x13 /* SKILL_GALACTIC_LORE_2 */);
@@ -1731,7 +1731,7 @@ namespace OFFICER {
                 // Officer is traveling or active
                 if (leader.eta > 0) {
                     leader.eta--;
-                    if (leader.eta == 0 && leader.type == 1 /* Colony Leader */) {
+                    if (leader.eta == 0 && leader.type == LEADER_TYPE_COLONY) {
                         // Recalculate colony effects once the leader arrives
                         COLCALC::Star_Colony_Calculation_(leader.location, (int16_t)leader.player_index);
                     }
@@ -1833,7 +1833,7 @@ namespace OFFICER {
 
         SYS::Clear_System_Display_Loaded_Flag_();
 
-        if (MOX::_officer_scrn_type == 1 /* OFFICER_SCREEN */) {
+        if (MOX::_officer_scrn_type == LEADER_TYPE_COLONY) {
             if (OFFICER::_officer_star_displayed == -1) {
                 if (static_cast<uint8_t>(MOX::_previous_screen) == SCREEN_COLONY) {
                     MOX::_officer_selected = -1;
@@ -1943,9 +1943,9 @@ namespace OFFICER {
 
             bool type_match;
             if (is_fleet_screen) {
-                type_match = (leader.type == 0);
+                type_match = (leader.type == LEADER_TYPE_SHIP);
             } else {
-                type_match = (leader.type == 1);
+                type_match = (leader.type == LEADER_TYPE_COLONY);
             }
 
             if (type_match && leader.status == 4 && 
@@ -2008,7 +2008,7 @@ namespace OFFICER {
             }
         }
 
-        if (MOX::_leaders[leader_idx].type == 0) {
+        if (MOX::_leaders[leader_idx].type == LEADER_TYPE_SHIP) {
             bool has_skill = Officer_Has_Special_Skill_(player_idx, leader_idx, 18);
             if (!has_skill) {
                 has_skill = Officer_Has_Special_Skill_(player_idx, leader_idx, 19);
@@ -2058,7 +2058,7 @@ namespace OFFICER {
             Give_Leader_Specials_To_Player_(officer_idx, player_idx);
         }
 
-        if (target.type == 1) {
+        if (target.type == LEADER_TYPE_COLONY) {
             COLCALC::Do_Player_Colony_Calculations_(player_idx);
         }
     }
@@ -2226,7 +2226,7 @@ namespace OFFICER {
             _prev_leaders[i].location = MOX::_leaders[i].location;
             _prev_leaders[i].eta = static_cast<short>(MOX::_leaders[i].eta);
 
-            if (MOX::_leaders[i].type == 1 /* Ship Captain */) {
+            if (MOX::_leaders[i].type == LEADER_TYPE_COLONY) {
                 if (_prev_leaders[i].status == 0 || _prev_leaders[i].status == 4) {
                     _prev_leaders[i].location = home_star_idx;
                 }
@@ -2378,7 +2378,7 @@ namespace OFFICER {
 
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             // Check if leader belongs to the player and is of type fleet (0)
-            if ((int16_t)MOX::_leaders[i].player_index == player_index && MOX::_leaders[i].type == 0) {
+            if ((int16_t)MOX::_leaders[i].player_index == player_index && MOX::_leaders[i].type == LEADER_TYPE_SHIP) {
                 if (Officer_Status_Ok_(i)) {
                     count++;
                 }
@@ -2398,7 +2398,7 @@ namespace OFFICER {
 
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             // Check if the leader belongs to the specified player and is of type 1 (Star Officer)
-            if (MOX::_leaders[i].player_index == (int8_t)player_index && MOX::_leaders[i].type == 1) {
+            if (MOX::_leaders[i].player_index == (int8_t)player_index && MOX::_leaders[i].type == LEADER_TYPE_COLONY) {
                 if (Officer_Status_Ok_(i)) {
                     count++;
                 }
@@ -2433,7 +2433,7 @@ namespace OFFICER {
                     int16_t loc = leader->location;
 
                     // If leader is an Officer (type 0) and assigned to a ship
-                    if (leader->type == 0 && loc > -1) {
+                    if (leader->type == LEADER_TYPE_SHIP && loc > -1) {
                         loc = MOX::_ship[loc].location;
 
                         // Resolve ship location to an absolute map index
@@ -2500,8 +2500,8 @@ namespace OFFICER {
             char leader_type = MOX::_leaders[leader_idx].type;
 
             // Check if leader type (Fleet=0 or Star=1) fits current player slots (max 4 of each)
-            if ((leader_type == 0 && n_fleet_officers < 4) || 
-                (leader_type == 1 && n_star_officers < 4)) {
+            if ((leader_type == LEADER_TYPE_SHIP && n_fleet_officers < 4) ||
+                (leader_type == LEADER_TYPE_COLONY && n_star_officers < 4)) {
                 type_match = true;
             }
 
@@ -2592,7 +2592,7 @@ namespace OFFICER {
         int16_t loc = leader->location;
 
         if (loc > -1) {
-            if (leader->type == 1) {
+            if (leader->type == LEADER_TYPE_COLONY) {
                 int16_t player_idx = (int16_t)leader->player_index;
                 if (player_idx > -1 && player_idx < MAX_PLAYERS) {
                     MOX::_star[loc].officer_index[player_idx] = -1;
@@ -2606,7 +2606,7 @@ namespace OFFICER {
         leader->eta = 0;
         leader->location = -1;
 
-        if (leader->type == 1) {
+        if (leader->type == LEADER_TYPE_COLONY) {
             COLCALC::Do_Player_Colony_Calculations_((int16_t)leader->player_index);
         }
     }
@@ -2657,11 +2657,11 @@ namespace OFFICER {
         int8_t player_idx = MOX::_leaders[leader_idx].player_index;
 
         if (location != -1 && MOX::_leaders[leader_idx].status != 5) {
-            if (MOX::_leaders[leader_idx].type == 0) {
+            if (MOX::_leaders[leader_idx].type == LEADER_TYPE_SHIP) {
                 if (MOX::_ship[location].officer_index == leader_idx) {
                     MOX::_ship[location].officer_index = -1;
                 }
-            } else if (MOX::_leaders[leader_idx].type == 1) {
+            } else if (MOX::_leaders[leader_idx].type == LEADER_TYPE_COLONY) {
                 MOX::_star[location].officer_index[player_idx] = -1;
             }
         }
@@ -2670,7 +2670,7 @@ namespace OFFICER {
         MOX::_leaders[leader_idx].eta = 0;
         MOX::_leaders[leader_idx].location = -1;
 
-        if (MOX::_leaders[leader_idx].type == 1) {
+        if (MOX::_leaders[leader_idx].type == LEADER_TYPE_COLONY) {
             COLCALC::Do_Player_Colony_Calculations_((int16_t)MOX::_leaders[leader_idx].player_index);
         }
     }
@@ -2684,8 +2684,8 @@ namespace OFFICER {
 
         for (int16_t i = 0; i < MAX_LEADERS; i++) {
             bool is_valid = (MOX::_leaders[i].status >= 0 || MOX::_leaders[i].status == 4);
-            bool is_type_0 = (MOX::_leaders[i].type == 0);
-            bool is_type_1 = (MOX::_leaders[i].type == 1);
+            bool is_type_0 = (MOX::_leaders[i].type == LEADER_TYPE_SHIP);
+            bool is_type_1 = (MOX::_leaders[i].type == LEADER_TYPE_COLONY);
             bool is_fleet_screen = Is_Fleet_Officer_Screen_();
 
             if (is_valid && MOX::_leaders[i].player_index == MOX::_PLAYER_NUM) {
@@ -3016,7 +3016,7 @@ namespace OFFICER {
         }
 
         if (new_level != current_level) {
-            if (MOX::_leaders[leader_idx].type == 1 && MOX::_leaders[leader_idx].location != -1) {
+            if (MOX::_leaders[leader_idx].type == LEADER_TYPE_COLONY && MOX::_leaders[leader_idx].location != -1) {
                 COLCALC::Star_Colony_Calculation_(MOX::_leaders[leader_idx].location, player_idx);
             }
             MOX::_leaders[leader_idx].display_level_popup = 1;
@@ -3082,7 +3082,7 @@ namespace OFFICER {
 
         MOX::_temp_string[0] = '\0';
 
-        if (MOX::_leaders[leader_idx].type == '\0') {
+        if (MOX::_leaders[leader_idx].type == LEADER_TYPE_SHIP) {
             strlcpy(MOX::_temp_string, MOX::_officer_level_names[level], sizeof(MOX::_temp_string));
         } else {
             strlcpy(MOX::_temp_string, MOX::_star_officer_level_names[level], sizeof(MOX::_temp_string));
@@ -3185,7 +3185,7 @@ namespace OFFICER {
             Officer_Screen_User_Box_(msg_buf2, 3);
         } else if (msg_buf3[0] != '\0') {
             MOX::_global_var = 0;
-            if (MOX::_settings.game_difficulty != 0) {
+            if (MOX::_settings.game_difficulty != GAME_DIFFICULTY_TUTOR) {
                 MOX::_global_var = 0xf;
             }
             Officer_Screen_User_Box_(msg_buf3, 5);
@@ -3231,16 +3231,16 @@ namespace OFFICER {
 
 int16_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
     switch (static_cast<int32_t>(MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT]) / 2) {
-    case 0:
-        return 1;
-    case 1:
-        return 3;
-    case 2:
-        return 5;
-    case 3:
-        return 7;
+    case GOVERNMENT_FEUDAL / 2:
+        return GOVERNMENT_CONFEDERATION;
+    case GOVERNMENT_DICTATORSHIP / 2:
+        return GOVERNMENT_IMPERIUM;
+    case GOVERNMENT_DEMOCRACY / 2:
+        return GOVERNMENT_FEDERATION;
+    case GOVERNMENT_UNIFICATION / 2:
+        return GOVERNMENT_GALACTIC_UNIFICATION;
     default:
-        return 0;
+        return GOVERNMENT_FEUDAL;
     }
 }
 
@@ -3383,7 +3383,7 @@ bool __cdecl Marooned_Hero_At_Star_Can_Join_(int16_t star_idx, int16_t* hero_idx
 
         if (MOX::_leaders[i].status == 5 && MOX::_leaders[i].location == star_idx) {
             int16_t count;
-            if (MOX::_leaders[i].type == 0) {
+            if (MOX::_leaders[i].type == LEADER_TYPE_SHIP) {
                 count = N_Fleet_Officers_Owned_By_Player_(player_idx);
             } else {
                 count = N_Star_Officers_Owned_By_Player_(player_idx);
@@ -3518,14 +3518,14 @@ void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skill_counts) {
             int16_t player_idx = MOX::_leaders[officer_idx].player_index;
             char type = MOX::_leaders[officer_idx].type;
 
-            if (type == 0) {
+            if (type == LEADER_TYPE_SHIP) {
                 for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
                     if ((MOX::_skill_data[skill_idx].skill_type == 0 && OFFICER::Officer_Has_General_Skill_(player_idx, officer_idx, skill_idx)) ||
                         (MOX::_skill_data[skill_idx].skill_type == 1 && OFFICER::Officer_Has_Special_Skill_(player_idx, officer_idx, skill_idx))) {
                         skill_counts[i]++;
                     }
                 }
-            } else if (type == 1) {
+            } else if (type == LEADER_TYPE_COLONY) {
                 for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
                     if ((MOX::_skill_data[skill_idx].skill_type == 0 && OFFICER::Officer_Has_General_Skill_(player_idx, officer_idx, skill_idx)) ||
                         (MOX::_skill_data[skill_idx].skill_type == 2 && OFFICER::Officer_Has_Special_Skill_(player_idx, officer_idx, skill_idx))) {
@@ -3651,9 +3651,9 @@ void __cdecl Print_Officer_Data_(
     } else if (officer_status == 1) {
         fonts::Set_Font_Style_(2, &text_colors);
 
-        if (officer_type == 0 && leader_location > -1) {
+        if (officer_type == LEADER_TYPE_SHIP && leader_location > -1) {
             strlcpy(status_text, MOX::_ship[leader_location].d.name, sizeof(status_text));
-        } else if (officer_type == 1 && leader_location > -1) {
+        } else if (officer_type == LEADER_TYPE_COLONY && leader_location > -1) {
             strlcpy(status_text, MOX::_star[leader_location].name, sizeof(status_text));
         }
     } else if (officer_status == 4) {
@@ -3726,12 +3726,12 @@ void __cdecl Print_Officer_Data_(
     for (int16_t skill_idx = 0; skill_idx < 0x36; ++skill_idx) {
         bool has_skill = false;
 
-        if (officer_type == 0) {
+        if (officer_type == LEADER_TYPE_SHIP) {
             if (MOX::_skill_data[skill_idx].skill_type == 1 &&
                 OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, officer_id, skill_idx)) {
                 has_skill = true;
             }
-        } else if (officer_type == 1) {
+        } else if (officer_type == LEADER_TYPE_COLONY) {
             if (MOX::_skill_data[skill_idx].skill_type == 2 &&
                 OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, officer_id, skill_idx)) {
                 has_skill = true;
@@ -3872,7 +3872,7 @@ void __cdecl Add_Skill_Description_Help_Fields_(
     for (int16_t skill_index = 0; skill_index < 54; ++skill_index) {
         bool add_field = false;
 
-        if (leader_type == 0) {
+        if (leader_type == LEADER_TYPE_SHIP) {
             if (MOX::_skill_data[skill_index].skill_type == 1) {
                 add_field = OFFICER::Officer_Has_Special_Skill_(
                     MOX::_PLAYER_NUM,
@@ -3880,7 +3880,7 @@ void __cdecl Add_Skill_Description_Help_Fields_(
                     skill_index
                 );
             }
-        } else if (leader_type == 1) {
+        } else if (leader_type == LEADER_TYPE_COLONY) {
             if (MOX::_skill_data[skill_index].skill_type == 2) {
                 add_field = OFFICER::Officer_Has_Special_Skill_(
                     MOX::_PLAYER_NUM,

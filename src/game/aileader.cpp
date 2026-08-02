@@ -35,7 +35,7 @@ namespace aileader {
                         hire_criteria_met = true;
                     } else if ((general_skills & LEADER_GENERAL_SKILL_TRADER) != 0 && player->traits[TRAIT_REPULSIVE] == 0) {
                         hire_criteria_met = true;
-                    } else if (leader->type == 0 &&
+                    } else if (leader->type == LEADER_TYPE_SHIP &&
                                (leader->special_skills & (
                                    LEADER_SHIP_SKILL_HELMSMAN |
                                    LEADER_SHIP_SKILL_HELMSMAN2 |
@@ -117,7 +117,7 @@ namespace aileader {
                     }
 
                     if ((skills & (LEADER_COLONY_SKILL_SPIRITUAL_LEADER | LEADER_COLONY_SKILL_SPIRITUAL_LEADER2)) &&
-                        (MOX::_player[player_index].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != 3)) {
+                        (MOX::_player[player_index].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != GOVERNMENT_UNIFICATION / 2)) {
                         star_scores[star_index] += (uint8_t)colony->n_pops;
                     }
 
@@ -216,14 +216,14 @@ namespace aileader {
 
             if (leader->player_index == (char)player_idx) {
                 if (leader->status == 0 /* Available/Unassigned */) {
-                    if (leader->type == 0 /* Fleet Officer */) {
+                    if (leader->type == LEADER_TYPE_SHIP) {
                         Assign_Fleet_Officer_(player_idx, leader_index);
                     } else /* Star Officer */ {
                         Assign_Star_Officer_(player_idx, leader_index);
                     }
                 } else if (leader->status == 1 /* Assigned */) {
                     // Only fleet officers seem to be reassigned in this manner
-                    if (leader->type == 0 /* Fleet Officer */) {
+                    if (leader->type == LEADER_TYPE_SHIP) {
                         Reassign_Fleet_Officer_(player_idx, leader_index);
                     }
                 }

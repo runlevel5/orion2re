@@ -194,7 +194,7 @@ void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, in
     s_player* player = &MOX::_player[(int8_t)colony->owner];
     int8_t govt_trait = player->traits[TRAIT_CURRENT_GOVERNMENT];
 
-    if (govt_trait >= 6) {
+    if (govt_trait >= GOVERNMENT_UNIFICATION) {
         morale_count = 0;
     }
 
@@ -206,7 +206,7 @@ void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, in
 
     Calculate_Squish_Step_(x, (int16_t)width, (int16_t)morale_count, 30);
 
-    if (govt_trait < 6) {
+    if (govt_trait < GOVERNMENT_UNIFICATION) {
         int32_t loop_limit = morale_count_abs;
         if (loop_limit > 20) {
             loop_limit = 20;

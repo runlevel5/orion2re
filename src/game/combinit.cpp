@@ -46,8 +46,8 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
             MOX::_global_combat_data.weapons[i].specials = MOX::_ship[ship_idx].d.ship_weapon[i].specials;
             MOX::_global_combat_data.weapons[i].ammo = MOX::_ship[ship_idx].d.ship_weapon[i].ammo;
 
-            if (MOX::_global_combat_data.weapons[i].arc == 16) {
-                MOX::_global_combat_data.weapons[i].arc = 15;
+            if (MOX::_global_combat_data.weapons[i].arc == WEAPON_FIRING_ARC_360) {
+                MOX::_global_combat_data.weapons[i].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
             }
 
             MOX::_global_combat_data.weapons[i].active = 1;
@@ -261,8 +261,8 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->weapons[i].specials = ship->d.ship_weapon[i].specials;
         combat->weapons[i].ammo = ship->d.ship_weapon[i].ammo;
 
-        if (combat->weapons[i].arc == 16) {
-            combat->weapons[i].arc = 15;
+        if (combat->weapons[i].arc == WEAPON_FIRING_ARC_360) {
+            combat->weapons[i].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         }
 
         combat->weapons[i].active = 1;
@@ -1236,10 +1236,10 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].weapon_id = WEAPON_DEATH_RAY;
     ship->weapons[w_idx].active = 1;
     ship->weapons[w_idx].ammo = -1;
-    ship->weapons[w_idx].arc = 15;
+    ship->weapons[w_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[w_idx].specials = 2;
 
-    int space0 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, 1, 0, ship->weapons[w_idx].specials);
+    int space0 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, 0, ship->weapons[w_idx].specials);
     int count0 = (fortress_weapon_space / 2) / space0;
     if (count0 > 99) {
         count0 = 99;
@@ -1251,10 +1251,10 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
     ship->weapons[w_idx].active = 1;
     ship->weapons[w_idx].ammo = -1;
-    ship->weapons[w_idx].arc = 15;
+    ship->weapons[w_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[w_idx].specials = 0;
 
-    int space1 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, 1, 0, ship->weapons[w_idx].specials);
+    int space1 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, 0, ship->weapons[w_idx].specials);
     int count1 = (fortress_weapon_space / 4) / space1;
     if (count1 > 198) {
         count1 = 198;
@@ -1270,7 +1270,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
             ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
             ship->weapons[w_idx].active = 1;
             ship->weapons[w_idx].ammo = -1;
-            ship->weapons[w_idx].arc = 15;
+            ship->weapons[w_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
             ship->weapons[w_idx].specials = 0;
         }
     }
@@ -1281,10 +1281,10 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
     ship->weapons[w_idx].active = 1;
     ship->weapons[w_idx].ammo = -1;
-    ship->weapons[w_idx].arc = 15;
+    ship->weapons[w_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[w_idx].specials = 4;
 
-    int space2 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, 1, 0, ship->weapons[w_idx].specials);
+    int space2 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, 0, ship->weapons[w_idx].specials);
     int count2 = (fortress_weapon_space / 4) / space2;
     if (count2 > 198) {
         count2 = 198;
@@ -1300,7 +1300,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
             ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
             ship->weapons[w_idx].active = 1;
             ship->weapons[w_idx].ammo = -1;
-            ship->weapons[w_idx].arc = 15;
+            ship->weapons[w_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
             ship->weapons[w_idx].specials = 4;
         }
     }
@@ -1311,10 +1311,10 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->weapons[w_idx].weapon_id = WEAPON_PARTICLE_BEAM;
     ship->weapons[w_idx].active = 1;
     ship->weapons[w_idx].ammo = -1;
-    ship->weapons[w_idx].arc = 15;
+    ship->weapons[w_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     ship->weapons[w_idx].specials = 2;
 
-    int space3 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, 1, 0, ship->weapons[w_idx].specials);
+    int space3 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, ship->weapons[w_idx].weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, 0, ship->weapons[w_idx].specials);
     int count3 = (fortress_weapon_space / 2) / space3;
     if (count3 > 99) {
         count3 = 99;
@@ -1326,7 +1326,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
         ship->weapon_ready_flags[i] = 1;
     }
 
-    ship->crew_quality = 3;
+    ship->crew_quality = CREW_QUALITY_ELITE;
     ship->officer_idx = 0x42;
     ship->marine_count = (uint8_t)TECHDATA::_hull_data[HULL_STAR_FORTRESS].marines;
     ship->current_speed = 0;
@@ -1598,12 +1598,12 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         }
         specials_1 &= TECHDATA::_weapons[weapon_id_1].available_mods;
 
-        int32_t space_1 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, weapon_id_1, 1, 1, 1, specials_1);
+        int32_t space_1 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, weapon_id_1, 1, WEAPON_FIRING_ARC_FORWARD, 1, specials_1);
         int32_t count_1 = 225 / space_1;
 
         MOX::_combat_data->weapons[0].weapon_id = weapon_id_1;
         MOX::_combat_data->weapons[0].count = (int8_t)count_1;
-        MOX::_combat_data->weapons[0].arc = 0xf;
+        MOX::_combat_data->weapons[0].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         MOX::_combat_data->weapons[0].specials = specials_1;
         MOX::_combat_data->weapons[0].ammo = -1;
         MOX::_combat_data->weapons[0].active = 1;
@@ -1622,12 +1622,12 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         }
         specials_2 &= TECHDATA::_weapons[weapon_id_2].available_mods;
 
-        int32_t space_2 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, weapon_id_2, 1, 1, 1, specials_2);
+        int32_t space_2 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, weapon_id_2, 1, WEAPON_FIRING_ARC_FORWARD, 1, specials_2);
         int32_t count_2 = 75 / space_2;
 
         MOX::_combat_data->weapons[1].weapon_id = weapon_id_2;
         MOX::_combat_data->weapons[1].count = (int8_t)count_2;
-        MOX::_combat_data->weapons[1].arc = 0xf;
+        MOX::_combat_data->weapons[1].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         MOX::_combat_data->weapons[1].specials = specials_2;
         MOX::_combat_data->weapons[1].ammo = -1;
         MOX::_combat_data->weapons[1].active = 1;
@@ -1652,7 +1652,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         for (int i = 0; i < 2; ++i) {
             MOX::_combat_data->weapons[weapon_index].weapon_id = weapon_id_fg;
             MOX::_combat_data->weapons[weapon_index].count = (int8_t)count_fg;
-            MOX::_combat_data->weapons[weapon_index].arc = 0xf;
+            MOX::_combat_data->weapons[weapon_index].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
             MOX::_combat_data->weapons[weapon_index].specials = 0;
             MOX::_combat_data->weapons[weapon_index].ammo = 1;
             MOX::_combat_data->weapons[weapon_index].active = 1;
@@ -1665,7 +1665,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     if (MOX::_colony[colony_idx].buildings[BUILDING_STELLAR_CONVERTER] != 0) {
         MOX::_combat_data->weapons[weapon_index].weapon_id = WEAPON_STELLAR_CONVERTER;
         MOX::_combat_data->weapons[weapon_index].count = 1;
-        MOX::_combat_data->weapons[weapon_index].arc = 0xf;
+        MOX::_combat_data->weapons[weapon_index].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         MOX::_combat_data->weapons[weapon_index].specials = 0;
         MOX::_combat_data->weapons[weapon_index].status = 0;
         MOX::_combat_data->weapons[weapon_index].ammo = -1;
@@ -1686,7 +1686,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
             specials_m |= 0x800;
         }
 
-        int32_t space_m = DESIGN::Weapon_Space_(MOX::_combat_defender_player, weapon_id_m, 1, 16, 5, specials_m);
+        int32_t space_m = DESIGN::Weapon_Space_(MOX::_combat_defender_player, weapon_id_m, 1, WEAPON_FIRING_ARC_360, 5, specials_m);
         int32_t total_count = 300 / space_m;
         int32_t slots = 1;
         int32_t count_per_slot = total_count;
@@ -1701,7 +1701,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         for (int i = 0; i < slots; i++) {
             MOX::_combat_data->weapons[weapon_index].weapon_id = weapon_id_m;
             MOX::_combat_data->weapons[weapon_index].count = (uint8_t)count_per_slot;
-            MOX::_combat_data->weapons[weapon_index].arc = 0xf;
+            MOX::_combat_data->weapons[weapon_index].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
             MOX::_combat_data->weapons[weapon_index].specials = specials_m;
             MOX::_combat_data->weapons[weapon_index].status = 0;
 
@@ -1724,7 +1724,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     }
 
     MOX::_combat_data->structure_max = 0;
-    MOX::_combat_data->crew_quality = 1;
+    MOX::_combat_data->crew_quality = CREW_QUALITY_REGULAR;
     MOX::_combat_data->officer_idx = -1;
     MOX::_combat_data->marine_count = 0;
     MOX::_combat_data->structure_damage = 0;
@@ -1883,9 +1883,9 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = beam_id_1;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = -1;
-    MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = 15;
+    MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].specials = 2;
-    int beam_space_1 = DESIGN::Weapon_Space_(defender, beam_id_1, 1, 15, 0, 2);
+    int beam_space_1 = DESIGN::Weapon_Space_(defender, beam_id_1, 1, WEAPON_FIRING_ARC_ALL_SECTORS, 0, 2);
     int count1 = (space / 2) / beam_space_1;
     if (count1 < 1) count1 = 1;
     if (count1 > 99) count1 = 99;
@@ -1897,9 +1897,9 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = beam_id_2;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = -1;
-    MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = 15;
+    MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].specials = 0;
-    int beam_space_2 = DESIGN::Weapon_Space_(defender, beam_id_2, 1, 15, 0, 0);
+    int beam_space_2 = DESIGN::Weapon_Space_(defender, beam_id_2, 1, WEAPON_FIRING_ARC_ALL_SECTORS, 0, 0);
     int count2 = (space / 4) / beam_space_2;
     if (count2 < 1) count2 = 1;
     if (count2 > 198) count2 = 198;
@@ -1915,7 +1915,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = INITSHIP::Best_Beam_Weapon_(defender);
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = -1;
-            MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = 15;
+            MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].specials = 0;
         }
     }
@@ -1927,9 +1927,9 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = pd_id;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = -1;
-    MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = 15;
+    MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].specials = 4;
-    int pd_space = DESIGN::Weapon_Space_(defender, pd_id, 1, 15, 0, 4);
+    int pd_space = DESIGN::Weapon_Space_(defender, pd_id, 1, WEAPON_FIRING_ARC_ALL_SECTORS, 0, 4);
     int pd_count = (space / 4) / pd_space;
     if (pd_count < 1) pd_count = 1;
     if (pd_count > 198) pd_count = 198;
@@ -1945,7 +1945,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = INITSHIP::Best_Point_Defense_Weapon_By_Size_(defender);
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = -1;
-            MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = 15;
+            MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].specials = 4;
         }
     }
@@ -1971,10 +1971,10 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     } else {
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 0;
     }
-    MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = 15;
+    MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].specials = missile_specials;
 
-    int missile_space_calc = DESIGN::Weapon_Space_(defender, missile_id, 1, 15, 20, 0);
+    int missile_space_calc = DESIGN::Weapon_Space_(defender, missile_id, 1, WEAPON_FIRING_ARC_ALL_SECTORS, 20, 0);
     int missile_count = space / missile_space_calc;
     if (missile_count < 1) missile_count = 1;
     if (missile_count > 90) missile_count = 90;
@@ -1992,7 +1992,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         } else {
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 0;
         }
-        MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = 15;
+        MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = WEAPON_FIRING_ARC_ALL_SECTORS;
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].specials = missile_specials;
     }
     if (missile_count > 30) missile_count = 30;
@@ -2003,7 +2003,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         MOX::_combat_data[MOX::_combat_total_ship_count].weapon_ready_flags[i] = 1;
     }
 
-    MOX::_combat_data[MOX::_combat_total_ship_count].crew_quality = 1;
+    MOX::_combat_data[MOX::_combat_total_ship_count].crew_quality = CREW_QUALITY_REGULAR;
     MOX::_combat_data[MOX::_combat_total_ship_count].officer_idx = -1;
     MOX::_combat_data[MOX::_combat_total_ship_count].marine_count = (uint8_t)TECHDATA::_hull_data[station_type].marines;
     MOX::_combat_data[MOX::_combat_total_ship_count].current_speed = 0;

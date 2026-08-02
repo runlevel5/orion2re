@@ -70,7 +70,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
                 if (COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) != 0) {
                     blocked += 3;
                 }
-                if ((TECHDATA::_weapons[weapon_id].natural_mods & 0x100) != 0 ||
+                if ((TECHDATA::_weapons[weapon_id].natural_mods & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) != 0 ||
                     ((specials & 0x40) != 0 && COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) == 0)) {
                     blocked = 0;
                 }
@@ -838,7 +838,7 @@ int16_t __cdecl Get_Long_Range_Beam_Strength_(int16_t player_idx) {
                 if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM || weapon_id == WEAPON_PROTON_TORPEDO) {
                     bool is_long_range = false;
 
-                    if ((TECHDATA::_weapons[weapon_id].natural_mods & 4 /* W_CONT_BEAM */) != 0) {
+                    if ((TECHDATA::_weapons[weapon_id].natural_mods & WEAPON_NATURAL_FLAG_NO_RANGE_DISSIPATION) != 0) {
                         is_long_range = true;
                     } else if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 15 /* SPEC_RANGE_FINDER */) != 0) {
                         is_long_range = true;
@@ -2289,7 +2289,7 @@ int16_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx
 
         int16_t base_dmg = (int16_t)((TECHDATA::_weapons[slot_weapon_id].min_damage + TECHDATA::_weapons[slot_weapon_id].max_damage) * 5);
 
-        if (!((specials & 0x20) || (TECHDATA::_weapons[slot_weapon_id].natural_mods & 0x4) || COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0xF))) {
+        if (!((specials & 0x20) || (TECHDATA::_weapons[slot_weapon_id].natural_mods & WEAPON_NATURAL_FLAG_NO_RANGE_DISSIPATION) || COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0xF))) {
             int16_t penalty = MOX::_ranged_damage_penalty[range];
             base_dmg += (abs(penalty) * base_dmg) / -100;
         }

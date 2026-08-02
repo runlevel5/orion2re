@@ -109,9 +109,9 @@ namespace TRADE {
         int32_t trait_multiplier = 100;
         int16_t base_goal = Base_Trade_Agreement_Goal_(player, other_player_idx);
 
-        if (player->traits[TRAIT_CURRENT_GOVERNMENT] == 4) {
+        if (player->traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_DEMOCRACY) {
             trait_multiplier = 150;
-        } else if (player->traits[TRAIT_CURRENT_GOVERNMENT] == 5) {
+        } else if (player->traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_FEDERATION) {
             trait_multiplier = 175;
         }
 
@@ -151,13 +151,13 @@ namespace TRADE {
         int16_t truncated_combined_points = (int16_t)combined_points;
 
         switch (player->traits[TRAIT_CURRENT_GOVERNMENT]) {
-            case 0:
+            case GOVERNMENT_FEUDAL:
                 return (int16_t)((int32_t)truncated_combined_points / 2);
-            case 1:
+            case GOVERNMENT_CONFEDERATION:
                 return (int16_t)(((int32_t)truncated_combined_points * 3) / 4);
-            case 4:
+            case GOVERNMENT_DEMOCRACY:
                 return (int16_t)(((int32_t)truncated_combined_points * 3) / 2);
-            case 5:
+            case GOVERNMENT_FEDERATION:
                 return (int16_t)(((int32_t)truncated_combined_points * 7) / 4);
             default:
                 return combined_points;

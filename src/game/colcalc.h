@@ -9,11 +9,11 @@ namespace COLCALC {
 
     extern int8_t _minerals_per_mine[8];
 
-    extern int8_t _climate_maintenance_modifiers[10];
+    extern int8_t _climate_maintenance_modifiers[PLANET_CLIMATE_COUNT];
 
-    extern int8_t _morale_lookup_table[8];
-    extern int8_t _non_capital_morale_lookup[8];
-    extern int8_t _barracks_morale_lookup[8];
+    extern int8_t _morale_lookup_table[GOVERNMENT_COUNT];
+    extern int8_t _non_capital_morale_lookup[GOVERNMENT_COUNT];
+    extern int8_t _barracks_morale_lookup[GOVERNMENT_COUNT];
 
     extern int8_t _colony_job_production_difficulty_lookup[8];
 
@@ -80,7 +80,7 @@ namespace COLCALC {
 
     void __cdecl Apply_Colony_Pop_Growth_(s_colony* colony);
 
-    extern int8_t _assimilation_rate_by_government[8];
+    extern int8_t _assimilation_rate_by_government[GOVERNMENT_COUNT];
 
     void __cdecl Apply_Assimilation_(s_colony* colony);
 
@@ -122,7 +122,7 @@ namespace COLCALC {
     void __cdecl Compute_Total_Building_Costs_(int32_t* player_costs);
 
     extern int8_t _difficulty_bc_lookup_table[8];
-    extern int8_t _size_climate_max_pop_lookup[10];
+    extern int8_t _size_climate_max_pop_lookup[PLANET_CLIMATE_COUNT];
     extern char* _government_bonus_msg;
     extern char* _produced_by_farmers_msg;
     extern char* _produced_by_workers_msg;

@@ -25,11 +25,11 @@ namespace antarans {
     }
 
     int16_t __cdecl Antarans_Defensive_Resource_Bonus_() {
-        if (MOX::_settings.game_difficulty == 3) {
+        if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
             return 150;
         }
 
-        if (MOX::_settings.game_difficulty == 4) {
+        if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
             return 200;
         }
 
@@ -37,11 +37,11 @@ namespace antarans {
     }
 
     int16_t __cdecl Antarans_Offensive_Resource_Bonus_() {
-        if (MOX::_settings.game_difficulty == 3) {
+        if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
             return 150;
         }
 
-        if (MOX::_settings.game_difficulty == 4) {
+        if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
             return 200;
         }
 
@@ -51,7 +51,7 @@ namespace antarans {
     int16_t __cdecl No_Small_Ships_After_N_Turns_() {
         int16_t bonus = Antarans_Defensive_Resource_Bonus_();
 
-        if (MOX::_settings.game_difficulty < 3 /* HARD */) {
+        if (MOX::_settings.game_difficulty < GAME_DIFFICULTY_HARD) {
             return 100;
         }
 
@@ -63,7 +63,7 @@ namespace antarans {
     int16_t __cdecl No_Medium_Ships_After_N_Turns_() {
         int16_t bonus = Antarans_Defensive_Resource_Bonus_();
 
-        if (MOX::_settings.game_difficulty < 3) {
+        if (MOX::_settings.game_difficulty < GAME_DIFFICULTY_HARD) {
             return 199;
         }
 
@@ -229,7 +229,7 @@ namespace antarans {
                      (int)*resources, (int)chosen_size, (int)ships[chosen_size]);
 
             // Special Titan logic (size 4) on Hard/Impossible difficulty
-            if (chosen_size == SHIP_SIZE_TITAN && _offensive_titan_ship_built == 0 && MOX::_settings.game_difficulty > 2) {
+            if (chosen_size == SHIP_SIZE_TITAN && _offensive_titan_ship_built == 0 && MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
                 _offensive_titan_ship_built = 1;
                 for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                     _antaran_ship_cost[i] = (uint8_t)((_antaran_ship_cost[i] * 90) / 100);
@@ -398,8 +398,8 @@ namespace antarans {
                     s_ship_data* ship = &MOX::_ship[ship_idx];
                     ship->status = 1;
                     ship->location = target_star + SHIP_LOCATION_MOVING_OFFSET;
-                    ship->crew_quality = 2;
-                    ship->crew_experience = MOX::_crew_data[2].experience + 1;
+                    ship->crew_quality = CREW_QUALITY_VETERAN;
+                    ship->crew_experience = MOX::_crew_data[CREW_QUALITY_VETERAN].experience + 1;
                 }
             }
 

@@ -74,9 +74,9 @@ namespace INITGAME {
 
         // Galaxy and Difficulty
         MOX::_settings.xenons_exist = 1;
-        MOX::_settings.game_difficulty = 0;
-        MOX::_settings.galaxy_size = 1;
-        MOX::_settings.galaxy_age = 1;
+        MOX::_settings.game_difficulty = GAME_DIFFICULTY_TUTOR;
+        MOX::_settings.galaxy_size = GALAXY_SIZE_MEDIUM;
+        MOX::_settings.galaxy_age = GALAXY_AGE_AVERAGE;
         MOX::_settings.strategic_combat_flag = 1;
         MOX::_settings.starting_civilization_level = 1;
         MOX::_settings.number_of_players = 5;
@@ -273,7 +273,7 @@ namespace INITGAME {
     }
 
     void __cdecl Init_Players_(void) {
-      RACESEL::_race_specials[0] = (uint8_t*)farload::Far_Reload_Data_(
+      RACESEL::_race_specials[STOCK_RACE_ALKARI] = (uint8_t*)farload::Far_Reload_Data_(
           "RACESTUF.LBX",
           7,
           MOX::_global_data_seg,
@@ -282,7 +282,7 @@ namespace INITGAME {
           TRAIT_COUNT);
       RUSS::Mox_Update_();
 
-      for (int16_t race_special_idx = 1; race_special_idx < 13; ++race_special_idx) {
+      for (int16_t race_special_idx = STOCK_RACE_BULRATHI; race_special_idx < STOCK_RACE_COUNT; ++race_special_idx) {
         RACESEL::_race_specials[race_special_idx] =
             (uint8_t*)farload::Far_Reload_Next_Data_(
                 "RACESTUF.LBX",
@@ -310,7 +310,7 @@ namespace INITGAME {
         int16_t race_idx = 0;
         while (true) {
           bool unique_race = true;
-          race_idx = (int16_t)(game_random::Random_(13) - 1);
+          race_idx = (int16_t)(game_random::Random_(STOCK_RACE_COUNT) - 1);
 
           for (int16_t prev_player_idx = 0; prev_player_idx < player_idx; ++prev_player_idx) {
             if (!unique_race) {

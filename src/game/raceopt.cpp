@@ -312,7 +312,7 @@ namespace raceopt {
         animate::Draw_(0, 0, bg1);
         
         s_animation_header* bg2 = (s_animation_header*)buffer::Buffer_Reload_("patch13.lbx", 0, MOX::_global_cache_seg);
-        animate::Draw_(131 /* 0x83 */, 0, bg2);
+        animate::Draw_(131, 0, bg2);
 
         int16_t col_idx = 0;
         int16_t y_idx = 0;
@@ -321,7 +321,7 @@ namespace raceopt {
         // First section: columns 0 and 1
         while (opt_string_idx < 36) {
             fonts::Set_Font_Style_Shadow_Down_(4, &_color_opt);
-            fonts::Set_Outline_Color_(119 /* 0x77 */, 0);
+            fonts::Set_Outline_Color_(119, 0);
 
             int16_t current_y = y_coords[y_idx];
             int16_t header_x = col_x[col_idx] - 22;
@@ -375,7 +375,7 @@ namespace raceopt {
 
         // Second section: column 1 bottom piece
         fonts::Set_Font_Style_Shadow_Down_(4, &_color_opt);
-        fonts::Set_Outline_Color_(119 /* 0x77 */, 0);
+        fonts::Set_Outline_Color_(119, 0);
 
         int16_t current_y = y_coords[y_idx];
         int16_t header_x = col_x[col_idx] - 22;
@@ -385,7 +385,7 @@ namespace raceopt {
         int16_t col_start_x = col_x[col_idx];
         int16_t right_align_x = col_x[col_idx + 1] - 50;
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < GOVERNMENT_COUNT / 2; i++) {
             animate::Set_Animation_Frame_(_special_button_seg, 0);
             animate::Draw_(col_start_x - 20, current_y, _special_button_seg);
 
@@ -415,7 +415,7 @@ namespace raceopt {
         // Third section: column 2
         col_idx++;
         fonts::Set_Font_Style_Shadow_Down_(4, &_color_opt);
-        fonts::Set_Outline_Color_(119 /* 0x77 */, 0);
+        fonts::Set_Outline_Color_(119, 0);
 
         fonts::Print_(col_x[col_idx] - 22, 50, _opt_string[opt_string_idx]);
         opt_string_idx++;
@@ -688,7 +688,7 @@ namespace raceopt {
             y2 += 0xD;
             loop2_j++;
             item_idx++;
-        } while (loop2_j < 4);
+        } while (loop2_j < GOVERNMENT_COUNT / 2);
 
         loop3_i = 0;
         loop3_j = 0;
@@ -1074,7 +1074,7 @@ namespace raceopt {
 
         _group_button[group_btn_idx++] = -1000;
 
-        for (int16_t i = 0; i < 4; i++) {
+        for (int16_t i = 0; i < GOVERNMENT_COUNT / 2; i++) {
             _group_button[group_btn_idx++] = -1000;
         }
 
@@ -1223,7 +1223,7 @@ namespace raceopt {
         right = static_cast<int16_t>(column_positions[column_index + 1] - 0x32);
         left = static_cast<int16_t>(column_positions[column_index] - 0x14);
 
-        for (int16_t i = 0; i < 4; ++i) {
+        for (int16_t i = 0; i < GOVERNMENT_COUNT / 2; ++i) {
             raceopt::_group_button[group_button_index] = fields::Add_Hidden_Field_(
                 left,
                 static_cast<int16_t>(bottom - 9),

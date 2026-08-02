@@ -1,7 +1,7 @@
 #include "pch.h"
 
 namespace MOX {
-    const char _ship_type_names[5][6][16] = {
+    const char _ship_type_names[SHIP_TYPE_COUNT][6][16] = {
         {
             "combat ships",
             "not used",
@@ -236,7 +236,7 @@ namespace MOX {
     int8_t _n_weapons_loaded;
     uint8_t _n_special_systems;
     int8_t* _fltscrn_icon_selection_status;
-    uint8_t _star_class_table[7][3] = {
+    uint8_t _star_class_table[STAR_CLASS_COUNT][GALAXY_AGE_COUNT] = {
         {20, 10, 5},
         {25, 15, 5},
         {10, 16, 30},
@@ -245,7 +245,7 @@ namespace MOX {
         {1, 2, 3},
         {2, 4, 6},
     };
-    int8_t _food_per_farmer_table[10] = {0, 0, 0, 1, 1, 2, 2, 1, 2, 3};
+    int8_t _food_per_farmer_table[PLANET_CLIMATE_COUNT] = {0, 0, 0, 1, 1, 2, 2, 1, 2, 3};
     int16_t _ranged_to_hit_penalty[9] = {0, 0, -10, -20, -30, -40, -55, -70, -85};
     int16_t _ranged_damage_penalty[9] = {0, 0, -10, -20, -30, -40, -50, -60, -65};
     int16_t _cur_missile_count;
@@ -421,7 +421,7 @@ namespace MOX {
     uint8_t _NUM_NEBULAS;
     int16_t _NUM_COLONIES;
     int16_t _planet_count;
-    int8_t _climate_modifier_table[5] = {0, 0, 0, -10, -20};
+    int8_t _climate_modifier_table[MINERAL_RESOURCE_COUNT] = {0, 0, 0, -10, -20};
     s_planet_data* _planet;
     const char* _roman_literals[21] = {
         nullptr,
@@ -446,17 +446,17 @@ namespace MOX {
         "XIX",
         "XX",
     };
-    char* _planet_special_string[12];
-    char* _planet_climate_string[10];
-    char* _mineral_class_string[5];
+    char* _planet_special_string[SYSTEM_SPECIAL_COUNT];
+    char* _planet_climate_string[PLANET_CLIMATE_COUNT];
+    char* _mineral_class_string[MINERAL_RESOURCE_COUNT];
     uint8_t _red_color2;
-    char* _planet_size_string[5];
+    char* _planet_size_string[PLANET_SIZE_COUNT];
     char* _planet_type_string[10];
-    char* _planet_group_string[4];
+    char* _planet_group_string[PLANET_GROUP_COUNT];
     char* _planet_atmosphere_string[3];
-    char* _spectral_class_string[7];
+    char* _spectral_class_string[STAR_CLASS_COUNT];
     char* _admin_skill_names[9];
-    char* _planet_gravity_string[3];
+    char* _planet_gravity_string[PLANET_GRAVITY_COUNT];
     int16_t _NUM_SHIPS;
     void* _global_bitmap_seg;
     uint8_t _first_time_drawn;
@@ -526,7 +526,7 @@ namespace MOX {
     s_animation_header* _far_star_seg;
     uint8_t _fleet_icon_selection_status[BITMAP(MAX_SHIPS)];
     s_animation_header* _star_seg[40];
-    s_animation_header* _sun_seg[7];
+    s_animation_header* _sun_seg[STAR_CLASS_COUNT];
     uint16_t _n_stats_to_generate;
     uint32_t _global_cache_size;
     uint32_t _cmd_line_seed;
@@ -549,7 +549,7 @@ namespace MOX {
     int16_t _main_screen_grid_y;
     int16_t _NUM_PLAYERS;
     uint8_t _red_color1;
-    char* _government_labels[8];
+    char* _government_labels[GOVERNMENT_COUNT];
     char* _special_ability_names[32];
     int32_t _stardate_at_beg_of_turn;
     int8_t _global_var;
@@ -736,16 +736,16 @@ namespace MOX {
     s_star_data* _star;
 
     uint8_t _orbit_to_satellite_type[10][5] = {
-        {1, 1, 1, 1, 1},
-        {4, 1, 1, 1, 2},
-        {3, 2, 1, 2, 2},
-        {3, 3, 2, 2, 2},
-        {3, 3, 2, 2, 2},
-        {3, 3, 3, 3, 2},
-        {3, 3, 3, 3, 3},
-        {3, 3, 3, 3, 3},
-        {3, 3, 3, 3, 3},
-        {3, 3, 3, 3, 3},
+        {MAPGEN_SATELLITE_ASTEROID, MAPGEN_SATELLITE_ASTEROID, MAPGEN_SATELLITE_ASTEROID, MAPGEN_SATELLITE_ASTEROID, MAPGEN_SATELLITE_ASTEROID},
+        {MAPGEN_SATELLITE_COMPANION_STAR, MAPGEN_SATELLITE_ASTEROID, MAPGEN_SATELLITE_ASTEROID, MAPGEN_SATELLITE_ASTEROID, MAPGEN_SATELLITE_GAS_GIANT},
+        {MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_GAS_GIANT, MAPGEN_SATELLITE_ASTEROID, MAPGEN_SATELLITE_GAS_GIANT, MAPGEN_SATELLITE_GAS_GIANT},
+        {MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_GAS_GIANT, MAPGEN_SATELLITE_GAS_GIANT, MAPGEN_SATELLITE_GAS_GIANT},
+        {MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_GAS_GIANT, MAPGEN_SATELLITE_GAS_GIANT, MAPGEN_SATELLITE_GAS_GIANT},
+        {MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_GAS_GIANT},
+        {MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET},
+        {MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET},
+        {MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET},
+        {MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET, MAPGEN_SATELLITE_PLANET},
     };
 
     s_ship_node _ship_node[MAX_SHIPS];
@@ -777,7 +777,7 @@ namespace MOX {
     int8_t _black_hole_anim_count[MAX_STARS];
     int16_t _bill_savegame[6] = {2, 0, 0, 0, 0, 0};
     uint16_t _antaran_resource_level;
-    s_crew_data _crew_data[5] = {
+    s_crew_data _crew_data[CREW_QUALITY_COUNT] = {
         {0, 0, 0, 0},
         {50, 15, 15, 5},
         {150, 30, 30, 10},
@@ -792,18 +792,18 @@ namespace MOX {
     uint8_t _g_galaxy_size;
     void* _nebula_screen_seg;
     s_animation_header* _nebula_pict_seg[12][4];
-    uint8_t _planet_max_farms[5] = {2, 4, 5, 7, 10};
-    int8_t _planet_max_population[5] = {5, 10, 15, 20, 25};
-    uint8_t _planet_size_table[5] = {1, 3, 7, 9, 10};
+    uint8_t _planet_max_farms[PLANET_SIZE_COUNT] = {2, 4, 5, 7, 10};
+    int8_t _planet_max_population[PLANET_SIZE_COUNT] = {5, 10, 15, 20, 25};
+    uint8_t _planet_size_table[PLANET_SIZE_COUNT] = {1, 3, 7, 9, 10};
     s_class_group _class_to_group[6] = {
-        {{0, 0, 0, 0, 1}},
-        {{0, 0, 1, 2, 3}},
-        {{0, 1, 2, 2, 3}},
-        {{1, 2, 2, 2, 3}},
-        {{1, 2, 3, 3, 3}},
-        {{0, 0, 1, 2, 3}},
+        {{PLANET_GROUP_BOMBARDED, PLANET_GROUP_BOMBARDED, PLANET_GROUP_BOMBARDED, PLANET_GROUP_BOMBARDED, PLANET_GROUP_HOSTILE}},
+        {{PLANET_GROUP_BOMBARDED, PLANET_GROUP_BOMBARDED, PLANET_GROUP_HOSTILE, PLANET_GROUP_LIFE_SUPPORTING, PLANET_GROUP_LIFELESS}},
+        {{PLANET_GROUP_BOMBARDED, PLANET_GROUP_HOSTILE, PLANET_GROUP_LIFE_SUPPORTING, PLANET_GROUP_LIFE_SUPPORTING, PLANET_GROUP_LIFELESS}},
+        {{PLANET_GROUP_HOSTILE, PLANET_GROUP_LIFE_SUPPORTING, PLANET_GROUP_LIFE_SUPPORTING, PLANET_GROUP_LIFE_SUPPORTING, PLANET_GROUP_LIFELESS}},
+        {{PLANET_GROUP_HOSTILE, PLANET_GROUP_LIFE_SUPPORTING, PLANET_GROUP_LIFELESS, PLANET_GROUP_LIFELESS, PLANET_GROUP_LIFELESS}},
+        {{PLANET_GROUP_BOMBARDED, PLANET_GROUP_BOMBARDED, PLANET_GROUP_HOSTILE, PLANET_GROUP_LIFE_SUPPORTING, PLANET_GROUP_LIFELESS}},
     };
-    uint8_t _climate_roll_table[10][4] = {
+    uint8_t _climate_roll_table[PLANET_CLIMATE_COUNT][PLANET_GROUP_COUNT] = {
         {15, 15, 10, 20},
         {55, 50, 15, 0},
         {25, 25, 10, 70},
@@ -815,7 +815,7 @@ namespace MOX {
         {0, 0, 11, 0},
         {0, 0, 2, 0},
     };
-    uint8_t _normal_gal_climate_roll_table[10][4] = {
+    uint8_t _normal_gal_climate_roll_table[PLANET_CLIMATE_COUNT][PLANET_GROUP_COUNT] = {
         {15, 15, 10, 20},
         {55, 50, 15, 0},
         {25, 25, 10, 70},
@@ -827,7 +827,7 @@ namespace MOX {
         {0, 0, 11, 0},
         {0, 0, 2, 0},
     };
-    uint8_t _old_gal_climate_roll_table[10][4] = {
+    uint8_t _old_gal_climate_roll_table[PLANET_CLIMATE_COUNT][PLANET_GROUP_COUNT] = {
         {15, 5, 5, 20},
         {40, 30, 8, 0},
         {20, 20, 8, 50},
@@ -905,25 +905,25 @@ namespace MOX {
     char _h_strings[0x4074];
     s_help_box _help_entry_list[50];
     int8_t _class_to_mineral[60] = {
-        2, 1, 1, 0, 0, 1,
-        2, 1, 1, 1, 0, 2,
-        2, 2, 1, 1, 1, 2,
-        2, 2, 2, 1, 1, 2,
-        3, 2, 2, 1, 1, 2,
-        3, 2, 2, 2, 1, 2,
-        3, 3, 2, 2, 2, 3,
-        3, 3, 3, 2, 2, 3,
-        4, 3, 3, 2, 2, 3,
-        4, 4, 4, 3, 2, 4,
+        MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_ULTRA_POOR, MINERAL_RESOURCE_ULTRA_POOR, MINERAL_RESOURCE_POOR,
+        MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_ULTRA_POOR, MINERAL_RESOURCE_ABUNDANT,
+        MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_ABUNDANT,
+        MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_ABUNDANT,
+        MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_ABUNDANT,
+        MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_POOR, MINERAL_RESOURCE_ABUNDANT,
+        MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_RICH,
+        MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_RICH,
+        MINERAL_RESOURCE_ULTRA_RICH, MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_RICH,
+        MINERAL_RESOURCE_ULTRA_RICH, MINERAL_RESOURCE_ULTRA_RICH, MINERAL_RESOURCE_ULTRA_RICH, MINERAL_RESOURCE_RICH, MINERAL_RESOURCE_ABUNDANT, MINERAL_RESOURCE_ULTRA_RICH,
     };
     int8_t _planet_special = 64;
-    uint8_t _planet_special_weighted_chance[12] = {64, 5, 3, 2, 3, 2, 9, 4, 3, 0, 5, 0};
+    uint8_t _planet_special_weighted_chance[SYSTEM_SPECIAL_COUNT] = {64, 5, 3, 2, 3, 2, 9, 4, 3, 0, 5, 0};
     int8_t _gravity_table[30] = {
-        0, 0, 0, 1, 1,
-        0, 0, 1, 1, 1,
-        0, 1, 1, 1, 2,
-        1, 1, 1, 2, 2,
-        1, 1, 2, 2, 2,
+        PLANET_GRAVITY_LOW_G, PLANET_GRAVITY_LOW_G, PLANET_GRAVITY_LOW_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_NORMAL_G,
+        PLANET_GRAVITY_LOW_G, PLANET_GRAVITY_LOW_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_NORMAL_G,
+        PLANET_GRAVITY_LOW_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_HEAVY_G,
+        PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_HEAVY_G, PLANET_GRAVITY_HEAVY_G,
+        PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_NORMAL_G, PLANET_GRAVITY_HEAVY_G, PLANET_GRAVITY_HEAVY_G, PLANET_GRAVITY_HEAVY_G,
         0, 0, 0, 0, 0,
     };
     s_mouse_list _mouse_list_arrow = {1, 0, 0, 0, 639, 479};

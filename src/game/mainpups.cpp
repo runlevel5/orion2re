@@ -421,7 +421,7 @@ namespace MAINPUPS {
             strlcat(buffer, chunk, buffer_size);
         }
 
-        if (p->planet_special != 0) {
+        if (p->planet_special != SYSTEM_SPECIAL_NO_SPECIAL) {
             char* special_str = MOX::_planet_special_string[p->planet_special];
             snprintf(chunk, sizeof(chunk), ESTRINGS::E_Strings_(0x50), "\x1A" "0", special_str);
             strlcat(buffer, chunk, buffer_size);
@@ -860,7 +860,7 @@ namespace MAINPUPS {
                     Eric_Pop_Fields_();
                     Update_Random_New_Officer_Fields_();
 
-                    if (MOX::_settings.game_difficulty <= 0 && _on_officer_screen_flag != 0) {
+                    if (MOX::_settings.game_difficulty <= GAME_DIFFICULTY_TUTOR && _on_officer_screen_flag != 0) {
                         COLONY::_full_draw = 0;
                     } else {
                         done = true;
@@ -875,7 +875,7 @@ namespace MAINPUPS {
                     Eric_Pop_Fields_();
                     Update_Random_New_Officer_Fields_();
 
-                    if (MOX::_settings.game_difficulty <= 0 && _on_officer_screen_flag != 0) {
+                    if (MOX::_settings.game_difficulty <= GAME_DIFFICULTY_TUTOR && _on_officer_screen_flag != 0) {
                         COLONY::_full_draw = 0;
                     } else {
                         _field_state = 0;

@@ -96,14 +96,14 @@ void __cdecl Load_H_And_Pro_File_Strings_(void) {
     MOX::_treaty_labels[5] = ESTRINGS::E_Strings_(0x27A);
     MOX::_treaty_labels[6] = ESTRINGS::E_Strings_(0x27B);
 
-    MOX::_government_labels[0] = ESTRINGS::E_Strings_(0x27C);
-    MOX::_government_labels[1] = ESTRINGS::E_Strings_(0x27D);
-    MOX::_government_labels[2] = ESTRINGS::E_Strings_(0x27E);
-    MOX::_government_labels[3] = ESTRINGS::E_Strings_(0x27F);
-    MOX::_government_labels[4] = ESTRINGS::E_Strings_(0x280);
-    MOX::_government_labels[5] = ESTRINGS::E_Strings_(0x281);
-    MOX::_government_labels[6] = ESTRINGS::E_Strings_(0x282);
-    MOX::_government_labels[7] = ESTRINGS::E_Strings_(0x283);
+    MOX::_government_labels[GOVERNMENT_FEUDAL] = ESTRINGS::E_Strings_(0x27C);
+    MOX::_government_labels[GOVERNMENT_CONFEDERATION] = ESTRINGS::E_Strings_(0x27D);
+    MOX::_government_labels[GOVERNMENT_DICTATORSHIP] = ESTRINGS::E_Strings_(0x27E);
+    MOX::_government_labels[GOVERNMENT_IMPERIUM] = ESTRINGS::E_Strings_(0x27F);
+    MOX::_government_labels[GOVERNMENT_DEMOCRACY] = ESTRINGS::E_Strings_(0x280);
+    MOX::_government_labels[GOVERNMENT_FEDERATION] = ESTRINGS::E_Strings_(0x281);
+    MOX::_government_labels[GOVERNMENT_UNIFICATION] = ESTRINGS::E_Strings_(0x282);
+    MOX::_government_labels[GOVERNMENT_GALACTIC_UNIFICATION] = ESTRINGS::E_Strings_(0x283);
 
     MOX::_race_names[0] = ESTRINGS::E_Strings_(0x285);
     MOX::_race_names[1] = ESTRINGS::E_Strings_(0x286);
@@ -172,10 +172,10 @@ void __cdecl Load_H_And_Pro_File_Strings_(void) {
     MOX::_planet_atmosphere_string[1] = ESTRINGS::E_Strings_(0x2B3);
     MOX::_planet_atmosphere_string[2] = ESTRINGS::E_Strings_(0x2B4);
 
-    MOX::_planet_group_string[0] = ESTRINGS::E_Strings_(0x2B5);
-    MOX::_planet_group_string[1] = ESTRINGS::E_Strings_(0x2B6);
-    MOX::_planet_group_string[2] = ESTRINGS::E_Strings_(0x2B7);
-    MOX::_planet_group_string[3] = ESTRINGS::E_Strings_(0x2B8);
+    MOX::_planet_group_string[PLANET_GROUP_BOMBARDED] = ESTRINGS::E_Strings_(0x2B5);
+    MOX::_planet_group_string[PLANET_GROUP_HOSTILE] = ESTRINGS::E_Strings_(0x2B6);
+    MOX::_planet_group_string[PLANET_GROUP_LIFE_SUPPORTING] = ESTRINGS::E_Strings_(0x2B7);
+    MOX::_planet_group_string[PLANET_GROUP_LIFELESS] = ESTRINGS::E_Strings_(0x2B8);
 
     MOX::_planet_special_string[SYSTEM_SPECIAL_NO_SPECIAL] = ESTRINGS::E_Strings_(0x2B9);
     MOX::_planet_special_string[SYSTEM_SPECIAL_STABLE_WORMHOLE] = ESTRINGS::E_Strings_(0x2BA);

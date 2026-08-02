@@ -219,8 +219,7 @@ namespace BOMB {
         int32_t non_android_count = 0;
 
         for (int32_t pop_slot_idx = 0; pop_slot_idx < (int32_t)(uint8_t)colony->n_pops; ++pop_slot_idx) {
-            // Check race index; 8 is RACE_ANDROID
-            if ((colony->pop[pop_slot_idx] & 0xf) != 8) {
+            if ((colony->pop[pop_slot_idx] & 0xf) != POP::RACE_ANDROID) {
                 non_android_count++;
                 if (game_random::Random_(non_android_count) == 1) {
                     target_pop_idx = pop_slot_idx;

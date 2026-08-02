@@ -227,7 +227,7 @@ namespace BILL {
     }
 
     void __cdecl Bill_Default_(void) {
-        if (MOX::_settings.game_difficulty < 2) {
+        if (MOX::_settings.game_difficulty < GAME_DIFFICULTY_AVERAGE) {
             BILL::Set_Plyr_Info_Btns_(4);
         }
         FMTPARA::Init_();

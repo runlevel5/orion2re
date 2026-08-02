@@ -558,12 +558,12 @@ namespace AIBUILD {
         int8_t gravity = planet->gravity_class;
         
         bool is_industrial_focus = false;
-        if (colony->buildings[BUILDING_AUTOMATED_FACTORY] == 0 && player->tech_applications[TECH_APP_AUTOMATED_FACTORIES] == TECH_RESEARCH_STATUS_RESEARCHED && planet->mineral_class <= 2) {
+        if (colony->buildings[BUILDING_AUTOMATED_FACTORY] == 0 && player->tech_applications[TECH_APP_AUTOMATED_FACTORIES] == TECH_RESEARCH_STATUS_RESEARCHED && planet->mineral_class <= MINERAL_RESOURCE_ABUNDANT) {
             is_industrial_focus = true;
         }
 
         bool is_military_focus = false;
-        int8_t ground_trait = player->traits[0 /* TRAIT_GROUND_COMBAT */] / 2;
+        int8_t ground_trait = player->traits[TRAIT_CURRENT_GOVERNMENT] / 2;
         if (ground_trait >= 0 && ground_trait <= 1) {
             if ((colony->buildings[BUILDING_MARINE_BARRACKS] == 0 && player->tech_applications[TECH_APP_MARINE_BARRACKS] == TECH_RESEARCH_STATUS_RESEARCHED) ||
                 (colony->buildings[BUILDING_ARMOR_BARRACKS] == 0 && player->tech_applications[TECH_APP_ARMOR_BARRACKS] == TECH_RESEARCH_STATUS_RESEARCHED)) {
@@ -963,7 +963,7 @@ namespace AIBUILD {
 
         int32_t difficulty = MOX::_settings.game_difficulty;
         if (MOX::_player[(int32_t)colony->owner].objectives == PLAYER_OBJECTIVE_HUMAN) {
-            difficulty = 4;
+            difficulty = GAME_DIFFICULTY_IMPOSSIBLE;
         }
 
         int32_t threshold_multiplier = 6 - difficulty;

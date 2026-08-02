@@ -144,22 +144,22 @@ namespace KEN {
             obj_w[0] = 1;
             obj_w[2] = 1;
             obj_w[5] = 1;
-            des_w[1] = 1;
+            des_w[AI_SHIP_DESIGN_THEME_CARRIER] = 1;
 
             obj_w[1] = 2;
             obj_w[3] = 2;
             obj_w[4] = 2;
-            des_w[0] = 2;
-            des_w[2] = 2;
-            spec_w[0] = 2;
-            spec_w[1] = 2;
-            spec_w[3] = 2;
+            des_w[AI_SHIP_DESIGN_THEME_BALANCED] = 2;
+            des_w[AI_SHIP_DESIGN_THEME_MISSILE] = 2;
+            spec_w[AI_SHIP_SPECIAL_THEME_BEAM_DEFENSE] = 2;
+            spec_w[AI_SHIP_SPECIAL_THEME_CAPTURE] = 2;
+            spec_w[AI_SHIP_SPECIAL_THEME_MISSILE_DEFENSE] = 2;
 
-            des_w[3] = 1;
-            spec_w[5] = 2;
-            spec_w[2] = 1;
-            spec_w[4] = 1;
-            spec_w[6] = 3;
+            des_w[AI_SHIP_DESIGN_THEME_SPECIAL] = 1;
+            spec_w[AI_SHIP_SPECIAL_THEME_ARMOR] = 2;
+            spec_w[AI_SHIP_SPECIAL_THEME_BIO_WEAPON] = 1;
+            spec_w[AI_SHIP_SPECIAL_THEME_CLOAKING] = 1;
+            spec_w[AI_SHIP_SPECIAL_THEME_SHIELD] = 3;
 
             int8_t* traits = MOX::_player[i].traits;
 
@@ -201,31 +201,31 @@ namespace KEN {
             }
             if (traits[TRAIT_SHIP_DEFENSE] == 20) {
                 obj_w[1] = 12;
-                spec_w[3] = 102;
-                des_w[1] = 11;
+                spec_w[AI_SHIP_SPECIAL_THEME_MISSILE_DEFENSE] = 102;
+                des_w[AI_SHIP_DESIGN_THEME_CARRIER] = 11;
             }
             if (traits[TRAIT_SHIP_DEFENSE] == 40) {
                 obj_w[1] += 100;
-                spec_w[3] += 1000;
-                des_w[1] += 100;
+                spec_w[AI_SHIP_SPECIAL_THEME_MISSILE_DEFENSE] += 1000;
+                des_w[AI_SHIP_DESIGN_THEME_CARRIER] += 100;
             }
             if (traits[TRAIT_SHIP_ATTACK] == 25) {
-                spec_w[4] = 4;
-                des_w[0] = 102;
+                spec_w[AI_SHIP_SPECIAL_THEME_CLOAKING] = 4;
+                des_w[AI_SHIP_DESIGN_THEME_BALANCED] = 102;
                 obj_w[1] += 10;
             }
             if (traits[TRAIT_SHIP_ATTACK] == 50) {
                 obj_w[1] += 100;
-                spec_w[4] += 10;
-                des_w[0] += 1000;
+                spec_w[AI_SHIP_SPECIAL_THEME_CLOAKING] += 10;
+                des_w[AI_SHIP_DESIGN_THEME_BALANCED] += 1000;
             }
             if (traits[TRAIT_GROUND_COMBAT_BONUS] == 10) {
-                spec_w[1] = 102;
+                spec_w[AI_SHIP_SPECIAL_THEME_CAPTURE] = 102;
                 obj_w[2] += 10;
             }
             if (traits[TRAIT_GROUND_COMBAT_BONUS] == 20) {
                 obj_w[2] += 100;
-                spec_w[1] += 1000;
+                spec_w[AI_SHIP_SPECIAL_THEME_CAPTURE] += 1000;
             }
             if (traits[TRAIT_SPYING_BONUS] == 10) {
                 obj_w[0] = 4;
@@ -240,7 +240,7 @@ namespace KEN {
             }
             if (traits[TRAIT_HEAVY_G_WORLD] == 1) {
                 obj_w[2] += 10;
-                spec_w[1] += 1000;
+                spec_w[AI_SHIP_SPECIAL_THEME_CAPTURE] += 1000;
             }
             if (traits[TRAIT_AQUATIC] == 1) {
                 obj_w[4] += 3;
@@ -261,8 +261,8 @@ namespace KEN {
             }
             if (traits[TRAIT_CYBERNETIC] == 1) {
                 obj_w[4] += 3;
-                des_w[0] += 10;
-                spec_w[5] = 1002;
+                des_w[AI_SHIP_DESIGN_THEME_BALANCED] += 10;
+                spec_w[AI_SHIP_SPECIAL_THEME_ARMOR] = 1002;
             }
             if (traits[TRAIT_EATS_MINERALS] == 1) {
                 obj_w[4] += 3;
@@ -290,21 +290,21 @@ namespace KEN {
             if (traits[TRAIT_TRANS_DIMENSIONAL] == 1) {
                 obj_w[2] += 10;
                 obj_w[1] += 13;
-                spec_w[3] += 100;
+                spec_w[AI_SHIP_SPECIAL_THEME_MISSILE_DEFENSE] += 100;
             }
 
-            if (MOX::_settings.game_difficulty == 3) {
+            if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
                 obj_w[4] += 3;
                 obj_w[2] += 3;
                 obj_w[3] += 3;
             }
-            if (MOX::_settings.game_difficulty == 4) {
+            if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
                 obj_w[4] += 10;
                 obj_w[2] += 10;
                 obj_w[3] += 10;
             }
             if (MOX::_player[i].personality == PLAYER_PERSONALITY_XENOPHOBIC) {
-                spec_w[2] = 4;
+                spec_w[AI_SHIP_SPECIAL_THEME_BIO_WEAPON] = 4;
             }
 
             // Calculate objectives
@@ -338,21 +338,21 @@ namespace KEN {
 
             // Calculate ship design theme
             int total_des = 0;
-            for (int32_t j = 0; j < design_weight_count; ++j) {
+            for (int32_t j = AI_SHIP_DESIGN_THEME_BALANCED; j < design_weight_count; ++j) {
                 total_des += des_w[j];
             }
             while (total_des > 1000) {
                 total_des = 0;
-                for (int32_t j = 0; j < design_weight_count; ++j) {
+                for (int32_t j = AI_SHIP_DESIGN_THEME_BALANCED; j < design_weight_count; ++j) {
                     des_w[j] /= 2;
                     total_des += des_w[j];
                 }
             }
             int rand_des = game_random::Random_(total_des);
-            int selected_des = 0;
-            rand_des -= des_w[0];
+            int selected_des = AI_SHIP_DESIGN_THEME_BALANCED;
+            rand_des -= des_w[AI_SHIP_DESIGN_THEME_BALANCED];
             if (rand_des > 0) {
-                for (int32_t j = 1; j < design_weight_count; ++j) {
+                for (int32_t j = AI_SHIP_DESIGN_THEME_CARRIER; j < design_weight_count; ++j) {
                     selected_des++;
                     rand_des -= des_w[j];
                     if (rand_des <= 0) break;
@@ -362,21 +362,21 @@ namespace KEN {
 
             // Calculate ship special theme
             int total_spec = 0;
-            for (int32_t j = 0; j < special_weight_count; ++j) {
+            for (int32_t j = AI_SHIP_SPECIAL_THEME_BEAM_DEFENSE; j < special_weight_count; ++j) {
                 total_spec += spec_w[j];
             }
             while (total_spec > 1000) {
                 total_spec = 0;
-                for (int32_t j = 0; j < special_weight_count; ++j) {
+                for (int32_t j = AI_SHIP_SPECIAL_THEME_BEAM_DEFENSE; j < special_weight_count; ++j) {
                     spec_w[j] /= 2;
                     total_spec += spec_w[j];
                 }
             }
             int rand_spec = game_random::Random_(total_spec);
-            int selected_spec = 0;
-            rand_spec -= spec_w[0];
+            int selected_spec = AI_SHIP_SPECIAL_THEME_BEAM_DEFENSE;
+            rand_spec -= spec_w[AI_SHIP_SPECIAL_THEME_BEAM_DEFENSE];
             if (rand_spec > 0) {
-                for (int32_t j = 1; j < special_weight_count; ++j) {
+                for (int32_t j = AI_SHIP_SPECIAL_THEME_CAPTURE; j < special_weight_count; ++j) {
                     selected_spec++;
                     rand_spec -= spec_w[j];
                     if (rand_spec <= 0) break;

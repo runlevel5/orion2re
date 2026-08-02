@@ -757,7 +757,7 @@ namespace DESBOX {
 
         memset(MOX::_design->replacement_item_unlocked, 0, sizeof(MOX::_design->replacement_item_unlocked));
 
-        if (MOX::_design_screen_replacement_type == 2 /* SHIELDS */) {
+        if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD) {
             MOX::_scroll_bar->total_rows = SHIELD_COUNT;
             for (int16_t idx = 0; idx < MOX::_scroll_bar->total_rows; ++idx) {
                 // If it is the first item (basic shield) or it has been researched (tech status 3)
@@ -768,7 +768,7 @@ namespace DESBOX {
                     MOX::_design_choice_items[idx] = -1;
                 }
             }
-        } else if (MOX::_design_screen_replacement_type == 8 /* COMPUTERS */) {
+        } else if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
             MOX::_scroll_bar->total_rows = COMPUTER_COUNT;
             for (int16_t idx = 0; idx < MOX::_scroll_bar->total_rows; ++idx) {
                 // If it is the first item (basic computer) or it has been researched (tech status 3)
@@ -786,7 +786,8 @@ namespace DESBOX {
         int16_t cancel_btn_height = animate::Get_Height_(MOX::_system_repl_box_cancel_btn);
 
         s_animation_header* top_seg_ptr = nullptr;
-        if (MOX::_design_screen_replacement_type == 2 || MOX::_design_screen_replacement_type == 8) {
+        if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD ||
+            MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
             top_seg_ptr = MOX::_system_repl_box_top_seg;
         }
 
@@ -810,7 +811,8 @@ namespace DESBOX {
 
     void __cdecl Add_Generic_Replacement_Fields_(int16_t* cancel_btn_field, int16_t* bg_field, int16_t* top_box_field) {
         s_animation_header* top_seg = nullptr;
-        if (MOX::_design_screen_replacement_type == 2 || MOX::_design_screen_replacement_type == 8) {
+        if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD ||
+            MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
             top_seg = MOX::_system_repl_box_top_seg;
         }
 
@@ -867,21 +869,21 @@ namespace DESBOX {
         int16_t help_id = -1;
 
         if (input_field + clear_btn_field == 0) {
-            if (MOX::_design_screen_replacement_type == 2) {
+            if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD) {
                 help_id = 0x2ab;
-            } else if (MOX::_design_screen_replacement_type == 8) {
+            } else if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
                 help_id = 0x2ae;
             }
         } else if (input_field + ok_btn_field == 0) {
-            if (MOX::_design_screen_replacement_type == 2) {
+            if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD) {
                 help_id = 0x2aa;
-            } else if (MOX::_design_screen_replacement_type == 8) {
+            } else if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
                 help_id = 0x2ad;
             }
         } else if (input_field + box_field == 0) {
-            if (MOX::_design_screen_replacement_type == 2) {
+            if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD) {
                 help_id = 0x2a9;
-            } else if (MOX::_design_screen_replacement_type == 8) {
+            } else if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
                 help_id = 0x2ac;
             }
         }
@@ -908,9 +910,9 @@ namespace DESBOX {
 
         if (choice_item == 0) {
             int16_t entry_id = -1;
-            if (MOX::_design_screen_replacement_type == 2) {
+            if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD) {
                 entry_id = 0x2b4;
-            } else if (MOX::_design_screen_replacement_type == 8) {
+            } else if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
                 entry_id = 0x2b5;
             }
             if (entry_id != -1) {
@@ -925,10 +927,10 @@ namespace DESBOX {
             description[0] = '\0';
             const char* name_ptr = nullptr;
 
-            if (MOX::_design_screen_replacement_type == 2) {
+            if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD) {
                 EVANHELP::Get_Application_Description_(description, sizeof(description), TECHDATA::_shields[choice_item].tech_app_id);
                 name_ptr = TECHDATA::_shields[choice_item].name;
-            } else if (MOX::_design_screen_replacement_type == 8) {
+            } else if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
                 EVANHELP::Get_Application_Description_(description, sizeof(description), TECHDATA::_computers[choice_item].tech_app_id);
                 name_ptr = TECHDATA::_computers[choice_item].name;
             }
@@ -1140,13 +1142,13 @@ namespace DESBOX {
     void __cdecl Draw_Weapons_Arc_Box_(int16_t x, int16_t y) {
         uint8_t arc_status[5] = { 0, 0, 0, 0, 0 };
 
-        if (_weapon_replacement_arcs & 0x02) {
+        if (_weapon_replacement_arcs & WEAPON_FIRING_ARC_FORWARD_EXTENDED) {
             arc_status[1] = 1;
-        } else if (_weapon_replacement_arcs & 0x04) {
+        } else if (_weapon_replacement_arcs & WEAPON_FIRING_ARC_BACK_EXTENDED) {
             arc_status[2] = 1;
-        } else if (_weapon_replacement_arcs & 0x08) {
+        } else if (_weapon_replacement_arcs & WEAPON_FIRING_ARC_REAR) {
             arc_status[3] = 1;
-        } else if (_weapon_replacement_arcs & 0x10) {
+        } else if (_weapon_replacement_arcs & WEAPON_FIRING_ARC_360) {
             arc_status[4] = 1;
         } else {
             arc_status[0] = 1;
@@ -1169,7 +1171,7 @@ namespace DESBOX {
     int32_t __cdecl New_Arc_Space_(uint8_t arc_index) {
         if (DESBOX::_field_item_chosen > -1) {
             int16_t weapon_idx = DESBOX::Weapon_Index_(DESBOX::_field_item_chosen);
-            uint16_t arc_mask = (uint16_t)(1u << arc_index);
+            uint16_t arc_mask = (uint16_t)(WEAPON_FIRING_ARC_FORWARD << arc_index);
 
             return DESIGN::Weapon_Space_(
                 MOX::_PLAYER_NUM,
@@ -1302,9 +1304,9 @@ namespace DESBOX {
         }
 
         if (chosen_index >= 0) {
-            if (MOX::_design_screen_replacement_type == 2) {
+            if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_SHIELD) {
                 MOX::_design->shield = MOX::_design_choice_items[chosen_index];
-            } else if (MOX::_design_screen_replacement_type == 8) {
+            } else if (MOX::_design_screen_replacement_type == TECH_APPLICATION_TYPE_COMPUTER) {
                 MOX::_design->computer_type = MOX::_design_choice_items[chosen_index];
             }
         }
@@ -1347,7 +1349,7 @@ namespace DESBOX {
 
         int16_t replacement_slot = MOX::_design_screen_replacement_slot;
 
-        _weapon_replacement_arcs = 0;
+        _weapon_replacement_arcs = WEAPON_FIRING_ARC_NONE;
         MOX::_multi_colored_line_start = 0;
 
         video::Set_Page_Off_();
@@ -1419,7 +1421,7 @@ namespace DESBOX {
                             snprintf(message_box_text, sizeof(message_box_text), invalid_arc_format, arc_strings[i]);
                             GENDRAW::Message_Box_(message_box_text);
                         } else {
-                            _weapon_replacement_arcs = 1 << i;
+                            _weapon_replacement_arcs = WEAPON_FIRING_ARC_FORWARD << i;
                         }
                         continue;
                     } else if ((weap_type == 1 || weap_type == 2) && MOX::_weapon_rack_field[i] == input) {
@@ -1428,7 +1430,7 @@ namespace DESBOX {
                             snprintf(message_box_text, sizeof(message_box_text), invalid_rack_format, racks[i]);
                             GENDRAW::Message_Box_(message_box_text);
                         } else {
-                            _weapon_replacement_arcs = 0x10;
+                            _weapon_replacement_arcs = WEAPON_FIRING_ARC_360;
                             _weapon_replacement_rack = i;
                         }
                         continue;
@@ -1466,7 +1468,7 @@ namespace DESBOX {
 
             if (scan_result == 0) {
                 if (scanned_idx == 0) {
-                    _weapon_replacement_arcs = 0;
+                    _weapon_replacement_arcs = WEAPON_FIRING_ARC_NONE;
                     _weapon_replacement_mods = 0;
                     _field_item_chosen = 0;
                     done_flag = 1;
@@ -1483,9 +1485,9 @@ namespace DESBOX {
                         int16_t wtype = DESIGN::Weapon_Type_(weap_idx);
                         _weapon_replacement_mods = 0;
                         memset(MOX::_weapon_mod_field_status, 0, sizeof(MOX::_weapon_mod_field_status));
-                        _weapon_replacement_arcs = 1;
+                        _weapon_replacement_arcs = WEAPON_FIRING_ARC_FORWARD;
                         if (wtype != 0) {
-                            _weapon_replacement_arcs = 0x10;
+                            _weapon_replacement_arcs = WEAPON_FIRING_ARC_360;
                         }
                         _weapon_replacement_rack = 1;
                         Update_Weapon_Modification_Data_();
@@ -1882,7 +1884,7 @@ namespace DESBOX {
 
         memset(MOX::_weapon_mod_field_status, 0, sizeof(MOX::_weapon_mod_field_status));
 
-        _weapon_replacement_arcs = 0;
+        _weapon_replacement_arcs = WEAPON_FIRING_ARC_NONE;
 
         if (MOX::_design->weapon_type[weapon_index] <= 0) {
             _weapon_replacement_mods = 0;
@@ -1980,7 +1982,7 @@ namespace DESBOX {
         int16_t current_x = DESBOX::_replacement_box_base_x;
         int16_t current_y = DESBOX::_replacement_box_base_y;
 
-        if (type == 2 || type == 8) {
+        if (type == TECH_APPLICATION_TYPE_SHIELD || type == TECH_APPLICATION_TYPE_COMPUTER) {
             animate::Draw_(current_x, current_y, MOX::_system_repl_box_top_seg);
         }
 
@@ -1995,9 +1997,9 @@ namespace DESBOX {
         current_y += DESBOX::_replacement_box_middle_height;
         animate::Draw_(current_x, current_y, MOX::_system_repl_box_btm_seg);
 
-        if (type == 2) {
+        if (type == TECH_APPLICATION_TYPE_SHIELD) {
             DESBOX::Print_Shield_Data_(DESBOX::_replacement_box_base_x, DESBOX::_replacement_box_base_y);
-        } else if (type == 8) {
+        } else if (type == TECH_APPLICATION_TYPE_COMPUTER) {
             DESBOX::Print_Computer_Data_(DESBOX::_replacement_box_base_x, DESBOX::_replacement_box_base_y);
         }
 
@@ -2215,8 +2217,8 @@ namespace DESBOX {
                 if (_field_item_chosen <= -1 || (weapon_idx > 0 && _field_item_chosen != row_idx)) {
                     if (weapon_idx > 0) {
                         int16_t rack_ammo = (DESIGN::Weapon_Needs_Racks_(weapon_idx) != 0) ? 5 : 0;
-                        weapon_cost = DESIGN::Weapon_Cost_(weapon_idx, 1, 1, rack_ammo, 0);
-                        weapon_space = DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, 1, rack_ammo, 0);
+                        weapon_cost = DESIGN::Weapon_Cost_(weapon_idx, 1, WEAPON_FIRING_ARC_FORWARD, rack_ammo, 0);
+                        weapon_space = DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, WEAPON_FIRING_ARC_FORWARD, rack_ammo, 0);
                     }
                 } else if (weapon_idx > 0 && _field_item_chosen == row_idx) {
                     int16_t rack_ammo = 0;
@@ -2975,7 +2977,6 @@ namespace DESBOX {
         int16_t base_cost = p_special->cost_per_ship_type[ship_size];
         uint16_t base_space = p_special->space_per_ship_type[ship_size];
 
-        // 4 likely corresponds to ITEM_STABILIZER or similar which does not miniaturize
         if (choice_idx == 4) {
             *out_cost = base_cost;
             *out_space = (int16_t)base_space;

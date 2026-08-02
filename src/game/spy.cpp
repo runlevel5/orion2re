@@ -1,7 +1,7 @@
 #include "pch.h"
 
 namespace spy {
-    int8_t _lookup_table[8] = {0, 0, 10, 15, -10, -10, 15, 15};
+    int8_t _lookup_table[GOVERNMENT_COUNT] = {0, 0, 10, 15, -10, -10, 15, 15};
 
     int16_t _spy_bonuses[MAX_PLAYERS * 2];
 
@@ -177,7 +177,7 @@ namespace spy {
             return;
         }
 
-        if (MOX::_settings.game_difficulty < 1) {
+        if (MOX::_settings.game_difficulty < GAME_DIFFICULTY_EASY) {
             return;
         }
 
@@ -222,7 +222,7 @@ namespace spy {
 
         if (total_spies == 0) {
             if ((*AIDATA::_ai_player_info)[player_idx].n_contacts > 0 && MOX::_stardate > 35030) {
-                if (MOX::_settings.game_difficulty == 4) {
+                if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
                     if (player->objectives != PLAYER_OBJECTIVE_DIPLOMATIC) {
                         game_random::Random_(8);
                     }
@@ -230,7 +230,7 @@ namespace spy {
                         game_random::Random_(5);
                     }
                     total_spies = 1;
-                } else if (MOX::_settings.game_difficulty == 3) {
+                } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
                     if (player->objectives == PLAYER_OBJECTIVE_DIPLOMATIC && game_random::Random_(7) == 1) {
                         total_spies = 1;
                     } else if (game_random::Random_(25) == 1) {
@@ -238,7 +238,7 @@ namespace spy {
                     } else if (player->traits[TRAIT_SPYING_BONUS] > 0 && game_random::Random_(6) == 1) {
                         total_spies = 1;
                     }
-                } else if (MOX::_settings.game_difficulty == 2) {
+                } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_AVERAGE) {
                     if (player->objectives == PLAYER_OBJECTIVE_DIPLOMATIC && game_random::Random_(13) == 1) {
                         total_spies = 1;
                     } else if (player->traits[TRAIT_SPYING_BONUS] > 0 && game_random::Random_(13) == 1) {
@@ -254,7 +254,7 @@ namespace spy {
 
         int32_t allocated_home = 0;
         if (_spy_bonuses[player_idx * 2] >= 0) {
-            if (MOX::_settings.game_difficulty > 2) {
+            if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
                 allocated_home = max_spy_val_100;
             } else {
                 allocated_home = max_spy_val_100;
@@ -405,7 +405,7 @@ namespace spy {
             int32_t roll = other_spies_bonus + other_off - my_def - def_spies_bonus - rand2 + rand1;
 
             if (other_player->objectives != PLAYER_OBJECTIVE_HUMAN && player->objectives == PLAYER_OBJECTIVE_HUMAN) {
-                roll += MOX::_settings.game_difficulty - 2;
+                roll += MOX::_settings.game_difficulty - GAME_DIFFICULTY_AVERAGE;
             }
 
             int16_t mission = BILL::Get_Their_Spy_Mission_(other_plr_idx, player_idx);

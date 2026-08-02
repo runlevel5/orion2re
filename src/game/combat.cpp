@@ -432,26 +432,26 @@ namespace COMBAT {
 
                             int16_t bonus = TECHDATA::_specials[device_idx].strategic;
                             switch (TECHDATA::_specials[device_idx].category) {
-                                case 1:
+                                case SPECIAL_CATEGORY_BEAM_ACCURACY:
                                     if (special_ocv < bonus) special_ocv = bonus;
                                     break;
-                                case 2:
+                                case SPECIAL_CATEGORY_BEAM_DAMAGE:
                                     if (special_beam_dmg < bonus) special_beam_dmg = bonus;
                                     break;
-                                case 3:
+                                case SPECIAL_CATEGORY_BEAM_DEFENSE:
                                     if (special_beam_def < bonus) special_beam_def = bonus;
                                     break;
-                                case 4:
+                                case SPECIAL_CATEGORY_MISSILE_DEFENSE:
                                     if (special_missile_def < bonus) special_missile_def = bonus;
                                     break;
-                                case 5:
+                                case SPECIAL_CATEGORY_MISSILE_DAMAGE:
                                     if (special_missile_dmg < bonus) special_missile_dmg = bonus;
                                     break;
-                                case 6:
+                                case SPECIAL_CATEGORY_BEAM_MISSILE_DEFENSE:
                                     if (special_beam_def < bonus) special_beam_def = bonus;
                                     if (special_missile_def < bonus) special_missile_def = bonus;
                                     break;
-                                case 7:
+                                case SPECIAL_CATEGORY_BEAM_MISSILE_DAMAGE:
                                     if (special_beam_dmg < bonus) special_beam_dmg = bonus;
                                     if (special_missile_dmg < bonus) special_missile_dmg = bonus;
                                     break;

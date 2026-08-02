@@ -97,7 +97,7 @@ namespace aidudes {
 
         aidudes::Collect_AI_Colonies_();
 
-        if (MOX::_settings.game_difficulty > 0 /* DIFF_TUTOR */) {
+        if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_TUTOR) {
             if (AIBUILD::Player_War_Level_(aidudes::_i_ai) < 3) {
                 aidudes::Clear_Build_Queues_If_New_Tech_(aidudes::_p_ai->got_new_app);
             }
@@ -203,8 +203,8 @@ namespace aidudes {
                 int player_idx = (int)(_p_ai - MOX::_player);
                 int trait_check = MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2;
 
-                if (trait_check != 3) {
-                    if (trait_check == 1 || trait_check == 0) {
+                if (trait_check != GOVERNMENT_UNIFICATION / 2) {
+                    if (trait_check == GOVERNMENT_DICTATORSHIP / 2 || trait_check == GOVERNMENT_FEUDAL / 2) {
                         // TECH_APP_MARINE_BARRACKS (103), BUILDING_MARINE_BARRACKS (22), BUILDING_ARMOR_BARRACKS (2)
                         if (_p_ai->tech_applications[TECH_APP_MARINE_BARRACKS] == TECH_RESEARCH_STATUS_RESEARCHED && colony->buildings[BUILDING_MARINE_BARRACKS] == 0 && colony->buildings[BUILDING_ARMOR_BARRACKS] == 0) {
                             weights[BUILDING_MARINE_BARRACKS] = 37;
@@ -383,7 +383,7 @@ namespace aidudes {
 
             if (threshold >= roll) {
                 plr->n_freighters += 5;
-            } else if (plr->n_freighters == 0 && MOX::_settings.game_difficulty >= 1) {
+            } else if (plr->n_freighters == 0 && MOX::_settings.game_difficulty >= GAME_DIFFICULTY_EASY) {
                 plr->n_freighters = 5;
             }
         }

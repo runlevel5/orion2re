@@ -1178,7 +1178,7 @@ namespace DIP_SCRN {
                 if (_old_response_message != _response_message) {
                     Diplomacy_Display_Response_();
                 }
-                _response_message = 0x82; /* 130 */
+                _response_message = 0x82;
                 Diplomacy_Display_Response_();
                 exit_flag = true;
             }

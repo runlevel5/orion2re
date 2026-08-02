@@ -20,7 +20,7 @@ namespace SCORE {
 
     int16_t _entry_to_flash;
 
-    char _difficulty_string[5][15];
+    char _difficulty_string[GAME_DIFFICULTY_COUNT][15];
 
     void __cdecl nullsub() {
         return;
@@ -208,8 +208,8 @@ namespace SCORE {
 
         _hof.version = 0x82;
 
-        int16_t indices[13];
-        for (int16_t i = 0; i < 13; ++i) {
+        int16_t indices[STOCK_RACE_COUNT];
+        for (int16_t i = 0; i < STOCK_RACE_COUNT; ++i) {
             indices[i] = i;
         }
 
@@ -240,12 +240,12 @@ namespace SCORE {
             int16_t r2 = (int16_t)game_random::Random_(5);
 
             _hof.scores[i] = score_base + (r2 * 10) + ((r1 - 1) * 15);
-            _hof.difficulties[i] = (int8_t)(i % 5);
+            _hof.difficulties[i] = (int8_t)(i % GAME_DIFFICULTY_COUNT);
             strlcpy(_hof.player_names[i], _default_names[i], sizeof(_hof.player_names[i]));
 
             int16_t race_idx = indices[i];
             if (i < 2) {
-                strlcpy(_hof.race_names[i], MOX::_race_names[5], sizeof(_hof.race_names[i]));
+                strlcpy(_hof.race_names[i], MOX::_race_names[STOCK_RACE_HUMAN], sizeof(_hof.race_names[i]));
             } else {
                 strlcpy(_hof.race_names[i], MOX::_race_names[race_idx], sizeof(_hof.race_names[i]));
             }
@@ -293,11 +293,11 @@ namespace SCORE {
 
         SCORE::_entry_to_flash = entry_to_flash_idx;
 
-        strlcpy(SCORE::_difficulty_string[0], ESTRINGS::E_Strings_(0x221), sizeof(SCORE::_difficulty_string[0]));
-        strlcpy(SCORE::_difficulty_string[1], ESTRINGS::E_Strings_(0x118), sizeof(SCORE::_difficulty_string[1]));
-        strlcpy(SCORE::_difficulty_string[2], ESTRINGS::E_Strings_(0xbe), sizeof(SCORE::_difficulty_string[2]));
-        strlcpy(SCORE::_difficulty_string[3], ESTRINGS::E_Strings_(0x13e), sizeof(SCORE::_difficulty_string[3]));
-        strlcpy(SCORE::_difficulty_string[4], ESTRINGS::E_Strings_(0x148), sizeof(SCORE::_difficulty_string[4]));
+        strlcpy(SCORE::_difficulty_string[GAME_DIFFICULTY_TUTOR], ESTRINGS::E_Strings_(0x221), sizeof(SCORE::_difficulty_string[GAME_DIFFICULTY_TUTOR]));
+        strlcpy(SCORE::_difficulty_string[GAME_DIFFICULTY_EASY], ESTRINGS::E_Strings_(0x118), sizeof(SCORE::_difficulty_string[GAME_DIFFICULTY_EASY]));
+        strlcpy(SCORE::_difficulty_string[GAME_DIFFICULTY_AVERAGE], ESTRINGS::E_Strings_(0xbe), sizeof(SCORE::_difficulty_string[GAME_DIFFICULTY_AVERAGE]));
+        strlcpy(SCORE::_difficulty_string[GAME_DIFFICULTY_HARD], ESTRINGS::E_Strings_(0x13e), sizeof(SCORE::_difficulty_string[GAME_DIFFICULTY_HARD]));
+        strlcpy(SCORE::_difficulty_string[GAME_DIFFICULTY_IMPOSSIBLE], ESTRINGS::E_Strings_(0x148), sizeof(SCORE::_difficulty_string[GAME_DIFFICULTY_IMPOSSIBLE]));
 
         if (SCORE::HOF_Version_Number_() != 0x82) {
             SCORE::Create_Default_HOF_File_();
@@ -562,11 +562,11 @@ namespace SCORE {
         palette::Refresh_Palette_();
         palstore::Darken_Palette_(100);
 
-        strlcpy(_difficulty_string[0], ESTRINGS::E_Strings_(545), sizeof(_difficulty_string[0]));
-        strlcpy(_difficulty_string[1], ESTRINGS::E_Strings_(280), sizeof(_difficulty_string[1]));
-        strlcpy(_difficulty_string[2], ESTRINGS::E_Strings_(190), sizeof(_difficulty_string[2]));
-        strlcpy(_difficulty_string[3], ESTRINGS::E_Strings_(318), sizeof(_difficulty_string[3]));
-        strlcpy(_difficulty_string[4], ESTRINGS::E_Strings_(328), sizeof(_difficulty_string[4]));
+        strlcpy(_difficulty_string[GAME_DIFFICULTY_TUTOR], ESTRINGS::E_Strings_(545), sizeof(_difficulty_string[GAME_DIFFICULTY_TUTOR]));
+        strlcpy(_difficulty_string[GAME_DIFFICULTY_EASY], ESTRINGS::E_Strings_(280), sizeof(_difficulty_string[GAME_DIFFICULTY_EASY]));
+        strlcpy(_difficulty_string[GAME_DIFFICULTY_AVERAGE], ESTRINGS::E_Strings_(190), sizeof(_difficulty_string[GAME_DIFFICULTY_AVERAGE]));
+        strlcpy(_difficulty_string[GAME_DIFFICULTY_HARD], ESTRINGS::E_Strings_(318), sizeof(_difficulty_string[GAME_DIFFICULTY_HARD]));
+        strlcpy(_difficulty_string[GAME_DIFFICULTY_IMPOSSIBLE], ESTRINGS::E_Strings_(328), sizeof(_difficulty_string[GAME_DIFFICULTY_IMPOSSIBLE]));
 
         video::Set_Page_Off_();
         Draw_Hall_Of_Fame_Screen_();
@@ -1321,7 +1321,7 @@ namespace SCORE {
         _hi->race_icon_frame_anim = (s_animation_header*)farload::Far_Reload_Next_("SCORE.LBX", 1, MOX::_screen_seg);
 
         lbx_index = 2;
-        for (int i = 0; i < 13; ++i) {
+        for (int i = 0; i < STOCK_RACE_COUNT; ++i) {
             _hi->race_icon_anims[i] = (s_animation_header*)farload::Far_Reload_Next_("SCORE.LBX", lbx_index, MOX::_screen_seg);
             lbx_index++;
         }

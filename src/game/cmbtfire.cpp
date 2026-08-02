@@ -241,7 +241,7 @@ namespace CMBTFIRE {
         if (CMBTMOV1::Ship_Is_In_Stasis_(target_idx)) {
             is_legal = 0;
         } else {
-            if ((TECHDATA::_weapons[weapon_id].natural_mods & 0x8) != 0) {
+            if ((TECHDATA::_weapons[weapon_id].natural_mods & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE) != 0) {
                 uint8_t prev_owner = MOX::_combat_data[target_idx].previous_owner;
                 if (prev_owner >= MAX_PLAYERS && prev_owner != 9) {
                     is_legal = 0;
@@ -445,7 +445,7 @@ namespace CMBTFIRE {
         uint16_t specials = 0;
         uint16_t weapon_flags = TECHDATA::_weapons[weapon_id].natural_mods;
 
-        if (weapon_flags & 0x100) {
+        if (weapon_flags & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) {
             specials = 0x40;
         }
 
@@ -575,7 +575,7 @@ namespace CMBTFIRE {
         weapon_flags = TECHDATA::_weapons[weapon_id].natural_mods;
         damage_special_flags = 0;
 
-        if ((weapon_flags & 0x100) != 0) {
+        if ((weapon_flags & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) != 0) {
             damage_special_flags = 0x40;
         }
 
@@ -682,11 +682,11 @@ namespace CMBTFIRE {
             }
         }
 
-        if (weapon_flags & 1) {
+        if (weapon_flags & WEAPON_NATURAL_FLAG_ANTI_SHIELD) {
             *dmg_out = 0;
         }
 
-        if ((weapon_flags & 0x10) != 0) {
+        if ((weapon_flags & WEAPON_NATURAL_FLAG_KILLS_MARINES) != 0) {
             if (!COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 7)) {
                 if (MOX::_combat_data[target_ship_idx].marine_count != 0xFF) {
                     CMBTFIR2::Kill_Crew_(target_ship_idx, *dmg_out / 5);
@@ -709,14 +709,14 @@ namespace CMBTFIRE {
             ignore_armor = 1;
         }
 
-        if ((weapon_flags & 8) && MOX::_combat_data[target_ship_idx].owner > 9) {
+        if ((weapon_flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE) && MOX::_combat_data[target_ship_idx].owner > 9) {
             *dmg_out /= 4;
         }
 
         if (*dmg_out > 0) {
             retval |= 2;
 
-            if (weapon_flags & 0x20) {
+            if (weapon_flags & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) {
                 MOX::_combat_data[target_ship_idx].structure_damage += *dmg_out / 2;
                 int16_t cur_dmg = MOX::_combat_data[target_ship_idx].structure_damage;
                 int16_t max_dmg = MOX::_combat_data[target_ship_idx].structure_max;
@@ -735,7 +735,7 @@ namespace CMBTFIRE {
                 int16_t remaining_damage = *dmg_out;
 
                 while (remaining_damage > 0 && !CMBTFIRE::Is_Combat_Ship_Dead_(target_ship_idx)) {
-                    CMBTFIR2::Select_Internal_(target_ship_idx, &internal_hit_type, &internal_hit_count, force_armor_bypass, weapon_flags & 8, 1, internal_only);
+                    CMBTFIR2::Select_Internal_(target_ship_idx, &internal_hit_type, &internal_hit_count, force_armor_bypass, weapon_flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE, 1, internal_only);
                     if (internal_hit_type == -1) {
                         remaining_damage = 0;
                     }
@@ -747,7 +747,7 @@ namespace CMBTFIRE {
 
             int16_t remaining_damage = *dmg_out - bypassed_damage;
             while (remaining_damage > 0 && !CMBTFIRE::Is_Combat_Ship_Dead_(target_ship_idx)) {
-                CMBTFIR2::Select_Internal_(target_ship_idx, &internal_hit_type, &internal_hit_count, force_armor_bypass, weapon_flags & 8, 0, internal_only);
+                CMBTFIR2::Select_Internal_(target_ship_idx, &internal_hit_type, &internal_hit_count, force_armor_bypass, weapon_flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE, 0, internal_only);
                 if (internal_hit_type == -1) {
                     remaining_damage = 0;
                 }
@@ -876,7 +876,7 @@ namespace CMBTFIRE {
 
         (void)specials;
 
-        if (flags & 0x80 /* BIO_WEAPON */) {
+        if (flags & WEAPON_NATURAL_FLAG_BIOLOGICAL) {
             MOX::_bio_weapon_flag = 1;
             MOX::_combat_bomb_result.is_bio_weapon = 1;
             bomb_stats.is_bio_weapon = 1;
@@ -928,8 +928,8 @@ namespace CMBTFIRE {
                 colony_hits = *damage - MOX::_combat_data->shield_arc_current[1];
             }
 
-            if (defense_hits > 0 && !(flags & 0x8)) {
-                if (flags & 0x20 /* HEAVY_MOUNT */) {
+            if (defense_hits > 0 && !(flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE)) {
+                if (flags & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) {
                     defense_hits *= 2;
                 }
                 MOX::_combat_data->structure_damage += defense_hits;
@@ -945,8 +945,8 @@ namespace CMBTFIRE {
             }
 
             if (colony_hits > 0) {
-                if (MOX::_cmbt_colony_id != -1 && !(flags & 0x8)) {
-                    if (flags & 0x20 /* HEAVY_MOUNT */) {
+                if (MOX::_cmbt_colony_id != -1 && !(flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE)) {
+                    if (flags & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) {
                         colony_hits *= 2;
                     }
 
@@ -1035,7 +1035,7 @@ namespace CMBTFIRE {
         }
 
         if (MOX::_apply_damage_to_planet == 0) {
-            target_arc_mask = 0xF;
+            target_arc_mask = WEAPON_FIRING_ARC_ALL_SECTORS;
         }
 
         Pre_Weapon_Specials_(source_ship_idx, target_ship_idx, flag);
@@ -1175,7 +1175,7 @@ namespace CMBTFIRE {
                                             uint16_t base_specials = weapon->specials;
                                             beam_fx_entries[beam_fx_count].specials = base_specials;
 
-                                            if ((TECHDATA::_weapons[weapon->weapon_id].natural_mods & 0x0200) != 0) {
+                                            if ((TECHDATA::_weapons[weapon->weapon_id].natural_mods & WEAPON_NATURAL_FLAG_ENVELOPING) != 0) {
                                                 beam_fx_entries[beam_fx_count].specials = base_specials | 0x100;
                                             }
 
@@ -1443,13 +1443,13 @@ namespace CMBTFIRE {
         uint16_t return_flags = 0;
 
         uint16_t weapon_flags_00 = TECHDATA::_weapons[weapon_id].natural_mods;
-        if (weapon_flags_00 & 0x100) {
+        if (weapon_flags_00 & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) {
             specials |= 0x40;
         }
-        if (weapon_flags_00 & 0x200) {
+        if (weapon_flags_00 & WEAPON_NATURAL_FLAG_ENVELOPING) {
             specials |= 0x100;
         }
-        if (weapon_flags_00 & 0x40) {
+        if (weapon_flags_00 & WEAPON_NATURAL_FLAG_CONTINUOUS) {
             specials |= 0x10;
         }
 
@@ -1517,7 +1517,7 @@ namespace CMBTFIRE {
             if (continue_firing == 0) break;
 
             int roll = game_random::Random_(100);
-            if ((weapon_flags_00 & 0x400) != 0) {
+            if ((weapon_flags_00 & WEAPON_NATURAL_FLAG_ALWAYS_HITS) != 0) {
                 roll = 100;
             }
 
@@ -1678,7 +1678,7 @@ namespace CMBTFIRE {
 
         *hit_bonus_out = CMBTFIRE::Get_Beam_Range_To_Hit_Bonus_(ship_idx, effective_range);
 
-        if (TECHDATA::_weapons[wpn_idx].natural_mods & 0x2 /* Continuous */) {
+        if (TECHDATA::_weapons[wpn_idx].natural_mods & WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY) {
             *hit_bonus_out *= 2;
         }
 
@@ -1686,7 +1686,7 @@ namespace CMBTFIRE {
             *dmg_mod_out += 50;
         }
 
-        if (!(wpn_modifier_flags & 0x20) && !(TECHDATA::_weapons[wpn_idx].natural_mods & 0x4)) {
+        if (!(wpn_modifier_flags & 0x20) && !(TECHDATA::_weapons[wpn_idx].natural_mods & WEAPON_NATURAL_FLAG_NO_RANGE_DISSIPATION)) {
             *dmg_mod_out += MOX::_ranged_damage_penalty[effective_range];
         }
 

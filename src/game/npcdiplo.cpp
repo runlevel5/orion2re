@@ -318,7 +318,7 @@ namespace npcdiplo {
             }
 
             // Case 8: Alliance protection logic (Difficulty >= Average)
-            if (MOX::_settings.game_difficulty >= 3 /* HARD */) {
+            if (MOX::_settings.game_difficulty >= GAME_DIFFICULTY_HARD) {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     if (j != i && !MOX::_player[j].eliminated && MOX::_player[j].objectives != PLAYER_OBJECTIVE_HUMAN) {
                         for (int k = 0; k < MOX::_NUM_PLAYERS; ++k) {
@@ -488,7 +488,7 @@ namespace npcdiplo {
     }
 
     void __cdecl NPC_Treaty_Hatred_() {
-        if (MOX::_settings.game_difficulty < 3 /* Hard */) {
+        if (MOX::_settings.game_difficulty < GAME_DIFFICULTY_HARD) {
             return;
         }
 
@@ -522,7 +522,7 @@ namespace npcdiplo {
                 }
 
                 // Reduction on Hard difficulty compared to Impossible
-                if (MOX::_settings.game_difficulty == 3 /* Hard */) {
+                if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
                     hatred_score /= 2;
                 }
 
@@ -684,7 +684,7 @@ namespace npcdiplo {
             }
         }
 
-        if (best_target == -1 && MOX::_settings.game_difficulty < 3 /* HARD */) {
+        if (best_target == -1 && MOX::_settings.game_difficulty < GAME_DIFFICULTY_HARD) {
             // Search 3: Low difficulty fallback.
             best_pop = 0;
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
@@ -701,7 +701,7 @@ namespace npcdiplo {
             }
         }
 
-        if (best_target == -1 && MOX::_settings.game_difficulty < 3 /* HARD */) {
+        if (best_target == -1 && MOX::_settings.game_difficulty < GAME_DIFFICULTY_HARD) {
             // Search 4: Final low difficulty fallback (Max Pop)
             best_pop = 0;
             for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
@@ -1028,16 +1028,16 @@ namespace npcdiplo {
             if (MOX::_player[other_player_idx].tech_applications[tech_idx] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 uint32_t tech_value = newtech::Calc_Tech_Value_(player_idx, tech_idx);
 
-                if (tech_idx == TECH_APP_CONFEDERATION && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != 0) {
+                if (tech_idx == TECH_APP_CONFEDERATION && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_FEUDAL) {
                     tech_value = 0;
                 }
-                if (tech_idx == TECH_APP_IMPERIUM && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != 2) {
+                if (tech_idx == TECH_APP_IMPERIUM && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_DICTATORSHIP) {
                     tech_value = 0;
                 }
-                if (tech_idx == TECH_APP_FEDERATION && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != 4) {
+                if (tech_idx == TECH_APP_FEDERATION && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_DEMOCRACY) {
                     tech_value = 0;
                 }
-                if (tech_idx == TECH_APP_GALACTIC_UNIFICATION && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != 6) {
+                if (tech_idx == TECH_APP_GALACTIC_UNIFICATION && MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_UNIFICATION) {
                     tech_value = 0;
                 }
 
@@ -1070,7 +1070,7 @@ namespace npcdiplo {
 
         int32_t reaction = MOX::_player[player_idx].diplomacy_proposal_rejection[target_idx] * 20
                          + COLCALC::Best_Leader_Diplomat_Bonus_(player_idx)
-                         + (3 - MOX::_settings.game_difficulty) * 50
+                         + (GAME_DIFFICULTY_HARD - MOX::_settings.game_difficulty) * 50
                          + MOX::_player[player_idx].broken_treaties_modifier[target_idx]
                          + MOX::_player[player_idx].relations[target_idx];
 

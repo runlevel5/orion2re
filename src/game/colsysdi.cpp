@@ -2,7 +2,7 @@
 
 namespace COLSYSDI {
     s_animation_header* __cdecl Planet_Anims_(int16_t climate, int16_t planet_size) {
-        return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, climate * (PLANET_SIZE_HUGE + 1) + planet_size + 11, MOX::_global_cache_seg);
+        return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, climate * PLANET_SIZE_COUNT + planet_size + 11, MOX::_global_cache_seg);
     }
 
     void __cdecl Draw_Col_Sys_Disp_(int16_t x, int16_t y) {
@@ -86,8 +86,8 @@ namespace COLSYSDI {
     }
 
     void __cdecl Planet_Summary_String_(char* summary_text, size_t summary_text_size, int16_t planet_idx, int16_t font_player_idx) {
-        char* gravity_and_mineral_str[8];
-        char* size_str[PLANET_SIZE_HUGE + 1];
+        char* gravity_and_mineral_str[PLANET_GRAVITY_COUNT + MINERAL_RESOURCE_COUNT];
+        char* size_str[PLANET_SIZE_COUNT];
         char* gas_giant_str;
         char* asteroid_str;
         char pop_str[500];
@@ -101,21 +101,21 @@ namespace COLSYSDI {
         s_planet_data* planet = &MOX::_planet[planet_idx];
         int16_t colony_idx = planet->colony_index;
 
-        gravity_and_mineral_str[0] = ESTRINGS::E_Strings_(0x169);
-        gravity_and_mineral_str[1] = ESTRINGS::E_Strings_(0xC);
-        gravity_and_mineral_str[2] = ESTRINGS::E_Strings_(0x25B);
+        gravity_and_mineral_str[PLANET_GRAVITY_LOW_G] = ESTRINGS::E_Strings_(0x169);
+        gravity_and_mineral_str[PLANET_GRAVITY_NORMAL_G] = ESTRINGS::E_Strings_(0xC);
+        gravity_and_mineral_str[PLANET_GRAVITY_HEAVY_G] = ESTRINGS::E_Strings_(0x25B);
 
-        size_str[0] = ESTRINGS::E_Strings_(0x1F6);
-        size_str[1] = ESTRINGS::E_Strings_(0x25C);
-        size_str[2] = ESTRINGS::E_Strings_(0x25D);
-        size_str[3] = ESTRINGS::E_Strings_(0x25E);
-        size_str[4] = ESTRINGS::E_Strings_(0x25F);
+        size_str[PLANET_SIZE_TINY] = ESTRINGS::E_Strings_(0x1F6);
+        size_str[PLANET_SIZE_SMALL] = ESTRINGS::E_Strings_(0x25C);
+        size_str[PLANET_SIZE_MEDIUM] = ESTRINGS::E_Strings_(0x25D);
+        size_str[PLANET_SIZE_LARGE] = ESTRINGS::E_Strings_(0x25E);
+        size_str[PLANET_SIZE_HUGE] = ESTRINGS::E_Strings_(0x25F);
 
-        gravity_and_mineral_str[3] = ESTRINGS::E_Strings_(0x222);
-        gravity_and_mineral_str[4] = ESTRINGS::E_Strings_(0x1A7);
-        gravity_and_mineral_str[5] = ESTRINGS::E_Strings_(0xC);
-        gravity_and_mineral_str[6] = ESTRINGS::E_Strings_(0x1C2);
-        gravity_and_mineral_str[7] = ESTRINGS::E_Strings_(0x223);
+        gravity_and_mineral_str[PLANET_GRAVITY_COUNT + MINERAL_RESOURCE_ULTRA_POOR] = ESTRINGS::E_Strings_(0x222);
+        gravity_and_mineral_str[PLANET_GRAVITY_COUNT + MINERAL_RESOURCE_POOR] = ESTRINGS::E_Strings_(0x1A7);
+        gravity_and_mineral_str[PLANET_GRAVITY_COUNT + MINERAL_RESOURCE_ABUNDANT] = ESTRINGS::E_Strings_(0xC);
+        gravity_and_mineral_str[PLANET_GRAVITY_COUNT + MINERAL_RESOURCE_RICH] = ESTRINGS::E_Strings_(0x1C2);
+        gravity_and_mineral_str[PLANET_GRAVITY_COUNT + MINERAL_RESOURCE_ULTRA_RICH] = ESTRINGS::E_Strings_(0x223);
 
         ESTRINGS::E_Strings_(0x1B9);
         ESTRINGS::E_Strings_(0x14E);
@@ -164,13 +164,13 @@ namespace COLSYSDI {
                      size_str[(int)planet->size],
                      MOX::_planet_climate_string[(int)climate],
                      gravity_and_mineral_str[(int)planet->gravity_class],
-                     gravity_and_mineral_str[(int)planet->mineral_class + 3],
+                     gravity_and_mineral_str[(int)planet->mineral_class + PLANET_GRAVITY_COUNT],
                      pop_str);
         } else {
             snprintf(summary_text, summary_text_size, ESTRINGS::E_Strings_(0x29),
                      MOX::_player[(int)MOX::_colony[colony_idx].owner].race_name,
                      gravity_and_mineral_str[(int)planet->gravity_class],
-                     gravity_and_mineral_str[(int)planet->mineral_class + 3],
+                     gravity_and_mineral_str[(int)planet->mineral_class + PLANET_GRAVITY_COUNT],
                      pop_str);
         }
     }

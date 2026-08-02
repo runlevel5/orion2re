@@ -78,7 +78,7 @@ namespace ERICNET {
 
         memset(colony.buildings, 0, sizeof(colony.buildings));
 
-        if (MOX::_player[colony.owner].traits[TRAIT_CURRENT_GOVERNMENT] < 6 && is_homeworld != 0) {
+        if (MOX::_player[colony.owner].traits[TRAIT_CURRENT_GOVERNMENT] < GOVERNMENT_UNIFICATION && is_homeworld != 0) {
             Add_Building_(colony_idx, BUILDING_CAPITOL);
         }
 
@@ -107,7 +107,7 @@ namespace ERICNET {
                         break;
                     case BUILDING_HOLO_SIMULATOR:
                     case BUILDING_PLEASURE_DOME:
-                        can_add = (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != 3);
+                        can_add = (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != GOVERNMENT_UNIFICATION / 2);
                         break;
                     case BUILDING_HYDROPONIC_FARM:
                     case BUILDING_SOIL_ENRICHMENT:
@@ -191,7 +191,7 @@ namespace ERICNET {
         s_ship_data* ship = &MOX::_ship[ship_idx];
         int16_t level = 0;
 
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < CREW_QUALITY_ULTRA_ELITE; ++i) {
             if (ship->crew_experience >= MOX::_crew_data[level + 1].experience) {
                 level++;
             }
@@ -213,7 +213,7 @@ namespace ERICNET {
         Do_Academy_At_Location_Check_(ship_index);
 
         int32_t total_xp = (int32_t)MOX::_ship[ship_index].crew_experience + (int32_t)xp_gain + 1;
-        int32_t max_xp = (int16_t)MOX::_crew_data[3].experience;
+        int32_t max_xp = (int16_t)MOX::_crew_data[CREW_QUALITY_ELITE].experience;
 
         if (total_xp > max_xp) {
             total_xp = max_xp;
@@ -419,7 +419,7 @@ namespace ERICNET {
                     tp->planet_type = PLANET_TYPE_PLANET;
                     tp->size = size;
                     tp->gravity_class = PLANET_GRAVITY_NORMAL_G;
-                    tp->group = 0;
+                    tp->group = PLANET_GROUP_BOMBARDED;
                     tp->climate = PLANET_CLIMATE_BARREN;
                     tp->climate_bg_type = (int8_t)game_random::Random_(3) - 1;
                     tp->mineral_class = MINERAL_RESOURCE_ABUNDANT;
@@ -455,7 +455,7 @@ namespace ERICNET {
             const s_leader_data& leader = MOX::_leaders[leader_index];
             const int16_t player_index = (int8_t)leader.player_index;
 
-            if ((leader.type == 1) &&
+            if ((leader.type == LEADER_TYPE_COLONY) &&
                 ((int8_t)leader.status >= 0) &&
                 ((int8_t)leader.eta == 0) &&
                 (player_index > -1) &&

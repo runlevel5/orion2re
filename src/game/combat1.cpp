@@ -1787,9 +1787,9 @@ namespace COMBAT1 {
                         GENDRAW::Warning_Box_(msg_buffer);
                         CMBTDRW1::Refresh_Combat_Screen_Full_();
                     }
-                    if (COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, 0xD /* SPEC_WARP_DISSIPATOR */) != 0) {
+                    if (COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, SPECIAL_HARD_SHIELDS) != 0) {
                         can_board = false;
-                        msg_idx = 0x46; // Warp dissipator blocks
+                        msg_idx = 0x46;
                     }
                 }
             }
@@ -1809,7 +1809,7 @@ namespace COMBAT1 {
                 MOX::_combat_data[MOX::_cur_ship].marine_count -= (int8_t)marines_sent;
 
                 if (max_range == 4 && (range != 1 || MOX::_combat_data[defender_idx].current_speed > 0)) {
-                    if (COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, 7 /* SPEC_DISPLACEMENT_DEVICE */) != 0) {
+                    if (COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, SPECIAL_DAMPER_FIELD) != 0) {
                         marines_sent = marines_sent / 3;
                     }
                     if (marines_sent <= 0) {
@@ -2013,7 +2013,7 @@ namespace COMBAT1 {
         int16_t y_pixel;
 
         if (((COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) ||
-              COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x16 /* TRANSPORTER */)) &&
+              COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_PHASE_SHIFTER)) &&
              CMBTFIR2::Used_Teleporter_(ship_idx) == 0) &&
             (range < 20)) {
             range = 20;

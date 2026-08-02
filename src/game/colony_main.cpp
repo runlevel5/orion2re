@@ -519,7 +519,7 @@ namespace COLONY {
         for (int h = 0; h < housing_to_add; ++h) {
             if (bldg_count < 36) {
                 if (is_ui_view == 0 || (is_ui_view == 1 && bldg_count < 18)) {
-                    Insert_Bldg_Into_Array_(colony_idx, -3 /* ECON_HOUSING */, bldg_count, is_ui_view);
+                    Insert_Bldg_Into_Array_(colony_idx, COLONY_PRODUCTION_HOUSING, bldg_count, is_ui_view);
                     bldg_count++;
                 }
             }

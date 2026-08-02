@@ -97,51 +97,51 @@ namespace newtech {
         int modifier = MOX::_tech_categories[ai_group][0];
 
         switch (MOX::_player[player_idx].ship_design_theme) {
-            case 0:
+            case AI_SHIP_DESIGN_THEME_BALANCED:
                 if (ai_group == 0x1A || ai_group == 0x1B || ai_group == 0x19) {
                     modifier = 100;
                 }
                 break;
-            case 1:
+            case AI_SHIP_DESIGN_THEME_CARRIER:
                 if (ai_group == 0x1A) modifier = 50;
                 else if (ai_group == 0x13 || ai_group == 0x1E) modifier = 100;
                 else if (ai_group == 0x19) modifier = 20;
                 break;
-            case 2:
+            case AI_SHIP_DESIGN_THEME_MISSILE:
                 if (ai_group == 0x15 || ai_group == 0x1D || ai_group == 0x18) modifier = 100;
                 break;
-            case 3:
+            case AI_SHIP_DESIGN_THEME_SPECIAL:
                 if (ai_group == 0x24) modifier = 50;
                 else if (ai_group == 0x26) modifier = 100;
                 break;
         }
 
         switch (MOX::_player[player_idx].ship_special_theme) {
-            case 0:
+            case AI_SHIP_SPECIAL_THEME_BEAM_DEFENSE:
                 if (ai_group == 0x12) modifier = 50;
                 else if (ai_group == 0x17) modifier = 50;
                 break;
-            case 1:
+            case AI_SHIP_SPECIAL_THEME_CAPTURE:
                 if (ai_group == 0xF) modifier = 20;
                 else if (ai_group == 0x10) modifier = 20;
                 else if (ai_group == 0x20) modifier = 50;
                 else if (ai_group == 0x23) modifier = 100;
                 break;
-            case 2:
+            case AI_SHIP_SPECIAL_THEME_BIO_WEAPON:
                 if (ai_group == 0x12) modifier = 50;
                 else if (ai_group == 0x14) modifier = 100;
                 break;
-            case 3:
+            case AI_SHIP_SPECIAL_THEME_MISSILE_DEFENSE:
                 if (ai_group == 0x1C) modifier = 100;
                 else if (ai_group == 0x1A) modifier = 20;
                 break;
-            case 4:
+            case AI_SHIP_SPECIAL_THEME_CLOAKING:
                 if (ai_group == 0x25) modifier = 100;
                 break;
-            case 5:
+            case AI_SHIP_SPECIAL_THEME_ARMOR:
                 if (ai_group == 0x20 || ai_group == 0x1F) modifier = 100;
                 break;
-            case 6:
+            case AI_SHIP_SPECIAL_THEME_SHIELD:
                 if (ai_group == 0x21 || ai_group == 0x22) modifier = 100;
                 break;
         }
@@ -198,7 +198,7 @@ namespace newtech {
                 break;
             case 12:
                 if (MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS] < 0 || MOX::_player[player_idx].traits[TRAIT_SPYING_BONUS] > 0) modifier = 50;
-                if (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 == 2) modifier = 50;
+                if (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 == GOVERNMENT_DEMOCRACY / 2) modifier = 50;
                 break;
             case 16:
                 if (MOX::_player[player_idx].traits[TRAIT_GROUND_COMBAT_BONUS] < 0) modifier = 20;
@@ -219,7 +219,7 @@ namespace newtech {
                 if (MOX::_player[player_idx].traits[TRAIT_STEALTHY_SHIPS] != 0) modifier = 1;
                 break;
             case 40:
-                if (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 == 3) modifier = 1;
+                if (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2 == GOVERNMENT_UNIFICATION / 2) modifier = 1;
                 break;
         }
 
@@ -288,16 +288,16 @@ namespace newtech {
         }
 
         int theme = MOX::_player[player_idx].ship_design_theme;
-        if (theme == 2 && ai_group == 0x18 && base_value < newtech::_best_category[7]) {
+        if (theme == AI_SHIP_DESIGN_THEME_MISSILE && ai_group == 0x18 && base_value < newtech::_best_category[7]) {
             val = (newtech::_best_category[7] - base_value) * val;
         }
 
-        if (theme == 0) {
+        if (theme == AI_SHIP_DESIGN_THEME_BALANCED) {
             if (ai_group == 0x1A && base_value < newtech::_best_category[11]) val = (newtech::_best_category[11] - base_value) * val;
-        } else if (theme == 1) {
+        } else if (theme == AI_SHIP_DESIGN_THEME_CARRIER) {
             if (ai_group == 0x1A && base_value < newtech::_best_category[11]) val = (newtech::_best_category[11] - base_value) * val;
             if (ai_group == 0x13 && base_value < newtech::_best_category[11]) val = (newtech::_best_category[11] - base_value) * val;
-        } else if (theme == 2) {
+        } else if (theme == AI_SHIP_DESIGN_THEME_MISSILE) {
             if (ai_group == 0x15 && base_value < newtech::_best_category[11]) val = (newtech::_best_category[11] - base_value) * val;
         }
 
@@ -466,7 +466,7 @@ namespace newtech {
             }
         }
 
-        if (MOX::_settings.game_difficulty > 0) {
+        if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_TUTOR) {
             if (max_weighted_choice == 0) {
                 return Choose_Hyper_Advanced_Tech_();
             }

@@ -23,7 +23,7 @@ namespace MAINSCR {
         memcpy(&colors2, p_stardate_colors, sizeof(colors2));
         fonts::Set_Outline_Color_(2, 1);
         fonts::Set_Font_Style_Outline_(stardate_font_style, &colors2);
-        fonts::Print_Centered_(580, 29, buffer); // 0x244, 0x1d
+        fonts::Print_Centered_(580, 29, buffer);
 
         if (EVENTS::Event_Check_Hyperspace_Flux_()) {
             MISC::Get_Mox_Font_Colors_(3, 'I', 'L', &colors1);
@@ -33,7 +33,7 @@ namespace MAINSCR {
             char flux_buffer[128];
             strlcpy(flux_buffer, flux_msg, sizeof(flux_buffer));
             int16_t flux_width = fonts::Get_String_Width_(flux_buffer);
-            int16_t flux_x = 526 - flux_width; // 0x20e
+            int16_t flux_x = 526 - flux_width;
 
             line::Line_(flux_x, 21, 526, 21, colors1.colors[0]);
             line::Line_(flux_x, 22, 526, 22, colors1.colors[1]);
@@ -70,7 +70,7 @@ namespace MAINSCR {
             MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
             fonts::Set_Outline_Color_(2, 1);
         }
-        fonts::Print_Centered_(579, 96, buffer); // 0x243, 0x60
+        fonts::Print_Centered_(579, 96, buffer);
 
         surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
         bc_sign = (plr->surplus_bc < 0) ? "" : "+";
@@ -513,7 +513,7 @@ namespace MAINSCR {
 
                             int16_t stack_ship = next_icon;
                             if (ships_count == MOX::_fleet_box.count) {
-                                stack_ship = 0; // Use dummy or 0
+                                stack_ship = 0;
                             }
 
                             int16_t ship_id = HACCESS::Fleet_Movement_Ship_Id_(stack_ship);
@@ -673,7 +673,7 @@ namespace MAINSCR {
 
             if (input == _leaders_button && MOX::_skip_fields == 0) {
                 int16_t design_num;
-                if (MOX::_officer_scrn_type == 0) {
+                if (MOX::_officer_scrn_type == LEADER_TYPE_SHIP) {
                     if (MOVEBOX::Moveable_Box_Selected_(2)) {
                         design_num = MOX::_fleet_box_ship_stack;
                     }

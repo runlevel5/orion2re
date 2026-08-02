@@ -1031,16 +1031,16 @@ namespace HAROLD {
         int16_t default_galaxy_size = static_cast<int16_t>(static_cast<int8_t>(MOX::_settings.galaxy_size));
 
         if (MOX::_NUM_STARS <= 20) {
-            return 0;
+            return GALAXY_SIZE_SMALL;
         }
         if (MOX::_NUM_STARS <= 36) {
-            return 1;
+            return GALAXY_SIZE_MEDIUM;
         }
         if (MOX::_NUM_STARS <= 54) {
-            return 2;
+            return GALAXY_SIZE_LARGE;
         }
         if (MOX::_NUM_STARS <= 71) {
-            return 3;
+            return GALAXY_SIZE_HUGE;
         }
 #if MAX_STARS > ORIGINAL_MAX_STARS
         if (MOX::_NUM_STARS < MAX_STARS) {

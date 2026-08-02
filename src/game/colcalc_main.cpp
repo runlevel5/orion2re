@@ -22,7 +22,7 @@ namespace COLCALC {
         int mixed_race_penalty = Mixed_Race_Morale_Penalty_(colony);
         colony->morale = _morale_lookup_table[govt];
 
-        if (gov_type != 3) { // 3 = Unification
+        if (gov_type != GOVERNMENT_UNIFICATION / 2) {
             int officer_idx = Colony_Officer_(colony);
             if (officer_idx != -1) {
                 s_leader_data* leader = &MOX::_leaders[officer_idx];
@@ -40,7 +40,7 @@ namespace COLCALC {
 
             int8_t owner_trait0 = MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT];
             int8_t owner_gov = owner_trait0 / 2;
-            if (owner_gov != 3) {
+            if (owner_gov != GOVERNMENT_UNIFICATION / 2) {
                 int16_t home_id = player->home_planet_id;
                 bool has_capitol = false;
                 if (home_id != -1) {
@@ -50,7 +50,7 @@ namespace COLCALC {
                 if (!has_capitol) no_capital_penalty = _non_capital_morale_lookup[owner_gov];
             }
 
-            if (gov_type < 2 && player->tech_applications[TECH_APP_PSIONICS] == TECH_RESEARCH_STATUS_RESEARCHED) psychophysics_bonus = 2;
+            if (gov_type < GOVERNMENT_DEMOCRACY / 2 && player->tech_applications[TECH_APP_PSIONICS] == TECH_RESEARCH_STATUS_RESEARCHED) psychophysics_bonus = 2;
 
             if (colony->buildings[BUILDING_MARINE_BARRACKS]) {
                 marine_barracks_bonus = _barracks_morale_lookup[govt];
@@ -58,7 +58,7 @@ namespace COLCALC {
             else if (colony->buildings[BUILDING_ARMOR_BARRACKS]) {
                 barracks_bonus = _barracks_morale_lookup[govt];
             }
-            else if (gov_type < 2) {
+            else if (gov_type < GOVERNMENT_DEMOCRACY / 2) {
                 msg_barracks = _no_barracks_msg;
             }
 
@@ -68,7 +68,7 @@ namespace COLCALC {
         }
 
         if (debug_out) {
-            if (gov_type == 3) {
+            if (gov_type == GOVERNMENT_UNIFICATION / 2) {
                 STRBUILD::Copy(debug_out, _unification_has_no_morale_msg);
                 return;
             }
@@ -703,16 +703,16 @@ namespace COLCALC {
             }
             break;
         case TECH_APP_CONFEDERATION:
-            plr->traits[TRAIT_CURRENT_GOVERNMENT] = 1;
+            plr->traits[TRAIT_CURRENT_GOVERNMENT] = GOVERNMENT_CONFEDERATION;
             break;
         case TECH_APP_FEDERATION:
-            plr->traits[TRAIT_CURRENT_GOVERNMENT] = 5;
+            plr->traits[TRAIT_CURRENT_GOVERNMENT] = GOVERNMENT_FEDERATION;
             break;
         case TECH_APP_GALACTIC_UNIFICATION:
-            plr->traits[TRAIT_CURRENT_GOVERNMENT] = 7;
+            plr->traits[TRAIT_CURRENT_GOVERNMENT] = GOVERNMENT_GALACTIC_UNIFICATION;
             break;
         case TECH_APP_IMPERIUM:
-            plr->traits[TRAIT_CURRENT_GOVERNMENT] = 3;
+            plr->traits[TRAIT_CURRENT_GOVERNMENT] = GOVERNMENT_IMPERIUM;
             break;
         case TECH_APP_SUB_SPACE_COMMUNICATIONS:
         case TECH_APP_TACHYON_COMMUNICATIONS:
@@ -774,7 +774,7 @@ namespace COLCALC {
         memset(&final, 0, sizeof(s_colony_job_production));
 
         short officer_bonus = 0;
-        bool base_morale_applies = (govt_trait / 2 != 3 /* Unification */);
+        bool base_morale_applies = (govt_trait / 2 != GOVERNMENT_UNIFICATION / 2);
 
         if (leader_idx != -1) {
             auto& leader = MOX::_leaders[leader_idx];
@@ -849,10 +849,10 @@ namespace COLCALC {
                 final.morale_bonus += cur_stat.morale_bonus;
 
                 if (econ_type <= ECON_INDUSTRY /* FOOD or INDUSTRY */) {
-                    if (govt_type == 6 /* Unification */) {
+                    if (govt_type == GOVERNMENT_UNIFICATION) {
                         cur_stat.govt_bonus = (int)pop_base_prod * 10;
                     }
-                    else if (govt_type == 7 /* Galactic Unification */) {
+                    else if (govt_type == GOVERNMENT_GALACTIC_UNIFICATION) {
                         cur_stat.govt_bonus = scaled_base;
                     }
                     final.govt_bonus += cur_stat.govt_bonus;
@@ -864,10 +864,10 @@ namespace COLCALC {
                 }
                 else if (econ_type == ECON_RESEARCH) {
                     switch (govt_type) {
-                    case 0: cur_stat.govt_bonus = (int)pop_base_prod * -10; break;
-                    case 1: cur_stat.govt_bonus = (int)pop_base_prod * -5; break;
-                    case 4: cur_stat.govt_bonus = (int)pop_base_prod * 10; break;
-                    case 5: cur_stat.govt_bonus = (int)pop_base_prod * 15; break;
+                    case GOVERNMENT_FEUDAL: cur_stat.govt_bonus = (int)pop_base_prod * -10; break;
+                    case GOVERNMENT_CONFEDERATION: cur_stat.govt_bonus = (int)pop_base_prod * -5; break;
+                    case GOVERNMENT_DEMOCRACY: cur_stat.govt_bonus = (int)pop_base_prod * 10; break;
+                    case GOVERNMENT_FEDERATION: cur_stat.govt_bonus = (int)pop_base_prod * 15; break;
                     }
                     final.govt_bonus += cur_stat.govt_bonus;
                 }
@@ -985,7 +985,7 @@ namespace COLCALC {
         plr->command_points = base_cp;
 
         int32_t imperium_bonus = 0;
-        if (plr->traits[TRAIT_CURRENT_GOVERNMENT] == 3) { // FEAT_GOVERNMENT_IMPERIUM
+        if (plr->traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_IMPERIUM) {
             imperium_bonus = base_cp / 2;
             plr->command_points = base_cp + (int16_t)imperium_bonus;
         }
@@ -1150,7 +1150,7 @@ namespace COLCALC {
         int total_pops = total_normal_pops + total_immune_pops;
         int taxes_collected = (base_tax_per_pop * total_pops + 2) / 4;
 
-        if (total_pops > 0 && (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2) != 3) {
+        if (total_pops > 0 && (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] / 2) != GOVERNMENT_UNIFICATION / 2) {
             morale_bonus = colony->morale * taxes_collected;
             morale_bonus = (morale_bonus + (morale_bonus < 0 ? -10 : 10)) / 20;
         }
@@ -1191,10 +1191,10 @@ namespace COLCALC {
             spaceport_bc = income_base / 2;
         }
 
-        if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == 4) {
+        if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_DEMOCRACY) {
             gov_bonus_bc = income_base / 2;
         }
-        else if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == 5) {
+        else if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_FEDERATION) {
             gov_bonus_bc = (income_base * 3 + (income_base * 3 < 0 ? 3 : 0)) / 4;
         }
 

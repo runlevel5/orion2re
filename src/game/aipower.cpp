@@ -383,13 +383,13 @@ namespace AIPOWER {
                 int16_t rem_size = hull_size - size_div_2;
 
                 // Tactical: Calculate weapon counts based on available hull space
-                int32_t space_normal = DESIGN::Weapon_Space_(player_idx, best_beam, 1, 0xF /* STATUS_OK */, 0, 0);
+                int32_t space_normal = DESIGN::Weapon_Space_(player_idx, best_beam, 1, WEAPON_FIRING_ARC_ALL_SECTORS, 0, 0);
                 beam_count_normal = (int16_t)((size_div_2 / 4) / space_normal);
 
-                int32_t space_heavy = DESIGN::Weapon_Space_(player_idx, best_beam, 1, 0xF /* STATUS_OK */, 0, 2 /* MOD_HEAVY_MOUNT */);
+                int32_t space_heavy = DESIGN::Weapon_Space_(player_idx, best_beam, 1, WEAPON_FIRING_ARC_ALL_SECTORS, 0, 2 /* MOD_HEAVY_MOUNT */);
                 beam_count_heavy = (int16_t)((size_div_2 / 2) / space_heavy);
 
-                int32_t space_missile = DESIGN::Weapon_Space_(player_idx, best_missile, 1, 0xF /* STATUS_OK */, 20, 0);
+                int32_t space_missile = DESIGN::Weapon_Space_(player_idx, best_missile, 1, WEAPON_FIRING_ARC_ALL_SECTORS, 20, 0);
                 missile_count = (int16_t)(rem_size / space_missile);
             } else {
                 // Strategic: Use predefined counts
@@ -442,7 +442,7 @@ namespace AIPOWER {
         int16_t weapon_idx = INITSHIP::Best_Missile_Weapon_NT_(player_idx);
 
         // weapon_idx is used here to get space cost
-        int32_t weapon_space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, 16 /* 0x10 */, 5, 0);
+        int32_t weapon_space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, WEAPON_FIRING_ARC_360, 5, 0);
 
         // Calculate number of weapon mounts based on base space 300
         int16_t capacity = (int16_t)(300 / weapon_space);
@@ -507,7 +507,7 @@ namespace AIPOWER {
         }
 
         int16_t weapon_idx = INITSHIP::Best_Beam_Weapon_(player_idx);
-        int32_t space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, 1, 1, 2);
+        int32_t space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, WEAPON_FIRING_ARC_FORWARD, 1, 2);
 
         // Number of weapon mounts that can fit in standard phasor space allocation
         int16_t weapon_count = (int16_t)(225 /* 0xE1 */ / space);
@@ -523,7 +523,7 @@ namespace AIPOWER {
 
         uint32_t total_power = (uint32_t)base_damage * (uint32_t)weapon_count;
 
-        if ((TECHDATA::_weapons[weapon_idx].natural_mods & 8) != 0) {
+        if ((TECHDATA::_weapons[weapon_idx].natural_mods & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE) != 0) {
             total_power *= 3;
         }
 

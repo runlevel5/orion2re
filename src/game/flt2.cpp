@@ -754,19 +754,19 @@ char* __cdecl Crew_Description_String_(int16_t ship_idx) {
     MOX::_temp_string[0] = '\0';
 
     switch (MOX::_ship[ship_idx].crew_quality) {
-        case 0:
+        case CREW_QUALITY_GREEN:
             strlcpy(MOX::_temp_string, HAROLD::H_Message_(0x8A), sizeof(MOX::_temp_string));
             break;
-        case 1:
+        case CREW_QUALITY_REGULAR:
             strlcpy(MOX::_temp_string, HAROLD::H_Message_(0x8B), sizeof(MOX::_temp_string));
             break;
-        case 2:
+        case CREW_QUALITY_VETERAN:
             strlcpy(MOX::_temp_string, HAROLD::H_Message_(0x8C), sizeof(MOX::_temp_string));
             break;
-        case 3:
+        case CREW_QUALITY_ELITE:
             strlcpy(MOX::_temp_string, HAROLD::H_Message_(0x8D), sizeof(MOX::_temp_string));
             break;
-        case 4:
+        case CREW_QUALITY_ULTRA_ELITE:
             strlcpy(MOX::_temp_string, HAROLD::H_Message_(0x8E), sizeof(MOX::_temp_string));
             break;
         default:
@@ -831,7 +831,7 @@ uint8_t __cdecl Draw_Captains_Picture_(int16_t ship_idx) {
     for (int16_t i = 0; i < MAX_LEADERS; i++) {
         if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM &&
             MOX::_leaders[i].status == 1 &&
-            MOX::_leaders[i].type == 0) {
+            MOX::_leaders[i].type == LEADER_TYPE_SHIP) {
 
             if (MOX::_leaders[i].location == ship_idx) {
                 leader_idx = i;

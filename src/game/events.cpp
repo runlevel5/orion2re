@@ -547,7 +547,7 @@ namespace EVENTS {
                                 for (int j = 0; j < 5; ++j) {
                                     int16_t planet_idx = MOX::_star[_event_data[i].target_id].planet_index[j];
                                     if (planet_idx != -1) {
-                                        MOX::_planet[planet_idx].climate = 1 /* Dead */;
+                                        MOX::_planet[planet_idx].climate = PLANET_CLIMATE_RADIATED;
                                         int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
                                         if (colony_idx != -1) {
                                             BOMB::Destroy_Colony_(&MOX::_colony[colony_idx], -1);
@@ -691,11 +691,11 @@ namespace EVENTS {
 
             int32_t probability = delay;
             switch (MOX::_settings.game_difficulty) {
-            case 0: probability = delay / 2; break;
-            case 1: probability = (delay * 2) / 3; break;
-            case 2: probability = (delay * 3) / 4; break;
-            case 3: probability = (delay * 4) / 5; break;
-            case 4: probability = (delay * 5) / 6; break;
+            case GAME_DIFFICULTY_TUTOR: probability = delay / 2; break;
+            case GAME_DIFFICULTY_EASY: probability = (delay * 2) / 3; break;
+            case GAME_DIFFICULTY_AVERAGE: probability = (delay * 3) / 4; break;
+            case GAME_DIFFICULTY_HARD: probability = (delay * 4) / 5; break;
+            case GAME_DIFFICULTY_IMPOSSIBLE: probability = (delay * 5) / 6; break;
             }
 
             if ((int32_t)game_random::Random_(512) <= probability) {
@@ -714,7 +714,7 @@ namespace EVENTS {
         for (int16_t loop_idx = 0; loop_idx < 5; ++loop_idx) {
             int16_t event_type = game_random::Random_(29) - 1;
 
-            if (MOX::_settings.game_difficulty == 0 && EVENTS::_event_good_array[event_type] == 0) {
+            if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_TUTOR && EVENTS::_event_good_array[event_type] == 0) {
                 continue;
             }
 
@@ -1091,18 +1091,18 @@ namespace EVENTS {
 
                     if (plr->objectives == PLAYER_OBJECTIVE_HUMAN) {
                         switch (MOX::_settings.game_difficulty) {
-                        case 0:
+                        case GAME_DIFFICULTY_TUTOR:
                             weight /= 10;
                             break;
-                        case 1:
+                        case GAME_DIFFICULTY_EASY:
                             weight /= 5;
                             break;
-                        case 2:
+                        case GAME_DIFFICULTY_AVERAGE:
                             break;
-                        case 3:
+                        case GAME_DIFFICULTY_HARD:
                             weight = weight + weight / 2;
                             break;
-                        case 4:
+                        case GAME_DIFFICULTY_IMPOSSIBLE:
                             weight *= 3;
                             break;
                         }
@@ -1347,8 +1347,7 @@ namespace EVENTS {
 
             if (random_idx != -1) {
                 int16_t planet_idx = MOX::_colony[random_idx].planet;
-                // Check if the planet climate is suitable (must be > 1)
-                if (MOX::_planet[planet_idx].climate > 1) {
+                if (MOX::_planet[planet_idx].climate > PLANET_CLIMATE_RADIATED) {
                     result_colony_idx = random_idx;
                 }
             }
@@ -1368,7 +1367,7 @@ namespace EVENTS {
 
                 if (MOX::_colony[i].owner == player_idx) {
                     int16_t planet_idx = MOX::_colony[i].planet;
-                    if (MOX::_planet[planet_idx].climate > 1) {
+                    if (MOX::_planet[planet_idx].climate > PLANET_CLIMATE_RADIATED) {
                         result_colony_idx = i;
                     }
                 }
@@ -1547,19 +1546,19 @@ namespace EVENTS {
 
         int32_t scaled_cp;
         switch (MOX::_settings.game_difficulty) {
-            case 0: /* DIFFICULTY_TUTOR */
+            case GAME_DIFFICULTY_TUTOR:
                 scaled_cp = total_cp / 5;
                 break;
-            case 1: /* DIFFICULTY_EASY */
+            case GAME_DIFFICULTY_EASY:
                 scaled_cp = (total_cp * 2) / 5;
                 break;
-            case 2: /* DIFFICULTY_AVERAGE */
+            case GAME_DIFFICULTY_AVERAGE:
                 scaled_cp = (total_cp * 3) / 5;
                 break;
-            case 4: /* DIFFICULTY_HARDCORE */
+            case GAME_DIFFICULTY_IMPOSSIBLE:
                 scaled_cp = (total_cp * 4) / 5;
                 break;
-            case 3: /* DIFFICULTY_HARD */
+            case GAME_DIFFICULTY_HARD:
             default:
                 scaled_cp = (int32_t)total_cp;
                 break;

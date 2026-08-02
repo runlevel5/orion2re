@@ -4,49 +4,49 @@ namespace aidesign {
     int16_t _min_weapon_count_table[8] = {1, 2, 3, 5, 7, 10, 0, 0};
 
     s_spcl _bio_weapon_spcl[5] = {
-        {SPECIAL_PHASE_SHIFTER, 0},
-        {SPECIAL_SUB_SPACE_TELEPORTER, 0},
-        {SPECIAL_AUGMENTED_ENGINES, 0},
-        {WEAPON_BIO_TERMINATOR, 1},
-        {WEAPON_DEATH_SPORE, 1},
+        {SPECIAL_PHASE_SHIFTER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_SUB_SPACE_TELEPORTER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_AUGMENTED_ENGINES, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_BIO_TERMINATOR, AI_SPECIAL_ITEM_WEAPON},
+        {WEAPON_DEATH_SPORE, AI_SPECIAL_ITEM_WEAPON},
     };
     s_spcl _capture_spcl[5] = {
-        {SPECIAL_TRANSPORTERS, 0},
-        {WEAPON_TRACTOR_BEAM, 1},
-        {WEAPON_ASSAULT_SHUTTLE, 1},
-        {SPECIAL_TROOP_PODS, 0},
-        {SPECIAL_WARP_DISSIPATOR, 0},
+        {SPECIAL_TRANSPORTERS, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_TRACTOR_BEAM, AI_SPECIAL_ITEM_WEAPON},
+        {WEAPON_ASSAULT_SHUTTLE, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_TROOP_PODS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_WARP_DISSIPATOR, AI_SPECIAL_ITEM_SPECIAL},
     };
     s_spcl _cloaking_spcl[3] = {
-        {SPECIAL_PHASING_CLOAK, 0},
-        {SPECIAL_CLOAKING_DEVICE, 0},
-        {SPECIAL_STEALTH_FIELD, 0},
+        {SPECIAL_PHASING_CLOAK, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_CLOAKING_DEVICE, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_STEALTH_FIELD, AI_SPECIAL_ITEM_SPECIAL},
     };
     s_spcl _beam_defense_spcl[4] = {
-        {SPECIAL_INERTIAL_NULLIFIER, 0},
-        {SPECIAL_DISPLACEMENT_DEVICE, 0},
-        {SPECIAL_AUGMENTED_ENGINES, 0},
-        {SPECIAL_INERTIAL_STABILIZER, 0},
+        {SPECIAL_INERTIAL_NULLIFIER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_DISPLACEMENT_DEVICE, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_AUGMENTED_ENGINES, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_INERTIAL_STABILIZER, AI_SPECIAL_ITEM_SPECIAL},
     };
     s_spcl _missile_defense_spcl[8] = {
-        {SPECIAL_WIDE_AREA_JAMMER, 0},
-        {SPECIAL_MULTI_WAVE_ECM_JAMMER, 0},
-        {WEAPON_SPATIAL_COMPRESSOR, 1},
-        {SPECIAL_ECM_JAMMER, 0},
-        {WEAPON_PULSAR, 1},
-        {SPECIAL_DISPLACEMENT_DEVICE, 0},
-        {SPECIAL_LIGHTNING_FIELD, 0},
-        {WEAPON_ANTI_MISSILE_ROCKET, 1},
+        {SPECIAL_WIDE_AREA_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_MULTI_WAVE_ECM_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_SPATIAL_COMPRESSOR, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_ECM_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_PULSAR, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_DISPLACEMENT_DEVICE, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_LIGHTNING_FIELD, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_ANTI_MISSILE_ROCKET, AI_SPECIAL_ITEM_WEAPON},
     };
     s_spcl _armor_spcl[3] = {
-        {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
-        {SPECIAL_HEAVY_ARMOR, 0},
-        {SPECIAL_REINFORCED_HULL, 0},
+        {SPECIAL_AUTOMATED_REPAIR_UNIT, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_HEAVY_ARMOR, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_REINFORCED_HULL, AI_SPECIAL_ITEM_SPECIAL},
     };
     s_spcl _shield_spcl[3] = {
-        {SPECIAL_HARD_SHIELDS, 0},
-        {SPECIAL_MULTI_PHASED_SHIELDS, 0},
-        {SPECIAL_SHIELD_CAPACITOR, 0},
+        {SPECIAL_HARD_SHIELDS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_MULTI_PHASED_SHIELDS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_SHIELD_CAPACITOR, AI_SPECIAL_ITEM_SPECIAL},
     };
 
     s_aidesign_ship_design _ship_design_tables[7][6] = {
@@ -108,82 +108,82 @@ namespace aidesign {
         },
     };
     s_spcl _beam_offense_spcl[7] = {
-        {SPECIAL_TIME_WARP_FACILITATOR, 0},
-        {SPECIAL_ACHILLES_TARGETING_UNIT, 0},
-        {SPECIAL_HIGH_ENERGY_FOCUS, 0},
-        {SPECIAL_RANGEMASTER_UNIT, 0},
-        {SPECIAL_STRUCTURAL_ANALYZER, 0},
-        {SPECIAL_HYPER_X_CAPACITORS, 0},
-        {SPECIAL_BATTLE_SCANNER, 0},
+        {SPECIAL_TIME_WARP_FACILITATOR, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_ACHILLES_TARGETING_UNIT, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_HIGH_ENERGY_FOCUS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_RANGEMASTER_UNIT, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_STRUCTURAL_ANALYZER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_HYPER_X_CAPACITORS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_BATTLE_SCANNER, AI_SPECIAL_ITEM_SPECIAL},
     };
     s_spcl _missile_offense_spcl[2] = {
-        {SPECIAL_TIME_WARP_FACILITATOR, 0},
-        {SPECIAL_FAST_MISSILE_RACKS, 0},
+        {SPECIAL_TIME_WARP_FACILITATOR, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_FAST_MISSILE_RACKS, AI_SPECIAL_ITEM_SPECIAL},
     };
     s_spcl _special_weapons_spcl[5] = {
-        {WEAPON_STELLAR_CONVERTER, 1},
-        {WEAPON_BLACK_HOLE_GENERATOR, 1},
-        {SPECIAL_ENERGY_ABSORBER, 0},
-        {WEAPON_PLASMA_WEB, 1},
-        {WEAPON_GYRO_DESTABILIZER, 1},
+        {WEAPON_STELLAR_CONVERTER, AI_SPECIAL_ITEM_WEAPON},
+        {WEAPON_BLACK_HOLE_GENERATOR, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_ENERGY_ABSORBER, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_PLASMA_WEB, AI_SPECIAL_ITEM_WEAPON},
+        {WEAPON_GYRO_DESTABILIZER, AI_SPECIAL_ITEM_WEAPON},
     };
     s_spcl _special_device_spcl[12] = {
-        {SPECIAL_QUANTUM_DETONATOR, 0},
-        {WEAPON_SPATIAL_COMPRESSOR, 1},
-        {WEAPON_PULSAR, 1},
-        {WEAPON_STASIS_FIELD, 1},
-        {SPECIAL_PHASING_CLOAK, 0},
-        {SPECIAL_CLOAKING_DEVICE, 0},
-        {SPECIAL_STEALTH_FIELD, 0},
-        {SPECIAL_REFLECTION_FIELD, 0},
-        {SPECIAL_PHASE_SHIFTER, 0},
-        {SPECIAL_SUB_SPACE_TELEPORTER, 0},
-        {SPECIAL_WARP_DISSIPATOR, 0},
-        {SPECIAL_SCOUT_LAB, 0},
+        {SPECIAL_QUANTUM_DETONATOR, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_SPATIAL_COMPRESSOR, AI_SPECIAL_ITEM_WEAPON},
+        {WEAPON_PULSAR, AI_SPECIAL_ITEM_WEAPON},
+        {WEAPON_STASIS_FIELD, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_PHASING_CLOAK, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_CLOAKING_DEVICE, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_STEALTH_FIELD, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_REFLECTION_FIELD, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_PHASE_SHIFTER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_SUB_SPACE_TELEPORTER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_WARP_DISSIPATOR, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_SCOUT_LAB, AI_SPECIAL_ITEM_SPECIAL},
     };
     s_spcl _defense_specials_f_spcl[20] = {
-        {SPECIAL_SECURITY_STATIONS, 0},
-        {SPECIAL_DISPLACEMENT_DEVICE, 0},
-        {SPECIAL_LIGHTNING_FIELD, 0},
-        {SPECIAL_HARD_SHIELDS, 0},
-        {SPECIAL_WIDE_AREA_JAMMER, 0},
-        {SPECIAL_MULTI_WAVE_ECM_JAMMER, 0},
-        {SPECIAL_HEAVY_ARMOR, 0},
-        {SPECIAL_INERTIAL_NULLIFIER, 0},
-        {SPECIAL_ECM_JAMMER, 0},
-        {SPECIAL_REINFORCED_HULL, 0},
-        {SPECIAL_INERTIAL_STABILIZER, 0},
-        {SPECIAL_AUGMENTED_ENGINES, 0},
-        {SPECIAL_SHIELD_CAPACITOR, 0},
-        {SPECIAL_MULTI_PHASED_SHIELDS, 0},
-        {WEAPON_ANTI_MISSILE_ROCKET, 1},
-        {SPECIAL_REFLECTION_FIELD, 0},
-        {WEAPON_SPATIAL_COMPRESSOR, 1},
-        {WEAPON_PULSAR, 1},
-        {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
-        {SPECIAL_NO_SPECIAL, 0},
+        {SPECIAL_SECURITY_STATIONS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_DISPLACEMENT_DEVICE, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_LIGHTNING_FIELD, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_HARD_SHIELDS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_WIDE_AREA_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_MULTI_WAVE_ECM_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_HEAVY_ARMOR, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_INERTIAL_NULLIFIER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_ECM_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_REINFORCED_HULL, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_INERTIAL_STABILIZER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_AUGMENTED_ENGINES, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_SHIELD_CAPACITOR, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_MULTI_PHASED_SHIELDS, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_ANTI_MISSILE_ROCKET, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_REFLECTION_FIELD, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_SPATIAL_COMPRESSOR, AI_SPECIAL_ITEM_WEAPON},
+        {WEAPON_PULSAR, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_AUTOMATED_REPAIR_UNIT, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_NO_SPECIAL, AI_SPECIAL_ITEM_SPECIAL},
     };
     s_spcl _defense_specials_t_spcl[20] = {
-        {SPECIAL_SECURITY_STATIONS, 0},
-        {SPECIAL_DISPLACEMENT_DEVICE, 0},
-        {SPECIAL_LIGHTNING_FIELD, 0},
-        {SPECIAL_HARD_SHIELDS, 0},
-        {SPECIAL_WIDE_AREA_JAMMER, 0},
-        {SPECIAL_MULTI_WAVE_ECM_JAMMER, 0},
-        {SPECIAL_HEAVY_ARMOR, 0},
-        {SPECIAL_INERTIAL_NULLIFIER, 0},
-        {SPECIAL_ECM_JAMMER, 0},
-        {SPECIAL_REINFORCED_HULL, 0},
-        {SPECIAL_INERTIAL_STABILIZER, 0},
-        {SPECIAL_AUGMENTED_ENGINES, 0},
-        {SPECIAL_SHIELD_CAPACITOR, 0},
-        {SPECIAL_MULTI_PHASED_SHIELDS, 0},
-        {WEAPON_ANTI_MISSILE_ROCKET, 1},
-        {SPECIAL_REFLECTION_FIELD, 0},
-        {WEAPON_SPATIAL_COMPRESSOR, 1},
-        {WEAPON_PULSAR, 1},
-        {SPECIAL_AUTOMATED_REPAIR_UNIT, 0},
-        {SPECIAL_NO_SPECIAL, 0},
+        {SPECIAL_SECURITY_STATIONS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_DISPLACEMENT_DEVICE, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_LIGHTNING_FIELD, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_HARD_SHIELDS, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_WIDE_AREA_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_MULTI_WAVE_ECM_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_HEAVY_ARMOR, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_INERTIAL_NULLIFIER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_ECM_JAMMER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_REINFORCED_HULL, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_INERTIAL_STABILIZER, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_AUGMENTED_ENGINES, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_SHIELD_CAPACITOR, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_MULTI_PHASED_SHIELDS, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_ANTI_MISSILE_ROCKET, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_REFLECTION_FIELD, AI_SPECIAL_ITEM_SPECIAL},
+        {WEAPON_SPATIAL_COMPRESSOR, AI_SPECIAL_ITEM_WEAPON},
+        {WEAPON_PULSAR, AI_SPECIAL_ITEM_WEAPON},
+        {SPECIAL_AUTOMATED_REPAIR_UNIT, AI_SPECIAL_ITEM_SPECIAL},
+        {SPECIAL_NO_SPECIAL, AI_SPECIAL_ITEM_SPECIAL},
     };
 
     void __cdecl Determine_Beam_Weapon_Modifications_(
@@ -327,7 +327,7 @@ namespace aidesign {
             }
         }
 
-        if (MOX::_settings.game_difficulty < 2) {
+        if (MOX::_settings.game_difficulty < GAME_DIFFICULTY_AVERAGE) {
             int16_t idx1 = weapon_count - 1;
             while (idx1 >= 0) {
                 if ((TECHDATA::_weapons[weapon_id[idx1]].available_mods & WEAPON_MOD_FLAG_POINT_DEFENSE) != 0) {
@@ -406,29 +406,29 @@ namespace aidesign {
                         for (int16_t i = 0; i < weapon_count; i++) {
                             int16_t w_id = weapon_id[i];
                             if (w_id != 0) {
-                                int32_t space = DESIGN::Weapon_Space_(player_idx, w_id, 1, 1, 1, 0);
+                                int32_t space = DESIGN::Weapon_Space_(player_idx, w_id, 1, WEAPON_FIRING_ARC_FORWARD, 1, 0);
                                 uint16_t natural_mods = TECHDATA::_weapons[w_id].natural_mods;
                                 int32_t damage = TECHDATA::_weapons[w_id].max_damage;
 
-                                if ((natural_mods & 0x100) == 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) == 0) {
                                     damage -= target_shield_value;
                                 }
 
                                 int32_t val = (damage * 10) / space;
 
-                                if ((natural_mods & 0x20) != 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) != 0) {
                                     val = (val * 3) / 2;
                                 }
-                                if ((natural_mods & 0x4) != 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_NO_RANGE_DISSIPATION) != 0) {
                                     val = (val * 5) / 4;
                                 }
-                                if ((natural_mods & 0x400) != 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_ALWAYS_HITS) != 0) {
                                     val = (val * 5) / 4;
                                 }
-                                if ((natural_mods & 0x200) != 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_ENVELOPING) != 0) {
                                     val *= 2;
                                 }
-                                if ((natural_mods & 0x10) != 0 && MOX::_player[player_idx].ship_special_theme == 1) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_KILLS_MARINES) != 0 && MOX::_player[player_idx].ship_special_theme == AI_SHIP_SPECIAL_THEME_CAPTURE) {
                                     val *= 2;
                                 }
 
@@ -455,11 +455,11 @@ namespace aidesign {
                         for (int16_t i = 0; i < weapon_count; i++) {
                             int16_t w_id = weapon_id[i];
                             if (w_id != 0) {
-                                int32_t space = DESIGN::Weapon_Space_(player_idx, w_id, 1, 1, 1, 2);
+                                int32_t space = DESIGN::Weapon_Space_(player_idx, w_id, 1, WEAPON_FIRING_ARC_FORWARD, 1, 2);
                                 uint16_t natural_mods = TECHDATA::_weapons[w_id].natural_mods;
                                 int32_t damage = TECHDATA::_weapons[w_id].max_damage * 3;
 
-                                if ((natural_mods & 0x100) == 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) == 0) {
                                     damage = damage / 2 - target_shield_value;
                                 } else {
                                     damage = damage / 2;
@@ -467,16 +467,16 @@ namespace aidesign {
 
                                 int32_t val = (damage * 10) / space;
 
-                                if ((natural_mods & 0x20) != 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) != 0) {
                                     val = (val * 3) / 2;
                                 }
-                                if ((natural_mods & 0x4) != 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_NO_RANGE_DISSIPATION) != 0) {
                                     val = (val * 5) / 4;
                                 }
-                                if ((natural_mods & 0x400) != 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_ALWAYS_HITS) != 0) {
                                     val = (val * 5) / 4;
                                 }
-                                if ((natural_mods & 0x200) != 0) {
+                                if ((natural_mods & WEAPON_NATURAL_FLAG_ENVELOPING) != 0) {
                                     val *= 2;
                                 }
 
@@ -493,9 +493,9 @@ namespace aidesign {
             }
         }
 
-        *arc1 = 1;
-        *arc2 = 1;
-        *arc0 = 1;
+        *arc1 = WEAPON_FIRING_ARC_FORWARD;
+        *arc2 = WEAPON_FIRING_ARC_FORWARD;
+        *arc0 = WEAPON_FIRING_ARC_FORWARD;
 
         int16_t comp_tech = Get_Competition_Player_Tech_Values_(player_idx, 0x12);
         int16_t r_base = (int16_t)((0x14 - comp_tech) * hull_size);
@@ -525,31 +525,31 @@ namespace aidesign {
         if ((int32_t)game_random::Random_(100) < arc0_threshold) {
             int32_t arc0_inner_threshold = (int32_t)(r_base / 2) + (int32_t)spec0_mod_count * 20;
             if ((int32_t)game_random::Random_(100) < arc0_inner_threshold) {
-                *arc0 = 16;
+                *arc0 = WEAPON_FIRING_ARC_360;
             } else {
-                *arc0 = 2;
+                *arc0 = WEAPON_FIRING_ARC_FORWARD_EXTENDED;
             }
         }
 
         int32_t arc1_threshold = (int32_t)spec1_mod_count * 20 + (int32_t)(r_base / 2);
         if ((int32_t)game_random::Random_(100) < arc1_threshold) {
-            *arc1 = 2;
+            *arc1 = WEAPON_FIRING_ARC_FORWARD_EXTENDED;
         }
 
         int32_t arc2_threshold = (int32_t)spec2_mod_count * 20 + (int32_t)(r_base / 4);
         if ((int32_t)game_random::Random_(100) < arc2_threshold) {
-            *arc2 = 2;
+            *arc2 = WEAPON_FIRING_ARC_FORWARD_EXTENDED;
         }
     }
 
     int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int16_t count, int16_t player_idx, struct s_ship_design* design, int16_t space_available, int16_t* weapon_slot_idx_ptr) {
         int16_t total_space_used = 0;
-        int16_t already_has_fighter_bay = 0;
+        int16_t already_has_anti_missile_rocket = 0;
 
         for (int16_t i = 0; i < count; ++i) {
             int16_t item_id = list[i].id;
 
-            if (list[i].type == 0) {
+            if (list[i].type == AI_SPECIAL_ITEM_SPECIAL) {
                 int16_t tech_app_id = TECHDATA::_specials[item_id].tech_app_id;
 
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
@@ -571,20 +571,20 @@ namespace aidesign {
                 }
             } else {
                 if (*weapon_slot_idx_ptr < 8) {
-                    if (item_id == 0x21 /* WPN_FIGHTER_BAY */) {
+                    if (item_id == WEAPON_ANTI_MISSILE_ROCKET) {
                         for (int16_t slot = 0; slot < *weapon_slot_idx_ptr; ++slot) {
-                            if (design->ship_weapon[slot].type == 0x21 /* WPN_FIGHTER_BAY */) {
-                                already_has_fighter_bay = 1;
+                            if (design->ship_weapon[slot].type == WEAPON_ANTI_MISSILE_ROCKET) {
+                                already_has_anti_missile_rocket = 1;
                             }
                         }
                     }
 
                     int16_t weapon_tech_app_id = TECHDATA::_weapons[item_id].tech_app_id;
-                    if (MOX::_player[player_idx].tech_applications[weapon_tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED && !already_has_fighter_bay) {
-                        int32_t weapon_unit_space = DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
+                    if (MOX::_player[player_idx].tech_applications[weapon_tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED && !already_has_anti_missile_rocket) {
+                        int32_t weapon_unit_space = DESIGN::Weapon_Space_(player_idx, item_id, 1, WEAPON_FIRING_ARC_360, 1, 0);
                         int16_t max_count = (int16_t)(space_available / weapon_unit_space);
 
-                        if (item_id == 0x21 /* WPN_FIGHTER_BAY */) {
+                        if (item_id == WEAPON_ANTI_MISSILE_ROCKET) {
                             if (max_count > (int16_t)design->size * 10) {
                                 max_count = (int16_t)design->size * 10;
                             }
@@ -594,7 +594,7 @@ namespace aidesign {
                             int16_t items_this_type = 0;
 
                             design->ship_weapon[*weapon_slot_idx_ptr].type = item_id;
-                            design->ship_weapon[*weapon_slot_idx_ptr].firing_arc = 16;
+                            design->ship_weapon[*weapon_slot_idx_ptr].firing_arc = WEAPON_FIRING_ARC_360;
                             design->ship_weapon[*weapon_slot_idx_ptr].specials = 0;
                             design->ship_weapon[*weapon_slot_idx_ptr].ammo = 1;
 
@@ -611,7 +611,7 @@ namespace aidesign {
 
                                 if (*weapon_slot_idx_ptr < 8) {
                                     design->ship_weapon[*weapon_slot_idx_ptr].type = item_id;
-                                    design->ship_weapon[*weapon_slot_idx_ptr].firing_arc = 16;
+                                    design->ship_weapon[*weapon_slot_idx_ptr].firing_arc = WEAPON_FIRING_ARC_360;
                                     design->ship_weapon[*weapon_slot_idx_ptr].specials = 0;
                                     design->ship_weapon[*weapon_slot_idx_ptr].ammo = 1;
                                 }
@@ -625,7 +625,7 @@ namespace aidesign {
 
                             ++(*weapon_slot_idx_ptr);
 
-                            int16_t space_calc = (int16_t)DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
+                            int16_t space_calc = (int16_t)DESIGN::Weapon_Space_(player_idx, item_id, 1, WEAPON_FIRING_ARC_360, 1, 0);
                             int16_t used_space = (int16_t)(space_calc * items_this_type);
                             total_space_used = (int16_t)(total_space_used + used_space);
                             space_available = (int16_t)(space_available - used_space);
@@ -728,8 +728,8 @@ namespace aidesign {
         };
 
         switch ((uint8_t)player->ship_design_theme) {
-            case 0:
-            case 100: {
+            case AI_SHIP_DESIGN_THEME_BALANCED:
+            case AI_SHIP_DESIGN_THEME_HUMAN: {
                 switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                     case 2:
@@ -763,7 +763,7 @@ namespace aidesign {
                 }
             }
 
-            case 1: {
+            case AI_SHIP_DESIGN_THEME_CARRIER: {
                 switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         return get_default_class();
@@ -796,7 +796,7 @@ namespace aidesign {
                 }
             }
 
-            case 2:
+            case AI_SHIP_DESIGN_THEME_MISSILE:
                 switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         result = get_default_class();
@@ -835,7 +835,7 @@ namespace aidesign {
                 }
                 [[fallthrough]];
 
-            case 3:
+            case AI_SHIP_DESIGN_THEME_SPECIAL:
                 switch ((int16_t)game_random::Random_(20)) {
                     case 1:
                         return get_default_class();
@@ -921,28 +921,28 @@ namespace aidesign {
         uint8_t theme = (uint8_t)MOX::_player[player_idx].ship_special_theme;
 
         switch (theme) {
-            case 0:
+            case AI_SHIP_SPECIAL_THEME_BEAM_DEFENSE:
                 result = Add_Specials_To_Design_(_beam_defense_spcl, 4, player_idx, design, space, weapon_index_ptr);
                 break;
-            case 1:
+            case AI_SHIP_SPECIAL_THEME_CAPTURE:
                 result = Add_Specials_To_Design_(_capture_spcl, 5, player_idx, design, space, weapon_index_ptr);
                 break;
-            case 2:
+            case AI_SHIP_SPECIAL_THEME_BIO_WEAPON:
                 result = Add_Specials_To_Design_(_bio_weapon_spcl, 5, player_idx, design, space, weapon_index_ptr);
                 break;
-            case 3:
+            case AI_SHIP_SPECIAL_THEME_MISSILE_DEFENSE:
                 result = Add_Specials_To_Design_(_missile_defense_spcl, 8, player_idx, design, space, weapon_index_ptr);
                 break;
-            case 4:
+            case AI_SHIP_SPECIAL_THEME_CLOAKING:
                 result = Add_Specials_To_Design_(_cloaking_spcl, 3, player_idx, design, space, weapon_index_ptr);
                 break;
-            case 5:
+            case AI_SHIP_SPECIAL_THEME_ARMOR:
                 result = Add_Specials_To_Design_(_armor_spcl, 3, player_idx, design, space, weapon_index_ptr);
                 break;
-            case 6:
+            case AI_SHIP_SPECIAL_THEME_SHIELD:
                 result = Add_Specials_To_Design_(_shield_spcl, 3, player_idx, design, space, weapon_index_ptr);
                 break;
-            case 100:
+            case AI_SHIP_SPECIAL_THEME_HUMAN:
                 result = Add_Specials_To_Design_(_missile_defense_spcl, 8, player_idx, design, space, weapon_index_ptr);
                 break;
             default:
@@ -972,7 +972,7 @@ namespace aidesign {
             int16_t id = _special_device_spcl[i].id;
             int16_t type = _special_device_spcl[i].type;
 
-            if (type == 0) {
+            if (type == AI_SPECIAL_ITEM_SPECIAL) {
                 tech_app_id = (int16_t)TECHDATA::_specials[id].tech_app_id;
             } else {
                 tech_app_id = (int16_t)TECHDATA::_weapons[id].tech_app_id;
@@ -1005,7 +1005,7 @@ namespace aidesign {
         int16_t total_space_used = 0;
 
         if (MOX::_player[player_idx].tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            space_per_weapon = DESIGN::Weapon_Space_(player_idx, WEAPON_HEAVY_FIGHTER, 1, 0x10, 1, 0);
+            space_per_weapon = DESIGN::Weapon_Space_(player_idx, WEAPON_HEAVY_FIGHTER, 1, WEAPON_FIRING_ARC_360, 1, 0);
             if (available_space / space_per_weapon > 0) {
                 weapon_type = WEAPON_HEAVY_FIGHTER;
                 goto calculate_fighters;
@@ -1013,7 +1013,7 @@ namespace aidesign {
         }
 
         if (MOX::_player[player_idx].tech_applications[TECH_APP_BOMBER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            space_per_weapon = DESIGN::Weapon_Space_(player_idx, WEAPON_BOMBER, 1, 0x10, 1, 0);
+            space_per_weapon = DESIGN::Weapon_Space_(player_idx, WEAPON_BOMBER, 1, WEAPON_FIRING_ARC_360, 1, 0);
             if (available_space / space_per_weapon > 0) {
                 weapon_type = WEAPON_BOMBER;
                 goto calculate_fighters;
@@ -1023,14 +1023,14 @@ namespace aidesign {
         weapon_type = WEAPON_INTERCEPTOR;
 
     calculate_fighters:
-        space_per_weapon = DESIGN::Weapon_Space_(player_idx, weapon_type, 1, 0x10, 1, 0);
+        space_per_weapon = DESIGN::Weapon_Space_(player_idx, weapon_type, 1, WEAPON_FIRING_ARC_360, 1, 0);
         int num_fighters = (int)available_space / space_per_weapon;
 
         if (num_fighters > 0 && weapon_type != 0 && *weapon_slot_idx < 8) {
             int16_t current_idx = *weapon_slot_idx;
 
             design->ship_weapon[current_idx].type = weapon_type;
-            design->ship_weapon[current_idx].firing_arc = 0x10;
+            design->ship_weapon[current_idx].firing_arc = WEAPON_FIRING_ARC_360;
             design->ship_weapon[current_idx].specials = 0;
             design->ship_weapon[current_idx].ammo = 1;
 
@@ -1047,7 +1047,7 @@ namespace aidesign {
 
                 if (current_idx < 8) {
                     design->ship_weapon[current_idx].type = weapon_type;
-                    design->ship_weapon[current_idx].firing_arc = 0x10;
+                    design->ship_weapon[current_idx].firing_arc = WEAPON_FIRING_ARC_360;
                     design->ship_weapon[current_idx].specials = 0;
                     design->ship_weapon[current_idx].ammo = 1;
                 } else {
@@ -1064,7 +1064,7 @@ namespace aidesign {
         finalize_count:
             *weapon_slot_idx = *weapon_slot_idx + 1;
 
-            int fighter_unit_space = DESIGN::Weapon_Space_(player_idx, WEAPON_INTERCEPTOR, 1, 0x10, 1, 0);
+            int fighter_unit_space = DESIGN::Weapon_Space_(player_idx, WEAPON_INTERCEPTOR, 1, WEAPON_FIRING_ARC_360, 1, 0);
             total_space_used = (int16_t)((int16_t)fighter_unit_space * total_fighters);
         }
 
@@ -1077,7 +1077,7 @@ namespace aidesign {
         int num_candidates = 0;
 
         for (int i = 1; i <= WEAPON_TRACTOR_BEAM; ++i) {
-            if (TECHDATA::_weapons[i].type == WEAPON_TYPE_BOMB && (TECHDATA::_weapons[i].natural_mods & WEAPON_MOD_FLAG_AUTO_FIRE) == 0) {
+            if (TECHDATA::_weapons[i].type == WEAPON_TYPE_BOMB && (TECHDATA::_weapons[i].natural_mods & WEAPON_NATURAL_FLAG_BIOLOGICAL) == 0) {
                 int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
                     candidates[num_candidates] = i;
@@ -1143,7 +1143,7 @@ namespace aidesign {
 
         Determine_Bomb_Weapon_(player_idx, &bomb_type);
 
-        int32_t space_per_bomb = DESIGN::Weapon_Space_(player_idx, bomb_type, 1, 1, 0, 0);
+        int32_t space_per_bomb = DESIGN::Weapon_Space_(player_idx, bomb_type, 1, WEAPON_FIRING_ARC_FORWARD, 0, 0);
 
         if (space_per_bomb == 0) {
             return 0;
@@ -1153,7 +1153,7 @@ namespace aidesign {
 
         if (num_bombs > 0 && *weapon_slot_idx < 8 && bomb_type != 0) {
             design->ship_weapon[*weapon_slot_idx].type = bomb_type;
-            design->ship_weapon[*weapon_slot_idx].firing_arc = 16;
+            design->ship_weapon[*weapon_slot_idx].firing_arc = WEAPON_FIRING_ARC_360;
             design->ship_weapon[*weapon_slot_idx].specials = 0;
             design->ship_weapon[*weapon_slot_idx].ammo = 10;
 
@@ -1171,7 +1171,7 @@ namespace aidesign {
 
                 if (*weapon_slot_idx < 8) {
                     design->ship_weapon[*weapon_slot_idx].type = bomb_type;
-                    design->ship_weapon[*weapon_slot_idx].firing_arc = 16;
+                    design->ship_weapon[*weapon_slot_idx].firing_arc = WEAPON_FIRING_ARC_360;
                     design->ship_weapon[*weapon_slot_idx].specials = 0;
                     design->ship_weapon[*weapon_slot_idx].ammo = 10;
                 }
@@ -1186,7 +1186,7 @@ namespace aidesign {
             *weapon_slot_idx += 1;
         }
 
-        int32_t final_space_per_bomb = DESIGN::Weapon_Space_(player_idx, bomb_type, 1, 1, 0, 0);
+        int32_t final_space_per_bomb = DESIGN::Weapon_Space_(player_idx, bomb_type, 1, WEAPON_FIRING_ARC_FORWARD, 0, 0);
 
         return (int16_t)(final_space_per_bomb * total_bombs_added);
     }
@@ -1288,7 +1288,7 @@ namespace aidesign {
             }
         }
 
-        if (MOX::_settings.game_difficulty < 2) {
+        if (MOX::_settings.game_difficulty < GAME_DIFFICULTY_AVERAGE) {
             *out_weapon_id = weapon_indices[count - 1];
             *out_weapon_mods = 0;
             return;
@@ -1305,7 +1305,7 @@ namespace aidesign {
                 for (int16_t i = 0; i < count; ++i) {
                     uint16_t w_idx = weapon_indices[i];
                     if (w_idx != 0) {
-                        int32_t space = DESIGN::Weapon_Space_(player_idx, w_idx, 1, 1, 5, 0);
+                        int32_t space = DESIGN::Weapon_Space_(player_idx, w_idx, 1, WEAPON_FIRING_ARC_FORWARD, 5, 0);
                         int32_t score = (((int32_t)TECHDATA::_weapons[w_idx].max_damage - max_shield) * 10) / space;
                         if (best_score < score) {
                             best_index = i;
@@ -1320,14 +1320,14 @@ namespace aidesign {
         }
 
         uint16_t mods = *out_weapon_mods;
-        int32_t space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
+        int32_t space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, *out_weapon_count, mods);
 
         if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
             if (*out_weapon_count > 5) {
                 *out_weapon_count = 5;
             }
 
-            space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
+            space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, *out_weapon_count, mods);
 
             if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
                 if (mods & WEAPON_MOD_FLAG_HEAVILY_ARMORED) {
@@ -1335,7 +1335,7 @@ namespace aidesign {
                     *out_weapon_mods = mods;
                 }
 
-                space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
+                space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, *out_weapon_count, mods);
 
                 if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
                     if (mods & WEAPON_MOD_FLAG_FAST) {
@@ -1343,7 +1343,7 @@ namespace aidesign {
                         *out_weapon_mods = mods;
                     }
 
-                    DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
+                    DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, *out_weapon_count, mods);
                 }
             }
         }
@@ -1361,7 +1361,7 @@ namespace aidesign {
             return 0;
         }
 
-        int32_t space_per_missile = DESIGN::Weapon_Space_(player_idx, (int16_t)weapon_type, 1, 1, modified_ammo, specials);
+        int32_t space_per_missile = DESIGN::Weapon_Space_(player_idx, (int16_t)weapon_type, 1, WEAPON_FIRING_ARC_FORWARD, modified_ammo, specials);
 
         int16_t total_possible = (int16_t)(space_limit / space_per_missile);
 
@@ -1371,7 +1371,7 @@ namespace aidesign {
 
         int16_t current_idx = *weapon_index_ptr;
         design->ship_weapon[current_idx].type = (int16_t)weapon_type;
-        design->ship_weapon[current_idx].firing_arc = 0x10;
+        design->ship_weapon[current_idx].firing_arc = WEAPON_FIRING_ARC_360;
         design->ship_weapon[current_idx].specials = (int16_t)specials;
         design->ship_weapon[current_idx].ammo = (int8_t)modified_ammo;
 
@@ -1391,7 +1391,7 @@ namespace aidesign {
 
             if (current_idx < 8) {
                 design->ship_weapon[current_idx].type = (int16_t)weapon_type;
-                design->ship_weapon[current_idx].firing_arc = 0x10;
+                design->ship_weapon[current_idx].firing_arc = WEAPON_FIRING_ARC_360;
                 design->ship_weapon[current_idx].specials = (int16_t)specials;
                 design->ship_weapon[current_idx].ammo = (int8_t)modified_ammo;
             }
@@ -1407,7 +1407,7 @@ namespace aidesign {
     finalize_index:
         (*weapon_index_ptr)++;
 
-        int32_t final_space_coeff = DESIGN::Weapon_Space_(player_idx, (int16_t)weapon_type, 1, 1, modified_ammo, specials);
+        int32_t final_space_coeff = DESIGN::Weapon_Space_(player_idx, (int16_t)weapon_type, 1, WEAPON_FIRING_ARC_FORWARD, modified_ammo, specials);
         return (int16_t)(final_space_coeff * total_missiles_added);
     }
 

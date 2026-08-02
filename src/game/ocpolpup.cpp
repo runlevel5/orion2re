@@ -25,7 +25,7 @@ namespace OCPOLPUP {
         colony_index = MOX::_planet[planet_index].colony_index;
         owner_index = MOX::_colony[colony_index].owner;
 
-        if (MOX::_player[owner_index].traits[TRAIT_CURRENT_GOVERNMENT] != 4 && MOX::_player[owner_index].traits[TRAIT_CURRENT_GOVERNMENT] != 5) {
+        if (MOX::_player[owner_index].traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_DEMOCRACY && MOX::_player[owner_index].traits[TRAIT_CURRENT_GOVERNMENT] != GOVERNMENT_FEDERATION) {
             if (GENDRAW::Confirmation_Box_(ESTRINGS::E_Strings_(0xB4)) != 0) {
                 _occupation_policy_value = 0;
             } else {

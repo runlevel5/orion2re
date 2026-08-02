@@ -634,7 +634,7 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
 
     colony->auto_building = 0;
 
-    if (MOX::_player[new_owner_idx].traits[0] / 2 == 3) {
+    if (MOX::_player[new_owner_idx].traits[0] / 2 == GOVERNMENT_UNIFICATION / 2) {
         if (colony->buildings[BUILDING_HOLO_SIMULATOR] != 0) {
             ERICNET::Remove_Building_(colony_idx, BUILDING_HOLO_SIMULATOR);
             MOX::_player[new_owner_idx].bc += TECHDATA::_buildings[BUILDING_HOLO_SIMULATOR].cost / 2;

@@ -204,51 +204,51 @@ namespace JIM {
     }
 
     void __cdecl Decode_Text_Stat_(char* buffer, int16_t numeric_value, int16_t max_len) {
-        Decode_Text_Message_(buffer, -1, -1, -1, numeric_value, -1, -1, -1, max_len);
+        Decode_Text_Message_(buffer, -1, -1, -1, numeric_value, -1, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Year_(char* buffer, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, -1, -1, -1, -1, -1, -1, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, -1, -1, -1, -1, -1, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Race2_(char* buffer, int16_t race_idx, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, race_idx, -1, -1, -1, -1, -1, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, race_idx, -1, -1, -1, -1, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Race_(char* buffer, int16_t race_idx, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, race_idx, -1, -1, -1, -1, -1, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, race_idx, -1, -1, -1, -1, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Name_And_Stat_(char* buffer, int16_t name_idx, int16_t numeric_value, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, name_idx, -1, -1, numeric_value, -1, -1, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, name_idx, -1, -1, numeric_value, -1, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Name_Tech_And_Other_Tech_(char* buffer, int16_t name_idx, int16_t other_name_idx, int16_t first_tech_idx, int16_t second_tech_idx, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, name_idx, -1, first_tech_idx, -1, other_name_idx, second_tech_idx, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, name_idx, -1, first_tech_idx, -1, other_name_idx, second_tech_idx, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Name_And_System_(char* buffer, int16_t name_idx, int16_t system_idx, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, name_idx, system_idx, -1, -1, -1, -1, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, name_idx, system_idx, -1, -1, -1, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_System_(char* buffer, int16_t system_idx, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, -1, system_idx, -1, -1, -1, -1, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, -1, system_idx, -1, -1, -1, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Name_And_Other_Tech_(char* buffer, int16_t name_idx, int16_t other_name_idx, int16_t tech_idx, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, name_idx, -1, -1, -1, other_name_idx, tech_idx, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, name_idx, -1, -1, -1, other_name_idx, tech_idx, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Name_And_Tech_(char* buffer, int16_t name_idx, int16_t tech_idx, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, name_idx, -1, tech_idx, -1, -1, -1, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, name_idx, -1, tech_idx, -1, -1, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t name_idx1, int16_t name_idx2, int16_t max_len) {
-        Decode_Text_Message_(buffer, name_idx1, -1, -1, -1, name_idx2, -1, -1, max_len);
+        Decode_Text_Message_(buffer, name_idx1, -1, -1, -1, name_idx2, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Tech_And_Other_Name_(char* buffer, int16_t tech_id, int16_t other_name_1, int16_t other_name_2, int16_t max_len) {
-        JIM::Decode_Text_Message_(buffer, tech_id, -1, other_name_1, -1, other_name_2, -1, -1, max_len);
+        JIM::Decode_Text_Message_(buffer, tech_id, -1, other_name_1, -1, other_name_2, -1, TECH_FIELD_INVALID, max_len);
     }
 
     void __cdecl Decode_Text_Field_(char* buffer, int16_t field_id, int16_t max_len) {

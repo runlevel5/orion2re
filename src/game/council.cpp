@@ -770,7 +770,7 @@ namespace council {
             }
 
             if (MOX::_player[candidate_idx].objectives == PLAYER_OBJECTIVE_HUMAN) {
-                if (MOX::_settings.game_difficulty > 2) {
+                if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
                     vote_score = (int16_t)((vote_score * 6) / (MOX::_settings.game_difficulty + 6));
                 }
             }

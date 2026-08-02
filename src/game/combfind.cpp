@@ -693,7 +693,7 @@ int16_t __cdecl Find_Planet_At_Star_Satisfying_(s_star_data* star, bool (__cdecl
 }
 
 bool __cdecl Planet_Has_Splinter_Colony_(s_planet_data* planet) {
-    return planet->planet_special == 7 /* PLANET_SPECIAL_SPLINTER_COLONY */;
+    return planet->planet_special == SYSTEM_SPECIAL_SPLINTER_COLONY;
 }
 
 /**
@@ -877,7 +877,7 @@ void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
             int16_t planet_idx = star->planet_index[i];
             if (planet_idx != -1) {
                 // Reset the special status on each planet belonging to this system.
-                MOX::_planet[planet_idx].planet_special = 0;
+                MOX::_planet[planet_idx].planet_special = SYSTEM_SPECIAL_NO_SPECIAL;
             }
         }
         // Clear the system special flag
@@ -1754,7 +1754,7 @@ void __cdecl Reset_Combat_Ships_At_Current_Star_Has_Player_(int16_t player_idx) 
     _current_star_has_player[player_idx].ship_sizes[SHIP_TYPE_COMBAT] = 0;
     _current_star_has_player[player_idx].has_player = 0;
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < SHIP_TYPE_COUNT; ++i) {
         if (_current_star_has_player[player_idx].ship_sizes[i] != 0) {
             _current_star_has_player[player_idx].has_player = 1;
         }
@@ -1983,8 +1983,8 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, int
                             ERIC::Play_Planetary_Destruction_Flic_();
                             COMBFIND::_current_star_has_player[colony_owner].colony_count--;
                             MOX::_planet[planet_idx].planet_type = PLANET_TYPE_ASTEROID;
-                            if (MOX::_planet[planet_idx].planet_special != 0) {
-                                MOX::_planet[planet_idx].planet_special = 0;
+                            if (MOX::_planet[planet_idx].planet_special != SYSTEM_SPECIAL_NO_SPECIAL) {
+                                MOX::_planet[planet_idx].planet_special = SYSTEM_SPECIAL_NO_SPECIAL;
                                 MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
                             }
                             NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, old_n_pops);
@@ -2095,7 +2095,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, int
 
                 if (bomb_hits != 0 || bio_hits != 0 || has_stellar) {
                     bool surrender = false;
-                    if (MOX::_player[colony_owner].objectives != PLAYER_OBJECTIVE_HUMAN && MOX::_settings.game_difficulty > 2) {
+                    if (MOX::_player[colony_owner].objectives != PLAYER_OBJECTIVE_HUMAN && MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
                         if (COLCALC::May_Surrender_Star_(enemy_star_idx, colony_owner, attacker_id) && (int)(colony->n_pops * 2) <= bomb_hits) {
                             surrender = true;
                         }
@@ -2224,7 +2224,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, int
                 ERIC::Play_Amoeba_Flic_();
                 COMBFIND::_messed_up_fleet_palette = 1;
                 if (results->bomb.colony_wiped_out == 0) {
-                    MOX::_planet[planet_idx].climate = 0;
+                    MOX::_planet[planet_idx].climate = PLANET_CLIMATE_TOXIC;
                     MOX::_planet[planet_idx].food_per_farmer = 0;
                     COLCALC::Colony_Environmental_Stuff_(colony);
                     invasion::Enforce_Population_Limits_At_Colony_(colony);

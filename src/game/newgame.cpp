@@ -16,15 +16,15 @@ int16_t _gal_age_button_variable;
 int16_t _fields[10];
 s_animation_header* _anims[7];
 s_animation_header* _tech_level_anims[3];
-s_animation_header* _difficulty_anims[5];
+s_animation_header* _difficulty_anims[GAME_DIFFICULTY_COUNT];
 s_animation_header* _num_players_anims[MAX_PLAYERS - 1];
-s_animation_header* _gal_age_anims[3];
-s_animation_header* _gal_size_anims[4];
+s_animation_header* _gal_age_anims[GALAXY_AGE_COUNT];
+s_animation_header* _gal_size_anims[GALAXY_SIZE_MAXIMUM];
 s_animation_header* _background_seg;
 char* _gal_size_button_strings[GALAXY_SIZE_COUNT];
 char* _civ_button_strings[3];
-char* _diff_button_strings[5];
-char* _gal_age_button_strings[3];
+char* _diff_button_strings[GAME_DIFFICULTY_COUNT];
+char* _gal_age_button_strings[GALAXY_AGE_COUNT];
 char* _combat_button_strings[2];
 char _localized_gal_size_label[20];
 char* _opp_button_strings[MAX_PLAYERS - 1];
@@ -166,7 +166,7 @@ void __cdecl Reload_Newgame_Screen_() {
     RUSS::Mox_Update_();
 
     int16_t index = 0;
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < GALAXY_AGE_COUNT; ++i) {
         _gal_age_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, i + 1, MOX::_screen_seg);
         index = i + 1;
     }
@@ -174,16 +174,16 @@ void __cdecl Reload_Newgame_Screen_() {
     index++;
     RUSS::Mox_Update_();
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < GAME_DIFFICULTY_COUNT; ++i) {
         _difficulty_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, index + i, MOX::_screen_seg);
     }
-    index += 5;
+    index += GAME_DIFFICULTY_COUNT;
     RUSS::Mox_Update_();
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < GALAXY_SIZE_MAXIMUM; ++i) {
         _gal_size_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, index + i, MOX::_screen_seg);
     }
-    index += 4;
+    index += GALAXY_SIZE_MAXIMUM;
     RUSS::Mox_Update_();
 
     for (int i = 0; i < MAX_PLAYERS - 1; ++i) {
@@ -262,7 +262,7 @@ void __cdecl Update_Fields_() {
 
     // Difficulty
     int16_t difficulty_hidden_field = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x77, gx + 0xBC, gy + 0xB8, common_help_text, 0);
-    _fields[0] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0xCC, gx + 0xCD, gy + 0xE0, _diff_button_strings, 5, &_diff_button_variable, 0, common_help_text, 0, difficulty_hidden_field);
+    _fields[0] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0xCC, gx + 0xCD, gy + 0xE0, _diff_button_strings, GAME_DIFFICULTY_COUNT, &_diff_button_variable, 0, common_help_text, 0, difficulty_hidden_field);
 
     // Galaxy Size
     int16_t galaxy_size_hidden_field = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x77, gx + 0x157, gy + 0xB8, common_help_text, 0);
@@ -270,7 +270,7 @@ void __cdecl Update_Fields_() {
 
     // Galaxy Age
     int16_t galaxy_age_hidden_field = fields::Add_Hidden_Field_(gx + 0x1AF, gy + 0x77, gx + 0x1F2, gy + 0xB8, common_help_text, 0);
-    _fields[2] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x1A1, gy + 0xCC, gx + 0x205, gy + 0xE0, _gal_age_button_strings, 3, &_gal_age_button_variable, 0, common_help_text, 0, galaxy_age_hidden_field);
+    _fields[2] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x1A1, gy + 0xCC, gx + 0x205, gy + 0xE0, _gal_age_button_strings, GALAXY_AGE_COUNT, &_gal_age_button_variable, 0, common_help_text, 0, galaxy_age_hidden_field);
 
     // Opponents
     int16_t opponents_hidden_field = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x103, gx + 0xBC, gy + 0x144, common_help_text, 0);
@@ -324,39 +324,39 @@ void __cdecl Draw_Newgame_Screen_() {
 }
 
 void Load_New_Game_Strings_() {
-    _diff_button_strings[0] = ESTRINGS::E_Strings_(0x221 /* ESTR_TUTOR */);
-    _diff_button_strings[1] = ESTRINGS::E_Strings_(0x118 /* ESTR_EASY */);
-    _diff_button_strings[2] = ESTRINGS::E_Strings_(0xbe /* ESTR_AVERAGE */);
-    _diff_button_strings[3] = ESTRINGS::E_Strings_(0x13e /* ESTR_HARD */);
-    _diff_button_strings[4] = ESTRINGS::E_Strings_(0x148 /* ESTR_IMPOSSIBLE */);
+    _diff_button_strings[GAME_DIFFICULTY_TUTOR] = ESTRINGS::E_Strings_(0x221 /* ESTR_TUTOR */);
+    _diff_button_strings[GAME_DIFFICULTY_EASY] = ESTRINGS::E_Strings_(0x118 /* ESTR_EASY */);
+    _diff_button_strings[GAME_DIFFICULTY_AVERAGE] = ESTRINGS::E_Strings_(0xbe /* ESTR_AVERAGE */);
+    _diff_button_strings[GAME_DIFFICULTY_HARD] = ESTRINGS::E_Strings_(0x13e /* ESTR_HARD */);
+    _diff_button_strings[GAME_DIFFICULTY_IMPOSSIBLE] = ESTRINGS::E_Strings_(0x148 /* ESTR_IMPOSSIBLE */);
 
-    _gal_size_button_strings[0] = ESTRINGS::E_Strings_(0x1e0 /* ESTR_SMALL */);
+    _gal_size_button_strings[GALAXY_SIZE_SMALL] = ESTRINGS::E_Strings_(0x1e0 /* ESTR_SMALL */);
     // Special case for Italian language
     if (MOX::_settings.language == 4) {
         snprintf(_localized_gal_size_label, sizeof(_localized_gal_size_label), "Piccola");
-        _gal_size_button_strings[0] = _localized_gal_size_label;
+        _gal_size_button_strings[GALAXY_SIZE_SMALL] = _localized_gal_size_label;
     }
 
-    _gal_size_button_strings[1] = ESTRINGS::E_Strings_(0x173 /* ESTR_MEDIUM */);
+    _gal_size_button_strings[GALAXY_SIZE_MEDIUM] = ESTRINGS::E_Strings_(0x173 /* ESTR_MEDIUM */);
 
     if (MOX::_settings.language == 2) {
         char* medium_str = ESTRINGS::E_Strings_(0x173 /* ESTR_MEDIUM */);
         snprintf(_localized_gal_size_label, sizeof(_localized_gal_size_label), "%sen", medium_str);
-        _gal_size_button_strings[2] = _localized_gal_size_label;
+        _gal_size_button_strings[GALAXY_SIZE_LARGE] = _localized_gal_size_label;
     } else if (MOX::_settings.language == 4) {
         snprintf(_localized_gal_size_label, sizeof(_localized_gal_size_label), "Media");
-        _gal_size_button_strings[2] = _localized_gal_size_label;
+        _gal_size_button_strings[GALAXY_SIZE_LARGE] = _localized_gal_size_label;
     }
 
-    _gal_size_button_strings[2] = ESTRINGS::E_Strings_(0x168);
-    _gal_size_button_strings[3] = ESTRINGS::E_Strings_(0x143);
+    _gal_size_button_strings[GALAXY_SIZE_LARGE] = ESTRINGS::E_Strings_(0x168);
+    _gal_size_button_strings[GALAXY_SIZE_HUGE] = ESTRINGS::E_Strings_(0x143);
 #if MAX_STARS > ORIGINAL_MAX_STARS
     _gal_size_button_strings[GALAXY_SIZE_MAXIMUM] = const_cast<char*>("Maximum");
 #endif
 
-    _gal_age_button_strings[0] = ESTRINGS::E_Strings_(0x179);
-    _gal_age_button_strings[1] = ESTRINGS::E_Strings_(0xbe /* ESTR_AVERAGE */);
-    _gal_age_button_strings[2] = ESTRINGS::E_Strings_(0x192);
+    _gal_age_button_strings[GALAXY_AGE_YOUNG] = ESTRINGS::E_Strings_(0x179);
+    _gal_age_button_strings[GALAXY_AGE_AVERAGE] = ESTRINGS::E_Strings_(0xbe /* ESTR_AVERAGE */);
+    _gal_age_button_strings[GALAXY_AGE_OLD] = ESTRINGS::E_Strings_(0x192);
 
     _combat_button_strings[0] = ESTRINGS::E_Strings_(0x1f7);
     _combat_button_strings[1] = ESTRINGS::E_Strings_(0x1f0);

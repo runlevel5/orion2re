@@ -609,7 +609,7 @@ namespace DESIGN {
             }
         }
 
-        bool replacement_exists_3 = Replacement_Exists_(3);
+        bool replacement_exists_3 = Replacement_Exists_(TECH_APPLICATION_TYPE_WEAPON);
         int16_t weapon_y = 0xA9;
         for (int16_t i = 0; i < 8; ++i) {
             int16_t weapon_idx = i + MOX::_first_weapon_ctr;
@@ -662,7 +662,7 @@ namespace DESIGN {
             weapon_y += 13;
         }
 
-        bool replacement_exists_9 = Replacement_Exists_(9);
+        bool replacement_exists_9 = Replacement_Exists_(TECH_APPLICATION_TYPE_SPECIAL);
         int16_t special_y = 0x13F;
         for (int16_t i = 0; i < 8; ++i) {
             MOX::_special_system_clear_button[i] = -1000;

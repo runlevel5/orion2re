@@ -1132,7 +1132,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
             planet_idx = colony->planet;
 
             int16_t y_pos = 349 /* 0x15d */;
-            for (int16_t i = 0; i < 4; ++i) {
+            for (int16_t i = 0; i < ECON_COUNT; ++i) {
                 COLDRAW::Draw_Colony_Wee_Prod_(COLONY::_g_colony_n, i, 106, y_pos, 366, 20);
                 y_pos += 18;
             }

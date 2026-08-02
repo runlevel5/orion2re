@@ -882,7 +882,7 @@ skip_cursor:
                 int8_t p_size = MOX::_planet[MOX::_colony[MOX::_cmbt_colony_id].planet].size;
                 if (p_size == 0) {
                     Draw_Blip4_(blip_x, blip_y, 0x60, blip_frame);
-                } else if (p_size > 0 && p_size <= 4) {
+                } else if (p_size > 0 && p_size < PLANET_SIZE_COUNT) {
                     allocate::Push_Block_(MOX::_screen_seg);
                     s_animation_header* p_bmp = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 400);
                     bitmap::Draw_Picture_To_Bitmap_(p_bmp, MOX::_combat_map_planet_seg);
@@ -1175,7 +1175,7 @@ skip_cursor:
 
             if (planet_size == 0) {
                 Draw_Blip4_(x_pos, y_pos, 0x60, 0);
-            } else if (planet_size >= 1 && planet_size <= 4) {
+            } else if (planet_size >= 1 && planet_size < PLANET_SIZE_COUNT) {
                 animate::Draw_(x_pos + planet_size - 7, y_pos + planet_size - 7, MOX::_combat_map_planet_seg);
             }
         }
@@ -1225,7 +1225,7 @@ skip_cursor:
         if (ship_idx != 0) {
             counter = 0;
             current_x = x;
-            if (MOX::_combat_data[ship_idx].crew_quality > 0) {
+            if (MOX::_combat_data[ship_idx].crew_quality > CREW_QUALITY_GREEN) {
                 do {
                     counter++;
                     animate::Draw_(current_x, y, (s_animation_header*)MOX::_level_symbol_seg);
@@ -1876,26 +1876,26 @@ skip_cursor:
     }
 
     uint8_t __cdecl Get_Weapon_Arc_(int16_t bearing) {
-        uint8_t arc_flags = 0;
+        uint8_t arc_flags = WEAPON_FIRING_ARC_NONE;
 
         // Front arc bit (approx. +/- 60 degrees)
         if (bearing <= 60 || bearing >= 300) {
-            arc_flags = 1;
+            arc_flags = WEAPON_FIRING_ARC_FORWARD;
         }
 
         // Side-extended front arc bit (approx. +/- 120 degrees)
         if (bearing <= 120 || bearing >= 240) {
-            arc_flags += 2;
+            arc_flags += WEAPON_FIRING_ARC_FORWARD_EXTENDED;
         }
 
         // Rear-extended back arc bit (approx. 60 to 300 degrees)
         if (bearing >= 60 && bearing <= 300) {
-            arc_flags += 4;
+            arc_flags += WEAPON_FIRING_ARC_BACK_EXTENDED;
         }
 
         // Back arc bit (approx. 120 to 240 degrees)
         if (bearing >= 120 && bearing <= 240) {
-            arc_flags += 8;
+            arc_flags += WEAPON_FIRING_ARC_REAR;
         }
 
         return arc_flags;
@@ -2887,23 +2887,23 @@ skip_cursor:
                 } else if (weapon_type_class == WEAPON_TYPE_BEAM) {
                     strlcat(weapon_label, " (", sizeof(weapon_label));
                     switch (arc) {
-                        case 1:
+                        case WEAPON_FIRING_ARC_FORWARD:
                             KEN::Ken_Get_Text_Message_(3, arc_text, 80);
                             strlcat(weapon_label, arc_text, sizeof(weapon_label));
                             break;
-                        case 2:
+                        case WEAPON_FIRING_ARC_FORWARD_EXTENDED:
                             KEN::Ken_Get_Text_Message_(4, arc_text, 80);
                             strlcat(weapon_label, arc_text, sizeof(weapon_label));
                             break;
-                        case 4:
+                        case WEAPON_FIRING_ARC_BACK_EXTENDED:
                             KEN::Ken_Get_Text_Message_(6, arc_text, 80);
                             strlcat(weapon_label, arc_text, sizeof(weapon_label));
                             break;
-                        case 8:
+                        case WEAPON_FIRING_ARC_REAR:
                             KEN::Ken_Get_Text_Message_(5, arc_text, 80);
                             strlcat(weapon_label, arc_text, sizeof(weapon_label));
                             break;
-                        case 15:
+                        case WEAPON_FIRING_ARC_ALL_SECTORS:
                             strlcat(weapon_label, "360", sizeof(weapon_label));
                             break;
                     }
@@ -2996,7 +2996,7 @@ skip_cursor:
     }
 
     void __cdecl Draw_Bombs_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_id, int16_t damage) {
-        bool is_bio = (TECHDATA::_weapons[weapon_id].natural_mods & 0x80) != 0;
+        bool is_bio = (TECHDATA::_weapons[weapon_id].natural_mods & WEAPON_NATURAL_FLAG_BIOLOGICAL) != 0;
         bool has_transporter = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, SPECIAL_TRANSPORTERS) != 0;
         int16_t speed = (MOX::_speedx2_flag != 0 || MOX::_net_flag != 0) ? 12 : 6;
 
@@ -3651,23 +3651,23 @@ skip_cursor:
 
                 strlcpy(arc_text, " (", sizeof(arc_text));
                 switch (weapon_arc) {
-                    case 1:
+                    case WEAPON_FIRING_ARC_FORWARD:
                         KEN::Ken_Get_Text_Message_(3, message_text, 0x50);
                         strlcat(arc_text, message_text, sizeof(arc_text));
                         break;
-                    case 2:
+                    case WEAPON_FIRING_ARC_FORWARD_EXTENDED:
                         KEN::Ken_Get_Text_Message_(4, message_text, 0x50);
                         strlcat(arc_text, message_text, sizeof(arc_text));
                         break;
-                    case 4:
+                    case WEAPON_FIRING_ARC_BACK_EXTENDED:
                         KEN::Ken_Get_Text_Message_(6, message_text, 0x50);
                         strlcat(arc_text, message_text, sizeof(arc_text));
                         break;
-                    case 8:
+                    case WEAPON_FIRING_ARC_REAR:
                         KEN::Ken_Get_Text_Message_(5, message_text, 0x50);
                         strlcat(arc_text, message_text, sizeof(arc_text));
                         break;
-                    case 15:
+                    case WEAPON_FIRING_ARC_ALL_SECTORS:
                         strlcat(arc_text, "360", sizeof(arc_text));
                         break;
                     default:
@@ -3675,7 +3675,7 @@ skip_cursor:
                 }
                 strlcat(arc_text, ")", sizeof(arc_text));
 
-                if (weapon_arc != 1) {
+                if (weapon_arc != WEAPON_FIRING_ARC_FORWARD) {
                     strlcat(quantity_text, arc_text, sizeof(quantity_text));
                 }
 
@@ -3803,27 +3803,27 @@ skip_cursor:
         MOX::_temp_string[0] = '\0';
 
         switch (crew_quality) {
-        case 0:
+        case CREW_QUALITY_GREEN:
             KEN::Ken_Get_Text_Message_(0x1f, format_text, 0x50);
             snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 0);
             return MOX::_temp_string;
 
-        case 1:
+        case CREW_QUALITY_REGULAR:
             KEN::Ken_Get_Text_Message_(0x20, format_text, 0x50);
             snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 100);
             return MOX::_temp_string;
 
-        case 2:
+        case CREW_QUALITY_VETERAN:
             KEN::Ken_Get_Text_Message_(0x21, format_text, 0x50);
             snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 200);
             return MOX::_temp_string;
 
-        case 3:
+        case CREW_QUALITY_ELITE:
             KEN::Ken_Get_Text_Message_(0x22, format_text, 0x50);
             snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 300);
             return MOX::_temp_string;
 
-        case 4:
+        case CREW_QUALITY_ULTRA_ELITE:
             KEN::Ken_Get_Text_Message_(0x23, format_text, 0x50);
             snprintf(MOX::_temp_string, sizeof(MOX::_temp_string), format_text, 300);
             break;

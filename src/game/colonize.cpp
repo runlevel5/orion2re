@@ -354,18 +354,18 @@ namespace COLONIZE {
             colony->pop[0] = (colony->pop[0] & ~0x70) | ((player_idx << 4) & 0x70);
             colony->pop[0] |= 0x200;
 
-            if (planet->planet_special == 6 /* ORION */) {
+            if (planet->planet_special == SYSTEM_SPECIAL_NATIVES) {
                 for (int32_t i = 1; i < 4; ++i) {
                     uint32_t pop_flags = colony->pop[i];
                     pop_flags = pop_flags & 0xFFFFFE7F;
-                    pop_flags = (pop_flags & 0xFFFFFFF9) | 9;
+                    pop_flags = (pop_flags & 0xFFFFFFF9) | POP::RACE_NATIVE;
                     pop_flags = (pop_flags & ~0x70) | ((player_idx << 4) & 0x70);
                     pop_flags |= 0x200;
                     colony->pop[i] = pop_flags;
                 }
                 colony->n_pops = 4;
-                planet->planet_special = 0;
-                MOX::_star[planet->star_index].system_special = 0;
+                planet->planet_special = SYSTEM_SPECIAL_NO_SPECIAL;
+                MOX::_star[planet->star_index].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
             }
 
             if (is_reused) {

@@ -901,7 +901,7 @@ namespace diplomac {
 
             int8_t war_treaty_type;
             if (p1->objectives == PLAYER_OBJECTIVE_HUMAN || p2->objectives == PLAYER_OBJECTIVE_HUMAN) {
-                war_treaty_type = (MOX::_settings.game_difficulty < 3) ? 5 : 6;
+                war_treaty_type = (MOX::_settings.game_difficulty < GAME_DIFFICULTY_HARD) ? 5 : 6;
             } else {
                 war_treaty_type = 4;
             }

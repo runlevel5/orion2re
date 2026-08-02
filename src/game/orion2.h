@@ -506,9 +506,9 @@ struct s_colony {
     uint8_t climate;
     int16_t ground_strength;
     int16_t space_strength;
-    int16_t production[4];
-    uint8_t maintenance[4];
-    int16_t imports[4];
+    int16_t production[ECON_COUNT];
+    uint8_t maintenance[ECON_COUNT];
+    int16_t imports[ECON_COUNT];
     int8_t n_industry_recyclers;
     uint8_t food2_needed_for_our_empire;
     uint8_t food2_needed_for_assimilated;

@@ -8,6 +8,26 @@
 * Configuration
 
   * [ ] Expose the galaxy star-count soft limit as a configuration variable, validate it against the compile-time `MAX_STARS` capacity, and use it consistently in map generation and new-game setup.
+  * [ ] Add typed build-queue presets as one configuration parameter instead of loading `BUILD.CFG` and `BUILD0.CFG` through `BUILD9.CFG` at keypress time.
+    * Model the parameter as an outer fixed array of 11 presets and an inner fixed-capacity array of generated `build_queue_instruction` enum values.
+    * Give the outer array semantic selectors `q`, `key0`, ..., `key9`, so assignments use syntax such as `build_queue_presets q = merge automated_factory research_lab end;` and `build_queue_presets key0 = clear end;`.
+    * Represent modes, commands, products, designs, and buildings as single enum tokens. Keep `append`, `prepend`, `merge`, `clear`, `clear_refits`, `buy`, `buy10`, `buy50`, `buy75`, `unbuy`, `repeat`, `design1` through `design6`, and the documented product names; do not expose the 1.50 internal `print` and `flush` operations.
+    * Use unique instruction values rather than native production IDs, and decode them explicitly in the queue interpreter.
+    * Require an explicit `end` sentinel because configuration assignments are layered and may replace a longer preset with a shorter one; execution ignores all trailing array elements after the first `end`.
+    * Let generated configuration parsing validate selectors, array bounds, token spelling, and enum membership. Add post-configuration validation that every preset contains `end`; retain runtime checks for sequence rules and colony-dependent legality such as `repeat`, research, buildability, ship capacity, and buying.
+    * Treat the presets as synchronized configuration because applying them can alter queues, ships, and treasury state.
+  * [ ] Generate a human-facing, self-contained HTML configuration reference from the JSON5 schema.
+    * Replace the current flattened Markdown-style parameter dump with one offline `config-reference.html` containing embedded CSS and JavaScript and no external assets or network dependencies.
+    * Extend the schema model with a declaration-level documentation representation for public parameters, named scalar types, records, record fields, arrays, and their references. Keep the existing flattened leaf representation for runtime code generation, but do not use it as the primary documentation hierarchy or expand large arrays into repetitive entries.
+    * Allow named types, records, and record fields to carry human-facing title, description, remarks, and examples. Validate required documentation metadata for public definitions while allowing explicitly internal implementation definitions to remain hidden.
+    * Give groups, parameters, types, and records stable namespaced anchors. Link parameter types to their definitions, record fields to their types, parameters to groups, array index types to their enum definitions, and every definition back to the parameters and definitions that use it.
+    * Provide a persistent navigation pane organized into Overview, Groups, Parameters, Types, and Records. Make it responsive so it becomes a compact menu on narrow displays, and retain usable anchor navigation when JavaScript is disabled.
+    * Generate a compact embedded search index over IDs, canonical paths, titles, descriptions, enum values, mask flags, field names, aliases, and groups. Implement dependency-free instant search with exact ID/path matches ranked first, keyboard focus via `/` or Ctrl+K, Escape to close, and result links that jump directly to stable anchors.
+    * Show each parameter's assignment path, description, group and save/synchronization policy, declared type and shape, default, constraints, units, array selectors, remarks, and copyable configuration examples. Put native C++ bindings and targets in a collapsed implementation-details section rather than presenting them as primary user documentation.
+    * Show scalar definitions with their primitive base, constraints, numeric policy, enum values or mask flags, and reverse references. Show records as ordered field tables with linked field types, field descriptions, defaults, and reverse references.
+    * Render schema metadata as escaped text and examples as escaped code blocks; do not allow raw schema text to inject HTML, attributes, styles, scripts, or the embedded search index.
+    * Change the `config-docs` build target to produce `config-reference.html`, include it in documentation/release packaging, and keep generation deterministic with write-if-different behavior. Retain Markdown output only if another repository workflow still consumes it.
+    * Add schema-model tests for retained declarations and reference relationships, plus documentation-generator tests for deterministic output, escaping, stable anchors, valid internal link targets, non-expanded arrays, search-index coverage, reverse references, enum and record rendering, and graceful empty-section handling.
 
 * Networking
 

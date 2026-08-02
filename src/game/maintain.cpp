@@ -371,7 +371,7 @@ namespace maintain {
             const int32_t owner_player_idx = colony->owner;
             const int32_t owner_trait_group = MOX::_player[owner_player_idx].traits[0] / 2;
 
-            if (owner_trait_group >= 0 && owner_trait_group <= 1) {
+            if (owner_trait_group >= GOVERNMENT_FEUDAL / 2 && owner_trait_group <= GOVERNMENT_DICTATORSHIP / 2) {
                 if (building_idx == BUILDING_MARINE_BARRACKS) {
                     if (colony->buildings[BUILDING_ARMOR_BARRACKS] == 0) {
                         return worth * 8;
@@ -399,7 +399,7 @@ namespace maintain {
             const int32_t owner_player_idx = colony->owner;
             const int32_t owner_trait_group = MOX::_player[owner_player_idx].traits[0] / 2;
 
-            if (owner_trait_group != 3) {
+            if (owner_trait_group != GOVERNMENT_UNIFICATION / 2) {
                 return worth * 7;
             }
             break;

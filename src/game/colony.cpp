@@ -649,9 +649,9 @@ namespace COLONY {
             // i=0: 295, i=1: 245, i=2: 395, i=3: 145, i=4: 495, etc.
             int16_t multiplier = (i % 2 == 0) ? 1 : -1;
             int16_t x = (multiplier * i * 50) + 295;
-            int16_t y = 162; /* 0xA2 */
+            int16_t y = 162;
 
-            if (satellite_id == _scanned_satellite && ERIC::Global_Cycler_(30 /* 0x1E */, 2) != 0) {
+            if (satellite_id == _scanned_satellite && ERIC::Global_Cycler_(30, 2) != 0) {
                 Draw_Satellite_Dark_(x, y, satellite_id);
             } else {
                 s_animation_header* anim = Satellite_Anim_(satellite_id);
@@ -1226,8 +1226,7 @@ namespace COLONY {
             s_animation_header* ship_seg = KEN::Get_Ship_Picture_Seg_(MOX::_PLAYER_NUM, ship_picture_num);
             bitmap::Draw_Picture_To_Bitmap_(COLONY::_ship_bitm, ship_seg);
 
-            replace::Replace_Color_Range_(COLONY::_ship_bitm, ship_palette_map, 1, 31 /* 0x1f */);
-
+            replace::Replace_Color_Range_(COLONY::_ship_bitm, ship_palette_map, 1, 31);
             for (int16_t i = 0; i < 16; ++i) {
                 uint8_t palette_index = ship_palette_map[i * 2];
                 replace::Replace_Color_(COLONY::_ship_bitm, i + 0xc0, palette_index);
@@ -1338,9 +1337,9 @@ namespace COLONY {
             COLONY::_colony_handle,
             static_cast<int16_t>(type),
             0,
-            0x136 /* 310 */,
+            0x136,
             y_coord,
-            0x1FE /* 510 */,
+            0x1FE,
             1,
             COLONY::_pop_fields_ref[type],
             &COLONY::_pop_fields_count[type],
@@ -1378,7 +1377,7 @@ namespace COLONY {
             climate = (uint8_t)MOX::_colony[planet->colony_index].climate;
         }
 
-        int32_t anim_index = static_cast<int32_t>(planet->size) + static_cast<int32_t>(climate) * 5;
+        int32_t anim_index = static_cast<int32_t>(planet->size) + static_cast<int32_t>(climate) * PLANET_SIZE_COUNT;
 
         char* resource_name = ESTRINGS::E_Strings_(ESTR_CMBTPLNTLBX);
 
@@ -1746,12 +1745,12 @@ namespace COLONY {
                 int16_t side = (i % 2 == 0) ? 1 : -1;
                 int16_t x_offset = side * i * 50;
 
-                int16_t x1 = x_offset + 295 /* 0x127 */;
-                int16_t y1 = 162 /* 0xa2 */;
+                int16_t x1 = x_offset + 295;
+                int16_t y1 = 162;
                 int16_t x2 = width + x1;
                 int16_t y2 = height + y1;
 
-                char* hotkey = ESTRINGS::E_Strings_(12 /* 0xc */);
+                char* hotkey = ESTRINGS::E_Strings_(12);
                 int16_t field_id = fields::Add_Hidden_Field_(x1, y1, x2, y2, hotkey, 0);
 
                 COLONY::_colony_satellite_fields[i] = field_id;
@@ -1825,7 +1824,7 @@ namespace COLONY {
                         }
                     } else if (COLONY::_sys_disp_summ_fields[i] == *input_field) {
                         int16_t planet_idx = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
-                        if (MOX::_planet[planet_idx].planet_type == 3 /* Gas Giant */) {
+                        if (MOX::_planet[planet_idx].planet_type == PLANET_TYPE_PLANET) {
                             COLONY::_planet_display_handle = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
                             COLONY::_drawing_display = 2;
                             return 1;
@@ -2236,7 +2235,7 @@ namespace COLONY {
         race_idx = (int32_t)(uint8_t)MOX::_player[MOX::_PLAYER_NUM].race;
 
         // Get the first frame of the farmer animation for this race
-        anim = COLONY::People_Anim_(0, 2 /* ANIM_FARMER */, (int16_t)race_idx);
+        anim = COLONY::People_Anim_(0, 2, (int16_t)race_idx);
 
         // Draw the frame, replace color 240 with transparency/background,
         // apply the "glassed" (translucent) effect and outline it in white.

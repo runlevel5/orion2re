@@ -14,7 +14,7 @@ struct s_skill_data {
 };
 
 namespace MOX {
-    extern const char _ship_type_names[5][6][16];
+    extern const char _ship_type_names[SHIP_TYPE_COUNT][6][16];
     extern int8_t _tech_categories[51][2];
     extern const char s_combat_lbx[11];
     extern uint8_t _first_field_in_group[10];
@@ -113,7 +113,7 @@ namespace MOX {
     extern s_animation_header* _hl_antaran_ship_icon_seg[24];
     extern s_animation_header* _antaran_ship_icons[24];
     extern s_animation_header* _o_ring_seg[5];
-    extern s_animation_header* _planet_mask_seg[5];
+    extern s_animation_header* _planet_mask_seg[PLANET_SIZE_COUNT];
     extern s_animation_header* _fltscrn_small_ship_icon_seg[8];
     extern s_animation_header* _monster_ship_seg[4];
     extern s_animation_header* _hl_monster_ship_icon_seg[4];
@@ -156,8 +156,8 @@ namespace MOX {
     extern int8_t* _fltscrn_icon_selection_status;
 
     // References
-    extern int8_t _food_per_farmer_table[10];
-    extern uint8_t _star_class_table[7][3];
+    extern int8_t _food_per_farmer_table[PLANET_CLIMATE_COUNT];
+    extern uint8_t _star_class_table[STAR_CLASS_COUNT][GALAXY_AGE_COUNT];
     extern int16_t _ranged_to_hit_penalty[9];
     extern int16_t _ranged_damage_penalty[9];
     extern int16_t _cur_missile_count;
@@ -304,7 +304,7 @@ namespace MOX {
     extern uint8_t _previous_report;
     extern int16_t _first_node_ptr_in_stack_;
     extern int16_t _system_display_ring_radius[5];
-    extern uint8_t _rot_plan_dim[5];
+    extern uint8_t _rot_plan_dim[PLANET_SIZE_COUNT];
     extern int16_t _system_star_id;
     extern int16_t _system_star_id_for_auto_select;
     extern uint8_t _draw_fleet_screen_to_back;
@@ -336,7 +336,7 @@ namespace MOX {
     extern int8_t _planet_special;
 
     // Suggested name: MOX::_planet_special_weighted_chance
-    extern uint8_t _planet_special_weighted_chance[12];
+    extern uint8_t _planet_special_weighted_chance[SYSTEM_SPECIAL_COUNT];
 
     // Suggested name: MOX::_gravity_table
     extern int8_t _gravity_table[30];
@@ -383,24 +383,24 @@ namespace MOX {
     extern int16_t _planet_count;
 
     // Suggested name: MOX::_climate_modifier_table
-    extern int8_t _climate_modifier_table[5];
+    extern int8_t _climate_modifier_table[MINERAL_RESOURCE_COUNT];
 
     extern s_planet_data* _planet;
 
     extern const char* _roman_literals[21];
 
-    extern char* _planet_special_string[12];
-    extern char* _planet_climate_string[10];
-    extern char* _mineral_class_string[5];
+    extern char* _planet_special_string[SYSTEM_SPECIAL_COUNT];
+    extern char* _planet_climate_string[PLANET_CLIMATE_COUNT];
+    extern char* _mineral_class_string[MINERAL_RESOURCE_COUNT];
     extern uint8_t _red_color2;
-    extern char* _planet_size_string[5];
+    extern char* _planet_size_string[PLANET_SIZE_COUNT];
     extern char* _planet_type_string[10];
-    extern char* _planet_group_string[4];
+    extern char* _planet_group_string[PLANET_GROUP_COUNT];
     extern char* _planet_atmosphere_string[3];
-    extern char* _spectral_class_string[7];
+    extern char* _spectral_class_string[STAR_CLASS_COUNT];
     extern char* _admin_skill_names[9];
 
-    extern char* _planet_gravity_string[3];
+    extern char* _planet_gravity_string[PLANET_GRAVITY_COUNT];
 
     extern int16_t _NUM_SHIPS;
     extern void* _global_bitmap_seg;
@@ -478,7 +478,7 @@ namespace MOX {
 
     // Suggested name: MOX::_star_seg
     extern s_animation_header* _star_seg[40];
-    extern s_animation_header* _sun_seg[7];
+    extern s_animation_header* _sun_seg[STAR_CLASS_COUNT];
 
     extern uint16_t _n_stats_to_generate;
 
@@ -507,7 +507,7 @@ namespace MOX {
 
     extern int16_t _NUM_PLAYERS;
     extern uint8_t _red_color1;
-    extern char* _government_labels[8];
+    extern char* _government_labels[GOVERNMENT_COUNT];
     extern char* _special_ability_names[32];
     extern int32_t _stardate_at_beg_of_turn;
     extern int8_t _global_var;
@@ -658,7 +658,7 @@ namespace MOX {
 
     extern int16_t _bill_savegame[6];
     extern uint16_t _antaran_resource_level;
-    extern s_crew_data _crew_data[5];
+    extern s_crew_data _crew_data[CREW_QUALITY_COUNT];
     extern uint16_t _chance_for_antaran_invasion;
     extern uint16_t _disallow_saves_code;
 
@@ -674,11 +674,11 @@ namespace MOX {
     extern s_animation_header* _nebula_pict_seg[12][4];
 
     // Suggested name: _planet_max_farms
-    extern uint8_t _planet_max_farms[5];
+    extern uint8_t _planet_max_farms[PLANET_SIZE_COUNT];
 
-    extern int8_t _planet_max_population[5];
+    extern int8_t _planet_max_population[PLANET_SIZE_COUNT];
 
-    extern uint8_t _planet_size_table[5];
+    extern uint8_t _planet_size_table[PLANET_SIZE_COUNT];
 
     #pragma pack(push, 1)
     struct s_class_group {
@@ -690,13 +690,13 @@ namespace MOX {
     extern s_class_group _class_to_group[6];
 
     // 4 groups per climate
-    extern uint8_t _climate_roll_table[10][4];
+    extern uint8_t _climate_roll_table[PLANET_CLIMATE_COUNT][PLANET_GROUP_COUNT];
 
     // Suggested name: MOX::normal_galaxy_climate_roll_table
-    extern uint8_t _normal_gal_climate_roll_table[10][4];
+    extern uint8_t _normal_gal_climate_roll_table[PLANET_CLIMATE_COUNT][PLANET_GROUP_COUNT];
 
     // Suggested name: MOX::old_galaxy_climate_roll_table
-    extern uint8_t _old_gal_climate_roll_table[10][4];
+    extern uint8_t _old_gal_climate_roll_table[PLANET_CLIMATE_COUNT][PLANET_GROUP_COUNT];
 
     // Array of movable box structures.
     extern s_movable_box _moveable_box[5];

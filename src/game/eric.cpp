@@ -460,8 +460,8 @@ namespace ERIC {
                 MOX::_leaders[i].status == 1 &&
                 MOX::_leaders[i].eta == 0) {
 
-                if ((MOX::_leaders[i].type == 0 && MOX::_ship[MOX::_leaders[i].location].location == star_idx) ||
-                    (MOX::_leaders[i].type == 1 && MOX::_leaders[i].location == star_idx)) {
+                if ((MOX::_leaders[i].type == LEADER_TYPE_SHIP && MOX::_ship[MOX::_leaders[i].location].location == star_idx) ||
+                    (MOX::_leaders[i].type == LEADER_TYPE_COLONY && MOX::_leaders[i].location == star_idx)) {
 
                     if (OFFICER::Officer_Has_General_Skill_(player_idx, i, skill_idx)) {
                         return 1;

@@ -85,7 +85,7 @@ namespace NETSTART {
         }
 
         fields::Clear_Fields_();
-        fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, "", 0);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, "", 0);
 
         NETMOX::_net.sync_state = NET_SYNC_STATE_WAITING_FOR_GAME_DATA;
         NETMOX::_net.network_data_ptr = nullptr;

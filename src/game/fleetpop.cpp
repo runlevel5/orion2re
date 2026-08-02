@@ -63,11 +63,11 @@ namespace FLEETPOP {
                 int16_t end_x = draw_x + green_width;
                 int16_t bottom_y = draw_y + 4;
 
-                line::Line_(draw_x, draw_y, end_x, draw_y, 0x70 /* 'p' */);
-                line::Line_(draw_x, draw_y, draw_x, bottom_y, 0x70 /* 'p' */);
-                line::Line_(end_x, draw_y + 1, end_x, bottom_y, 0x72 /* 'r' */);
-                line::Line_(end_x, bottom_y, draw_x + 1, bottom_y, 0x72 /* 'r' */);
-                graphics::Fill_(draw_x + 1, draw_y + 1, end_x - 1, draw_y + 3, 0x71 /* 'q' */);
+                line::Line_(draw_x, draw_y, end_x, draw_y, 0x70);
+                line::Line_(draw_x, draw_y, draw_x, bottom_y, 0x70);
+                line::Line_(end_x, draw_y + 1, end_x, bottom_y, 0x72);
+                line::Line_(end_x, bottom_y, draw_x + 1, bottom_y, 0x72);
+                graphics::Fill_(draw_x + 1, draw_y + 1, end_x - 1, draw_y + 3, 0x71);
             }
 
             if (red_width > 1) {
@@ -75,11 +75,11 @@ namespace FLEETPOP {
                 int16_t end_red_x = start_red_x + red_width;
                 int16_t bottom_y = draw_y + 4;
 
-                line::Line_(start_red_x, draw_y, end_red_x, draw_y, 0x4B /* 'K' */);
-                line::Line_(start_red_x, draw_y, start_red_x, bottom_y, 0x4B /* 'K' */);
-                line::Line_(end_red_x, draw_y + 1, end_red_x, bottom_y, 0x4E /* 'N' */);
-                line::Line_(end_red_x, bottom_y, start_red_x + 1, bottom_y, 0x4E /* 'N' */);
-                graphics::Fill_(start_red_x + 1, draw_y + 1, end_red_x - 1, draw_y + 3, 0x4D /* 'M' */);
+                line::Line_(start_red_x, draw_y, end_red_x, draw_y, 0x4B);
+                line::Line_(start_red_x, draw_y, start_red_x, bottom_y, 0x4B);
+                line::Line_(end_red_x, draw_y + 1, end_red_x, bottom_y, 0x4E);
+                line::Line_(end_red_x, bottom_y, start_red_x + 1, bottom_y, 0x4E);
+                graphics::Fill_(start_red_x + 1, draw_y + 1, end_red_x - 1, draw_y + 3, 0x4D);
             }
         }
     }
@@ -480,32 +480,32 @@ void __cdecl Add_Added_Buttons_(int16_t x_offset, int16_t y_offset) {
         (char*)"",
         close_seg,
         (char*)"\x1b", /* fmtpara 0x1B starts a color-attribute control sequence; here it is reused as a non-printing field label. */
-        40 /* 0x28 */);
+        40);
 
     stack_y_offset = btn_height;
 
     if (MOX::_fleet_box.outpost_btn_active != 0) {
-        MOX::_fleet_box_outpost_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + btn_height, (char*)"", outpost_seg, (char*)"", 40 /* 0x28 */);
+        MOX::_fleet_box_outpost_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + btn_height, (char*)"", outpost_seg, (char*)"", 40);
         stack_y_offset = btn_height * 2;
     }
 
     if (MOX::_fleet_box.colonize_btn_active != 0) {
-        MOX::_fleet_box_colonize_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", colonize_seg, (char*)"", 40 /* 0x28 */);
+        MOX::_fleet_box_colonize_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", colonize_seg, (char*)"", 40);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.engage_btn_active != 0) {
-        MOX::_fleet_box_engage_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", engage_seg, (char*)"", 40 /* 0x28 */);
+        MOX::_fleet_box_engage_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", engage_seg, (char*)"", 40);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.transport_btn_active != 0) {
-        MOX::_fleet_box_transport_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", transport_seg, (char*)"", 40 /* 0x28 */);
+        MOX::_fleet_box_transport_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", transport_seg, (char*)"", 40);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.attack_btn_active != 0) {
-        MOX::_fleet_box_attack_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", attack_seg, (char*)"", 40 /* 0x28 */);
+        MOX::_fleet_box_attack_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, (char*)"", attack_seg, (char*)"", 40);
     }
 }
 

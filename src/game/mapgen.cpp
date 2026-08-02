@@ -16,7 +16,7 @@ namespace MAPGEN {
     char _fill_msg[36];
     int16_t _fill_msg_ctr;
     int8_t _first_time_map_is_generated = 1;
-    uint8_t _special_count[12];
+    uint8_t _special_count[SYSTEM_SPECIAL_COUNT];
     uint32_t _n_stars;
     uint32_t _n_planets;
     int16_t _t_roll;
@@ -213,13 +213,13 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     }
 
     int8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index) {
-        uint8_t weights[7];
+        uint8_t weights[STAR_CLASS_COUNT];
 
-        for (int32_t i = 0; i < 7; ++i) {
+        for (int32_t i = 0; i < STAR_CLASS_COUNT; ++i) {
             weights[i] = MOX::_star_class_table[i][star_type_index];
         }
 
-        return (int8_t)RUSS::Get_Weighted_Choice_Char_(weights, 7);
+        return (int8_t)RUSS::Get_Weighted_Choice_Char_(weights, STAR_CLASS_COUNT);
     }
 
     /**
@@ -264,7 +264,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         };
 
         for (int i = 0; i < 5; ++i) {
-            weights[i] = weight_table[i * 3 + MOX::_settings.galaxy_age];
+            weights[i] = weight_table[i * GALAXY_AGE_COUNT + MOX::_settings.galaxy_age];
         }
 
         int16_t choice;
@@ -283,7 +283,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     uint8_t __cdecl Generate_Size_() {
         int32_t rand_val = game_random::Random_(10);
 
-        for (int16_t i = 0; i < 5; ++i) {
+        for (int16_t i = 0; i < PLANET_SIZE_COUNT; ++i) {
             int16_t threshold = (int16_t)(int8_t)MOX::_planet_size_table[i];
 
             if (threshold >= (int16_t)rand_val) {
@@ -299,7 +299,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         int32_t random_roll = game_random::Random_(10);
         int8_t spectral_class = MOX::_star[star_idx].spectral_class;
 
-        if (spectral_class >= 0 && spectral_class < STAR_CLASS_BLACK_HOLE) {
+        if (spectral_class >= STAR_CLASS_B && spectral_class < STAR_CLASS_BLACK_HOLE) {
             int32_t table_index = (random_roll - 1) * 6 + (int32_t)spectral_class;
             return (int8_t)MOX::_class_to_mineral[table_index];
         }
@@ -325,7 +325,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
             satellite_type = MOX::_orbit_to_satellite_type[roll][orbit];
 
-            if (satellite_type == 4) { // Special logic for type 4 (potential companion star)
+            if (satellite_type == MAPGEN_SATELLITE_COMPANION_STAR) {
                 int chance = game_random::Random_(100);
 
                 // If the roll is specific and it's the inner-most orbit, try to spawn a binary companion
@@ -339,16 +339,13 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                         satellite_type = (uint8_t)(spectral + 4);
                     }
                 } else {
-                    // Fallback to type 1 if companion conditions aren't met
-                    satellite_type = 1;
+                    satellite_type = MAPGEN_SATELLITE_ASTEROID;
                 }
             }
 
-            // Validation: Cannot have a Gas Giant (type 2) in the 0th orbit (too close to star)
-        } while (satellite_type == PLANET_TYPE_GAS_GIANT && orbit == 0);
+        } while (satellite_type == MAPGEN_SATELLITE_GAS_GIANT && orbit == 0);
 
-        // Debug assertion: Check for invalid satellite type 0
-        if (satellite_type == 0) {
+        if (satellite_type == MAPGEN_SATELLITE_INVALID) {
             int table_value = (int)(int8_t)MOX::_orbit_to_satellite_type[MAPGEN::_t_roll][orbit];
             RUSS::PFMT_(0, 0x0F, "Star %d, orbit %d, has a 0 sat type.  Roll: %d  Table: %d",
                         star_idx,
@@ -397,8 +394,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     int8_t __cdecl Get_Climate_Modifier_(int8_t climate_index) {
         int8_t modifier = 0;
 
-        // Climate index must be between 0 and 4 inclusive
-        if (climate_index >= 0 && climate_index < 5) {
+        if (climate_index >= MINERAL_RESOURCE_ULTRA_POOR && climate_index < MINERAL_RESOURCE_COUNT) {
             modifier = MOX::_climate_modifier_table[climate_index];
 
             if (modifier > 0) {
@@ -417,12 +413,12 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
         int16_t mineral_class = planet.mineral_class;
 
-        if (mineral_class >= 0 && mineral_class < 5) {
+        if (mineral_class >= MINERAL_RESOURCE_ULTRA_POOR && mineral_class < MINERAL_RESOURCE_COUNT) {
             int16_t size = planet.size;
-            return MOX::_gravity_table[mineral_class * 5 + size];
+            return MOX::_gravity_table[mineral_class * PLANET_SIZE_COUNT + size];
         }
 
-        return 0;
+        return PLANET_GRAVITY_LOW_G;
     }
 
     void __cdecl Update_Planet_Group_Cache() {
@@ -438,7 +434,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         if (_companion_star == 1) {
             orbit -= 2;
             if (orbit < 0) {
-                return 0;
+                return PLANET_GROUP_BOMBARDED;
             }
         }
 
@@ -450,7 +446,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             return (int16_t)group;
         }
 
-        return 0;
+        return PLANET_GROUP_BOMBARDED;
     }
 
     /**
@@ -459,15 +455,15 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
      * If forced to be a food planet, it ensures the chosen climate supports agriculture.
      */
     int8_t __cdecl Generate_Climate_(int16_t planet_group) {
-        uint8_t weights[10];
+        uint8_t weights[PLANET_CLIMATE_COUNT];
         memset(&weights, 0, sizeof(weights));
 
         // 1. Determine weights based on planet group and galaxy age
-        for (int i = 0; i < 10; ++i) {
-            if (MOX::_g_galaxy_age <= 1) { // 0: Young, 1: Normal
+        for (int i = 0; i < PLANET_CLIMATE_COUNT; ++i) {
+            if (MOX::_g_galaxy_age <= GALAXY_AGE_AVERAGE) {
                 weights[i] = MOX::_normal_gal_climate_roll_table[i][planet_group];
             }
-            else if (MOX::_g_galaxy_age == 2) { // 2: Old
+            else if (MOX::_g_galaxy_age == GALAXY_AGE_OLD) {
                 weights[i] = MOX::_old_gal_climate_roll_table[i][planet_group];
             }
         }
@@ -478,7 +474,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         if (_make_food_planet != 0) {
             int16_t match_count = 0;
             uint8_t match_index = 0;
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < PLANET_CLIMATE_COUNT; ++i) {
                 // Check if climate has a non-zero weight and supports food production
                 if (weights[i] != 0 && (int8_t)MOX::_food_per_farmer_table[i] > 0) {
                     match_count++;
@@ -495,12 +491,12 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         // 3. Perform weighted selection if no unique result was forced
         if (result == -1) {
             if (_make_food_planet == 0) {
-                result = RUSS::Get_Weighted_Choice_Char_(weights, 10);
+                result = RUSS::Get_Weighted_Choice_Char_(weights, PLANET_CLIMATE_COUNT);
             }
             else {
                 // If forced to be food planet but multiple options exist, loop until a valid choice is picked
                 do {
-                    result = RUSS::Get_Weighted_Choice_Char_(weights, 10);
+                    result = RUSS::Get_Weighted_Choice_Char_(weights, PLANET_CLIMATE_COUNT);
                 } while (MOX::_food_per_farmer_table[result] == 0);
             }
         }
@@ -653,11 +649,11 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         }
 
         int16_t tries = 0;
-        uint16_t system_weights[12];
+        uint16_t system_weights[SYSTEM_SPECIAL_COUNT];
         system_weights[SYSTEM_SPECIAL_NO_SPECIAL] = 0;
 
         while (true) {
-            for (int s = 1; s < 12; ++s) {
+            for (int s = SYSTEM_SPECIAL_STABLE_WORMHOLE; s < SYSTEM_SPECIAL_COUNT; ++s) {
                 if ((excluded_mask >> s) & 1) {
                     system_weights[s] = 0;
                 }
@@ -682,7 +678,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 }
             }
 
-            int16_t choice = RUSS::Get_Weighted_Choice_Short_(system_weights, 12);
+            int16_t choice = RUSS::Get_Weighted_Choice_Short_(system_weights, SYSTEM_SPECIAL_COUNT);
             *special_out = (int8_t)choice;
             bool success = false;
 
@@ -779,9 +775,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         }
 
         int16_t monster_chance;
-        if (MOX::_settings.game_difficulty == 3) {
+        if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
             monster_chance = 8;
-        } else if (MOX::_settings.game_difficulty == 4) {
+        } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
             monster_chance = 12;
         } else {
             monster_chance = 5;
@@ -837,16 +833,16 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         }
 
         switch (galaxy_size) {
-        case 0:
+        case GALAXY_SIZE_SMALL:
             MOX::_NUM_NEBULAS = (uint8_t)(game_random::Random_(2) - 1);
             break;
-        case 1:
+        case GALAXY_SIZE_MEDIUM:
             MOX::_NUM_NEBULAS = (uint8_t)game_random::Random_(2);
             break;
-        case 2:
+        case GALAXY_SIZE_LARGE:
             MOX::_NUM_NEBULAS = (uint8_t)game_random::Random_(3);
             break;
-        case 3:
+        case GALAXY_SIZE_HUGE:
             MOX::_NUM_NEBULAS = (uint8_t)(game_random::Random_(3) + 1);
             break;
 #if MAX_STARS > ORIGINAL_MAX_STARS
@@ -1001,7 +997,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         int16_t size = HAROLD::Galaxy_Size_From_N_Stars_();
 
         switch (size) {
-        case 0:
+        case GALAXY_SIZE_SMALL:
             MOX::_MAP_MAX_X = 0x1FA;
             MOX::_MAP_MAX_Y = 0x190;
             MOX::_cur_map_scale = 10;
@@ -1009,7 +1005,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             MOX::_max_zoom_count = 0;
             MOX::_zoom_count = 0;
             break;
-        case 1:
+        case GALAXY_SIZE_MEDIUM:
             MOX::_MAP_MAX_X = 0x2F7;
             MOX::_MAP_MAX_Y = 0x258;
             MOX::_cur_map_scale = 15;
@@ -1017,7 +1013,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             MOX::_max_zoom_count = 1;
             MOX::_zoom_count = 1;
             break;
-        case 2:
+        case GALAXY_SIZE_LARGE:
             MOX::_MAP_MAX_X = 0x3F4;
             MOX::_MAP_MAX_Y = 0x320;
             MOX::_cur_map_scale = 20;
@@ -1025,7 +1021,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             MOX::_max_zoom_count = 2;
             MOX::_zoom_count = 2;
             break;
-        case 3:
+        case GALAXY_SIZE_HUGE:
             MOX::_MAP_MAX_X = 0x5EE;
             MOX::_MAP_MAX_Y = 0x4B0;
             MOX::_cur_map_scale = 30;
@@ -1127,8 +1123,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         int8_t orbit = (int8_t)orbit_res;
         int16_t type = Generate_Satellite_Type_(star_idx, orbit);
 
-        // Check if satellite type is Small (1), Medium (2), or Large (3)
-        if (type == PLANET_TYPE_ASTEROID || type == PLANET_TYPE_GAS_GIANT || type == PLANET_TYPE_PLANET) {
+        if (type == MAPGEN_SATELLITE_ASTEROID || type == MAPGEN_SATELLITE_GAS_GIANT || type == MAPGEN_SATELLITE_PLANET) {
             MOX::_star[star_idx].planet_index[orbit] = MOX::_planet_count;
 
             s_planet_data& planet = MOX::_planet[MOX::_planet_count];
@@ -1415,22 +1410,22 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             }
 
             switch (galaxy_size) {
-            case 0:
+            case GALAXY_SIZE_SMALL:
                 MOX::_NUM_STARS = 20;
                 grid_x = 5;
                 grid_y = 4;
                 break;
-            case 1:
+            case GALAXY_SIZE_MEDIUM:
                 MOX::_NUM_STARS = 36;
                 grid_x = 6;
                 grid_y = 6;
                 break;
-            case 2:
+            case GALAXY_SIZE_LARGE:
                 MOX::_NUM_STARS = 54;
                 grid_x = 9;
                 grid_y = 6;
                 break;
-            case 3:
+            case GALAXY_SIZE_HUGE:
                 MOX::_NUM_STARS = 71;
                 grid_x = 9;
                 grid_y = 8;

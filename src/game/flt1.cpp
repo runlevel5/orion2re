@@ -1152,7 +1152,7 @@ namespace FLT1 {
 
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
-            if (leader->player_index == MOX::_PLAYER_NUM && leader->status == 1 /* Status: Active? */ && leader->type == 0 /* Type: Ship Officer? */) {
+            if (leader->player_index == MOX::_PLAYER_NUM && leader->status == 1 && leader->type == LEADER_TYPE_SHIP) {
                 MOX::_temp_officers_pict[matching_officer_count] = (s_animation_header*)FLT1::Load_Fltscrn_Officer_Picture_(MOX::_PLAYER_NUM, i, MOX::_screen_seg, 0);
                 MOX::_officer_id_list[matching_officer_count] = i;
                 matching_officer_count++;

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SOURCE_DIR = PROJECT_ROOT / "src"
 OUTPUT_FILE = PROJECT_ROOT / "files.md"
 EXTENSIONS = {".cpp", ".h"}
