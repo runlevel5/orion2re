@@ -111,6 +111,44 @@ namespace {
         return parameter.native_targets[index];
     }
 
+    std::string Default_Name_(size_t index) {
+        return "generated_default_" + std::to_string(index);
+    }
+
+    std::string Targets_Name_(size_t index) {
+        return "generated_targets_" + std::to_string(index);
+    }
+
+    std::string Byte_Array_(const std::vector<uint8_t>& value);
+
+    void Append_Default_(const s_parameter& parameter, size_t index,
+                         std::string* output) {
+        const std::string name = Default_Name_(index);
+        if (parameter.type == PRIMITIVE_STRING) {
+            *output += "static const char " + name + "[] = " +
+                       Cpp_String_(Encode_Game_String(parameter.default_string)) + ";\n";
+        } else if (parameter.type == PRIMITIVE_BITMAP) {
+            *output += "static const uint8_t " + name + "[] = " +
+                       Byte_Array_(parameter.default_bitmap) + ";\n";
+        } else if (parameter.type == PRIMITIVE_RATIO) {
+            *output += "static const s_ratio_value " + name + " = { " +
+                       std::to_string(parameter.default_ratio_numerator) + ", " +
+                       std::to_string(parameter.default_ratio_denominator) + " };\n";
+        } else {
+            *output += std::string("static const ") + Native_Type_(parameter.type) + " " + name +
+                       " = " + Default_Value_(parameter) + ";\n";
+        }
+    }
+
+    void Append_Targets_(const s_parameter& parameter, size_t index,
+                         std::string* output) {
+        *output += "static const s_variable_target " + Targets_Name_(index) + "[] = {\n";
+        for (const std::string& target : parameter.native_targets) {
+            *output += "    { (void*)&" + target + ", sizeof(" + target + ") },\n";
+        }
+        *output += "};\n\n";
+    }
+
     std::string Byte_Array_(const std::vector<uint8_t>& value) {
         std::string output = "{ ";
         for (size_t index = 0; index < value.size(); ++index) {
@@ -355,11 +393,18 @@ namespace {
                       Cpp_Type_(parameter.ratio_component_type) + " };\n";
         }
         output += "\n";
+        for (size_t index = 0; index < schema->parameters.size(); ++index) {
+            const s_parameter& parameter = schema->parameters[index];
+            Append_Default_(parameter, index, &output);
+            Append_Targets_(parameter, index, &output);
+        }
         output += "const s_variable_descriptor variables[] = {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
             const s_parameter& parameter = schema->parameters[index];
             output += "    { " + Cpp_String_(parameter.path) + ", " +
-                      "&generated_type_" + std::to_string(type_ids[index]) + " },\n";
+                      "&generated_type_" + std::to_string(type_ids[index]) + ", " +
+                      "&" + Default_Name_(index) + ", " + Targets_Name_(index) + ", " +
+                      std::to_string(parameter.native_targets.size()) + " },\n";
         }
         output +=
             "};\n\n"
@@ -429,110 +474,6 @@ namespace {
         output +=
             "};\n\n"
             "const size_t schema_node_count = sizeof(schema_nodes) / sizeof(schema_nodes[0]);\n\n"
-            "}\n"
-            "\nnamespace config::generated {\n\n"
-            "bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {\n"
-            "    if (value == nullptr) {\n"
-            "        return false;\n"
-            "    }\n"
-            "    *value = {};\n"
-            "    switch (variable_id) {\n";
-        for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            const s_parameter& parameter = schema->parameters[index];
-            output += "    case " + std::to_string(index) + ": // " + parameter.path + "\n"
-                      "        value->type = " + Cpp_Type_(parameter.type) + ";\n";
-            if (parameter.type == PRIMITIVE_BOOL) {
-                output += "        value->bool_value = " + Default_Value_(parameter) + ";\n";
-            } else if (parameter.type == PRIMITIVE_STRING) {
-                output += "        value->string_value = " +
-                          Cpp_String_(Encode_Game_String(parameter.default_string)) + ";\n";
-            } else if (parameter.type == PRIMITIVE_BITMAP) {
-                output += "        value->bitmap_value = " +
-                          Byte_Array_(parameter.default_bitmap) + ";\n";
-            } else if (parameter.type == PRIMITIVE_RATIO) {
-                output += "        value->ratio_numerator = " +
-                          std::to_string(parameter.default_ratio_numerator) + ";\n"
-                          "        value->ratio_denominator = " +
-                          std::to_string(parameter.default_ratio_denominator) + ";\n";
-            } else {
-                output += "        value->integer_value = " + Default_Value_(parameter) + ";\n";
-            }
-            output += "        return true;\n";
-        }
-        output +=
-            "    }\n"
-            "    return false;\n"
-            "}\n\n"
-            "void Set_Value(t_variable_id variable_id, const s_typed_value* value) {\n"
-            "    switch (variable_id) {\n";
-        for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            const s_parameter& parameter = schema->parameters[index];
-            const std::string native = Native_Target_(parameter, 0);
-            const char* value = parameter.type == PRIMITIVE_BOOL ? "value->bool_value" :
-                                parameter.type == PRIMITIVE_STRING ? "value->string_value.c_str()" :
-                                "value->integer_value";
-            output += "    case " + std::to_string(index) + ": // " + parameter.path + "\n";
-            if (parameter.type == PRIMITIVE_STRING) {
-                for (size_t target = 0; target < parameter.native_targets.size(); ++target) {
-                    const std::string destination = Native_Target_(parameter, target);
-                    output += "        strlcpy(" + destination +
-                              ", value->string_value.c_str(), sizeof(" + destination + "));\n";
-                }
-            } else if (parameter.type == PRIMITIVE_BITMAP) {
-                for (size_t target = 0; target < parameter.native_targets.size(); ++target) {
-                    const std::string destination = Native_Target_(parameter, target);
-                    output += "        std::memcpy(" + destination +
-                              ", value->bitmap_value.data(), sizeof(" + destination + "));\n";
-                }
-            } else if (parameter.type == PRIMITIVE_RATIO) {
-                output += "        " + native + " = (" +
-                          Native_Type_(parameter.ratio_component_type) +
-                          ")value->ratio_numerator;\n"
-                          "        " + Native_Target_(parameter, 1) + " = (" +
-                          Native_Type_(parameter.ratio_component_type) +
-                          ")value->ratio_denominator;\n";
-            } else {
-                for (size_t target = 0; target < parameter.native_targets.size(); ++target) {
-                    output += "        " + Native_Target_(parameter, target) + " = (" +
-                              Native_Type_(parameter.type) + ")" + value + ";\n";
-                }
-            }
-            output += "        return;\n";
-        }
-        output +=
-            "    }\n"
-            "}\n\n"
-            "bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value) {\n"
-            "    if (value == nullptr) {\n"
-            "        return false;\n"
-            "    }\n"
-            "    *value = {};\n"
-            "    switch (variable_id) {\n";
-        for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            const s_parameter& parameter = schema->parameters[index];
-            const std::string native = Native_Target_(parameter, 0);
-            output += "    case " + std::to_string(index) + ": // " + parameter.path + "\n"
-                      "        value->type = " + Cpp_Type_(parameter.type) + ";\n";
-            if (parameter.type == PRIMITIVE_BOOL) {
-                output += "        value->bool_value = (bool)" + native + ";\n";
-            } else if (parameter.type == PRIMITIVE_STRING) {
-                output += "        value->string_value = (const char*)" + native + ";\n";
-            } else if (parameter.type == PRIMITIVE_BITMAP) {
-                output += "        value->bitmap_value.assign((const uint8_t*)" + native +
-                          ", (const uint8_t*)" + native + " + sizeof(" + native + "));\n";
-            } else if (parameter.type == PRIMITIVE_RATIO) {
-                output += "        value->ratio_numerator = (int64_t)" + native + ";\n"
-                          "        value->ratio_denominator = (int64_t)" +
-                          Native_Target_(parameter, 1) + ";\n";
-            } else {
-                output += "        value->integer_value = (int64_t)" + native + ";\n";
-            }
-            output += "        return true;\n";
-        }
-        output +=
-            "    }\n"
-            "    return false;\n"
-            "}\n\n"
             "}\n";
         return output;
     }

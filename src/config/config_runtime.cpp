@@ -1,5 +1,6 @@
 #include "config_runtime.h"
 
+#include <algorithm>
 #include <climits>
 #include <cstring>
 #include <utility>
@@ -8,6 +9,53 @@
 
 namespace config {
 namespace {
+    bool Read_Integer_(const void* address, e_value_type type, int64_t* value) {
+        switch (type) {
+        case CONFIG_VALUE_BOOL: *value = *(const uint8_t*)address; return true;
+        case CONFIG_VALUE_INT8: *value = *(const int8_t*)address; return true;
+        case CONFIG_VALUE_UINT8: *value = *(const uint8_t*)address; return true;
+        case CONFIG_VALUE_INT16: *value = *(const int16_t*)address; return true;
+        case CONFIG_VALUE_UINT16: *value = *(const uint16_t*)address; return true;
+        case CONFIG_VALUE_INT32: *value = *(const int32_t*)address; return true;
+        case CONFIG_VALUE_UINT32: *value = *(const uint32_t*)address; return true;
+        default: return false;
+        }
+    }
+
+    bool Write_Integer_(void* address, size_t size, e_value_type type, int64_t value) {
+        switch (type) {
+        case CONFIG_VALUE_BOOL:
+            if (size != sizeof(uint8_t)) return false;
+            *(uint8_t*)address = (uint8_t)(value != 0);
+            return true;
+        case CONFIG_VALUE_INT8:
+            if (size != sizeof(int8_t)) return false;
+            *(int8_t*)address = (int8_t)value;
+            return true;
+        case CONFIG_VALUE_UINT8:
+            if (size != sizeof(uint8_t)) return false;
+            *(uint8_t*)address = (uint8_t)value;
+            return true;
+        case CONFIG_VALUE_INT16:
+            if (size != sizeof(int16_t)) return false;
+            *(int16_t*)address = (int16_t)value;
+            return true;
+        case CONFIG_VALUE_UINT16:
+            if (size != sizeof(uint16_t)) return false;
+            *(uint16_t*)address = (uint16_t)value;
+            return true;
+        case CONFIG_VALUE_INT32:
+            if (size != sizeof(int32_t)) return false;
+            *(int32_t*)address = (int32_t)value;
+            return true;
+        case CONFIG_VALUE_UINT32:
+            if (size != sizeof(uint32_t)) return false;
+            *(uint32_t*)address = (uint32_t)value;
+            return true;
+        default: return false;
+        }
+    }
+
     bool Fail_(const s_config_write* write, const char* message,
                s_cfg_diagnostic* diagnostic) {
         diagnostic->location = write->provenance;
@@ -237,6 +285,133 @@ bool Commit_State(const s_config_state* state) {
         generated::Set_Value(variable_id, &state->values[variable_id]);
     }
     return true;
+}
+
+namespace generated {
+
+bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
+    const s_variable_descriptor* variable = Get_Variable(variable_id);
+    if (value == nullptr || variable == nullptr || variable->default_value == nullptr) {
+        return false;
+    }
+    *value = {};
+    value->type = variable->type->value_type;
+    switch (value->type) {
+    case CONFIG_VALUE_BOOL: {
+        int64_t integer = 0;
+        if (!Read_Integer_(variable->default_value, value->type, &integer)) return false;
+        value->bool_value = integer != 0;
+        return true;
+    }
+    case CONFIG_VALUE_INT8:
+    case CONFIG_VALUE_UINT8:
+    case CONFIG_VALUE_INT16:
+    case CONFIG_VALUE_UINT16:
+    case CONFIG_VALUE_INT32:
+    case CONFIG_VALUE_UINT32:
+        return Read_Integer_(variable->default_value, value->type, &value->integer_value);
+    case CONFIG_VALUE_STRING:
+        value->string_value = (const char*)variable->default_value;
+        return true;
+    case CONFIG_VALUE_BITMAP: {
+        const size_t size = (variable->type->bitmap_bit_count + 7) / 8;
+        const uint8_t* bytes = (const uint8_t*)variable->default_value;
+        value->bitmap_value.assign(bytes, bytes + size);
+        return true;
+    }
+    case CONFIG_VALUE_RATIO: {
+        const s_ratio_value* ratio = (const s_ratio_value*)variable->default_value;
+        value->ratio_numerator = ratio->numerator;
+        value->ratio_denominator = ratio->denominator;
+        return true;
+    }
+    }
+    return false;
+}
+
+void Set_Value(t_variable_id variable_id, const s_typed_value* value) {
+    const s_variable_descriptor* variable = Get_Variable(variable_id);
+    if (value == nullptr || variable == nullptr || value->type != variable->type->value_type) {
+        return;
+    }
+    if (value->type == CONFIG_VALUE_STRING) {
+        for (size_t index = 0; index < variable->target_count; ++index) {
+            const s_variable_target& target = variable->targets[index];
+            if (target.size == 0) continue;
+            const size_t copy_size = std::min(value->string_value.size(), target.size - 1);
+            std::memcpy(target.address, value->string_value.data(), copy_size);
+            ((char*)target.address)[copy_size] = '\0';
+        }
+        return;
+    }
+    if (value->type == CONFIG_VALUE_BITMAP) {
+        for (size_t index = 0; index < variable->target_count; ++index) {
+            const s_variable_target& target = variable->targets[index];
+            if (target.size == value->bitmap_value.size()) {
+                std::memcpy(target.address, value->bitmap_value.data(), target.size);
+            }
+        }
+        return;
+    }
+    if (value->type == CONFIG_VALUE_RATIO) {
+        if (variable->target_count == 2) {
+            Write_Integer_(variable->targets[0].address, variable->targets[0].size,
+                           variable->type->ratio_component_type, value->ratio_numerator);
+            Write_Integer_(variable->targets[1].address, variable->targets[1].size,
+                           variable->type->ratio_component_type, value->ratio_denominator);
+        }
+        return;
+    }
+    const int64_t integer = value->type == CONFIG_VALUE_BOOL ?
+        (value->bool_value ? 1 : 0) : value->integer_value;
+    for (size_t index = 0; index < variable->target_count; ++index) {
+        Write_Integer_(variable->targets[index].address, variable->targets[index].size,
+                       value->type, integer);
+    }
+}
+
+bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value) {
+    const s_variable_descriptor* variable = Get_Variable(variable_id);
+    if (value == nullptr || variable == nullptr || variable->target_count == 0) {
+        return false;
+    }
+    *value = {};
+    value->type = variable->type->value_type;
+    const s_variable_target& target = variable->targets[0];
+    switch (value->type) {
+    case CONFIG_VALUE_BOOL: {
+        int64_t integer = 0;
+        if (!Read_Integer_(target.address, value->type, &integer)) return false;
+        value->bool_value = integer != 0;
+        return true;
+    }
+    case CONFIG_VALUE_INT8:
+    case CONFIG_VALUE_UINT8:
+    case CONFIG_VALUE_INT16:
+    case CONFIG_VALUE_UINT16:
+    case CONFIG_VALUE_INT32:
+    case CONFIG_VALUE_UINT32:
+        return Read_Integer_(target.address, value->type, &value->integer_value);
+    case CONFIG_VALUE_STRING:
+        value->string_value = (const char*)target.address;
+        return true;
+    case CONFIG_VALUE_BITMAP: {
+        const uint8_t* bytes = (const uint8_t*)target.address;
+        value->bitmap_value.assign(bytes, bytes + target.size);
+        return true;
+    }
+    case CONFIG_VALUE_RATIO:
+        if (variable->target_count != 2) return false;
+        return Read_Integer_(variable->targets[0].address,
+                             variable->type->ratio_component_type,
+                             &value->ratio_numerator) &&
+               Read_Integer_(variable->targets[1].address,
+                             variable->type->ratio_component_type,
+                             &value->ratio_denominator);
+    }
+    return false;
+}
+
 }
 
 }

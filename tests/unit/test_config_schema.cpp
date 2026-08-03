@@ -207,6 +207,22 @@ DOCTEST_TEST_CASE("main schema game-domain types are documented and match native
         DOCTEST_CHECK(Integer_(symbol) == expected.value);
     }
 
+    const char* described_symbols[][2] = {
+        {"technology_application_type", "special"},
+        {"planet_environment_group", "hostile"},
+        {"ai_special_choice_item_kind", "special"},
+        {"ai_ship_design_theme", "special"},
+        {"weapon_firing_arc", "all_sectors"},
+        {"weapon_firing_arc", "design_360"},
+    };
+    for (const auto& expected : described_symbols) {
+        const config::tool::s_json_value* type = Member_(types, expected[0]);
+        const config::tool::s_json_value* symbol = Member_(Member_(type, "values"), expected[1]);
+        const config::tool::s_json_value* description = Member_(symbol, "description");
+        DOCTEST_REQUIRE_MESSAGE(description != nullptr, expected[0], ".", expected[1]);
+        DOCTEST_CHECK_FALSE(description->string_value.empty());
+    }
+
     struct s_expected_extent {
         const char* type;
         const char* collection;
@@ -310,9 +326,12 @@ DOCTEST_TEST_CASE("C++ generation is byte-for-byte deterministic") {
     const std::string second_content((std::istreambuf_iterator<char>(second_file)),
                                      std::istreambuf_iterator<char>());
     DOCTEST_CHECK(first_content == second_content);
-    DOCTEST_CHECK(first_content.find("Get_Default_Value") != std::string::npos);
-    DOCTEST_CHECK(first_content.find("Set_Value") != std::string::npos);
-    DOCTEST_CHECK(first_content.find("Get_Current_Value") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("generated_default_0") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("generated_targets_0") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("generated_get_default_0") == std::string::npos);
+    DOCTEST_CHECK(first_content.find("generated_set_value_0") == std::string::npos);
+    DOCTEST_CHECK(first_content.find("generated_get_current_0") == std::string::npos);
+    DOCTEST_CHECK(first_content.find("switch (variable_id)") == std::string::npos);
     DOCTEST_CHECK(first_content.find("decltype") == std::string::npos);
     DOCTEST_CHECK(first_content.find("static_assert") == std::string::npos);
     DOCTEST_CHECK(first_content.find("CONFIG_PARAMETER_") == std::string::npos);
@@ -344,8 +363,8 @@ DOCTEST_TEST_CASE("C++ generation emits array aliases only for path resolution")
         "static_assert(sizeof(fixture.special_device_flags) == 5);") !=
         std::string::npos);
     DOCTEST_CHECK(generated.find(
-        "std::memcpy(fixture.special_device_flags, value->bitmap_value.data(), "
-        "sizeof(fixture.special_device_flags));") != std::string::npos);
+        "{ (void*)&fixture.special_device_flags, "
+        "sizeof(fixture.special_device_flags) }") != std::string::npos);
     DOCTEST_CHECK(Count_(generated,
         "static const s_symbol_descriptor generated_values_") == 2);
     DOCTEST_CHECK(Count_(generated,
@@ -412,17 +431,25 @@ DOCTEST_TEST_CASE("HTML documentation is deterministic searchable linked and aut
         std::string::npos);
     DOCTEST_CHECK(generated.find("Type in the file") != std::string::npos);
     DOCTEST_CHECK(generated.find("<code>ships guardian</code>") != std::string::npos);
+    DOCTEST_CHECK(generated.find("Name to type") == std::string::npos);
+    DOCTEST_CHECK(generated.find("See the containing setting") == std::string::npos);
+    DOCTEST_CHECK(generated.find("<div class=\"field-list\">") != std::string::npos);
     DOCTEST_CHECK(generated.find("Built-in default configuration") != std::string::npos);
     DOCTEST_CHECK(generated.find("ships guardian appearance = 2;") != std::string::npos);
     DOCTEST_CHECK(generated.find(
-        "ships guardian weapon 1 type = plasma_cannon;") != std::string::npos);
+        "ships guardian weapon =\n"
+        "    plasma_cannon all 0 2\n"
+        "    mass_driver forward,aft 0 10;") !=
+        std::string::npos);
     DOCTEST_CHECK(generated.find(
-        "ships guardian weapon 2 arc = forward,aft;") != std::string::npos);
+        "ships guardian weapon primary type = plasma_cannon;") == std::string::npos);
+    DOCTEST_CHECK(generated.find("ships guardian weapon 1 type") == std::string::npos);
     DOCTEST_CHECK(generated.find(
         "ships guardian specials = self_repairing;") != std::string::npos);
     DOCTEST_CHECK(generated.find(
         "ships guardian label = &quot;Grüße&quot;;") != std::string::npos);
     DOCTEST_CHECK(generated.find("ships guardian reduction = 1/3;") != std::string::npos);
+    DOCTEST_CHECK(Count_(generated, "ships guardian weapon =") == 1);
     DOCTEST_CHECK(generated.find("Configuration path") == std::string::npos);
     DOCTEST_CHECK(generated.find("<dt>Storage</dt>") == std::string::npos);
     DOCTEST_CHECK(generated.find("uint8") == std::string::npos);

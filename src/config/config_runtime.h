@@ -84,9 +84,22 @@ struct s_type_descriptor {
     e_value_type ratio_component_type;
 };
 
+struct s_ratio_value {
+    int64_t numerator;
+    int64_t denominator;
+};
+
+struct s_variable_target {
+    void* address;
+    size_t size;
+};
+
 struct s_variable_descriptor {
     const char* name;
     const s_type_descriptor* type;
+    const void* default_value;
+    const s_variable_target* targets;
+    size_t target_count;
 };
 
 struct s_schema_node_descriptor {

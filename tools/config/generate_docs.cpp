@@ -64,9 +64,72 @@ namespace {
             parameter.name_space + "." + parameter.id;
     }
 
-    std::string Cfg_Path_(const std::string& path) {
-        std::string result = path;
-        std::replace(result.begin(), result.end(), '.', ' ');
+    std::string Cfg_Path_(const s_schema* schema, size_t parameter_index) {
+        uint32_t node_index = UINT32_MAX;
+        for (size_t index = 0; index < schema->nodes.size(); ++index) {
+            if (schema->nodes[index].parameter == parameter_index) {
+                node_index = static_cast<uint32_t>(index);
+                break;
+            }
+        }
+        if (node_index == UINT32_MAX) {
+            std::string result = schema->parameters[parameter_index].path;
+            std::replace(result.begin(), result.end(), '.', ' ');
+            return result;
+        }
+
+        std::vector<std::string> parts;
+        while (node_index != UINT32_MAX) {
+            const s_node& node = schema->nodes[node_index];
+            if (!node.id.empty()) {
+                parts.push_back(node.id);
+            } else if (node.parent != UINT32_MAX) {
+                const s_node& array = schema->nodes[node.parent];
+                std::string selector = std::to_string(node.external_index);
+                for (const s_symbol& alias : array.index_aliases) {
+                    if (alias.value == node.external_index) {
+                        selector = alias.name;
+                        break;
+                    }
+                }
+                parts.push_back(selector);
+            }
+            node_index = node.parent;
+        }
+        std::reverse(parts.begin(), parts.end());
+
+        std::string result;
+        for (const std::string& part : parts) {
+            result += result.empty() ? part : " " + part;
+        }
+        return result;
+    }
+
+    std::string Cfg_Node_Path_(const s_schema* schema, uint32_t node_index) {
+        std::vector<std::string> parts;
+        while (node_index != UINT32_MAX) {
+            const s_node& node = schema->nodes[node_index];
+            if (!node.id.empty()) {
+                parts.push_back(node.id);
+            } else if (node.parent != UINT32_MAX) {
+                const s_node& array = schema->nodes[node.parent];
+                std::string selector = std::to_string(node.external_index);
+                for (const s_symbol& alias : array.index_aliases) {
+                    if (alias.value == node.external_index) {
+                        selector = alias.name;
+                        break;
+                    }
+                }
+                parts.push_back(selector);
+            }
+            node_index = node.parent;
+        }
+        std::reverse(parts.begin(), parts.end());
+
+        std::string result;
+        for (const std::string& part : parts) {
+            result += result.empty() ? part : " " + part;
+        }
         return result;
     }
 
@@ -174,15 +237,111 @@ namespace {
         return "";
     }
 
+    bool Leaf_Record_(const s_schema* schema, uint32_t node_index) {
+        if (schema->nodes[node_index].kind != NODE_RECORD) {
+            return false;
+        }
+        bool has_fields = false;
+        for (const s_node& node : schema->nodes) {
+            if (node.parent != node_index) {
+                continue;
+            }
+            has_fields = true;
+            if (node.kind != NODE_SCALAR) {
+                return false;
+            }
+        }
+        return has_fields;
+    }
+
+    bool Compact_Node_(const s_schema* schema, uint32_t node_index) {
+        if (Leaf_Record_(schema, node_index)) {
+            return true;
+        }
+        if (schema->nodes[node_index].kind != NODE_ARRAY) {
+            return false;
+        }
+        bool has_elements = false;
+        for (size_t index = 0; index < schema->nodes.size(); ++index) {
+            const s_node& node = schema->nodes[index];
+            if (node.parent != node_index) {
+                continue;
+            }
+            has_elements = true;
+            if (node.kind != NODE_SCALAR &&
+                !Leaf_Record_(schema, static_cast<uint32_t>(index))) {
+                return false;
+            }
+        }
+        return has_elements;
+    }
+
     std::string Default_Configuration_(const s_schema* schema,
                                        const s_parameter_declaration& declaration) {
         const std::string prefix = Parameter_Prefix_(declaration);
         std::string defaults;
-        for (const s_parameter& parameter : schema->parameters) {
+        size_t parameter_index = 0;
+        while (parameter_index < schema->parameters.size()) {
+            const s_parameter& parameter = schema->parameters[parameter_index];
             if (parameter.path != prefix && !parameter.path.starts_with(prefix + ".")) {
+                ++parameter_index;
                 continue;
             }
-            defaults += Cfg_Path_(parameter.path) + " = " + Default_Value_(parameter) + ";\n";
+
+            uint32_t node_index = UINT32_MAX;
+            for (size_t index = 0; index < schema->nodes.size(); ++index) {
+                if (schema->nodes[index].parameter == parameter_index) {
+                    node_index = static_cast<uint32_t>(index);
+                    break;
+                }
+            }
+            uint32_t assignment_node = node_index;
+            while (assignment_node != UINT32_MAX) {
+                const uint32_t parent = schema->nodes[assignment_node].parent;
+                if (parent == UINT32_MAX || !Compact_Node_(schema, parent) ||
+                    schema->nodes[parent].first_parameter != parameter_index) {
+                    break;
+                }
+                assignment_node = parent;
+            }
+
+            size_t last_parameter = parameter_index;
+            if (assignment_node != UINT32_MAX) {
+                last_parameter = schema->nodes[assignment_node].last_parameter;
+            }
+            while (last_parameter > parameter_index &&
+                   (last_parameter >= schema->parameters.size() ||
+                    (schema->parameters[last_parameter].path != prefix &&
+                     !schema->parameters[last_parameter].path.starts_with(prefix + ".")))) {
+                --last_parameter;
+            }
+
+            const std::string path = assignment_node == UINT32_MAX ?
+                Cfg_Path_(schema, parameter_index) :
+                Cfg_Node_Path_(schema, assignment_node);
+            if (assignment_node != UINT32_MAX &&
+                schema->nodes[assignment_node].kind == NODE_ARRAY) {
+                defaults += path + " =\n";
+                for (const s_node& child : schema->nodes) {
+                    if (child.parent != assignment_node) {
+                        continue;
+                    }
+                    defaults += "    ";
+                    for (size_t index = child.first_parameter;
+                         index <= child.last_parameter; ++index) {
+                        defaults += (index == child.first_parameter ? "" : " ") +
+                                    Default_Value_(schema->parameters[index]);
+                    }
+                    defaults += child.last_parameter == last_parameter ? ";\n" : "\n";
+                }
+            } else {
+                defaults += path + " =";
+                for (size_t index = parameter_index; index <= last_parameter; ++index) {
+                    defaults += " " + Default_Value_(schema->parameters[index]);
+                }
+                defaults += ";\n";
+            }
+            parameter_index = last_parameter + 1;
         }
         return defaults;
     }
@@ -396,28 +555,28 @@ namespace {
 
     void Fields_(const s_schema* schema, const std::vector<s_documented_field>& fields,
                  std::string* output) {
-        *output += "<div class=\"table-wrap\"><table><thead><tr><th>Name to type</th><th>What it controls</th><th>What to enter</th><th>Default value</th></tr></thead><tbody>";
+        *output += "<div class=\"field-list\">";
         for (const s_documented_field& field : fields) {
             if (field.internal) {
                 continue;
             }
-            *output += "<tr><td><code>" + Html_(field.id) + "</code>";
+            *output += "<section class=\"field\"><h4><code>" + Html_(field.id) + "</code>";
             if (!field.metadata.title.empty()) {
-                *output += "<br>" + Html_(field.metadata.title);
+                *output += " - " + Html_(field.metadata.title);
             }
-            *output += "</td><td>" + Html_(field.metadata.description) + "</td><td>";
+            *output += "</h4><p>" + Html_(field.metadata.description) + "</p><dl class=\"facts\">"
+                       "<dt>What to enter</dt><dd>";
             if (field.type != nullptr) {
                 *output += Type_Link_(schema, *field.type);
             }
-            *output += "</td><td>";
+            *output += "</dd>";
             if (field.has_default) {
-                *output += "<code>" + Html_(field.default_value) + "</code>";
-            } else {
-                *output += "See the containing setting";
+                *output += "<dt>Default</dt><dd><code>" +
+                           Html_(field.default_value) + "</code></dd>";
             }
-            *output += "</td></tr>";
+            *output += "</dl></section>";
         }
-        *output += "</tbody></table></div>";
+        *output += "</div>";
     }
 
     void References_(const std::vector<s_documentation_reference>& references,
@@ -495,7 +654,7 @@ namespace {
 
     std::string Style_() {
         return R"CSS(
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#fff;color:rgba(0,0,0,.8);font-family:"Noto Serif","DejaVu Serif",serif;font-size:100%;line-height:1.6;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}a{color:#2156a5;text-decoration:underline}a:hover,a:focus{color:#1d4b8f}h1,h2,h3,h4{color:#ba3925;font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;line-height:1.2;text-rendering:optimizeLegibility}h1{font-size:2.125em}h2{font-size:1.6875em}h3{font-size:1.375em}h4{font-size:1.125em}p{font-size:1.0625rem;line-height:1.6;margin:0 0 1.25rem}code{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400}pre{overflow:auto;white-space:pre-wrap;background:#f7f7f8;border-radius:4px;padding:1em;font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-size:.90625em;line-height:1.45}pre code{font-size:1em}.layout{width:100%;max-width:62.5em;margin:0 auto;padding:0 .9375em 3rem}.sidebar h1{color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;margin:2.25rem 0 1.25rem;padding-bottom:8px}.sidebar h1 a{color:inherit;text-decoration:none}.toc{border:1px solid #e0e0dc;border-radius:4px;background:#f8f8f7;margin-bottom:1.25em;padding:1.25em}.toc label{display:block;color:#7a2518;font-family:"Open Sans","DejaVu Sans",sans-serif;font-size:1.125em;margin-bottom:.35em}.sidebar nav{display:flex;flex-wrap:wrap;gap:.25em 1.25em;margin-top:.75em}.search-box{width:100%;border:1px solid #d5d5d5;border-radius:4px;background:#fff;color:rgba(0,0,0,.9);font:1em "Open Sans","DejaVu Sans",sans-serif;padding:.55em .7em}.search-results{display:none;background:#fff;border:1px solid #dedede;border-radius:4px;max-height:45vh;overflow:auto}.search-results.active{display:block}.search-results a{display:block;padding:.55em .7em;border-bottom:1px solid #e7e7e9;text-decoration:none}.search-results small{display:block;color:rgba(0,0,0,.6)}.hero{padding-bottom:.625em}.hero>p:first-of-type{color:rgba(0,0,0,.85);font-size:1.21875em}.section-title{border-top:1px solid #e7e7e9;margin-top:1.25em;padding-top:1em}.card{border-bottom:1px solid #e7e7e9;margin-bottom:1.25em;padding:0 0 1.25em}.card h3{margin:1em 0 .5em}.badge{display:inline-block;border-radius:4px;background:#f3f3f2;color:rgba(0,0,0,.7);font:600 .8em "Open Sans","DejaVu Sans",sans-serif;margin:0 .35em .5em 0;padding:.2em .55em}.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:.25em 1em;margin:1em 0 1.25em}.facts dt{font-weight:700}.facts dd{margin:0}.option-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));gap:.5em;margin-bottom:1.25em}.option{display:flex;align-items:flex-start;gap:.6em;border:1px solid #dedede;padding:.625em}.option code{flex:none}.note{border-left:1px solid #dddddf;color:rgba(0,0,0,.6);margin:1.25em 0;padding:.25em 1.125em}.table-wrap{overflow:auto}table{width:100%;border:1px solid #dedede;border-collapse:collapse;margin-bottom:1.25em}thead{background:#f7f8f7}th,td{text-align:left;vertical-align:top;border:1px solid #dedede;padding:.5em .625em}.links{columns:2}.defaults{margin:1em 0 1.25em}.defaults summary{color:#2156a5;cursor:pointer;font-size:1.0625rem}.defaults pre{margin-top:.75em}.empty{color:rgba(0,0,0,.6);font-style:italic}@media(max-width:760px){.sidebar nav{display:block}.sidebar nav a{display:block;padding:.2em 0}.facts{grid-template-columns:1fr}.links{columns:1}}@media print{.toc{display:none}.layout{max-width:none}.section-title{page-break-after:avoid}.card,pre,tr{page-break-inside:avoid}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#fff;color:rgba(0,0,0,.8);font-family:"Noto Serif","DejaVu Serif",serif;font-size:100%;line-height:1.6;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}a{color:#2156a5;text-decoration:underline}a:hover,a:focus{color:#1d4b8f}h1,h2,h3,h4{color:#ba3925;font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;line-height:1.2;text-rendering:optimizeLegibility}h1{font-size:2.125em}h2{font-size:1.6875em}h3{font-size:1.375em}h4{font-size:1.125em}p{font-size:1.0625rem;line-height:1.6;margin:0 0 1.25rem}code{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400}pre{overflow:auto;white-space:pre-wrap;background:#f7f7f8;border-radius:4px;padding:1em;font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-size:.90625em;line-height:1.45}pre code{font-size:1em}.layout{width:100%;max-width:62.5em;margin:0 auto;padding:0 .9375em 3rem}.sidebar h1{color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;margin:2.25rem 0 1.25rem;padding-bottom:8px}.sidebar h1 a{color:inherit;text-decoration:none}.toc{border:1px solid #e0e0dc;border-radius:4px;background:#f8f8f7;margin-bottom:1.25em;padding:1.25em}.toc label{display:block;color:#7a2518;font-family:"Open Sans","DejaVu Sans",sans-serif;font-size:1.125em;margin-bottom:.35em}.sidebar nav{display:flex;flex-wrap:wrap;gap:.25em 1.25em;margin-top:.75em}.search-box{width:100%;border:1px solid #d5d5d5;border-radius:4px;background:#fff;color:rgba(0,0,0,.9);font:1em "Open Sans","DejaVu Sans",sans-serif;padding:.55em .7em}.search-results{display:none;background:#fff;border:1px solid #dedede;border-radius:4px;max-height:45vh;overflow:auto}.search-results.active{display:block}.search-results a{display:block;padding:.55em .7em;border-bottom:1px solid #e7e7e9;text-decoration:none}.search-results small{display:block;color:rgba(0,0,0,.6)}.hero{padding-bottom:.625em}.hero>p:first-of-type{color:rgba(0,0,0,.85);font-size:1.21875em}.section-title{border-top:1px solid #e7e7e9;margin-top:1.25em;padding-top:1em}.card{border-bottom:1px solid #e7e7e9;margin-bottom:1.25em;padding:0 0 1.25em}.card h3{margin:1em 0 .5em}.badge{display:inline-block;border-radius:4px;background:#f3f3f2;color:rgba(0,0,0,.7);font:600 .8em "Open Sans","DejaVu Sans",sans-serif;margin:0 .35em .5em 0;padding:.2em .55em}.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:.25em 1em;margin:1em 0 1.25em}.facts dt{font-weight:700}.facts dd{margin:0}.option-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));gap:.5em;margin-bottom:1.25em}.option{display:flex;align-items:flex-start;gap:.6em;border:1px solid #dedede;padding:.625em}.option code{flex:none}.note{border-left:1px solid #dddddf;color:rgba(0,0,0,.6);margin:1.25em 0;padding:.25em 1.125em}.field-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(20rem,1fr));gap:.75em;margin-bottom:1.25em}.field{border:1px solid #dedede;padding:.75em}.field h4{margin:0 0 .5em}.field p{font-size:1em;margin-bottom:.75em}.field .facts{margin:0}.links{columns:2}.defaults{margin:1em 0 1.25em}.defaults summary{color:#2156a5;cursor:pointer;font-size:1.0625rem}.defaults pre{margin-top:.75em}.empty{color:rgba(0,0,0,.6);font-style:italic}@media(max-width:760px){.sidebar nav{display:block}.sidebar nav a{display:block;padding:.2em 0}.facts{grid-template-columns:1fr}.field-list{grid-template-columns:1fr}.links{columns:1}}@media print{.toc{display:none}.layout{max-width:none}.section-title{page-break-after:avoid}.card,pre,.field{page-break-inside:avoid}}
 )CSS";
     }
 
@@ -536,6 +695,8 @@ bool Generate_Documentation(const s_schema* schema, const char* output_path,
         "Copy an example into a <code>.cfg</code> file, then change only the values you want.</p>"
         "<p>The <strong>Type in the file</strong> line gives the exact words that start a setting. "
         "Spaces separate its parts. Words shown in code style are meant to be typed exactly as shown.</p>"
+        "<p>Compact assignments can set a complete layout at once. Their values follow the field order "
+        "shown under <a href=\"#records\">Setting layouts</a>.</p>"
         "<div class=\"note\"><strong>Before you begin:</strong> Keep a backup of a working configuration. "
         "Prefer the listed names over numbers because they are easier to read and less error-prone.</div></header>";
 
@@ -613,7 +774,7 @@ bool Generate_Documentation(const s_schema* schema, const char* output_path,
     }
 
     output += "<h2 id=\"records\" class=\"section-title\">Setting layouts</h2>"
-              "<p>These tables explain the named fields used inside more detailed settings.</p>";
+              "<p>These entries explain the named fields used inside more detailed settings.</p>";
     size_t public_records = 0;
     for (const s_record_declaration& declaration : schema->record_declarations) {
         if (declaration.internal) {
