@@ -342,6 +342,10 @@ namespace {
         s_constraints constraints;
         std::vector<s_symbol> values;
         std::vector<s_symbol> flags;
+        std::vector<s_bitmap_symbol> bitmap_values;
+        std::vector<s_bitmap_symbol> bitmap_flags;
+        std::vector<uint8_t> bitmap_known_bits;
+        size_t bitmap_bit_count = 0;
         bool allow_numeric = false;
         bool reject_unknown_numeric = false;
         uint64_t known_bits = 0;
@@ -361,6 +365,122 @@ namespace {
             return false;
         }
         *output = value->bool_value;
+        return true;
+    }
+
+    void Set_Bitmap_Bit_(std::vector<uint8_t>* bitmap, size_t bit) {
+        (*bitmap)[bit >> 3] |= static_cast<uint8_t>(1U << (bit & 7));
+    }
+
+    const s_bitmap_symbol* Find_Bitmap_Symbol_(
+        const std::vector<s_bitmap_symbol>& symbols, const std::string& name) {
+        for (const s_bitmap_symbol& symbol : symbols) {
+            if (symbol.name == name) {
+                return &symbol;
+            }
+        }
+        return nullptr;
+    }
+
+    bool Bitmap_Flags_(const s_json_value* object, const std::string& path,
+                       size_t bit_count, std::vector<s_bitmap_symbol>* flags,
+                       std::vector<uint8_t>* known_bits, std::string* diagnostic) {
+        if (object == nullptr || object->kind != JSON_OBJECT || object->values.empty()) {
+            *diagnostic = path + ": bitmap requires a non-empty flag object";
+            return false;
+        }
+        const size_t byte_count = (bit_count + 7) / 8;
+        known_bits->assign(byte_count, 0);
+        for (size_t index = 0; index < object->member_names.size(); ++index) {
+            const std::string& name = object->member_names[index];
+            if (!Canonical_Name_(name)) {
+                *diagnostic = path + "." + name + ": names must use lower_snake_case";
+                return false;
+            }
+            s_bitmap_symbol flag;
+            flag.name = name;
+            const s_json_value* value = &object->values[index];
+            if (value->kind == JSON_OBJECT) {
+                if (!Has_Only_Members_(value, {"bit", "description"},
+                                       path + "." + name, diagnostic) ||
+                    !Required_String_(value, "description", path + "." + name,
+                                      &flag.description, diagnostic)) {
+                    return false;
+                }
+                value = Member_(value, "bit");
+            }
+            int64_t bit = 0;
+            if (value == nullptr || !Integer_(value, &bit) || bit < 0 ||
+                static_cast<uint64_t>(bit) >= bit_count) {
+                *diagnostic = path + "." + name +
+                              ": expected a bit index within the bitmap";
+                return false;
+            }
+            const size_t byte = static_cast<size_t>(bit) >> 3;
+            const uint8_t mask = static_cast<uint8_t>(1U << (bit & 7));
+            if (((*known_bits)[byte] & mask) != 0) {
+                *diagnostic = path + "." + name + ": duplicate bit index";
+                return false;
+            }
+            flag.value.assign(byte_count, 0);
+            Set_Bitmap_Bit_(&flag.value, static_cast<size_t>(bit));
+            (*known_bits)[byte] |= mask;
+            flags->push_back(std::move(flag));
+        }
+        return true;
+    }
+
+    bool Bitmap_Values_(const s_json_value* object, const std::string& path,
+                        size_t byte_count, const std::vector<s_bitmap_symbol>& flags,
+                        std::vector<s_bitmap_symbol>* values, std::string* diagnostic) {
+        if (object == nullptr) {
+            return true;
+        }
+        if (object->kind != JSON_OBJECT) {
+            *diagnostic = path + ": expected an object";
+            return false;
+        }
+        for (size_t index = 0; index < object->member_names.size(); ++index) {
+            const std::string& name = object->member_names[index];
+            if (!Canonical_Name_(name)) {
+                *diagnostic = path + "." + name + ": names must use lower_snake_case";
+                return false;
+            }
+            s_bitmap_symbol composite;
+            composite.name = name;
+            composite.value.assign(byte_count, 0);
+            const s_json_value* flag_names = &object->values[index];
+            if (flag_names->kind == JSON_OBJECT) {
+                if (!Has_Only_Members_(flag_names, {"flags", "description"},
+                                       path + "." + name, diagnostic) ||
+                    !Required_String_(flag_names, "description", path + "." + name,
+                                      &composite.description, diagnostic)) {
+                    return false;
+                }
+                flag_names = Member_(flag_names, "flags");
+            }
+            if (flag_names == nullptr || flag_names->kind != JSON_ARRAY) {
+                *diagnostic = path + "." + name + ": expected an array of flag names";
+                return false;
+            }
+            for (const s_json_value& flag_name : flag_names->values) {
+                if (flag_name.kind != JSON_STRING) {
+                    *diagnostic = path + "." + name + ": expected flag-name strings";
+                    return false;
+                }
+                const s_bitmap_symbol* flag = Find_Bitmap_Symbol_(flags,
+                                                                  flag_name.string_value);
+                if (flag == nullptr) {
+                    *diagnostic = path + "." + name + ": unknown bitmap flag '" +
+                                  flag_name.string_value + "'";
+                    return false;
+                }
+                for (size_t byte = 0; byte < byte_count; ++byte) {
+                    composite.value[byte] |= flag->value[byte];
+                }
+            }
+            values->push_back(std::move(composite));
+        }
         return true;
     }
 
@@ -390,11 +510,17 @@ namespace {
                 *diagnostic = path + "." + name + ": names must use lower_snake_case";
                 return false;
             }
+            s_symbol symbol;
             const s_json_value* value = &object->values[index];
             if (value->kind == JSON_OBJECT) {
+                if (!Has_Only_Members_(value, {"value", "description"},
+                                       path + "." + name, diagnostic) ||
+                    !Required_String_(value, "description", path + "." + name,
+                                      &symbol.description, diagnostic)) {
+                    return false;
+                }
                 value = Member_(value, "value");
             }
-            s_symbol symbol;
             symbol.name = name;
             if (value == nullptr || !Integer_(value, &symbol.value)) {
                 *diagnostic = path + "." + name + ": expected an integer value";
@@ -624,6 +750,28 @@ namespace {
             }
             return true;
         }
+        if (kind == "bitmap") {
+            int64_t bit_count = 0;
+            const s_json_value* bit_count_value = Member_(declaration, "bit_count");
+            if (bit_count_value == nullptr || !Integer_(bit_count_value, &bit_count) ||
+                bit_count <= 0 || static_cast<uint64_t>(bit_count) > SIZE_MAX - 7) {
+                *diagnostic = path + ".bit_count: expected a positive bitmap size";
+                return false;
+            }
+            resolved->primitive = PRIMITIVE_BITMAP;
+            resolved->scalar_kind = SCALAR_BITMAP;
+            resolved->bitmap_bit_count = static_cast<size_t>(bit_count);
+            if (!Bitmap_Flags_(Member_(declaration, "flags"), path + ".flags",
+                               resolved->bitmap_bit_count, &resolved->bitmap_flags,
+                               &resolved->bitmap_known_bits, diagnostic) ||
+                !Bitmap_Values_(Member_(declaration, "values"), path + ".values",
+                                (resolved->bitmap_bit_count + 7) / 8,
+                                resolved->bitmap_flags, &resolved->bitmap_values,
+                                diagnostic)) {
+                return false;
+            }
+            return true;
+        }
         if (kind == "ratio") {
             const s_json_value* component = Member_(declaration, "component_type");
             s_resolved_type component_type;
@@ -732,6 +880,36 @@ namespace {
                 *diagnostic = path + ": numeric mask defaults are not allowed";
                 return false;
             }
+        } else if (type.scalar_kind == SCALAR_BITMAP) {
+            if (value->kind != JSON_STRING) {
+                *diagnostic = path + ": bitmap defaults must use named flags";
+                return false;
+            }
+            const size_t byte_count = (type.bitmap_bit_count + 7) / 8;
+            parameter->default_bitmap.assign(byte_count, 0);
+            const s_bitmap_symbol* composite = Find_Bitmap_Symbol_(
+                type.bitmap_values, value->string_value);
+            if (composite != nullptr) {
+                parameter->default_bitmap = composite->value;
+                return true;
+            }
+            size_t start = 0;
+            while (start < value->string_value.size()) {
+                const size_t comma = value->string_value.find(',', start);
+                const size_t end = comma == std::string::npos ?
+                                   value->string_value.size() : comma;
+                const s_bitmap_symbol* flag = Find_Bitmap_Symbol_(
+                    type.bitmap_flags, value->string_value.substr(start, end - start));
+                if (flag == nullptr) {
+                    *diagnostic = path + ": unknown bitmap flag";
+                    return false;
+                }
+                for (size_t byte = 0; byte < byte_count; ++byte) {
+                    parameter->default_bitmap[byte] |= flag->value[byte];
+                }
+                start = end + 1;
+            }
+            return true;
         } else if (type.scalar_kind == SCALAR_RATIO) {
             if (value->kind == JSON_STRING) {
                 const size_t slash = value->string_value.find('/');
@@ -949,6 +1127,10 @@ namespace {
             parameter.constraints = type.constraints;
             parameter.values = type.values;
             parameter.flags = type.flags;
+            parameter.bitmap_values = type.bitmap_values;
+            parameter.bitmap_flags = type.bitmap_flags;
+            parameter.bitmap_known_bits = type.bitmap_known_bits;
+            parameter.bitmap_bit_count = type.bitmap_bit_count;
             parameter.allow_numeric = type.allow_numeric;
             parameter.reject_unknown_numeric = type.reject_unknown_numeric;
             parameter.known_bits = type.known_bits;
@@ -1113,6 +1295,7 @@ namespace {
 
     bool Rich_Parameter_(const s_json_value* root, const std::string& id,
                          const s_json_value* value, const std::string& root_path,
+                         uint32_t parent, const std::string& name_space,
                          s_schema* schema, std::string* diagnostic) {
         const std::string path = root_path + ".parameters." + id;
         s_metadata metadata;
@@ -1123,7 +1306,7 @@ namespace {
         }
         if (!Has_Only_Members_(value,
                                {"title", "description", "remarks", "units", "examples",
-                                "group", "type", "constraints", "default", "bind_root", "bind"},
+                                "group", "namespace", "type", "constraints", "default", "bind_root", "bind"},
                                path, diagnostic) ||
             !Metadata_(value, path, &metadata, diagnostic) ||
             !Required_String_(value, "group", path, &group, diagnostic)) {
@@ -1142,8 +1325,328 @@ namespace {
         }
         std::vector<std::string> bases = {binding.symbol};
         std::vector<const s_json_value*> aggregate_stack;
-        return Build_Node_(root, id, value, nullptr, id, path, group, metadata, binding,
-                           bases, UINT32_MAX, 0, &aggregate_stack, schema, diagnostic);
+        const std::string canonical_path = name_space.empty() ? id : name_space + "." + id;
+        return Build_Node_(root, id, value, nullptr, canonical_path, path, group, metadata,
+                           binding, bases, parent, 0, &aggregate_stack, schema, diagnostic);
+    }
+
+    std::string Default_Text_(const s_json_value* value) {
+        if (value == nullptr) {
+            return {};
+        }
+        switch (value->kind) {
+        case JSON_NULL: return "null";
+        case JSON_BOOL: return value->bool_value ? "true" : "false";
+        case JSON_SIGNED: return std::to_string(value->signed_value);
+        case JSON_UNSIGNED: return std::to_string(value->unsigned_value);
+        case JSON_REAL: return std::to_string(value->real_value);
+        case JSON_STRING: {
+            std::string text = "\"";
+            for (char character : value->string_value) {
+                if (character == '\\' || character == '"') {
+                    text += '\\';
+                }
+                text += character;
+            }
+            return text + "\"";
+        }
+        case JSON_ARRAY: {
+            std::string text = "[";
+            for (size_t index = 0; index < value->values.size(); ++index) {
+                text += index == 0 ? "" : ", ";
+                text += Default_Text_(&value->values[index]);
+            }
+            return text + "]";
+        }
+        case JSON_OBJECT: {
+            std::string text = "{ ";
+            for (size_t index = 0; index < value->values.size(); ++index) {
+                text += index == 0 ? "" : ", ";
+                text += value->member_names[index] + ": " +
+                        Default_Text_(&value->values[index]);
+            }
+            return text + " }";
+        }
+        }
+        return {};
+    }
+
+    bool Documentation_Metadata_(const s_json_value* declaration,
+                                 const std::string& path, bool* internal,
+                                 s_metadata* metadata, std::string* diagnostic) {
+        if (!Optional_Bool_(declaration, "internal", false, path, internal, diagnostic)) {
+            return false;
+        }
+        if (!*internal) {
+            return Metadata_(declaration, path, metadata, diagnostic);
+        }
+        return Optional_String_(declaration, "title", path, &metadata->title, diagnostic) &&
+               Optional_String_(declaration, "description", path,
+                                &metadata->description, diagnostic) &&
+               Optional_String_(declaration, "remarks", path,
+                                &metadata->remarks, diagnostic) &&
+               Optional_String_(declaration, "units", path, &metadata->units, diagnostic);
+    }
+
+    bool Document_Type_(const s_json_value* root, const s_json_value* declaration,
+                        const std::string& path, s_documented_type* documented,
+                        std::string* diagnostic);
+
+    bool Document_Fields_(const s_json_value* root, const s_json_value* fields,
+                          const std::string& path, bool require_documentation,
+                          std::vector<s_documented_field>* documented_fields,
+                          std::string* diagnostic) {
+        if (fields == nullptr || fields->kind != JSON_ARRAY || fields->values.empty()) {
+            *diagnostic = path + ": record requires a non-empty field array";
+            return false;
+        }
+        for (const s_json_value& field : fields->values) {
+            s_documented_field documented;
+            if (field.kind != JSON_OBJECT ||
+                !Required_String_(&field, "id", path, &documented.id, diagnostic) ||
+                !Canonical_Name_(documented.id)) {
+                *diagnostic = path + ": invalid field declaration";
+                return false;
+            }
+            const std::string field_path = path + "." + documented.id;
+            if (!Optional_Bool_(&field, "internal", false, field_path,
+                                &documented.internal, diagnostic)) {
+                return false;
+            }
+            if (require_documentation && !documented.internal) {
+                if (!Metadata_(&field, field_path, &documented.metadata, diagnostic)) {
+                    return false;
+                }
+            } else if (!Optional_String_(&field, "title", field_path,
+                                         &documented.metadata.title, diagnostic) ||
+                       !Optional_String_(&field, "description", field_path,
+                                         &documented.metadata.description, diagnostic)) {
+                return false;
+            }
+            if (!Optional_String_(&field, "remarks", field_path,
+                                  &documented.metadata.remarks, diagnostic) ||
+                !Optional_String_(&field, "units", field_path,
+                                  &documented.metadata.units, diagnostic)) {
+                return false;
+            }
+            documented.type = std::make_shared<s_documented_type>();
+            if (!Document_Type_(root, Member_(&field, "type"), field_path + ".type",
+                                documented.type.get(), diagnostic)) {
+                return false;
+            }
+            s_constraints field_constraints;
+            if (documented.type->node_kind == NODE_SCALAR &&
+                !Constraints_(Member_(&field, "constraints"), field_path + ".constraints",
+                              documented.type->primitive, &field_constraints, diagnostic)) {
+                return false;
+            }
+            s_constraints effective_constraints;
+            if (!Narrow_Constraints_(documented.type->constraints, field_constraints,
+                                     field_path + ".constraints", &effective_constraints,
+                                     diagnostic)) {
+                return false;
+            }
+            documented.type->constraints = effective_constraints;
+            const s_json_value* default_value = Member_(&field, "default");
+            documented.has_default = default_value != nullptr;
+            documented.default_value = Default_Text_(default_value);
+            documented_fields->push_back(std::move(documented));
+        }
+        return true;
+    }
+
+    void Copy_Resolved_Type_(const s_resolved_type& resolved,
+                             s_documented_type* documented) {
+        documented->node_kind = resolved.node_kind;
+        documented->primitive = resolved.primitive;
+        documented->scalar_kind = resolved.scalar_kind;
+        documented->constraints = resolved.constraints;
+        documented->values = resolved.values;
+        documented->flags = resolved.flags;
+        documented->bitmap_values = resolved.bitmap_values;
+        documented->bitmap_flags = resolved.bitmap_flags;
+        documented->bitmap_bit_count = resolved.bitmap_bit_count;
+        documented->allow_numeric = resolved.allow_numeric;
+        documented->reject_unknown_numeric = resolved.reject_unknown_numeric;
+    }
+
+    bool Document_Type_(const s_json_value* root, const s_json_value* declaration,
+                        const std::string& path, s_documented_type* documented,
+                        std::string* diagnostic) {
+        if (declaration == nullptr) {
+            *diagnostic = path + ": missing type";
+            return false;
+        }
+        std::vector<std::string> stack;
+        s_resolved_type resolved;
+        if (!Resolve_Type_(root, declaration, path, &stack, &resolved, diagnostic)) {
+            return false;
+        }
+        Copy_Resolved_Type_(resolved, documented);
+        if (declaration->kind == JSON_STRING) {
+            if (!Primitive_(declaration->string_value, &documented->primitive)) {
+                documented->reference = declaration->string_value;
+            }
+            return true;
+        }
+        const s_json_value* kind_value = Member_(declaration, "kind");
+        if (kind_value == nullptr) {
+            return Document_Type_(root, Member_(declaration, "type"), path + ".type",
+                                  documented, diagnostic);
+        }
+        if (kind_value->string_value == "record") {
+            documented->node_kind = NODE_RECORD;
+            return Document_Fields_(root, Member_(declaration, "fields"),
+                                    path + ".fields", true, &documented->fields, diagnostic);
+        }
+        if (kind_value->string_value == "array") {
+            documented->node_kind = NODE_ARRAY;
+            if (!Integer_(Member_(declaration, "count"), &documented->array_count)) {
+                *diagnostic = path + ".count: expected an integer";
+                return false;
+            }
+            const s_json_value* index_base = Member_(declaration, "index_base");
+            if (index_base != nullptr &&
+                !Integer_(index_base, &documented->array_index_base)) {
+                *diagnostic = path + ".index_base: expected an integer";
+                return false;
+            }
+            const s_json_value* index_type = Member_(declaration, "index_type");
+            if (index_type != nullptr) {
+                documented->array_index_type = index_type->string_value;
+            }
+            const s_json_value* element = Member_(declaration, "element");
+            documented->array_element = std::make_shared<s_documented_type>();
+            return Document_Type_(root, Member_(element, "type"), path + ".element.type",
+                                  documented->array_element.get(), diagnostic);
+        }
+        return true;
+    }
+
+    void Add_Reference_(const s_documented_type& type,
+                        const s_documentation_reference& source, s_schema* schema) {
+        if (!type.reference.empty()) {
+            for (s_type_declaration& declaration : schema->type_declarations) {
+                if (declaration.id == type.reference) {
+                    declaration.used_by.push_back(source);
+                }
+            }
+            for (s_record_declaration& declaration : schema->record_declarations) {
+                if (declaration.id == type.reference) {
+                    declaration.used_by.push_back(source);
+                }
+            }
+        }
+        if (type.array_element != nullptr) {
+            Add_Reference_(*type.array_element, source, schema);
+        }
+        if (!type.array_index_type.empty()) {
+            s_documented_type index_type;
+            index_type.reference = type.array_index_type;
+            Add_Reference_(index_type, source, schema);
+        }
+        for (const s_documented_field& field : type.fields) {
+            if (field.type != nullptr) {
+                Add_Reference_(*field.type, source, schema);
+            }
+        }
+    }
+
+    bool Build_Documentation_Model_(const s_json_value* root, const std::string& schema_path,
+                                    s_schema* schema, std::string* diagnostic) {
+        const s_json_value* types = Member_(root, "types");
+        const s_json_value* records = Member_(root, "records");
+        const s_json_value* parameters = Member_(root, "parameters");
+        for (size_t index = 0; index < types->member_names.size(); ++index) {
+            s_type_declaration declaration;
+            declaration.id = types->member_names[index];
+            const std::string path = schema_path + ".types." + declaration.id;
+            if (!Documentation_Metadata_(&types->values[index], path,
+                                         &declaration.internal, &declaration.metadata,
+                                         diagnostic) ||
+                !Document_Type_(root, &types->values[index], path,
+                                &declaration.type, diagnostic)) {
+                return false;
+            }
+            schema->type_declarations.push_back(std::move(declaration));
+        }
+        for (size_t index = 0; index < records->member_names.size(); ++index) {
+            s_record_declaration declaration;
+            declaration.id = records->member_names[index];
+            const std::string path = schema_path + ".records." + declaration.id;
+            if (!Documentation_Metadata_(&records->values[index], path,
+                                         &declaration.internal, &declaration.metadata,
+                                         diagnostic) ||
+                !Document_Fields_(root, Member_(&records->values[index], "fields"),
+                                  path + ".fields", !declaration.internal,
+                                  &declaration.fields, diagnostic)) {
+                return false;
+            }
+            schema->record_declarations.push_back(std::move(declaration));
+        }
+        for (size_t index = 0; index < parameters->member_names.size(); ++index) {
+            s_parameter_declaration declaration;
+            declaration.id = parameters->member_names[index];
+            const s_json_value& parameter = parameters->values[index];
+            const std::string path = schema_path + ".parameters." + declaration.id;
+            if (!Optional_String_(&parameter, "namespace", path,
+                                  &declaration.name_space, diagnostic)) {
+                return false;
+            }
+            if (!Metadata_(&parameter, path, &declaration.metadata, diagnostic) ||
+                !Required_String_(&parameter, "group", path, &declaration.group, diagnostic) ||
+                !Document_Type_(root, Member_(&parameter, "type"), path + ".type",
+                                &declaration.type, diagnostic)) {
+                return false;
+            }
+            s_constraints parameter_constraints;
+            if (declaration.type.node_kind == NODE_SCALAR &&
+                !Constraints_(Member_(&parameter, "constraints"), path + ".constraints",
+                              declaration.type.primitive, &parameter_constraints, diagnostic)) {
+                return false;
+            }
+            s_constraints effective_constraints;
+            if (!Narrow_Constraints_(declaration.type.constraints, parameter_constraints,
+                                     path + ".constraints", &effective_constraints,
+                                     diagnostic)) {
+                return false;
+            }
+            declaration.type.constraints = effective_constraints;
+            const s_json_value* default_value = Member_(&parameter, "default");
+            declaration.has_default = default_value != nullptr;
+            declaration.default_value = Default_Text_(default_value);
+            const s_json_value* bind_root = Member_(&parameter, "bind_root");
+            if (bind_root != nullptr) {
+                Required_String_(bind_root, "header", path + ".bind_root",
+                                 &declaration.binding.header, diagnostic);
+                Required_String_(bind_root, "symbol", path + ".bind_root",
+                                 &declaration.binding.symbol, diagnostic);
+            }
+            for (const s_parameter& leaf : schema->parameters) {
+                const std::string prefix = declaration.name_space.empty() ? declaration.id :
+                    declaration.name_space + "." + declaration.id;
+                if (leaf.path == prefix || leaf.path.starts_with(prefix + ".")) {
+                    declaration.native_targets.insert(declaration.native_targets.end(),
+                        leaf.native_targets.begin(), leaf.native_targets.end());
+                }
+            }
+            schema->parameter_declarations.push_back(std::move(declaration));
+        }
+        for (const s_parameter_declaration& parameter : schema->parameter_declarations) {
+            Add_Reference_(parameter.type,
+                {parameter.metadata.title, "parameter-" + parameter.id}, schema);
+        }
+        for (const s_type_declaration& declaration : schema->type_declarations) {
+            Add_Reference_(declaration.type,
+                {declaration.metadata.title, "type-" + declaration.id}, schema);
+        }
+        for (const s_record_declaration& declaration : schema->record_declarations) {
+            s_documented_type record;
+            record.fields = declaration.fields;
+            Add_Reference_(record,
+                {declaration.metadata.title, "record-" + declaration.id}, schema);
+        }
+        return true;
     }
 }
 
@@ -1162,7 +1665,7 @@ std::string Encode_Game_String(const std::string& text) {
 }
 
 const char* Primitive_Name(e_primitive_type type) {
-    static const char* names[] = {"bool", "int8", "uint8", "int16", "uint16", "int32", "uint32", "string", "ratio"};
+    static const char* names[] = {"bool", "int8", "uint8", "int16", "uint16", "int32", "uint32", "string", "bitmap", "ratio"};
     return names[type];
 }
 
@@ -1207,27 +1710,104 @@ bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* d
             return false;
         }
     }
-    for (size_t index = 0; index < parameters->member_names.size(); ++index) {
-        const s_json_value& parameter_value = parameters->values[index];
-        if (!Rich_Parameter_(&root, parameters->member_names[index],
-                             &parameter_value, schema_path, &loaded, diagnostic)) {
+    for (size_t index = 0; index < types->member_names.size(); ++index) {
+        const std::string& id = types->member_names[index];
+        const std::string path = schema_path + ".types." + id;
+        if (!Canonical_Name_(id)) {
+            *diagnostic = path + ": type names must use lower_snake_case";
             return false;
         }
+        std::vector<std::string> stack;
+        s_resolved_type resolved;
+        if (!Resolve_Type_(&root, &types->values[index], path, &stack,
+                           &resolved, diagnostic)) {
+            return false;
+        }
+    }
+    for (const s_group& group : loaded.groups) {
+        for (size_t index = 0; index < parameters->member_names.size(); ++index) {
+            const s_json_value& parameter_value = parameters->values[index];
+            const s_json_value* parameter_group = Member_(&parameter_value, "group");
+            if (parameter_group == nullptr || parameter_group->kind != JSON_STRING ||
+                parameter_group->string_value != group.id) {
+                continue;
+            }
+            std::string name_space;
+            if (!Optional_String_(&parameter_value, "namespace",
+                                  schema_path + ".parameters." +
+                                      parameters->member_names[index],
+                                  &name_space, diagnostic) ||
+                (!name_space.empty() && !Canonical_Name_(name_space))) {
+                if (diagnostic->empty()) {
+                    *diagnostic = schema_path + ".parameters." +
+                                  parameters->member_names[index] +
+                                  ".namespace: namespaces must use lower_snake_case";
+                }
+                return false;
+            }
+            uint32_t parent = UINT32_MAX;
+            if (!name_space.empty()) {
+                for (size_t other = 0; other < parameters->member_names.size(); ++other) {
+                    const s_json_value* other_namespace =
+                        Member_(&parameters->values[other], "namespace");
+                    if (parameters->member_names[other] == name_space &&
+                        other_namespace == nullptr) {
+                        *diagnostic = schema_path + ".parameters." +
+                                      parameters->member_names[index] +
+                                      ".namespace: namespace conflicts with a top-level parameter";
+                        return false;
+                    }
+                }
+                for (size_t node_index = 0; node_index < loaded.nodes.size(); ++node_index) {
+                    if (loaded.nodes[node_index].parent == UINT32_MAX &&
+                        loaded.nodes[node_index].id == name_space) {
+                        parent = static_cast<uint32_t>(node_index);
+                        break;
+                    }
+                }
+                if (parent == UINT32_MAX) {
+                    s_node node;
+                    node.id = name_space;
+                    node.kind = NODE_NAMESPACE;
+                    parent = static_cast<uint32_t>(loaded.nodes.size());
+                    loaded.nodes.push_back(std::move(node));
+                }
+            }
+            const size_t child_index = loaded.nodes.size();
+            if (!Rich_Parameter_(&root, parameters->member_names[index],
+                                 &parameter_value, schema_path, parent, name_space,
+                                 &loaded, diagnostic)) {
+                return false;
+            }
+            if (parent != UINT32_MAX) {
+                const s_node& child = loaded.nodes[child_index];
+                s_node& namespace_node = loaded.nodes[parent];
+                if (namespace_node.first_parameter == UINT32_MAX) {
+                    namespace_node.first_parameter = child.first_parameter;
+                }
+                namespace_node.last_parameter = child.last_parameter;
+            }
+        }
+    }
+    for (size_t index = 0; index < parameters->member_names.size(); ++index) {
+        const s_json_value& parameter_value = parameters->values[index];
+        const s_json_value* parameter_group = Member_(&parameter_value, "group");
         bool group_found = false;
-        for (const s_group& group : loaded.groups) {
-            const std::string& parameter_group = loaded.parameters.back().group;
-            if (group.id == parameter_group) {
-                group_found = true;
-                break;
+        if (parameter_group != nullptr && parameter_group->kind == JSON_STRING) {
+            for (const s_group& group : loaded.groups) {
+                group_found = group_found || group.id == parameter_group->string_value;
             }
         }
         if (!group_found) {
-            const std::string parameter_group = Member_(&parameter_value, "group") != nullptr ?
-                Member_(&parameter_value, "group")->string_value : std::string();
+            const std::string name = parameter_group != nullptr &&
+                parameter_group->kind == JSON_STRING ? parameter_group->string_value : "";
             *diagnostic = schema_path + ".parameters." + parameters->member_names[index] +
-                          ".group: unknown group '" + parameter_group + "'";
+                          ".group: unknown group '" + name + "'";
             return false;
         }
+    }
+    if (!Build_Documentation_Model_(&root, schema_path, &loaded, diagnostic)) {
+        return false;
     }
     *schema = std::move(loaded);
     return true;

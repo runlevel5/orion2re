@@ -6,6 +6,7 @@
 #include "config/config_decode.h"
 #include "config/config_runtime.h"
 #include "doctest/doctest.h"
+#include "game/ship_config.h"
 
 namespace {
     bool Append_Decoded_(const char* source, config::s_config_write_set* write_set,
@@ -36,7 +37,10 @@ namespace {
             if (left.values[index].type != right.values[index].type ||
                 left.values[index].bool_value != right.values[index].bool_value ||
                 left.values[index].integer_value != right.values[index].integer_value ||
-                left.values[index].string_value != right.values[index].string_value) {
+                left.values[index].string_value != right.values[index].string_value ||
+                left.values[index].bitmap_value != right.values[index].bitmap_value ||
+                left.values[index].ratio_numerator != right.values[index].ratio_numerator ||
+                left.values[index].ratio_denominator != right.values[index].ratio_denominator) {
                 return false;
             }
         }
@@ -58,6 +62,77 @@ namespace {
 }
 
 DOCTEST_TEST_SUITE("generated configuration bindings") {
+
+DOCTEST_TEST_CASE("predefined ship templates have native defaults before configuration") {
+    DOCTEST_CHECK(SHIP_CONFIG::guardian_template.picture_num == 7);
+    DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[2].type == 20);
+    DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[2].specials == 0x4500);
+    DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[2].count == 1);
+    DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[2].current_count == 1);
+    DOCTEST_CHECK((SHIP_CONFIG::guardian_template.special_device_flags[3] & 0x02) != 0);
+
+    DOCTEST_CHECK(SHIP_CONFIG::amoeba_templates[1].ship_weapon[1].count == 5);
+    DOCTEST_CHECK((SHIP_CONFIG::amoeba_templates[0].special_device_flags[4] & 0x80) != 0);
+
+    DOCTEST_CHECK(SHIP_CONFIG::antaran_templates[GAME_DIFFICULTY_IMPOSSIBLE]
+        [SHIP_SIZE_TITAN].ship_weapon[7].count == 12);
+    DOCTEST_CHECK((SHIP_CONFIG::antaran_templates[GAME_DIFFICULTY_HARD]
+        [SHIP_SIZE_LARGE].special_device_flags[2] & 0x20) != 0);
+    DOCTEST_CHECK((SHIP_CONFIG::antaran_templates[GAME_DIFFICULTY_IMPOSSIBLE]
+        [SHIP_SIZE_TITAN].special_device_flags[4] & 0x40) != 0);
+}
+
+DOCTEST_TEST_CASE("schema defaults restore complete predefined ship templates") {
+    const s_ship_design guardian = SHIP_CONFIG::guardian_template;
+    const s_ship_design avenger = SHIP_CONFIG::avenger_template;
+    s_ship_design amoebas[2];
+    s_ship_design crystals[2];
+    s_ship_design dragons[2];
+    s_ship_design eels[2];
+    s_ship_design hydras[2];
+    s_ship_design antarans[GAME_DIFFICULTY_COUNT][5];
+    std::memcpy(amoebas, SHIP_CONFIG::amoeba_templates, sizeof(amoebas));
+    std::memcpy(crystals, SHIP_CONFIG::crystal_templates, sizeof(crystals));
+    std::memcpy(dragons, SHIP_CONFIG::dragon_templates, sizeof(dragons));
+    std::memcpy(eels, SHIP_CONFIG::eel_templates, sizeof(eels));
+    std::memcpy(hydras, SHIP_CONFIG::hydra_templates, sizeof(hydras));
+    std::memcpy(antarans, SHIP_CONFIG::antaran_templates, sizeof(antarans));
+
+    config::s_config_state defaults;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&defaults));
+    DOCTEST_REQUIRE(config::Commit_State(&defaults));
+
+    DOCTEST_CHECK(std::memcmp(&guardian, &SHIP_CONFIG::guardian_template,
+                              sizeof(guardian)) == 0);
+    DOCTEST_CHECK(std::memcmp(&avenger, &SHIP_CONFIG::avenger_template,
+                              sizeof(avenger)) == 0);
+    DOCTEST_CHECK(std::memcmp(amoebas, SHIP_CONFIG::amoeba_templates,
+                              sizeof(amoebas)) == 0);
+    DOCTEST_CHECK(std::memcmp(crystals, SHIP_CONFIG::crystal_templates,
+                              sizeof(crystals)) == 0);
+    DOCTEST_CHECK(std::memcmp(dragons, SHIP_CONFIG::dragon_templates,
+                              sizeof(dragons)) == 0);
+    DOCTEST_CHECK(std::memcmp(eels, SHIP_CONFIG::eel_templates,
+                              sizeof(eels)) == 0);
+    DOCTEST_CHECK(std::memcmp(hydras, SHIP_CONFIG::hydra_templates,
+                              sizeof(hydras)) == 0);
+    DOCTEST_CHECK(std::memcmp(antarans, SHIP_CONFIG::antaran_templates,
+                              sizeof(antarans)) == 0);
+
+    SHIP_CONFIG::guardian_template.ship_weapon[0].count = 99;
+    SHIP_CONFIG::guardian_template.special_device_flags[4] = 0;
+    SHIP_CONFIG::antaran_templates[GAME_DIFFICULTY_IMPOSSIBLE]
+        [SHIP_SIZE_TITAN].ship_weapon[7].current_count = 0;
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&defaults));
+    DOCTEST_REQUIRE(config::Commit_State(&defaults));
+
+    DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[0].count == 2);
+    DOCTEST_CHECK(SHIP_CONFIG::guardian_template.ship_weapon[0].current_count == 2);
+    DOCTEST_CHECK((SHIP_CONFIG::guardian_template.special_device_flags[3] & 0x02) != 0);
+    DOCTEST_CHECK(SHIP_CONFIG::antaran_templates[GAME_DIFFICULTY_IMPOSSIBLE]
+        [SHIP_SIZE_TITAN].ship_weapon[7].current_count == 12);
+}
 
 DOCTEST_TEST_CASE("logical defaults initialize typed candidate state") {
     config::s_config_state state;

@@ -300,7 +300,7 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
         VERBATIM
     )
 
-    set(ORION2RE_CONFIG_DOCUMENTATION "${CMAKE_CURRENT_BINARY_DIR}/config-reference.md")
+    set(ORION2RE_CONFIG_DOCUMENTATION "${CMAKE_CURRENT_BINARY_DIR}/config-reference.html")
     add_custom_command(
         OUTPUT "${ORION2RE_CONFIG_DOCUMENTATION}"
         COMMAND $<TARGET_FILE:config-tool> docs
@@ -309,8 +309,11 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
         DEPENDS config-tool "${ORION2RE_CONFIG_SCHEMA}" ${ORION2RE_CONFIG_TOOL_SOURCES}
         VERBATIM
     )
-    add_custom_target(config-docs
+    add_custom_target(config-docs ALL
         DEPENDS "${ORION2RE_CONFIG_DOCUMENTATION}"
+    )
+    install(FILES "${ORION2RE_CONFIG_DOCUMENTATION}"
+        DESTINATION "docs"
     )
 endif()
 target_include_directories(orion2re_lz4 PUBLIC

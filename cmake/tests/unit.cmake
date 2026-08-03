@@ -60,6 +60,7 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
         PRODUCTION_SOURCES
             tools/config/file_util.cpp
             tools/config/generate_cpp.cpp
+            tools/config/generate_docs.cpp
             tools/config/json5_reader.cpp
             tools/config/schema_model.cpp
             vendors/yyjson/src/yyjson.c
@@ -70,6 +71,7 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
     )
     target_compile_definitions(test_config_schema PRIVATE
         CONFIG_SCHEMA_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/config/schema"
+        CONFIG_MAIN_SCHEMA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/specs/config/main.json5"
     )
 endif()
 
@@ -88,6 +90,7 @@ orion2re_add_unit_test(test_config_decode
         src/config/config_decode.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -100,6 +103,7 @@ orion2re_add_unit_test(test_config_bindings
         src/config/config_decode.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -113,6 +117,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/config/config_lifecycle.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -129,6 +134,7 @@ orion2re_add_unit_test(test_config_loader
         src/config/mod_manager.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/ship_config.cpp
         src/game/compat.cpp
         src/game/vfs.cpp
         src/game/vfs_file.cpp

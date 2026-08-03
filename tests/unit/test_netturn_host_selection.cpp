@@ -114,7 +114,8 @@ DOCTEST_TEST_CASE("client next turn preserves a payload that arrives before the 
     MOX::_leaders = leaders;
     MOX::_game_type = 3;
     MOX::_stardate = 35155;
-    MOX::_screen_seg = static_cast<s_animation_header*>(allocate::Allocate_Space_(1024 * 1024));
+    MOX::_screen_seg = static_cast<s_animation_header*>(allocate::Allocate_Space_(
+        NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES + sizeof(s_alloc_header)));
     NETTURN::_waiting_message_fmt = const_cast<char*>("");
 
     NETMOX::_net = {};

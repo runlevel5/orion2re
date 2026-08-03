@@ -14,7 +14,7 @@ The assignment language preserves the strongest part of the 1.50 format: one sta
 ## Goals
 
 - Preserve a compact configuration syntax suitable for hand-authored mods.
-- Support scalars, records, arrays, nested arrays, enums, masks, ratios, strings, and partial updates.
+- Support scalars, records, arrays, nested arrays, enums, integer masks, arbitrary-width bitmaps, ratios, strings, and partial updates.
 - Apply RHS values sequentially beginning at the first leaf selected by the LHS.
 - Allow a scalar LHS to act as a starting field within its nearest containing aggregate.
 - Bound traversal to the selected aggregate, or to a scalar's nearest containing aggregate, so assignment cannot spill into a sibling object.
@@ -75,11 +75,11 @@ The user-facing shape should describe game concepts naturally even when restored
 For example, the logical schema should expose:
 
 ```text
-guardian.weapon[1].type
-guardian.weapon[1].arc
-guardian.weapon[1].mods
-guardian.weapon[1].ammo
-guardian.weapon[1].amount
+ships.guardian.weapons[1].type
+ships.guardian.weapons[1].arc
+ships.guardian.weapons[1].mods
+ships.guardian.weapons[1].ammo
+ships.guardian.weapons[1].amount
 ```
 
 rather than preserving the 1.50 fields:
@@ -138,13 +138,13 @@ Examples:
 
 ```text
 # Replace one complete Guardian weapon slot.
-guardian weapon 1 = plasma_cannon all heavy 0 2;
+ships guardian weapons 1 = plasma_cannon all_sectors hv 0 2;
 
 # Change one field.
-guardian weapon 1 mods = heavy,eccm;
+ships guardian weapons 1 mods = hv,eccm;
 
-# Update all Guardian specials.
-guardian special = battle_scanner augmented_engines damper_field - - - - -;
+# Replace the Guardian special-system bitmap.
+ships guardian specials = battle_scanner,augmented_engines,damper_field;
 
 # Load a complete mod package.
 enable example_balance_mod;
@@ -155,7 +155,7 @@ enable example_balance_mod;
 A path is a whitespace-separated sequence beginning with a parameter name. Subsequent selectors traverse records and arrays.
 
 ```text
-guardian weapon 1 mods
+ships guardian weapons 1 mods
 building automated_factory cost
 weapon plasma_cannon available_mods
 ```
@@ -208,7 +208,7 @@ The LHS resolves to a scalar parameter with no containing aggregate, so exactly 
 A scalar field inside an aggregate acts as a bounded starting cursor:
 
 ```text
-guardian weapon 1 mods = heavy,eccm 0 2;
+ships guardian weapons 1 mods = hv,eccm 0 2;
 ```
 
 This updates `mods`, `ammo`, and `amount`. The boundary is the containing weapon 1 record, so another value is an error rather than an update to weapon 2.
@@ -224,21 +224,21 @@ type arc mods ammo amount
 the following updates one complete record:
 
 ```text
-guardian weapon 1 = plasma_cannon all heavy 0 2;
+ships guardian weapons 1 = plasma_cannon all_sectors hv 0 2;
 ```
 
-The selected aggregate is `guardian.weapon[1]`. The RHS cannot overflow into weapon 2.
+The selected aggregate is `ships.guardian.weapons[1]`. The RHS cannot overflow into weapon 2.
 
 ### Partial record assignment
 
 ```text
-guardian weapon 1 = - - heavy,eccm - 2;
+ships guardian weapons 1 = - - hv,eccm - 2;
 ```
 
 The LHS selects the complete weapon 1 record. The first two skips preserve `type` and `arc`, `mods` and `amount` are changed, and `ammo` is preserved. The scalar-start form can express the same suffix more directly:
 
 ```text
-guardian weapon 1 mods = heavy,eccm - 2;
+ships guardian weapons 1 mods = hv,eccm - 2;
 ```
 
 It may carry values only through the end of weapon 1.
@@ -248,28 +248,12 @@ It may carry values only through the end of weapon 1.
 Selecting an array allows traversal across its elements:
 
 ```text
-guardian weapon =
-    plasma_cannon all heavy 0 2
-    mass_driver   all point_defense,continuous 0 10;
+ships guardian weapons =
+    plasma_cannon all_sectors hv 0 2
+    mass_driver   all_sectors pd,co 0 10;
 ```
 
-The selected aggregate is the entire `weapon` array. Traversal may continue from one weapon element to the next, but it cannot continue into the following `special` field.
-
-Similarly:
-
-```text
-guardian special = 13 1 5 25 19 21 18 3;
-```
-
-may update the complete special array.
-
-Selecting one scalar array element starts within the containing array:
-
-```text
-guardian special 3 = battle_scanner augmented_engines damper_field;
-```
-
-This updates elements 3 through 5. Traversal may continue through the remaining `special` elements, but it cannot continue into the field after the array.
+The selected aggregate is the entire `weapons` array. Traversal may continue from one weapon element to the next, but it cannot continue into the following `specials` bitmap field.
 
 ### Table assignment
 
@@ -333,12 +317,11 @@ Examples:
 
 | Assignment prefix | First leaf | Boundary |
 | --- | --- | --- |
-| `guardian =` | `appearance` | Guardian record |
-| `guardian weapon =` | `weapon[1].type` | Complete weapon array |
-| `guardian weapon 1 =` | `weapon[1].type` | Weapon 1 record |
-| `guardian weapon 1 mods =` | `weapon[1].mods` | Weapon 1 record |
-| `guardian special =` | `special[1]` | Complete special array |
-| `guardian special 3 =` | `special[3]` | Complete special array, starting at element 3 |
+| `ships guardian =` | `appearance` | Guardian record |
+| `ships guardian weapons =` | `weapons[1].type` | Complete weapon array |
+| `ships guardian weapons 1 =` | `weapons[1].type` | Weapon 1 record |
+| `ships guardian weapons 1 mods =` | `weapons[1].mods` | Weapon 1 record |
+| `ships guardian specials =` | `specials` | Special-system bitmap scalar |
 | `combat fighters_use_point_defense =` | selected scalar | Scalar parameter; one value only |
 
 ### Leaf order
@@ -357,20 +340,20 @@ Declaration order is therefore part of the public schema contract. Reordering fi
 Overflow is an error, not an implicit transition to a sibling aggregate:
 
 ```text
-guardian weapon 1 = 11 15 heavy 0 2 4;
+ships guardian weapons 1 = 11 15 hv 0 2 4;
 ```
 
 Diagnostic direction:
 
 ```text
-guardian weapon 1: value 6 exceeds the selected weapon record;
+ships guardian weapons 1: value 6 exceeds the selected weapon record;
 5 writable fields are available: type, arc, mods, ammo, amount
 ```
 
 The same rule applies to scalar starts:
 
 ```text
-guardian weapon 1 mods = heavy 0 2 4;
+ships guardian weapons 1 mods = hv 0 2 4;
 ```
 
 The fourth item exceeds the weapon 1 boundary even though weapon 2 follows it in native or logical storage.
@@ -399,7 +382,8 @@ The JSON5 documents define:
 - explicit-width primitive types and ranges
 - reusable semantic type aliases and field-level constraints
 - enums and their stable numeric values
-- masks and their stable bit values
+- integer masks and their stable bit values
+- arbitrary-width bitmaps whose flags use stable bit indexes
 - ratios and strings
 - reusable records
 - arrays, index bases, and optional enum-backed keyed aliases for numeric indexes
@@ -437,6 +421,23 @@ An array may declare `index_type` as a reference to an enum whose names are acce
 
 `index_type` affects only path resolution and generated documentation. It does not change array size, element order, defaults, traversal, native indexing, or serialization identity. Schema validation rejects a non-enum `index_type`, an unknown type, duplicate enum names or values, and enum values outside the array's external index range. Generated descriptors retain the alias-to-external-index mapping, while resolved and persisted canonical paths use the decimal numeric index.
 
+### Configuration namespaces
+
+A parameter may declare a schema-only namespace:
+
+```json5
+guardian: {
+  namespace: "ships",
+  type: "predefined_ship_design",
+  bind_root: {
+    header: "game/ship_config.h",
+    symbol: "SHIP_CONFIG::guardian_template",
+  },
+}
+```
+
+The public path is then `ships guardian ...`, while the native binding remains independent and unchanged. A namespace is only a structural path component: it has no native object, default, variable ID, or writable value. Assigning directly to `ships` is an error, and sequential assignment cannot traverse from one parameter in the namespace into another. Canonical variable names include the namespace, for example `ships.guardian.weapons.1.amount`.
+
 ### Documentation metadata
 
 JSON5 comments explain the schema source to its maintainers, but comments are not documentation data and are not consumed by generators. Human-facing text must therefore be stored explicitly on schema nodes.
@@ -460,7 +461,7 @@ Example:
   description: "The Guardian's five weapon slots in firing priority order.",
   remarks: "External slot indexes are one-based.",
   examples: [
-    "guardian weapon 1 = plasma_cannon all heavy 0 2;",
+    "ships guardian weapons 1 = plasma_cannon all_sectors hv 0 2;",
   ],
 }
 ```
@@ -475,6 +476,7 @@ Scalar defaults use the JSON5 representation appropriate to their type. Quoted s
 - enums use a quoted canonical value name, or a numeric ID when the enum permits numeric values
 - masks use one quoted comma-separated string of canonical flag names, such as `"forward,aft"`; named zero or composite values such as `"none"` and `"all"` must be declared by the mask type
 - masks may use a numeric value when the mask permits numeric input; canonical schema defaults should prefer names
+- bitmaps use the same quoted comma-separated flag grammar, but do not accept numeric values
 - ratios use a quoted canonical ratio such as `"1/3"`
 
 For example, a weapon-slot default may be written as:
@@ -982,6 +984,43 @@ The same value is a quoted string in JSON5 because a comma is structural JSON5 s
 
 `values` declares canonical names for zero or useful composite masks. Its values must contain no unknown bits. A `values` entry may duplicate a combination of `flags`, but `flags` must still declare each independently addressable bit. Canonical output may use a declared composite name only when it represents the complete value; otherwise it emits the individual flag names in declaration order.
 
+### Bitmaps
+
+Bitmaps represent fixed native byte arrays whose width is not limited by the integer scalar types. Flags are declared by bit index rather than by a power-of-two integer value:
+
+```json5
+{
+  kind: "bitmap",
+  bit_count: 40,
+  values: {
+    none: [],
+    self_repairing: ["automated_repair_unit", "regeneration"],
+  },
+  flags: {
+    automated_repair_unit: 3,
+    regeneration: 39,
+  },
+}
+```
+
+CFG syntax is shared with masks:
+
+```text
+ships guardian specials = automated_repair_unit,regeneration;
+```
+
+Masks and bitmaps are not interchangeable native types. A mask binds to one integer and may permit numeric input. A bitmap binds to a byte array, rejects numeric input, and is copied atomically between candidate state and native storage. Generated code asserts that every bitmap target has exactly `(bit_count + 7) / 8` bytes.
+
+Named bitmap composites are arrays of declared flag names. Schema validation rejects duplicate or out-of-range bit indexes, unknown names in composites or defaults, and bits outside the declared width.
+
+### Predefined ship templates
+
+Predefined strategic ships bind a reusable public `predefined_ship_design` record directly to native `s_ship_design` templates. The record exposes appearance, hull, drive, armor, shield, computer, eight weapon slots, and the 40-bit special-system bitmap. A weapon's public `amount` initializes both native `count` and `current_count`.
+
+The C++ templates contain complete vanilla defaults independently of configuration loading. Generated schema defaults describe the same values and overwrite the templates transactionally at startup before CFG overrides are applied. Loaders therefore always copy a template and only complete runtime fields such as name, ship type, owner, cost, speed, and combat speed.
+
+Antaran strategic templates are a complete `[difficulty][hull]` matrix. Every entry is independently configurable, including weapons and equipment, rather than sharing one hull template with a separate difficulty bitmap. Tactical Antaran combat records are a separate native representation and are not configured by these strategic templates.
+
 ### Integers
 
 Integers are used only when every value in a numeric range is meaningful, or when the domain has not yet been recovered well enough to define an enum.
@@ -1458,13 +1497,13 @@ The terse language is a schema-aware override language, not a general serializat
 The critical safety rule is structural containment:
 
 ```text
-guardian weapon = ...;
+ships guardian weapons = ...;
 ```
 
 may traverse every weapon, while:
 
 ```text
-guardian weapon 1 = ...;
+ships guardian weapons 1 = ...;
 ```
 
 may modify only weapon 1. Terseness is retained without allowing a missing or extra value to spill into an unrelated object.
@@ -1472,7 +1511,7 @@ may modify only weapon 1. Terseness is retained without allowing a missing or ex
 A scalar selection starts at that field but remains structurally contained:
 
 ```text
-guardian weapon 1 mods = heavy,eccm 0 2;
+ships guardian weapons 1 mods = hv,eccm 0 2;
 ```
 
 may update the remaining fields of weapon 1, but cannot spill into weapon 2. Root scalar parameters still accept exactly one value because they have no containing aggregate.

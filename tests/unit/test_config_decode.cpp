@@ -36,27 +36,34 @@ namespace {
         {"battle_scanner", 5},
         {"damper_field", 7},
     };
+    const uint8_t BITMAP_NONE[] = {0, 0, 0, 0, 0};
+    const uint8_t BITMAP_SELF_REPAIRING[] = {0x08, 0, 0, 0, 0x80};
+    const uint8_t BITMAP_AUTOMATED_REPAIR[] = {0x08, 0, 0, 0, 0};
+    const uint8_t BITMAP_REGENERATION[] = {0, 0, 0, 0, 0x80};
+    const uint8_t BITMAP_KNOWN_BITS[] = {0x08, 0, 0, 0, 0x80};
+    const config::s_bitmap_symbol_descriptor BITMAP_VALUES[] = {
+        {"none", BITMAP_NONE},
+        {"self_repairing", BITMAP_SELF_REPAIRING},
+    };
+    const config::s_bitmap_symbol_descriptor BITMAP_FLAGS[] = {
+        {"automated_repair", BITMAP_AUTOMATED_REPAIR},
+        {"regeneration", BITMAP_REGENERATION},
+    };
     const config::s_array_index_alias_descriptor ARRAY_INDEX_ALIASES[] = {
         {21, "plasma_cannon", 11},
     };
 
     config::s_variable_descriptor Variable_(const char* name,
-                                            config::e_value_type type) {
+                                            const config::s_type_descriptor* type) {
         config::s_variable_descriptor variable = {};
         variable.name = name;
-        variable.title = name;
-        variable.description = "fixture";
-        variable.remarks = "";
-        variable.units = "";
-        variable.group = "fixture";
         variable.type = type;
-        variable.scalar_kind = config::CONFIG_SCALAR_PRIMITIVE;
-        variable.ratio_component_type = config::CONFIG_VALUE_INT16;
         return variable;
     }
 
     const config::s_runtime_schema* Aggregate_Schema_() {
-        static config::s_variable_descriptor variables[17];
+        static config::s_variable_descriptor variables[18];
+        static config::s_type_descriptor types[18];
         static bool initialized = false;
         if (!initialized) {
             const char* names[] = {
@@ -69,8 +76,9 @@ namespace {
                 "guardian.special.1", "guardian.special.2", "guardian.special.3",
                 "guardian.label", "guardian.reduction",
                 "weapon.11.available_mods",
+                "special_devices",
             };
-            const config::e_value_type types[] = {
+            const config::e_value_type value_types[] = {
                 config::CONFIG_VALUE_UINT8,
                 config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_UINT8,
                 config::CONFIG_VALUE_UINT16, config::CONFIG_VALUE_UINT8,
@@ -81,49 +89,60 @@ namespace {
                 config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_STRING,
                 config::CONFIG_VALUE_RATIO,
                 config::CONFIG_VALUE_UINT16,
+                config::CONFIG_VALUE_BITMAP,
             };
-            for (size_t index = 0; index < 17; ++index) {
-                variables[index] = Variable_(names[index], types[index]);
+            for (size_t index = 0; index < 18; ++index) {
+                types[index].value_type = value_types[index];
+                types[index].scalar_kind = config::CONFIG_SCALAR_PRIMITIVE;
+                types[index].ratio_component_type = config::CONFIG_VALUE_INT16;
+                variables[index] = Variable_(names[index], &types[index]);
             }
             for (size_t index : {size_t(1), size_t(6)}) {
-                variables[index].scalar_kind = config::CONFIG_SCALAR_ENUM;
-                variables[index].values = WEAPON_VALUES;
-                variables[index].value_count = 3;
-                variables[index].allow_numeric = true;
-                variables[index].reject_unknown_numeric = true;
+                types[index].scalar_kind = config::CONFIG_SCALAR_ENUM;
+                types[index].values = WEAPON_VALUES;
+                types[index].value_count = 3;
+                types[index].allow_numeric = true;
+                types[index].reject_unknown_numeric = true;
             }
             for (size_t index : {size_t(2), size_t(7)}) {
-                variables[index].scalar_kind = config::CONFIG_SCALAR_MASK;
-                variables[index].values = ARC_VALUES;
-                variables[index].value_count = 2;
-                variables[index].flags = ARC_FLAGS;
-                variables[index].flag_count = 4;
-                variables[index].allow_numeric = true;
-                variables[index].reject_unknown_numeric = true;
-                variables[index].known_bits = 15;
+                types[index].scalar_kind = config::CONFIG_SCALAR_MASK;
+                types[index].values = ARC_VALUES;
+                types[index].value_count = 2;
+                types[index].flags = ARC_FLAGS;
+                types[index].flag_count = 4;
+                types[index].allow_numeric = true;
+                types[index].reject_unknown_numeric = true;
+                types[index].known_bits = 15;
             }
             for (size_t index : {size_t(3), size_t(8)}) {
-                variables[index].scalar_kind = config::CONFIG_SCALAR_MASK;
-                variables[index].values = MOD_VALUES;
-                variables[index].value_count = 1;
-                variables[index].flags = MOD_FLAGS;
-                variables[index].flag_count = 2;
-                variables[index].allow_numeric = true;
-                variables[index].reject_unknown_numeric = true;
-                variables[index].known_bits = 0x202;
+                types[index].scalar_kind = config::CONFIG_SCALAR_MASK;
+                types[index].values = MOD_VALUES;
+                types[index].value_count = 1;
+                types[index].flags = MOD_FLAGS;
+                types[index].flag_count = 2;
+                types[index].allow_numeric = true;
+                types[index].reject_unknown_numeric = true;
+                types[index].known_bits = 0x202;
             }
             for (size_t index = 11; index <= 13; ++index) {
-                variables[index].scalar_kind = config::CONFIG_SCALAR_ENUM;
-                variables[index].values = SPECIAL_VALUES;
-                variables[index].value_count = 4;
-                variables[index].allow_numeric = true;
-                variables[index].reject_unknown_numeric = true;
+                types[index].scalar_kind = config::CONFIG_SCALAR_ENUM;
+                types[index].values = SPECIAL_VALUES;
+                types[index].value_count = 4;
+                types[index].allow_numeric = true;
+                types[index].reject_unknown_numeric = true;
             }
-            variables[14].has_min_length = true;
-            variables[14].has_max_length = true;
-            variables[14].min_length = 1;
-            variables[14].max_length = 8;
-            variables[15].scalar_kind = config::CONFIG_SCALAR_RATIO;
+            types[14].has_min_length = true;
+            types[14].has_max_length = true;
+            types[14].min_length = 1;
+            types[14].max_length = 8;
+            types[15].scalar_kind = config::CONFIG_SCALAR_RATIO;
+            types[17].scalar_kind = config::CONFIG_SCALAR_BITMAP;
+            types[17].bitmap_values = BITMAP_VALUES;
+            types[17].bitmap_value_count = 2;
+            types[17].bitmap_flags = BITMAP_FLAGS;
+            types[17].bitmap_flag_count = 2;
+            types[17].bitmap_known_bits = BITMAP_KNOWN_BITS;
+            types[17].bitmap_bit_count = 40;
             initialized = true;
         }
 
@@ -152,9 +171,10 @@ namespace {
             {"weapon", config::CONFIG_NODE_ARRAY, config::CONFIG_NO_NODE, 0, 16, 16, config::CONFIG_NO_VARIABLE},
             {"", config::CONFIG_NODE_RECORD, 21, 11, 16, 16, config::CONFIG_NO_VARIABLE},
             {"available_mods", config::CONFIG_NODE_SCALAR, 22, 0, 16, 16, 16},
+            {"special_devices", config::CONFIG_NODE_SCALAR, config::CONFIG_NO_NODE, 0, 17, 17, 17},
         };
         static const config::s_runtime_schema schema = {
-            nodes, sizeof(nodes) / sizeof(nodes[0]), variables, 17,
+            nodes, sizeof(nodes) / sizeof(nodes[0]), variables, 18,
             ARRAY_INDEX_ALIASES,
             sizeof(ARRAY_INDEX_ALIASES) / sizeof(ARRAY_INDEX_ALIASES[0]),
         };
@@ -197,6 +217,30 @@ namespace {
     }
 }
 
+DOCTEST_TEST_CASE("configuration namespaces group paths without becoming assignable") {
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(Decode_(
+        "ships guardian weapons 1 amount = 3;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 1);
+    DOCTEST_CHECK(writes.writes[0].canonical_path ==
+                  "ships.guardian.weapons.1.amount");
+    DOCTEST_CHECK(writes.writes[0].value.integer_value == 3);
+
+    DOCTEST_REQUIRE(Decode_(
+        "ships antaran impossible titan weapons 8 amount = 12;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 1);
+    DOCTEST_CHECK(writes.writes[0].canonical_path ==
+                  "ships.antaran.4.4.weapons.8.amount");
+    DOCTEST_CHECK(writes.writes[0].value.integer_value == 12);
+
+    DOCTEST_CHECK_FALSE(Decode_("ships = 1;", &writes, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message == "configuration namespaces are not assignable");
+    DOCTEST_CHECK(writes.writes.empty());
+}
+
 DOCTEST_TEST_SUITE("configuration assignment decode") {
 
 DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
@@ -206,9 +250,11 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     DOCTEST_CHECK(music_id == 1);
     const config::s_variable_descriptor* music = config::Get_Variable(music_id);
     DOCTEST_REQUIRE(music != nullptr);
-    DOCTEST_CHECK(music->type == config::CONFIG_VALUE_INT8);
-    DOCTEST_CHECK(music->min == 0);
-    DOCTEST_CHECK(music->max == 100);
+    DOCTEST_CHECK(music->type->value_type == config::CONFIG_VALUE_INT8);
+    DOCTEST_CHECK(music->type->min == 0);
+    DOCTEST_CHECK(music->type->max == 100);
+    DOCTEST_CHECK(config::variables[0].type == config::variables[2].type);
+    DOCTEST_CHECK(config::variables[1].type == config::variables[3].type);
     DOCTEST_CHECK(std::strcmp(config::Get_Variable_Name(music_id), "music_volume") == 0);
     DOCTEST_CHECK_FALSE(config::Find_Variable("music", 5, &music_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable("MUSIC_VOLUME", 12, &music_id));
@@ -420,6 +466,35 @@ DOCTEST_TEST_CASE("semantic scalars decode enums masks strings and normalized ra
     DOCTEST_CHECK(writes.writes.empty());
     DOCTEST_CHECK_FALSE(Decode_Aggregate_(
         "guardian reduction = 1/0;", &writes, &diagnostic));
+    DOCTEST_CHECK(writes.writes.empty());
+}
+
+DOCTEST_TEST_CASE("arbitrary width bitmaps decode named values and flags") {
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "special_devices = automated_repair,regeneration;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 1);
+    DOCTEST_CHECK(writes.writes[0].value.type == config::CONFIG_VALUE_BITMAP);
+    DOCTEST_REQUIRE(writes.writes[0].value.bitmap_value.size() == 5);
+    DOCTEST_CHECK(writes.writes[0].value.bitmap_value[0] == 0x08);
+    DOCTEST_CHECK(writes.writes[0].value.bitmap_value[4] == 0x80);
+
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "special_devices = self_repairing;", &writes, &diagnostic));
+    DOCTEST_CHECK(writes.writes[0].value.bitmap_value[0] == 0x08);
+    DOCTEST_CHECK(writes.writes[0].value.bitmap_value[4] == 0x80);
+
+    DOCTEST_REQUIRE(Decode_Aggregate_(
+        "special_devices = none;", &writes, &diagnostic));
+    DOCTEST_CHECK(writes.writes[0].value.bitmap_value ==
+                  std::vector<uint8_t>({0, 0, 0, 0, 0}));
+
+    DOCTEST_CHECK_FALSE(Decode_Aggregate_(
+        "special_devices = 0x8000000008;", &writes, &diagnostic));
+    DOCTEST_CHECK(writes.writes.empty());
+    DOCTEST_CHECK_FALSE(Decode_Aggregate_(
+        "special_devices = automated_repair,unknown;", &writes, &diagnostic));
     DOCTEST_CHECK(writes.writes.empty());
 }
 

@@ -13,7 +13,7 @@ namespace {
             "  config-tool validate <schema.json5>\n"
             "  config-tool generate <schema.json5> <output-directory>\n"
             "  config-tool check <schema.json5> <committed-directory> <temporary-directory>\n"
-            "  config-tool docs <schema.json5> <output.md>\n");
+            "  config-tool docs <schema.json5> <output.html>\n");
     }
 }
 

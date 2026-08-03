@@ -28,6 +28,7 @@ namespace {
         case CONFIG_VALUE_INT32: return "int32";
         case CONFIG_VALUE_UINT32: return "uint32";
         case CONFIG_VALUE_STRING: return "string";
+        case CONFIG_VALUE_BITMAP: return "bitmap";
         case CONFIG_VALUE_RATIO: return "ratio";
         }
         return "unknown";
@@ -35,6 +36,17 @@ namespace {
 
     const s_symbol_descriptor* Find_Symbol_(const s_symbol_descriptor* symbols,
                                             size_t count, const std::string& name) {
+        for (size_t index = 0; index < count; ++index) {
+            if (name == symbols[index].name) {
+                return &symbols[index];
+            }
+        }
+        return nullptr;
+    }
+
+    const s_bitmap_symbol_descriptor* Find_Bitmap_Symbol_(
+        const s_bitmap_symbol_descriptor* symbols, size_t count,
+        const std::string& name) {
         for (size_t index = 0; index < count; ++index) {
             if (name == symbols[index].name) {
                 return &symbols[index];
@@ -79,6 +91,49 @@ namespace {
         return true;
     }
 
+    bool Decode_Bitmap_(const s_variable_descriptor* variable,
+                        const s_cfg_token& token, s_typed_value* value,
+                        std::string* expected) {
+        const s_type_descriptor* type = variable->type;
+        const size_t byte_count = (type->bitmap_bit_count + 7) / 8;
+        value->bitmap_value.assign(byte_count, 0);
+        if (token.kind == CFG_TOKEN_IDENTIFIER) {
+            const s_bitmap_symbol_descriptor* symbol = Find_Bitmap_Symbol_(
+                type->bitmap_values, type->bitmap_value_count, token.value);
+            if (symbol == nullptr) {
+                symbol = Find_Bitmap_Symbol_(type->bitmap_flags,
+                                             type->bitmap_flag_count, token.value);
+            }
+            if (symbol == nullptr) {
+                *expected = "a declared bitmap value or flag";
+                return false;
+            }
+            value->bitmap_value.assign(symbol->value, symbol->value + byte_count);
+            return true;
+        }
+        if (token.kind != CFG_TOKEN_MASK) {
+            *expected = "declared bitmap flags";
+            return false;
+        }
+        size_t start = 0;
+        while (start < token.value.size()) {
+            const size_t comma = token.value.find(',', start);
+            const size_t end = comma == std::string::npos ? token.value.size() : comma;
+            const s_bitmap_symbol_descriptor* flag = Find_Bitmap_Symbol_(
+                type->bitmap_flags, type->bitmap_flag_count,
+                token.value.substr(start, end - start));
+            if (flag == nullptr) {
+                *expected = "declared bitmap flags";
+                return false;
+            }
+            for (size_t byte = 0; byte < byte_count; ++byte) {
+                value->bitmap_value[byte] |= flag->value[byte];
+            }
+            start = end + 1;
+        }
+        return true;
+    }
+
     bool Append_Cp850_(uint32_t codepoint, std::string* output) {
         static const uint16_t extended[] = {
             0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7,
@@ -114,6 +169,7 @@ namespace {
     bool Decode_String_(const s_variable_descriptor* variable,
                         const s_cfg_token& token, s_typed_value* value,
                         std::string* expected) {
+        const s_type_descriptor* type = variable->type;
         if (token.kind != CFG_TOKEN_STRING) {
             return false;
         }
@@ -127,13 +183,13 @@ namespace {
             }
         }
         const size_t length = value->string_value.size();
-        if ((variable->has_min_length && length < variable->min_length) ||
-            (variable->has_max_length && length > variable->max_length)) {
+        if ((type->has_min_length && length < type->min_length) ||
+            (type->has_max_length && length > type->max_length)) {
             *expected = "a string with CP850 byte length ";
-            *expected += variable->has_min_length ? std::to_string(variable->min_length) : "0";
+            *expected += type->has_min_length ? std::to_string(type->min_length) : "0";
             *expected += "..";
-            *expected += variable->has_max_length ? std::to_string(variable->max_length) :
-                                                    "unbounded";
+            *expected += type->has_max_length ? std::to_string(type->max_length) :
+                                                "unbounded";
             return false;
         }
         return true;
@@ -142,14 +198,15 @@ namespace {
     bool Decode_Integer_(const s_variable_descriptor* variable,
                          const s_cfg_token& token, int64_t* integer,
                          std::string* expected) {
+        const s_type_descriptor* type = variable->type;
         if (token.kind != CFG_TOKEN_INTEGER || !Parse_Integer_(token.value, integer)) {
             return false;
         }
         int64_t primitive_minimum = 0;
         int64_t primitive_maximum = 0;
-        Primitive_Range_(variable->type, &primitive_minimum, &primitive_maximum);
-        const int64_t minimum = variable->has_min ? variable->min : primitive_minimum;
-        const int64_t maximum = variable->has_max ? variable->max : primitive_maximum;
+        Primitive_Range_(type->value_type, &primitive_minimum, &primitive_maximum);
+        const int64_t minimum = type->has_min ? type->min : primitive_minimum;
+        const int64_t maximum = type->has_max ? type->max : primitive_maximum;
         if (*integer < minimum || *integer > maximum) {
             *expected += " in range " + std::to_string(minimum) + ".." +
                          std::to_string(maximum);
@@ -161,9 +218,10 @@ namespace {
     bool Decode_Enum_(const s_variable_descriptor* variable,
                       const s_cfg_token& token, s_typed_value* value,
                       std::string* expected) {
+        const s_type_descriptor* type = variable->type;
         if (token.kind == CFG_TOKEN_IDENTIFIER) {
             const s_symbol_descriptor* symbol = Find_Symbol_(
-                variable->values, variable->value_count, token.value);
+                type->values, type->value_count, token.value);
             if (symbol == nullptr) {
                 *expected = "a declared " + *expected + " value";
                 return false;
@@ -171,13 +229,13 @@ namespace {
             value->integer_value = symbol->value;
             return true;
         }
-        if (!variable->allow_numeric ||
+        if (!type->allow_numeric ||
             !Decode_Integer_(variable, token, &value->integer_value, expected)) {
             return false;
         }
-        if (variable->reject_unknown_numeric) {
-            for (size_t index = 0; index < variable->value_count; ++index) {
-                if (variable->values[index].value == value->integer_value) {
+        if (type->reject_unknown_numeric) {
+            for (size_t index = 0; index < type->value_count; ++index) {
+                if (type->values[index].value == value->integer_value) {
                     return true;
                 }
             }
@@ -190,16 +248,17 @@ namespace {
     bool Decode_Mask_(const s_variable_descriptor* variable,
                       const s_cfg_token& token, s_typed_value* value,
                       std::string* expected) {
+        const s_type_descriptor* type = variable->type;
         if (token.kind == CFG_TOKEN_INTEGER) {
-            if (!variable->allow_numeric ||
+            if (!type->allow_numeric ||
                 !Decode_Integer_(variable, token, &value->integer_value, expected)) {
                 return false;
             }
         } else if (token.kind == CFG_TOKEN_IDENTIFIER) {
             const s_symbol_descriptor* symbol = Find_Symbol_(
-                variable->values, variable->value_count, token.value);
+                type->values, type->value_count, token.value);
             if (symbol == nullptr) {
-                symbol = Find_Symbol_(variable->flags, variable->flag_count, token.value);
+                symbol = Find_Symbol_(type->flags, type->flag_count, token.value);
             }
             if (symbol == nullptr) {
                 *expected = "a declared " + *expected + " value";
@@ -214,7 +273,7 @@ namespace {
                 const size_t end = comma == std::string::npos ? token.value.size() : comma;
                 const std::string name = token.value.substr(start, end - start);
                 const s_symbol_descriptor* flag = Find_Symbol_(
-                    variable->flags, variable->flag_count, name);
+                    type->flags, type->flag_count, name);
                 if (flag == nullptr) {
                     *expected = "declared mask flags";
                     return false;
@@ -225,8 +284,8 @@ namespace {
         } else {
             return false;
         }
-        if (variable->reject_unknown_numeric &&
-            (static_cast<uint64_t>(value->integer_value) & ~variable->known_bits) != 0) {
+        if (type->reject_unknown_numeric &&
+            (static_cast<uint64_t>(value->integer_value) & ~type->known_bits) != 0) {
             *expected = "a mask containing only declared bits";
             return false;
         }
@@ -236,6 +295,7 @@ namespace {
     bool Decode_Ratio_(const s_variable_descriptor* variable,
                        const s_cfg_token& token, s_typed_value* value,
                        std::string* expected) {
+        const s_type_descriptor* type = variable->type;
         std::string numerator_text = token.value;
         std::string denominator_text = "1";
         if (token.kind == CFG_TOKEN_RATIO) {
@@ -265,11 +325,11 @@ namespace {
         }
         int64_t minimum = 0;
         int64_t maximum = 0;
-        Primitive_Range_(variable->ratio_component_type, &minimum, &maximum);
+        Primitive_Range_(type->ratio_component_type, &minimum, &maximum);
         if (value->ratio_numerator < minimum || value->ratio_numerator > maximum ||
             value->ratio_denominator < minimum || value->ratio_denominator > maximum) {
             *expected = "a ratio whose normalized components fit " +
-                        std::string(Type_Name_(variable->ratio_component_type));
+                        std::string(Type_Name_(type->ratio_component_type));
             return false;
         }
         return true;
@@ -356,21 +416,25 @@ namespace {
     bool Decode_Value_(const s_variable_descriptor* variable,
                        const s_cfg_token& token, s_typed_value* value,
                        std::string* expected) {
-        value->type = variable->type;
-        *expected = Type_Name_(variable->type);
-        if (variable->scalar_kind == CONFIG_SCALAR_ENUM) {
+        const s_type_descriptor* type = variable->type;
+        value->type = type->value_type;
+        *expected = Type_Name_(type->value_type);
+        if (type->scalar_kind == CONFIG_SCALAR_ENUM) {
             return Decode_Enum_(variable, token, value, expected);
         }
-        if (variable->scalar_kind == CONFIG_SCALAR_MASK) {
+        if (type->scalar_kind == CONFIG_SCALAR_MASK) {
             return Decode_Mask_(variable, token, value, expected);
         }
-        if (variable->scalar_kind == CONFIG_SCALAR_RATIO) {
+        if (type->scalar_kind == CONFIG_SCALAR_BITMAP) {
+            return Decode_Bitmap_(variable, token, value, expected);
+        }
+        if (type->scalar_kind == CONFIG_SCALAR_RATIO) {
             return Decode_Ratio_(variable, token, value, expected);
         }
-        if (variable->type == CONFIG_VALUE_BOOL) {
+        if (type->value_type == CONFIG_VALUE_BOOL) {
             return Decode_Bool_(token, value);
         }
-        if (variable->type == CONFIG_VALUE_STRING) {
+        if (type->value_type == CONFIG_VALUE_STRING) {
             return Decode_String_(variable, token, value, expected);
         }
         return Decode_Integer_(variable, token, &value->integer_value, expected);
@@ -476,6 +540,10 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
         return Fail_(statement->location, "assignment requires a value", write_set, diagnostic);
     }
     const s_schema_node_descriptor& selected_node = schema->nodes[selected];
+    if (selected_node.kind == CONFIG_NODE_NAMESPACE) {
+        return Fail_(statement->path.back().location,
+                     "configuration namespaces are not assignable", write_set, diagnostic);
+    }
     uint32_t boundary = selected;
     if (selected_node.kind == CONFIG_NODE_SCALAR && selected_node.parent != CONFIG_NO_NODE) {
         boundary = selected_node.parent;

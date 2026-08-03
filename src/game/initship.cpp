@@ -1,6 +1,44 @@
 #include "pch.h"
+#include "game/ship_config.h"
 
 namespace INITSHIP {
+    namespace {
+        void Complete_Configured_Design_(s_ship_design* design, const char* name,
+                                         uint8_t owner, int16_t cost,
+                                         int8_t speed, int16_t fallback_drive,
+                                         int16_t combat_speed_bonus) {
+            strlcpy(design->name, name, sizeof(design->name));
+            design->ship_type = SHIP_TYPE_COMBAT;
+            design->previous_owner = owner;
+            design->cost = cost;
+            design->speed = speed;
+            const int16_t speed_drive = design->ftl_type == DRIVE_NO_DRIVE ?
+                fallback_drive : design->ftl_type;
+            design->combat_speed = static_cast<uint8_t>(
+                TECHDATA::_drives[speed_drive].combat_speed_min[design->size] +
+                combat_speed_bonus);
+        }
+
+        void Load_Configured_Antaran_Design_(s_ship_design* design, int16_t hull_size) {
+            int16_t difficulty = MOX::_settings.game_difficulty;
+            if (difficulty < GAME_DIFFICULTY_TUTOR ||
+                difficulty > GAME_DIFFICULTY_IMPOSSIBLE) {
+                difficulty = GAME_DIFFICULTY_AVERAGE;
+            }
+            if (hull_size < SHIP_SIZE_SMALL || hull_size > SHIP_SIZE_TITAN) {
+                return;
+            }
+            const int16_t hull = hull_size;
+            *design = SHIP_CONFIG::antaran_templates[difficulty][hull];
+            const char* names[] = {
+                "Raider", "Marauder", global::s_Intruder_005576a0,
+                "Interdictor", "Harbinger",
+            };
+            Complete_Configured_Design_(design, names[hull], 8, 500,
+                                        1, Best_Warp_Drive_(8), 0);
+        }
+    }
+
     void __cdecl Init_Ship_Designs_(int16_t player_idx) {
         s_player* plr = &MOX::_player[player_idx];
         int16_t design_flag = 0;
@@ -366,355 +404,31 @@ namespace INITSHIP {
         design->date_of_design = static_cast<uint16_t>(MOX::_stardate);
     }
 
+
+
+
     void __cdecl Load_Small_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, sizeof(*design));
-
-        strlcpy(design->name, "Raider", sizeof(design->name));
-
-        design->ship_type = SHIP_TYPE_COMBAT;
-        design->shield_type = SHIELD_NO_SHIELD;
-        design->size = SHIP_SIZE_SMALL;
-        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-        design->speed = 1;
-
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 2;
-        design->ship_weapon[0].current_count = 2;
-        design->ship_weapon[0].type = 4;
-
-        design->ship_weapon[1].specials = 0;
-        design->ship_weapon[1].ammo = 0;
-        design->ship_weapon[1].count = 1;
-        design->ship_weapon[1].current_count = 1;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[1].type = 24;
-
-        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
-        design->ftl_type = DRIVE_HYPER_DRIVE;
-
-        struct_::Set_Bit_Field_(design->special_device_flags, 7);
-        struct_::Set_Bit_Field_(design->special_device_flags, 24);
-
-        if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
-            struct_::Set_Bit_Field_(design->special_device_flags, 9);
-        }
-
-        design->picture_num = 0;
-        design->previous_owner = 8;
-        design->cost = 500;
-
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
+        Load_Configured_Antaran_Design_(design, SHIP_SIZE_SMALL);
     }
 
     void __cdecl Load_Medium_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, sizeof(*design));
-
-        strlcpy(design->name, "Marauder", sizeof(design->name));
-
-        design->ship_type = SHIP_TYPE_COMBAT;
-        design->shield_type = SHIELD_NO_SHIELD;
-        design->size = SHIP_SIZE_MEDIUM;
-        design->ftl_type = DRIVE_HYPER_DRIVE;
-        design->speed = 1;
-        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
-
-        // Weapon 0: Beam (Type 4)
-        design->ship_weapon[0].type = 4;
-        design->ship_weapon[0].count = 3;
-        design->ship_weapon[0].current_count = 3;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].ammo = 0;
-
-        // Weapon 1: Beam (Type 4) with specials (Value 2)
-        design->ship_weapon[1].type = 4;
-        design->ship_weapon[1].count = 1;
-        design->ship_weapon[1].current_count = 1;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[1].specials = 2;
-        design->ship_weapon[1].ammo = 0;
-
-        // Weapon 2: Missile/Special (Type 24)
-        design->ship_weapon[2].type = 24;
-        design->ship_weapon[2].count = 1;
-        design->ship_weapon[2].current_count = 1;
-        design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[2].specials = 0;
-        design->ship_weapon[2].ammo = 10;
-
-        struct_::Set_Bit_Field_(design->special_device_flags, 7);
-        struct_::Set_Bit_Field_(design->special_device_flags, 24);
-
-        if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_HARD) {
-            struct_::Set_Bit_Field_(design->special_device_flags, 21);
-        } else if (MOX::_settings.game_difficulty > GAME_DIFFICULTY_AVERAGE) {
-            struct_::Set_Bit_Field_(design->special_device_flags, 9);
-        }
-
-        design->picture_num = 1;
-        design->previous_owner = 8;
-        design->cost = 500;
-
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
-    }
-
-    void __cdecl Load_Huge_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, sizeof(*design));
-
-        strlcpy(design->name, "Interdictor", sizeof(design->name));
-
-        design->ship_type = SHIP_TYPE_COMBAT;
-        design->shield_type = SHIELD_NO_SHIELD;
-        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-
-        design->ship_weapon[0].type = 4;
-        design->speed = 1;
-        design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 10;
-        design->ship_weapon[0].current_count = 10;
-
-        design->ship_weapon[1].type = 4;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->size = SHIP_SIZE_HUGE;
-        design->ship_weapon[1].ammo = 0;
-        design->ship_weapon[1].count = 4;
-        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
-        design->ship_weapon[1].current_count = 4;
-
-        design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[2].specials = 0;
-        design->ship_weapon[2].ammo = 10;
-        design->ftl_type = DRIVE_HYPER_DRIVE;
-        design->ship_weapon[2].count = 15;
-        design->ship_weapon[2].current_count = 15;
-
-        design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[3].specials = 0;
-        design->ship_weapon[3].ammo = 0;
-        design->ship_weapon[3].count = 2;
-        design->ship_weapon[3].current_count = 2;
-
-        design->ship_weapon[4].type = 4;
-        design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[4].specials = 4;
-        design->ship_weapon[4].ammo = 0;
-        design->ship_weapon[4].count = 10;
-        design->ship_weapon[4].current_count = 10;
-
-        design->ship_weapon[1].specials = 2;
-        design->ship_weapon[5].specials = 0;
-        design->ship_weapon[5].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[2].type = 24;
-        design->ship_weapon[3].type = 13;
-        design->ship_weapon[5].type = 11;
-        design->ship_weapon[5].ammo = 0;
-        design->ship_weapon[5].count = 4;
-        design->ship_weapon[5].current_count = 4;
-
-        struct_::Set_Bit_Field_(design->special_device_flags, 7);
-        struct_::Set_Bit_Field_(design->special_device_flags, 24);
-        struct_::Set_Bit_Field_(design->special_device_flags, 33);
-        struct_::Set_Bit_Field_(design->special_device_flags, 26);
-
-        switch (MOX::_settings.game_difficulty) {
-            case GAME_DIFFICULTY_EASY:
-                struct_::Set_Bit_Field_(design->special_device_flags, 9);
-                break;
-            case GAME_DIFFICULTY_AVERAGE:
-                struct_::Set_Bit_Field_(design->special_device_flags, 21);
-                break;
-            case GAME_DIFFICULTY_HARD:
-            case GAME_DIFFICULTY_IMPOSSIBLE:
-                struct_::Set_Bit_Field_(design->special_device_flags, 38);
-                break;
-            default:
-                break;
-        }
-
-        design->picture_num = 3;
-        design->previous_owner = 8;
-        design->cost = 500;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
+        Load_Configured_Antaran_Design_(design, SHIP_SIZE_MEDIUM);
     }
 
     void __cdecl Load_Large_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, sizeof(*design));
-        strlcpy(design->name, global::s_Intruder_005576a0, sizeof(design->name));
+        Load_Configured_Antaran_Design_(design, SHIP_SIZE_LARGE);
+    }
 
-        design->ship_type = SHIP_TYPE_COMBAT;
-        design->shield_type = SHIELD_NO_SHIELD;
-        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-        design->size = SHIP_SIZE_LARGE;
-        design->speed = 1;
-        design->ftl_type = DRIVE_HYPER_DRIVE;
-        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
-
-        design->ship_weapon[0].type = 4;
-        design->ship_weapon[0].count = 4;
-        design->ship_weapon[0].current_count = 4;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].ammo = 0;
-
-        design->ship_weapon[1].type = 4;
-        design->ship_weapon[1].count = 2;
-        design->ship_weapon[1].current_count = 2;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[1].specials = 2;
-        design->ship_weapon[1].ammo = 0;
-
-        design->ship_weapon[2].type = 24 /* 0x18 */;
-        design->ship_weapon[2].count = 5;
-        design->ship_weapon[2].current_count = 5;
-        design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[2].specials = 0;
-        design->ship_weapon[2].ammo = 10 /* 0x0A */;
-
-        design->ship_weapon[3].type = 13 /* 0x0D */;
-        design->ship_weapon[3].count = 2;
-        design->ship_weapon[3].current_count = 2;
-        design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[3].specials = 0;
-        design->ship_weapon[3].ammo = 0;
-
-        design->ship_weapon[4].type = 31 /* 0x1F */;
-        design->ship_weapon[4].count = 3;
-        design->ship_weapon[4].current_count = 3;
-        design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[4].specials = 0;
-        design->ship_weapon[4].ammo = 0;
-
-        struct_::Set_Bit_Field_(design->special_device_flags, 7);
-        struct_::Set_Bit_Field_(design->special_device_flags, 24 /* 0x18 */);
-
-        if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_AVERAGE) {
-            struct_::Set_Bit_Field_(design->special_device_flags, 9);
-        } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_HARD) {
-            struct_::Set_Bit_Field_(design->special_device_flags, 21 /* 0x15 */);
-        } else if (MOX::_settings.game_difficulty == GAME_DIFFICULTY_IMPOSSIBLE) {
-            struct_::Set_Bit_Field_(design->special_device_flags, 38 /* 0x26 */);
-        }
-
-        design->picture_num = 2;
-        design->previous_owner = 8;
-        design->cost = 500;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
+    void __cdecl Load_Huge_Antaran_Design_(s_ship_design* design) {
+        Load_Configured_Antaran_Design_(design, SHIP_SIZE_HUGE);
     }
 
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design) {
-        struct_::Clear_Structure_(design, sizeof(*design));
-
-        strlcpy(design->name, "Harbinger", sizeof(design->name));
-
-        design->size = SHIP_SIZE_TITAN;
-        design->ship_type = SHIP_TYPE_COMBAT;
-        design->shield_type = SHIELD_NO_SHIELD;
-        design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-        design->speed = 1;
-        design->ftl_type = DRIVE_HYPER_DRIVE;
-        design->armor_type = ARMOR_XENTRONIUM_ARMOR;
-
-        design->ship_weapon[0].type = 4;
-        design->ship_weapon[0].count = 20;
-        design->ship_weapon[0].current_count = 20;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[0].ammo = 0;
-
-        design->ship_weapon[1].type = 4;
-        design->ship_weapon[1].count = 5;
-        design->ship_weapon[1].current_count = 5;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[1].specials = 2;
-        design->ship_weapon[1].ammo = 0;
-
-        design->ship_weapon[2].type = 24;
-        design->ship_weapon[2].count = 30;
-        design->ship_weapon[2].current_count = 30;
-        design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[2].ammo = 10;
-
-        design->ship_weapon[3].type = 13;
-        design->ship_weapon[3].count = 3;
-        design->ship_weapon[3].current_count = 3;
-        design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[3].ammo = 0;
-
-        design->ship_weapon[4].type = 4;
-        design->ship_weapon[4].count = 20;
-        design->ship_weapon[4].current_count = 20;
-        design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[4].specials = 4;
-        design->ship_weapon[4].ammo = 0;
-
-        design->ship_weapon[5].type = 11;
-        design->ship_weapon[5].count = 5;
-        design->ship_weapon[5].current_count = 5;
-        design->ship_weapon[5].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-        design->ship_weapon[5].specials = 2;
-        design->ship_weapon[5].ammo = 0;
-
-        design->ship_weapon[6].type = 37;
-        design->ship_weapon[6].count = 1;
-        design->ship_weapon[6].current_count = 1;
-        design->ship_weapon[6].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[6].ammo = 0;
-
-        design->ship_weapon[7].type = 37;
-        design->ship_weapon[7].count = 12;
-        design->ship_weapon[7].current_count = 12;
-        design->ship_weapon[7].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[7].ammo = 0;
-
-        struct_::Set_Bit_Field_(design->special_device_flags, 7);
-        struct_::Set_Bit_Field_(design->special_device_flags, 24);
-        struct_::Set_Bit_Field_(design->special_device_flags, 33);
-        struct_::Set_Bit_Field_(design->special_device_flags, 26);
-
-        switch (MOX::_settings.game_difficulty) {
-        case GAME_DIFFICULTY_TUTOR:
-            struct_::Set_Bit_Field_(design->special_device_flags, 9);
-            break;
-        case GAME_DIFFICULTY_EASY:
-            struct_::Set_Bit_Field_(design->special_device_flags, 21);
-            break;
-        case GAME_DIFFICULTY_AVERAGE:
-        case GAME_DIFFICULTY_HARD:
-        case GAME_DIFFICULTY_IMPOSSIBLE:
-            struct_::Set_Bit_Field_(design->special_device_flags, 38);
-            break;
-        }
-
-        design->picture_num = 4;
-        design->previous_owner = 8;
-        design->cost = 500;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
+        Load_Configured_Antaran_Design_(design, SHIP_SIZE_TITAN);
     }
 
     void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size) {
-        switch (hull_size) {
-            case SHIP_SIZE_SMALL:
-                INITSHIP::Load_Small_Antaran_Design_(design);
-                break;
-            case SHIP_SIZE_MEDIUM:
-                INITSHIP::Load_Medium_Antaran_Design_(design);
-                break;
-            case SHIP_SIZE_LARGE:
-                INITSHIP::Load_Large_Antaran_Design_(design);
-                break;
-            case SHIP_SIZE_HUGE:
-                INITSHIP::Load_Huge_Antaran_Design_(design);
-                break;
-            case SHIP_SIZE_TITAN:
-                INITSHIP::Load_Titan_Antaran_Design_(design);
-                break;
-            default:
-                break;
-        }
+        Load_Configured_Antaran_Design_(design, hull_size);
     }
 
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design) {
@@ -1961,236 +1675,27 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
 }
 
 void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
-    struct_::Clear_Structure_(design, sizeof(*design));
-
-    strlcpy(design->name, MOX::_race_names[14], sizeof(design->name));
-
-    design->ship_type = SHIP_TYPE_COMBAT;
-    design->size = SHIP_SIZE_TITAN;
-    design->ftl_type = DRIVE_NO_DRIVE;
-    design->speed = 0;
-    design->shield_type = SHIELD_CLASS_V_SHIELD;
-
-    design->ship_weapon[0].type = 11;
-    design->ship_weapon[0].count = 2;
-    design->ship_weapon[0].current_count = 2;
-    design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-    design->ship_weapon[0].specials = 2;
-    design->ship_weapon[0].ammo = 0;
-
-    design->ship_weapon[1].type = 4;
-    design->ship_weapon[1].count = 10;
-    design->ship_weapon[1].current_count = 10;
-    design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-    design->ship_weapon[1].specials = 4;
-    design->ship_weapon[1].ammo = 0;
-
-    design->ship_weapon[2].type = 20;
-    design->ship_weapon[2].count = 1;
-    design->ship_weapon[2].current_count = 1;
-    design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-    design->ship_weapon[2].specials = 0x4500;
-    design->ship_weapon[2].ammo = 0;
-
-    design->ship_weapon[3].type = 20;
-    design->ship_weapon[3].count = 1;
-    design->ship_weapon[3].current_count = 1;
-    design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-    design->ship_weapon[3].specials = 0x4500;
-    design->ship_weapon[3].ammo = 0;
-
-    design->ship_weapon[4].type = 13;
-    design->ship_weapon[4].count = 2;
-    design->ship_weapon[4].current_count = 2;
-    design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-    design->ship_weapon[4].specials = 0;
-    design->ship_weapon[4].ammo = 0;
-
-    design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-    design->armor_type = ARMOR_XENTRONIUM_ARMOR;
-
-    struct_::Set_Bit_Field_(design->special_device_flags, 3);
-    struct_::Set_Bit_Field_(design->special_device_flags, 13);
-    struct_::Set_Bit_Field_(design->special_device_flags, 1);
-    struct_::Set_Bit_Field_(design->special_device_flags, 5);
-    struct_::Set_Bit_Field_(design->special_device_flags, 25);
-    struct_::Set_Bit_Field_(design->special_device_flags, 19);
-    struct_::Set_Bit_Field_(design->special_device_flags, 21);
-    struct_::Set_Bit_Field_(design->special_device_flags, 18);
-
-    int16_t drive_idx = Best_Warp_Drive_(9);
-    design->combat_speed = TECHDATA::_drives[drive_idx].combat_speed_min[(uint8_t)design->size];
-    design->cost = 0;
-    design->picture_num = 7;
-    design->previous_owner = 9;
+    *design = SHIP_CONFIG::guardian_template;
+    Complete_Configured_Design_(design, MOX::_race_names[14], 9, 0,
+                                0, Best_Warp_Drive_(9), 0);
 }
 
 void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t is_large) {
-    struct_::Clear_Structure_(design, sizeof(s_ship_design));
-    strlcpy(design->name, MOX::_race_names[15], sizeof(design->name));
-
-    if (is_large != 0) {
-        design->ship_type = SHIP_TYPE_COMBAT;
-        design->size = SHIP_SIZE_HUGE;
-        design->shield_type = SHIELD_NO_SHIELD;
-        design->ftl_type = (int8_t)Best_Warp_Drive_(10);
-        design->computer_type = COMPUTER_OPTRONIC_COMPUTER;
-        design->armor_type = ARMOR_NO_ARMOR;
-        design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 2;
-        design->ship_weapon[0].current_count = 2;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->speed = 1;
-        design->ship_weapon[1].specials = 0;
-        design->ship_weapon[1].count = 5;
-        design->ship_weapon[1].current_count = 5;
-        design->ship_weapon[1].ammo = 10;
-        design->picture_num = 8;
-        design->ship_weapon[0].type = 45;
-        design->ship_weapon[1].type = 23;
-        design->combat_speed = TECHDATA::_drives[(uint8_t)design->ftl_type].combat_speed_min[design->size];
-    } else {
-        design->size = SHIP_SIZE_LARGE;
-        design->ship_type = SHIP_TYPE_COMBAT;
-        design->shield_type = SHIELD_NO_SHIELD;
-        design->computer_type = COMPUTER_OPTRONIC_COMPUTER;
-        design->armor_type = ARMOR_NO_ARMOR;
-        design->ftl_type = DRIVE_NO_DRIVE;
-        design->ship_weapon[0].specials = 0;
-        design->speed = 0;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 1;
-        design->ship_weapon[0].current_count = 1;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->picture_num = 20;
-        design->ship_weapon[0].type = 45;
-        int16_t best_drive = Best_Warp_Drive_(10);
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
-    }
-
-    struct_::Set_Bit_Field_(design->special_device_flags, 39 /* 0x27 */);
-    design->previous_owner = 10;
-    design->cost = 0;
+    *design = SHIP_CONFIG::amoeba_templates[is_large != 0];
+    Complete_Configured_Design_(design, MOX::_race_names[15], 10, 0,
+                                is_large != 0 ? 1 : 0, Best_Warp_Drive_(10), 0);
 }
 
-void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, uint8_t variant) {
-    struct_::Clear_Structure_(design, sizeof(*design));
-    
-    // Copy "Crystal" or specific race name from the race names array
-    strlcpy(design->name, MOX::_race_names[16], sizeof(design->name));
-    design->ship_type = SHIP_TYPE_COMBAT;
-    design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-    design->shield_type = SHIELD_NO_SHIELD;
-
-    if (variant != 0) {
-        // Crystal variant
-        design->armor_type = ARMOR_NO_ARMOR;
-        design->size = SHIP_SIZE_TITAN;
-        int16_t best_drive = Best_Warp_Drive_(11);
-        design->ftl_type = (int8_t)best_drive;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[0].ammo = 0;
-        design->speed = 1;
-        design->ship_weapon[0].count = 1;
-        design->ship_weapon[0].current_count = 1;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[1].ammo = 10;
-        design->ship_weapon[1].count = 5;
-        design->ship_weapon[1].current_count = 5;
-        design->ship_weapon[0].type = 42;
-        design->ship_weapon[1].specials = 0;
-        design->ship_weapon[1].type = 26;
-        design->ship_weapon[0].specials = 2;
-        design->picture_num = 9;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
-    } else {
-        // Guardian variant
-        design->armor_type = ARMOR_NO_ARMOR;
-        design->ftl_type = DRIVE_NO_DRIVE;
-        design->ship_weapon[0].specials = 0;
-        design->speed = 0;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 1;
-        design->ship_weapon[0].current_count = 1;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->size = SHIP_SIZE_LARGE;
-        design->ship_weapon[1].ammo = 10;
-        design->ship_weapon[1].specials = 0;
-        design->ship_weapon[0].type = 42;
-        design->ship_weapon[1].type = 25;
-        design->ship_weapon[1].count = 5;
-        design->ship_weapon[1].current_count = 5;
-        int16_t best_drive = Best_Warp_Drive_(11);
-        design->picture_num = 21;
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[2];
-    }
-
-    design->previous_owner = 11;
-    design->cost = 0;
+void __cdecl Load_Crystal_Ship_Design_(s_ship_design* design, uint8_t variant) {
+    *design = SHIP_CONFIG::crystal_templates[variant != 0];
+    Complete_Configured_Design_(design, MOX::_race_names[16], 11, 0,
+                                variant != 0 ? 1 : 0, Best_Warp_Drive_(11), 0);
 }
 
 void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster) {
-    struct_::Clear_Structure_(design, sizeof(s_ship_design));
-    strlcpy(design->name, MOX::_race_names[17], sizeof(design->name));
-
-    design->ship_type = SHIP_TYPE_COMBAT;
-    design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-    design->shield_type = SHIELD_NO_SHIELD;
-
-    if (is_monster != 0) {
-        design->armor_type = ARMOR_NO_ARMOR;
-        design->size = SHIP_SIZE_TITAN;
-        design->speed = 1;
-
-        design->ftl_type = (int8_t)Best_Warp_Drive_(12);
-
-        design->ship_weapon[0].type = 0x29;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[0].specials = 4;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 20;
-        design->ship_weapon[0].current_count = 20;
-
-        design->ship_weapon[1].type = 0x28;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[1].specials = 0x4000;
-        design->ship_weapon[1].ammo = 0;
-        design->ship_weapon[1].count = 1;
-        design->ship_weapon[1].current_count = 1;
-
-        int8_t modifier = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
-        design->picture_num = 10;
-        design->combat_speed = modifier + 4;
-    } else {
-        design->armor_type = ARMOR_NO_ARMOR;
-        design->speed = 0;
-        design->size = SHIP_SIZE_LARGE;
-
-        design->ship_weapon[0].type = 0x29;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[0].specials = 4;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 8;
-        design->ship_weapon[0].current_count = 8;
-
-        design->ship_weapon[1].type = 0x28;
-        design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[1].specials = 0;
-        design->ship_weapon[1].ammo = 0;
-        design->ship_weapon[1].count = 1;
-        design->ship_weapon[1].current_count = 1;
-
-        int16_t best_drive = Best_Warp_Drive_(12);
-        int8_t modifier = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
-        design->picture_num = 22;
-        design->combat_speed = modifier + 4;
-    }
-
-    design->previous_owner = 12;
-    design->cost = 0;
+    *design = SHIP_CONFIG::dragon_templates[is_monster != 0];
+    Complete_Configured_Design_(design, MOX::_race_names[17], 12, 0,
+                                is_monster != 0 ? 1 : 0, Best_Warp_Drive_(12), 4);
 }
 
 /**
@@ -2199,98 +1704,15 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t is_monster)
  * @param is_greater_eel If non-zero, loads Greater Eel design; otherwise, Young/Small Eel.
  */
 void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t is_greater_eel) {
-    struct_::Clear_Structure_(design, sizeof(s_ship_design));
-
-    strlcpy(design->name, MOX::_race_names[18], sizeof(design->name));
-
-    design->ship_type = SHIP_TYPE_COMBAT;
-    design->computer_type = COMPUTER_CYBERTRONIC_COMPUTER;
-    design->shield_type = SHIELD_NO_SHIELD;
-
-    if (is_greater_eel != 0) {
-        design->size = SHIP_SIZE_HUGE;
-        design->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(13 /* TECH_WARP_DRIVE */);
-        design->armor_type = ARMOR_NO_ARMOR;
-        design->speed = 1;
-
-        struct_::Set_Bit_Field_(design->special_device_flags, 19 /* SPECIAL_DEVICE_19 */);
-
-        design->ship_weapon[0].type = 44 /* WEAPON_EEL_ATTACK */;
-        design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 2;
-        design->ship_weapon[0].current_count = 2;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-
-        design->picture_num = 11;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size] + 8;
-    } else {
-        design->armor_type = ARMOR_NO_ARMOR;
-        int16_t best_warp = INITSHIP::Best_Warp_Drive_(13 /* TECH_WARP_DRIVE */);
-
-        design->ftl_type = DRIVE_NO_DRIVE;
-        design->size = SHIP_SIZE_LARGE;
-        design->speed = 0;
-
-        struct_::Set_Bit_Field_(design->special_device_flags, 19 /* SPECIAL_DEVICE_19 */);
-
-        design->ship_weapon[0].type = 44 /* WEAPON_EEL_ATTACK */;
-        design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 1;
-        design->ship_weapon[0].current_count = 1;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-
-        design->picture_num = 23;
-        // Lookup uses Best_Warp_Drive directly regardless of ftl_type field
-        design->combat_speed = TECHDATA::_drives[best_warp].combat_speed_min[design->size] + 8;
-    }
-
-    design->previous_owner = 13 /* PLAYER_MONSTER */;
-    design->cost = 0;
+    *design = SHIP_CONFIG::eel_templates[is_greater_eel != 0];
+    Complete_Configured_Design_(design, MOX::_race_names[18], 13, 0,
+                                is_greater_eel != 0 ? 1 : 0, Best_Warp_Drive_(13), 8);
 }
 
 void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t is_monster) {
-    struct_::Clear_Structure_(design, sizeof(s_ship_design));
-
-    strlcpy(design->name, MOX::_race_names[19], sizeof(design->name));
-
-    design->ship_type = SHIP_TYPE_COMBAT;
-    design->computer_type = COMPUTER_OPTRONIC_COMPUTER;
-    design->shield_type = SHIELD_NO_SHIELD;
-
-    if (is_monster != 0) {
-        design->size = SHIP_SIZE_TITAN;
-        design->armor_type = ARMOR_NO_ARMOR;
-        design->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(14);
-        design->speed = 1;
-        design->ship_weapon[0].type = 43;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[0].specials = 2;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 5;
-        design->ship_weapon[0].current_count = 5;
-        design->picture_num = 12;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
-    } else {
-        design->size = SHIP_SIZE_LARGE;
-        design->armor_type = (int8_t)INITSHIP::Best_Armor_(14);
-        design->speed = 0;
-        design->ship_weapon[0].type = 43;
-        design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-        design->ship_weapon[0].specials = 0;
-        design->ship_weapon[0].ammo = 0;
-        design->ship_weapon[0].count = 3;
-        design->ship_weapon[0].current_count = 3;
-        design->picture_num = 24;
-
-        int16_t best_drive = INITSHIP::Best_Warp_Drive_(14);
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
-    }
-
-    struct_::Set_Bit_Field_(design->special_device_flags, 10);
-    design->previous_owner = 14;
-    design->cost = 0;
+    *design = SHIP_CONFIG::hydra_templates[is_monster != 0];
+    Complete_Configured_Design_(design, MOX::_race_names[19], 14, 0,
+                                is_monster != 0 ? 1 : 0, Best_Warp_Drive_(14), 0);
 }
 
 void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* design) {
@@ -2337,69 +1759,9 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
 }
 
 void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
-    struct_::Clear_Structure_(design, sizeof(*design));
-
-    strlcpy(design->name, "Avenger", sizeof(design->name));
-
-    design->computer_type = COMPUTER_MOLECULARTRONIC_COMPUTER;
-    design->ship_type = SHIP_TYPE_COMBAT;
-    design->shield_type = SHIELD_NO_SHIELD;
-    design->size = SHIP_SIZE_HUGE;
-    design->armor_type = ARMOR_XENTRONIUM_ARMOR;
-    design->speed = 8;
-    design->ftl_type = DRIVE_INTERPHASED_DRIVE;
-
-    design->ship_weapon[0].type = 4;
-    design->ship_weapon[0].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-    design->ship_weapon[0].specials = 2;
-    design->ship_weapon[0].ammo = 0;
-    design->ship_weapon[0].count = 4;
-    design->ship_weapon[0].current_count = 4;
-
-    design->ship_weapon[1].type = 11;
-    design->ship_weapon[1].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-    design->ship_weapon[1].specials = 2;
-    design->ship_weapon[1].ammo = 0;
-    design->ship_weapon[1].count = 2;
-    design->ship_weapon[1].current_count = 2;
-
-    design->ship_weapon[2].type = 4;
-    design->ship_weapon[2].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-    design->ship_weapon[2].specials = 0;
-    design->ship_weapon[2].ammo = 0;
-    design->ship_weapon[2].count = 10;
-    design->ship_weapon[2].current_count = 10;
-
-    design->ship_weapon[3].type = 13;
-    design->ship_weapon[3].firing_arc = WEAPON_FIRING_ARC_ALL_SECTORS;
-    design->ship_weapon[3].specials = 0;
-    design->ship_weapon[3].ammo = 0;
-    design->ship_weapon[3].count = 2;
-    design->ship_weapon[3].current_count = 2;
-
-    design->ship_weapon[4].type = 4;
-    design->ship_weapon[4].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-    design->ship_weapon[4].specials = 4;
-    design->ship_weapon[4].ammo = 0;
-    design->ship_weapon[4].count = 10;
-    design->ship_weapon[4].current_count = 10;
-
-    design->ship_weapon[5].type = 24;
-    design->ship_weapon[5].firing_arc = WEAPON_FIRING_ARC_FORWARD;
-    design->ship_weapon[5].specials = 0;
-    design->ship_weapon[5].ammo = 10;
-    design->ship_weapon[5].count = 15;
-    design->ship_weapon[5].current_count = 15;
-
-    struct_::Set_Bit_Field_(design->special_device_flags, 7);
-    struct_::Set_Bit_Field_(design->special_device_flags, 24);
-    struct_::Set_Bit_Field_(design->special_device_flags, 33);
-
-    design->picture_num = 44;
-    design->previous_owner = 8;
-
-    design->cost = 500;
-    design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size] + 2;
+    *design = SHIP_CONFIG::avenger_template;
+    Complete_Configured_Design_(design, "Avenger", 8, 500,
+                                8, Best_Warp_Drive_(8), 2);
 }
 
 void __cdecl Update_Ship_Names_To_New_Language_(void) {

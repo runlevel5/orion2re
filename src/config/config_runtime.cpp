@@ -32,26 +32,47 @@ namespace {
         if (variable == nullptr) {
             return Fail_(write, "unknown typed write variable", diagnostic);
         }
-        if (write->value.type != variable->type) {
+        const s_type_descriptor* type = variable->type;
+        if (write->value.type != type->value_type) {
             diagnostic->location = write->provenance;
             diagnostic->message = "typed write mismatch for " + std::string(variable->name);
             return false;
         }
-        if (variable->type == CONFIG_VALUE_BOOL) {
+        if (type->value_type == CONFIG_VALUE_BOOL) {
             return true;
         }
-        if (variable->type == CONFIG_VALUE_STRING) {
+        if (type->value_type == CONFIG_VALUE_STRING) {
             const size_t length = write->value.string_value.size();
-            if ((variable->has_min_length && length < variable->min_length) ||
-                (variable->has_max_length && length > variable->max_length)) {
+            if ((type->has_min_length && length < type->min_length) ||
+                (type->has_max_length && length > type->max_length)) {
                 return Fail_(write, "typed write string length error", diagnostic);
             }
             return true;
         }
-        if (variable->type == CONFIG_VALUE_RATIO) {
+        if (type->value_type == CONFIG_VALUE_BITMAP) {
+            const size_t byte_count = (type->bitmap_bit_count + 7) / 8;
+            if (write->value.bitmap_value.size() != byte_count) {
+                return Fail_(write, "typed write bitmap size error", diagnostic);
+            }
+            for (size_t index = 0; index < byte_count; ++index) {
+                if ((write->value.bitmap_value[index] &
+                     static_cast<uint8_t>(~type->bitmap_known_bits[index])) != 0) {
+                    return Fail_(write, "typed write unknown bitmap bits", diagnostic);
+                }
+            }
+            if ((type->bitmap_bit_count & 7) != 0 && !write->value.bitmap_value.empty()) {
+                const uint8_t final_mask = static_cast<uint8_t>(
+                    (1U << (type->bitmap_bit_count & 7)) - 1U);
+                if ((write->value.bitmap_value.back() & static_cast<uint8_t>(~final_mask)) != 0) {
+                    return Fail_(write, "typed write bitmap padding bits", diagnostic);
+                }
+            }
+            return true;
+        }
+        if (type->value_type == CONFIG_VALUE_RATIO) {
             int64_t minimum = 0;
             int64_t maximum = 0;
-            Primitive_Range_(variable->ratio_component_type, &minimum, &maximum);
+            Primitive_Range_(type->ratio_component_type, &minimum, &maximum);
             if (write->value.ratio_denominator <= 0 ||
                 write->value.ratio_numerator < minimum ||
                 write->value.ratio_numerator > maximum ||
@@ -63,28 +84,28 @@ namespace {
 
         int64_t primitive_minimum = 0;
         int64_t primitive_maximum = 0;
-        Primitive_Range_(variable->type, &primitive_minimum, &primitive_maximum);
-        const int64_t minimum = variable->has_min ? variable->min : primitive_minimum;
-        const int64_t maximum = variable->has_max ? variable->max : primitive_maximum;
+        Primitive_Range_(type->value_type, &primitive_minimum, &primitive_maximum);
+        const int64_t minimum = type->has_min ? type->min : primitive_minimum;
+        const int64_t maximum = type->has_max ? type->max : primitive_maximum;
         if (write->value.integer_value < minimum || write->value.integer_value > maximum) {
             diagnostic->location = write->provenance;
             diagnostic->message = "typed write range error for " + std::string(variable->name);
             return false;
         }
-        if (variable->scalar_kind == CONFIG_SCALAR_ENUM &&
-            variable->reject_unknown_numeric) {
+        if (type->scalar_kind == CONFIG_SCALAR_ENUM &&
+            type->reject_unknown_numeric) {
             bool found = false;
-            for (size_t index = 0; index < variable->value_count; ++index) {
-                found = found || variable->values[index].value == write->value.integer_value;
+            for (size_t index = 0; index < type->value_count; ++index) {
+                found = found || type->values[index].value == write->value.integer_value;
             }
             if (!found) {
                 return Fail_(write, "typed write unknown enum value", diagnostic);
             }
         }
-        if (variable->scalar_kind == CONFIG_SCALAR_MASK &&
-            variable->reject_unknown_numeric &&
+        if (type->scalar_kind == CONFIG_SCALAR_MASK &&
+            type->reject_unknown_numeric &&
             (static_cast<uint64_t>(write->value.integer_value) &
-             ~variable->known_bits) != 0) {
+             ~type->known_bits) != 0) {
             return Fail_(write, "typed write unknown mask bits", diagnostic);
         }
         return true;
@@ -202,7 +223,13 @@ bool Commit_State(const s_config_state* state) {
         return false;
     }
     for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
-        if (state->values[variable_id].type != variables[variable_id].type) {
+        const s_type_descriptor* type = variables[variable_id].type;
+        if (state->values[variable_id].type != type->value_type) {
+            return false;
+        }
+        if (type->value_type == CONFIG_VALUE_BITMAP &&
+            state->values[variable_id].bitmap_value.size() !=
+                (type->bitmap_bit_count + 7) / 8) {
             return false;
         }
     }

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,7 @@ enum e_primitive_type {
     PRIMITIVE_INT32,
     PRIMITIVE_UINT32,
     PRIMITIVE_STRING,
+    PRIMITIVE_BITMAP,
     PRIMITIVE_RATIO,
 };
 
@@ -23,6 +25,7 @@ enum e_scalar_kind {
     SCALAR_PRIMITIVE,
     SCALAR_ENUM,
     SCALAR_MASK,
+    SCALAR_BITMAP,
     SCALAR_RATIO,
 };
 
@@ -30,11 +33,19 @@ enum e_node_kind {
     NODE_SCALAR,
     NODE_RECORD,
     NODE_ARRAY,
+    NODE_NAMESPACE,
 };
 
 struct s_symbol {
     std::string name;
+    std::string description;
     int64_t value = 0;
+};
+
+struct s_bitmap_symbol {
+    std::string name;
+    std::string description;
+    std::vector<uint8_t> value;
 };
 
 struct s_metadata {
@@ -62,6 +73,70 @@ struct s_binding {
     std::string symbol;
 };
 
+struct s_documented_type;
+
+struct s_documented_field {
+    std::string id;
+    s_metadata metadata;
+    bool internal = false;
+    std::shared_ptr<s_documented_type> type;
+    bool has_default = false;
+    std::string default_value;
+};
+
+struct s_documented_type {
+    e_node_kind node_kind = NODE_SCALAR;
+    e_primitive_type primitive = PRIMITIVE_BOOL;
+    e_scalar_kind scalar_kind = SCALAR_PRIMITIVE;
+    std::string reference;
+    s_constraints constraints;
+    std::vector<s_symbol> values;
+    std::vector<s_symbol> flags;
+    std::vector<s_bitmap_symbol> bitmap_values;
+    std::vector<s_bitmap_symbol> bitmap_flags;
+    size_t bitmap_bit_count = 0;
+    bool allow_numeric = false;
+    bool reject_unknown_numeric = false;
+    int64_t array_count = 0;
+    int64_t array_index_base = 1;
+    std::string array_index_type;
+    std::shared_ptr<s_documented_type> array_element;
+    std::vector<s_documented_field> fields;
+};
+
+struct s_documentation_reference {
+    std::string title;
+    std::string anchor;
+};
+
+struct s_type_declaration {
+    std::string id;
+    s_metadata metadata;
+    bool internal = false;
+    s_documented_type type;
+    std::vector<s_documentation_reference> used_by;
+};
+
+struct s_record_declaration {
+    std::string id;
+    s_metadata metadata;
+    bool internal = false;
+    std::vector<s_documented_field> fields;
+    std::vector<s_documentation_reference> used_by;
+};
+
+struct s_parameter_declaration {
+    std::string id;
+    std::string name_space;
+    s_metadata metadata;
+    std::string group;
+    s_documented_type type;
+    bool has_default = false;
+    std::string default_value;
+    s_binding binding;
+    std::vector<std::string> native_targets;
+};
+
 struct s_group {
     std::string id;
     s_metadata metadata;
@@ -79,11 +154,16 @@ struct s_parameter {
     bool default_bool = false;
     int64_t default_integer = 0;
     std::string default_string;
+    std::vector<uint8_t> default_bitmap;
     int64_t default_ratio_numerator = 0;
     int64_t default_ratio_denominator = 1;
     e_primitive_type ratio_component_type = PRIMITIVE_INT16;
     std::vector<s_symbol> values;
     std::vector<s_symbol> flags;
+    std::vector<s_bitmap_symbol> bitmap_values;
+    std::vector<s_bitmap_symbol> bitmap_flags;
+    std::vector<uint8_t> bitmap_known_bits;
+    size_t bitmap_bit_count = 0;
     bool allow_numeric = false;
     bool reject_unknown_numeric = false;
     uint64_t known_bits = 0;
@@ -104,6 +184,9 @@ struct s_node {
 
 struct s_schema {
     std::vector<s_group> groups;
+    std::vector<s_type_declaration> type_declarations;
+    std::vector<s_record_declaration> record_declarations;
+    std::vector<s_parameter_declaration> parameter_declarations;
     std::vector<s_parameter> parameters;
     std::vector<s_node> nodes;
 };

@@ -10,7 +10,7 @@ Prepare authoritative definitions before using `.vocode/workflows/mass.yaml` for
 - [ ] Reconcile existing definitions in `src/game/orion2_consts.h`, including names, count sentinels, spelling, zero values, and distinctions between IDs and bit masks.
 - [x] Add verified definitions for weapon firing arcs, natural weapon properties, game setup, governments, stock-race table indexes, crew quality, strategic special categories, technology application types, map environmental groups, map-generation satellite choices, leader types, AI special-choice item kinds, and AI ship themes.
 - [x] Preserve the distinct tactical all-sector and design-screen 360-degree firing-arc encodings, and retain weapon-modification bit 0 as reserved.
-- [ ] Keep wire/save/native numeric values stable and add compile-time checks for important counts, bit positions, and table extents.
+- [x] Keep wire/save/native numeric values stable and add compile-time checks for important counts, bit positions, and table extents.
 
 #### Deferred domains and unresolved names
 
@@ -27,22 +27,22 @@ Prepare authoritative definitions before using `.vocode/workflows/mass.yaml` for
 
 ### 2. Prepare the mass-update queue
 
-- [ ] Create `files.md` only after the domain definitions and naming rules are reviewed. Put global replacement rules under `# Instructions` and one source entry point per `[ ] <filename>` line under `# Files`.
-- [ ] Instruct the mass workflow to replace raw literals only when the field's semantic domain is proven, to leave quantities and unrelated bit fields unchanged, and to report ambiguous values instead of guessing.
-- [ ] Process definitions and central data tables before behavioral call sites, then search globally for stale literals and partially migrated domains.
-- [ ] Keep each claimed-file change focused; do not combine enum migration with unrelated cleanup or behavior changes.
+- [x] Create `files.md` only after the domain definitions and naming rules are reviewed. Put global replacement rules under `# Instructions` and one source entry point per `[ ] <filename>` line under `# Files`.
+- [x] Instruct the mass workflow to replace raw literals only when the field's semantic domain is proven, to leave quantities and unrelated bit fields unchanged, and to report ambiguous values instead of guessing.
+- [x] Process definitions and central data tables before behavioral call sites, then search globally for stale literals and partially migrated domains.
+- [x] Keep each claimed-file change focused; do not combine enum migration with unrelated cleanup or behavior changes.
 
 ### 3. Define JSON5 schema types independently
 
-- [ ] Recreate the verified domains explicitly under `types` in `specs/config/main.json5`; the configuration tool must not parse C/C++ headers.
-- [ ] Use separate schema types for semantic IDs, table indexes, masks, and similarly named domains with different encodings, including weapon modification IDs, available-modification flags, natural weapon properties, and firing arcs.
+- [x] Recreate the verified domains explicitly under `types` in `specs/config/main.json5`; the configuration tool must not parse C/C++ headers.
+- [x] Use separate schema types for semantic IDs, table indexes, masks, and similarly named domains with different encodings, including weapon modification IDs, available-modification flags, natural weapon properties, and firing arcs.
 - [ ] Use enum-backed `index_type` declarations for configurable arrays such as weapons, specials, buildings, technologies, and technology fields.
-- [ ] Prefer stable lowercase configuration names while retaining exact native numeric values; reject unknown numeric values where the domain is complete.
-- [ ] Add validation tests that pin representative and boundary values in both the JSON5 declarations and native enums so duplicated definitions cannot drift silently.
+- [x] Prefer stable lowercase configuration names while retaining exact native numeric values; reject unknown numeric values where the domain is complete.
+- [x] Add validation tests that pin representative and boundary values in both the JSON5 declarations and native enums so duplicated definitions cannot drift silently.
 
 ### 4. Verify each migration wave
 
-- [ ] Build after central definitions and after each domain wave.
+- [x] Build after central definitions and after each domain wave.
 - [ ] Run focused tests for configuration schema/generation, save serialization, networking, ship design and combat, technology data, map generation, leaders, and new-game setup as applicable.
 - [ ] Verify generated configuration output, save/network numeric compatibility, and all configured table indexes against their native counts.
 - [ ] Finish with global searches for raw domain literals, `git diff --check`, the full test suite, and a review of any intentionally retained numeric values.

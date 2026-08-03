@@ -1318,3 +1318,28 @@ typedef enum COLONY_JOB_BONUS {
     COLONY_JOB_RACIAL_BONUS_NATIVE = 9,
     COLONY_JOB_RACIAL_BONUS_COUNT = 10,
 };
+
+static_assert(GAME_DIFFICULTY_COUNT == 5, "game difficulty values must remain save-compatible");
+static_assert(GALAXY_AGE_COUNT == 3, "galaxy age values must remain save-compatible");
+static_assert(GALAXY_SIZE_COUNT == 5, "galaxy size values must remain save-compatible");
+static_assert(GOVERNMENT_COUNT == 8, "government values must remain save-compatible");
+static_assert(STOCK_RACE_COUNT == 13, "stock race table extent must remain compatible");
+static_assert(LEADER_TYPE_COUNT == 2, "leader type values must remain compatible");
+static_assert(CREW_QUALITY_COUNT == 5, "crew quality values must remain compatible");
+static_assert(SPECIAL_CATEGORY_COUNT == 8, "special category values must remain compatible");
+static_assert(TECH_APPLICATION_TYPE_COUNT == 10, "technology application type values must remain compatible");
+static_assert(PLANET_GROUP_COUNT == 4, "planet group table extent must remain compatible");
+static_assert(MAPGEN_SATELLITE_COUNT == 5, "map-generation satellite table extent must remain compatible");
+static_assert(BUILDING_COUNT == 49, "building table extent must remain compatible");
+static_assert(SPECIAL_COUNT == 40, "special table extent must remain compatible");
+static_assert(TECH_APP_COUNT == 212, "technology application table extent must remain compatible");
+static_assert(TECH_FIELD_COUNT == 83, "technology field table extent must remain compatible");
+static_assert(WEAPON_COUNT == 46, "weapon table extent must remain compatible");
+static_assert(WEAPON_MOD_COUNT == 15, "weapon modification values must remain compatible");
+static_assert(WEAPON_MOD_FLAG_RESERVED_0 == 0x0001, "weapon modification bit zero must remain reserved");
+static_assert(WEAPON_MOD_FLAG_HEAVY_MOUNT == (1 << WEAPON_MOD_HEAVY_MOUNT), "weapon modification IDs and flags must remain distinct");
+static_assert(WEAPON_MOD_FLAG_OVERLOADED == (1 << WEAPON_MOD_OVERLOADED), "weapon modification flag positions must remain compatible");
+static_assert(WEAPON_FIRING_ARC_ALL_SECTORS == 0x0F, "tactical all-sector firing arc must remain compatible");
+static_assert(WEAPON_FIRING_ARC_360 == 0x10, "design-screen 360-degree firing arc must remain compatible");
+static_assert((WEAPON_FIRING_ARC_ALL_SECTORS & WEAPON_FIRING_ARC_360) == 0, "firing arc encodings must remain distinct");
+static_assert(WEAPON_NATURAL_FLAG_AI_SPATIAL_COMPRESSOR == 0x1000, "natural weapon flag positions must remain compatible");
