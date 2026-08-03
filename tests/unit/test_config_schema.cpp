@@ -366,7 +366,7 @@ DOCTEST_TEST_CASE("C++ generation emits array aliases only for path resolution")
     std::filesystem::remove_all(root);
 }
 
-DOCTEST_TEST_CASE("HTML documentation is deterministic searchable linked and non-expanded") {
+DOCTEST_TEST_CASE("HTML documentation is deterministic searchable linked and author-facing") {
     config::tool::s_schema schema;
     std::string diagnostic;
     DOCTEST_REQUIRE(Load_("valid_aggregates.json5", &schema, &diagnostic));
@@ -390,6 +390,12 @@ DOCTEST_TEST_CASE("HTML documentation is deterministic searchable linked and non
     DOCTEST_CHECK(generated == regenerated);
     DOCTEST_CHECK(generated.starts_with("<!doctype html>"));
     DOCTEST_CHECK(generated.find("<style>") != std::string::npos);
+    DOCTEST_CHECK(generated.find("fonts.googleapis.com/css?family=Open+Sans") !=
+                  std::string::npos);
+    DOCTEST_CHECK(generated.find("font-family:\"Noto Serif\"") != std::string::npos);
+    DOCTEST_CHECK(generated.find("color:#ba3925") != std::string::npos);
+    DOCTEST_CHECK(generated.find("color:#2156a5") != std::string::npos);
+    DOCTEST_CHECK(generated.find("background:#f7f7f8") != std::string::npos);
     DOCTEST_CHECK(generated.find("window.CONFIG_SEARCH_INDEX") != std::string::npos);
     DOCTEST_CHECK(generated.find("Ctrl+K") == std::string::npos);
     DOCTEST_CHECK(generated.find("id=\"parameter-guardian\"") != std::string::npos);
@@ -404,14 +410,31 @@ DOCTEST_TEST_CASE("HTML documentation is deterministic searchable linked and non
     DOCTEST_CHECK(generated.find(
         "The weapon can fire toward the front of the ship.") !=
         std::string::npos);
-    DOCTEST_CHECK(generated.find("Implementation details") != std::string::npos);
-    DOCTEST_CHECK(generated.find("fixture.weapons") != std::string::npos);
+    DOCTEST_CHECK(generated.find("Type in the file") != std::string::npos);
+    DOCTEST_CHECK(generated.find("<code>ships guardian</code>") != std::string::npos);
+    DOCTEST_CHECK(generated.find("Built-in default configuration") != std::string::npos);
+    DOCTEST_CHECK(generated.find("ships guardian appearance = 2;") != std::string::npos);
+    DOCTEST_CHECK(generated.find(
+        "ships guardian weapon 1 type = plasma_cannon;") != std::string::npos);
+    DOCTEST_CHECK(generated.find(
+        "ships guardian weapon 2 arc = forward,aft;") != std::string::npos);
+    DOCTEST_CHECK(generated.find(
+        "ships guardian specials = self_repairing;") != std::string::npos);
+    DOCTEST_CHECK(generated.find(
+        "ships guardian label = &quot;Grüße&quot;;") != std::string::npos);
+    DOCTEST_CHECK(generated.find("ships guardian reduction = 1/3;") != std::string::npos);
+    DOCTEST_CHECK(generated.find("Configuration path") == std::string::npos);
+    DOCTEST_CHECK(generated.find("<dt>Storage</dt>") == std::string::npos);
+    DOCTEST_CHECK(generated.find("uint8") == std::string::npos);
+    DOCTEST_CHECK(generated.find("uint16") == std::string::npos);
+    DOCTEST_CHECK(generated.find("int8") == std::string::npos);
+    DOCTEST_CHECK(generated.find("int16") == std::string::npos);
+    DOCTEST_CHECK(generated.find("Implementation details") == std::string::npos);
+    DOCTEST_CHECK(generated.find("fixture.weapons") == std::string::npos);
     DOCTEST_CHECK(generated.find("guardian.weapon.1.type") == std::string::npos);
     DOCTEST_CHECK(generated.find("guardian.weapon.2.type") == std::string::npos);
     DOCTEST_CHECK(generated.find("guardian label = &quot;Sentinel&quot;;") !=
                   std::string::npos);
-    DOCTEST_CHECK(generated.find("https://") == std::string::npos);
-    DOCTEST_CHECK(generated.find("http://") == std::string::npos);
     DOCTEST_CHECK(Internal_Links_Resolve_(generated));
 
     std::filesystem::remove_all(root);
@@ -445,9 +468,9 @@ DOCTEST_TEST_CASE("HTML documentation escapes metadata and handles empty public 
     DOCTEST_CHECK(generated.find("Local <script>alert(1)</script>") == std::string::npos);
     DOCTEST_CHECK(generated.find("\\u003cscript\\u003ealert(1)\\u003c/script\\u003e") !=
                   std::string::npos);
-    DOCTEST_CHECK(generated.find("This schema has no public named value types.") !=
+    DOCTEST_CHECK(generated.find("There are no additional allowed-value lists.") !=
                   std::string::npos);
-    DOCTEST_CHECK(generated.find("This schema has no public record types.") !=
+    DOCTEST_CHECK(generated.find("There are no additional setting layouts.") !=
                   std::string::npos);
     DOCTEST_CHECK(Internal_Links_Resolve_(generated));
 
