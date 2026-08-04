@@ -1,6 +1,7 @@
 #include "file_util.h"
 
 #include <cstdio>
+#include <utility>
 
 namespace config::tool {
 
@@ -8,18 +9,22 @@ bool Read_File(const char* path, std::string* content) {
     if (path == nullptr || content == nullptr) {
         return false;
     }
+    content->clear();
     FILE* file = std::fopen(path, "rb");
     if (file == nullptr) {
         return false;
     }
-    content->clear();
+    std::string result;
     char buffer[4096];
     while (true) {
         const size_t count = std::fread(buffer, 1, sizeof(buffer), file);
-        content->append(buffer, count);
+        result.append(buffer, count);
         if (count != sizeof(buffer)) {
             const bool success = std::ferror(file) == 0;
             std::fclose(file);
+            if (success) {
+                *content = std::move(result);
+            }
             return success;
         }
     }

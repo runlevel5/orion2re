@@ -142,6 +142,25 @@ DOCTEST_TEST_CASE("aggregate schema normalizes traversal leaves defaults and nat
 
 DOCTEST_TEST_SUITE("configuration schema") {
 
+DOCTEST_TEST_CASE("JSON reader replaces reused output instead of appending to it") {
+    config::tool::s_json_value reused;
+    config::tool::s_json_value expected;
+    std::string diagnostic;
+    const std::string primitives = Fixture_Path_("valid_primitives.json5");
+    const std::string aggregates = Fixture_Path_("valid_aggregates.json5");
+
+    DOCTEST_REQUIRE(config::tool::Read_Json5_File(
+        primitives.c_str(), &reused, &diagnostic));
+    DOCTEST_REQUIRE(config::tool::Read_Json5_File(
+        aggregates.c_str(), &reused, &diagnostic));
+    DOCTEST_REQUIRE(config::tool::Read_Json5_File(
+        aggregates.c_str(), &expected, &diagnostic));
+
+    DOCTEST_CHECK(reused.kind == expected.kind);
+    DOCTEST_CHECK(reused.member_names == expected.member_names);
+    DOCTEST_CHECK(reused.values.size() == expected.values.size());
+}
+
 DOCTEST_TEST_CASE("main schema game-domain types are documented and match native values") {
     config::tool::s_schema schema;
     std::string diagnostic;

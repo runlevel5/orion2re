@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cstdio>
 #include <filesystem>
-#include <functional>
 #include <set>
 
 #include "file_util.h"
@@ -301,6 +300,66 @@ namespace {
         return tables.size();
     }
 
+    bool Same_Layout_(const s_schema* schema,
+                      const std::vector<std::vector<uint32_t>>& children,
+                      uint32_t left_index, uint32_t right_index) {
+        const s_node& left = schema->nodes[left_index];
+        const s_node& right = schema->nodes[right_index];
+        if (left.id != right.id || left.kind != right.kind ||
+            left.last_parameter - left.first_parameter !=
+                right.last_parameter - right.first_parameter ||
+            left.array_count != right.array_count ||
+            left.array_index_base != right.array_index_base ||
+            left.has_terminator != right.has_terminator ||
+            left.terminator != right.terminator ||
+            !Same_Symbols_(left.index_aliases, right.index_aliases) ||
+            children[left_index].size() != children[right_index].size()) {
+            return false;
+        }
+        if (left.kind == NODE_SCALAR) {
+            return Same_Runtime_Type_(schema->parameters[left.parameter],
+                                      schema->parameters[right.parameter]) &&
+                   Same_Target_Expressions_(schema->parameters[left.parameter],
+                                            schema->parameters[right.parameter]);
+        }
+        for (size_t child = 0; child < children[left_index].size(); ++child) {
+            const uint32_t left_child = children[left_index][child];
+            const uint32_t right_child = children[right_index][child];
+            if (schema->nodes[left_child].external_index !=
+                    schema->nodes[right_child].external_index ||
+                !Same_Layout_(schema, children, left_child, right_child)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void Map_Subtree_(const std::vector<std::vector<uint32_t>>& children,
+                      uint32_t representative, uint32_t duplicate,
+                      std::vector<bool>* omitted_nodes,
+                      std::vector<uint32_t>* node_representatives) {
+        (*omitted_nodes)[duplicate] = true;
+        (*node_representatives)[duplicate] = representative;
+        for (size_t child = 0; child < children[representative].size(); ++child) {
+            Map_Subtree_(children, children[representative][child],
+                         children[duplicate][child], omitted_nodes,
+                         node_representatives);
+        }
+    }
+
+    uint32_t Compact_Leaf_Count_(const s_schema* schema,
+                                 const std::vector<std::vector<uint32_t>>& children,
+                                 const std::vector<bool>& repeated_layout_arrays,
+                                 uint32_t node_index) {
+        uint32_t layout = children[node_index].front();
+        while (schema->nodes[layout].kind == NODE_ARRAY &&
+               repeated_layout_arrays[layout]) {
+            layout = children[layout].front();
+        }
+        return schema->nodes[layout].last_parameter -
+               schema->nodes[layout].first_parameter + 1;
+    }
+
     std::string Source_(const s_schema* schema) {
         std::string output =
             "// Generated from specs/config/main.json5. Do not edit.\n"
@@ -515,47 +574,6 @@ namespace {
             node_representatives[node_index] = node_index;
         }
         std::vector<bool> repeated_layout_arrays(schema->nodes.size(), false);
-        std::function<bool(uint32_t, uint32_t)> same_layout =
-            [&](uint32_t left_index, uint32_t right_index) {
-                const s_node& left = schema->nodes[left_index];
-                const s_node& right = schema->nodes[right_index];
-                if (left.id != right.id || left.kind != right.kind ||
-                    left.last_parameter - left.first_parameter !=
-                        right.last_parameter - right.first_parameter ||
-                    left.array_count != right.array_count ||
-                    left.array_index_base != right.array_index_base ||
-                    left.has_terminator != right.has_terminator ||
-                    left.terminator != right.terminator ||
-                    !Same_Symbols_(left.index_aliases, right.index_aliases) ||
-                    model_children[left_index].size() != model_children[right_index].size()) {
-                    return false;
-                }
-                if (left.kind == NODE_SCALAR) {
-                    return Same_Runtime_Type_(schema->parameters[left.parameter],
-                                              schema->parameters[right.parameter]) &&
-                           Same_Target_Expressions_(schema->parameters[left.parameter],
-                                                    schema->parameters[right.parameter]);
-                }
-                for (size_t child = 0; child < model_children[left_index].size(); ++child) {
-                    const uint32_t left_child = model_children[left_index][child];
-                    const uint32_t right_child = model_children[right_index][child];
-                    if (schema->nodes[left_child].external_index !=
-                            schema->nodes[right_child].external_index ||
-                        !same_layout(left_child, right_child)) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-        std::function<void(uint32_t, uint32_t)> map_subtree =
-            [&](uint32_t representative, uint32_t duplicate) {
-                omitted_nodes[duplicate] = true;
-                node_representatives[duplicate] = representative;
-                for (size_t child = 0; child < model_children[representative].size(); ++child) {
-                    map_subtree(model_children[representative][child],
-                                model_children[duplicate][child]);
-                }
-        };
         for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
             const s_node& node = schema->nodes[node_index];
             if (omitted_nodes[node_index] || node.kind != NODE_ARRAY ||
@@ -567,12 +585,15 @@ namespace {
             bool equivalent = true;
             for (size_t element = 1; element < model_children[node_index].size(); ++element) {
                 equivalent = equivalent &&
-                    same_layout(representative, model_children[node_index][element]);
+                    Same_Layout_(schema, model_children, representative,
+                                 model_children[node_index][element]);
             }
             if (!equivalent) continue;
             repeated_layout_arrays[node_index] = true;
             for (size_t element = 1; element < model_children[node_index].size(); ++element) {
-                map_subtree(representative, model_children[node_index][element]);
+                Map_Subtree_(model_children, representative,
+                             model_children[node_index][element], &omitted_nodes,
+                             &node_representatives);
             }
         }
         for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
@@ -610,15 +631,6 @@ namespace {
                 if (!entirely_prefix_fill) compact_default_ranges.push_back(node_index);
             }
         }
-        auto compact_leaf_count = [&](uint32_t node_index) {
-            uint32_t layout = model_children[node_index].front();
-            while (schema->nodes[layout].kind == NODE_ARRAY &&
-                   repeated_layout_arrays[layout]) {
-                layout = model_children[layout].front();
-            }
-            return schema->nodes[layout].last_parameter -
-                   schema->nodes[layout].first_parameter + 1;
-        };
         std::vector<bool> compact_parameters(schema->parameters.size(), false);
         for (uint32_t node_index : compact_ranges) {
             const s_node& node = schema->nodes[node_index];
@@ -637,7 +649,9 @@ namespace {
         }
         for (size_t range_index = 0; range_index < compact_default_ranges.size(); ++range_index) {
             const s_node& range = schema->nodes[compact_default_ranges[range_index]];
-            const uint32_t leaf_count = compact_leaf_count(compact_default_ranges[range_index]);
+            const uint32_t leaf_count = Compact_Leaf_Count_(
+                schema, model_children, repeated_layout_arrays,
+                compact_default_ranges[range_index]);
             const uint32_t instance_count =
                 (range.last_parameter - range.first_parameter + 1) / leaf_count;
             for (uint32_t leaf = 0; leaf < leaf_count; ++leaf) {
@@ -819,7 +833,9 @@ namespace {
         }
         for (size_t range_index = 0; range_index < compact_default_ranges.size(); ++range_index) {
             const s_node& range = schema->nodes[compact_default_ranges[range_index]];
-            const uint32_t leaf_count = compact_leaf_count(compact_default_ranges[range_index]);
+            const uint32_t leaf_count = Compact_Leaf_Count_(
+                schema, model_children, repeated_layout_arrays,
+                compact_default_ranges[range_index]);
             output += "    if (variable_id >= " + std::to_string(range.first_parameter) +
                       " && variable_id <= " + std::to_string(range.last_parameter) + ") {\n"
                       "        const size_t instance = (variable_id - " +
@@ -873,7 +889,8 @@ namespace {
                   "    *variable = {};\n";
         for (uint32_t node_index : compact_ranges) {
             const s_node& range_node = schema->nodes[node_index];
-            const uint32_t element_variable_count = compact_leaf_count(node_index);
+            const uint32_t element_variable_count = Compact_Leaf_Count_(
+                schema, model_children, repeated_layout_arrays, node_index);
             output += "    if (variable_id >= " +
                       std::to_string(range_node.first_parameter) +
                       " && variable_id <= " +

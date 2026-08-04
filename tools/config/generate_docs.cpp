@@ -64,20 +64,7 @@ namespace {
             parameter.name_space + "." + parameter.id;
     }
 
-    std::string Cfg_Path_(const s_schema* schema, size_t parameter_index) {
-        uint32_t node_index = UINT32_MAX;
-        for (size_t index = 0; index < schema->nodes.size(); ++index) {
-            if (schema->nodes[index].parameter == parameter_index) {
-                node_index = static_cast<uint32_t>(index);
-                break;
-            }
-        }
-        if (node_index == UINT32_MAX) {
-            std::string result = schema->parameters[parameter_index].path;
-            std::replace(result.begin(), result.end(), '.', ' ');
-            return result;
-        }
-
+    std::string Cfg_Node_Path_(const s_schema* schema, uint32_t node_index) {
         std::vector<std::string> parts;
         while (node_index != UINT32_MAX) {
             const s_node& node = schema->nodes[node_index];
@@ -105,31 +92,23 @@ namespace {
         return result;
     }
 
-    std::string Cfg_Node_Path_(const s_schema* schema, uint32_t node_index) {
-        std::vector<std::string> parts;
-        while (node_index != UINT32_MAX) {
-            const s_node& node = schema->nodes[node_index];
-            if (!node.id.empty()) {
-                parts.push_back(node.id);
-            } else if (node.parent != UINT32_MAX) {
-                const s_node& array = schema->nodes[node.parent];
-                std::string selector = std::to_string(node.external_index);
-                for (const s_symbol& alias : array.index_aliases) {
-                    if (alias.value == node.external_index) {
-                        selector = alias.name;
-                        break;
-                    }
-                }
-                parts.push_back(selector);
+    uint32_t Parameter_Node_(const s_schema* schema, size_t parameter_index) {
+        for (size_t index = 0; index < schema->nodes.size(); ++index) {
+            if (schema->nodes[index].parameter == parameter_index) {
+                return static_cast<uint32_t>(index);
             }
-            node_index = node.parent;
         }
-        std::reverse(parts.begin(), parts.end());
+        return UINT32_MAX;
+    }
 
-        std::string result;
-        for (const std::string& part : parts) {
-            result += result.empty() ? part : " " + part;
+    std::string Cfg_Path_(const s_schema* schema, size_t parameter_index) {
+        const uint32_t node_index = Parameter_Node_(schema, parameter_index);
+        if (node_index != UINT32_MAX) {
+            return Cfg_Node_Path_(schema, node_index);
         }
+
+        std::string result = schema->parameters[parameter_index].path;
+        std::replace(result.begin(), result.end(), '.', ' ');
         return result;
     }
 
@@ -182,14 +161,9 @@ namespace {
             std::to_string(parameter.default_integer);
     }
 
-    bool Bitmap_Equals_(const std::vector<uint8_t>& left,
-                        const std::vector<uint8_t>& right) {
-        return left == right;
-    }
-
     std::string Symbolic_Bitmap_(const s_parameter& parameter) {
         for (const s_bitmap_symbol& symbol : parameter.bitmap_values) {
-            if (Bitmap_Equals_(symbol.value, parameter.default_bitmap)) {
+            if (symbol.value == parameter.default_bitmap) {
                 return symbol.name;
             }
         }
@@ -288,13 +262,7 @@ namespace {
                 continue;
             }
 
-            uint32_t node_index = UINT32_MAX;
-            for (size_t index = 0; index < schema->nodes.size(); ++index) {
-                if (schema->nodes[index].parameter == parameter_index) {
-                    node_index = static_cast<uint32_t>(index);
-                    break;
-                }
-            }
+            const uint32_t node_index = Parameter_Node_(schema, parameter_index);
             uint32_t assignment_node = node_index;
             while (assignment_node != UINT32_MAX) {
                 const uint32_t parent = schema->nodes[assignment_node].parent;

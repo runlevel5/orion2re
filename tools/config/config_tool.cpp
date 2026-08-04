@@ -18,7 +18,11 @@ namespace {
 }
 
 int main(int argc, char** argv) {
-    if (argc < 3) {
+    const bool validate = argc == 3 && std::strcmp(argv[1], "validate") == 0;
+    const bool generate = argc == 4 && std::strcmp(argv[1], "generate") == 0;
+    const bool check = argc == 5 && std::strcmp(argv[1], "check") == 0;
+    const bool docs = argc == 4 && std::strcmp(argv[1], "docs") == 0;
+    if (!validate && !generate && !check && !docs) {
         Print_Usage_();
         return 2;
     }
@@ -30,18 +34,13 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    bool success = false;
-    if (std::strcmp(argv[1], "validate") == 0 && argc == 3) {
-        success = true;
-    } else if (std::strcmp(argv[1], "generate") == 0 && argc == 4) {
+    bool success = true;
+    if (generate) {
         success = config::tool::Generate_Cpp(&schema, argv[3], &diagnostic);
-    } else if (std::strcmp(argv[1], "check") == 0 && argc == 5) {
+    } else if (check) {
         success = config::tool::Check_Generated_Cpp(&schema, argv[3], argv[4], &diagnostic);
-    } else if (std::strcmp(argv[1], "docs") == 0 && argc == 4) {
+    } else if (docs) {
         success = config::tool::Generate_Documentation(&schema, argv[3], &diagnostic);
-    } else {
-        Print_Usage_();
-        return 2;
     }
 
     if (!success) {

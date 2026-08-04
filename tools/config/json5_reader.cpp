@@ -1,6 +1,7 @@
 #include "json5_reader.h"
 
 #include <cmath>
+#include <utility>
 
 #include "file_util.h"
 #include "yyjson.h"
@@ -78,6 +79,10 @@ namespace {
 }
 
 bool Read_Json5_File(const char* path, s_json_value* value, std::string* diagnostic) {
+    if (path == nullptr || value == nullptr || diagnostic == nullptr) {
+        return false;
+    }
+
     std::string source;
     if (!Read_File(path, &source)) {
         *diagnostic = std::string(path) + ": unable to read file";
@@ -102,8 +107,13 @@ bool Read_Json5_File(const char* path, s_json_value* value, std::string* diagnos
         return false;
     }
 
-    const bool result = Convert_Value_(yyjson_doc_get_root(document), 0, path, value, diagnostic);
+    s_json_value converted;
+    const bool result = Convert_Value_(yyjson_doc_get_root(document), 0, path,
+                                       &converted, diagnostic);
     yyjson_doc_free(document);
+    if (result) {
+        *value = std::move(converted);
+    }
     return result;
 }
 
