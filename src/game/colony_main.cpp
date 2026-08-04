@@ -16,7 +16,7 @@ namespace COLONY {
 
         char input[4];
         snprintf(input, sizeof(input), "%d", preset);
-        char prompt[] = "Autobuild queue: 0-10";
+        char prompt[] = "Auto Build Queue: 0-10";
         char invalid[] = "Enter a queue number from 0 to 10, or leave it blank to disable autobuild.";
 
         fonts::Set_Font_Style_(3, &COLONY::_font_color_array);
@@ -963,7 +963,7 @@ namespace COLONY {
             fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_bright_blue_font_color_array);
             if (autobuild_preset >= 0) {
                 char auto_msg[40];
-                snprintf(auto_msg, sizeof(auto_msg), "Autobuild queue %d", autobuild_preset);
+                snprintf(auto_msg, sizeof(auto_msg), "Auto Build Queue %d", autobuild_preset);
                 fonts::Print_Centered_(0x242 /* 578 */, 0x1c /* 28 */, auto_msg);
             } else {
                 fonts::Print_Centered_(0x242 /* 578 */, 0x1c /* 28 */,

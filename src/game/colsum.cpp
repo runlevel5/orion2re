@@ -625,7 +625,7 @@ namespace COLSUM {
 
             if (autobuild_active) {
                 if (autobuild_preset >= 0) {
-                    snprintf(buffer, sizeof(buffer), "Autobuild queue %d", autobuild_preset);
+                    snprintf(buffer, sizeof(buffer), "Auto Build Queue %d", autobuild_preset);
                 } else {
                     snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(COLONY_PRODUCTION_NONE));
                 }
