@@ -120,6 +120,8 @@ struct s_schema_node_descriptor {
     uint32_t first_child;
     uint32_t next_sibling;
     const s_type_descriptor* type;
+    int32_t array_index_base;
+    uint32_t array_element_count;
 };
 
 struct s_array_index_alias_descriptor {

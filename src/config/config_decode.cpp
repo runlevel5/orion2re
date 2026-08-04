@@ -464,6 +464,14 @@ namespace {
                     }
                 }
             }
+            const s_schema_node_descriptor& array = schema->nodes[parent];
+            const int64_t offset = static_cast<int64_t>(external_index) -
+                                   array.array_index_base;
+            if (has_index && array.array_element_count != 0 && offset >= 0 &&
+                offset < array.array_element_count) {
+                *resolved_index = external_index;
+                return parent;
+            }
         }
         for (uint32_t index = 0; index < schema->node_count; ++index) {
             const s_schema_node_descriptor& node = schema->nodes[index];
@@ -515,36 +523,45 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
         }
     }
     std::string canonical_path = root.value;
+    t_variable_id selected_variable = CONFIG_NO_VARIABLE;
     if (selected == CONFIG_NO_NODE) {
         return Fail_(root.location, "unknown configuration variable '" + canonical_path + "'",
                      write_set, diagnostic);
     }
     for (size_t path_index = 1; path_index < statement->path.size(); ++path_index) {
         const s_cfg_token& token = statement->path[path_index];
-        if (schema->nodes[selected].kind == CONFIG_NODE_SCALAR) {
+        if (schema->nodes[selected].kind == CONFIG_NODE_SCALAR ||
+            selected_variable != CONFIG_NO_VARIABLE) {
             canonical_path += "." + token.value;
             return Fail_(root.location, "unknown configuration variable '" + canonical_path + "'",
                          write_set, diagnostic);
         }
         const bool array_selector = schema->nodes[selected].kind == CONFIG_NODE_ARRAY;
         int32_t resolved_index = 0;
-        selected = Find_Child_(schema, selected, token, &resolved_index);
+        const uint32_t parent = selected;
+        selected = Find_Child_(schema, parent, token, &resolved_index);
         if (selected == CONFIG_NO_NODE) {
             canonical_path += "." + token.value;
             return Fail_(token.location, "unknown configuration variable '" + canonical_path + "'",
                          write_set, diagnostic);
         }
         canonical_path += "." + (array_selector ? std::to_string(resolved_index) : token.value);
+        if (selected == parent && schema->nodes[parent].array_element_count != 0) {
+            selected_variable = schema->nodes[parent].first_variable +
+                static_cast<t_variable_id>(resolved_index -
+                                           schema->nodes[parent].array_index_base);
+        }
     }
     if (statement->values.empty()) {
         return Fail_(statement->location, "assignment requires a value", write_set, diagnostic);
     }
     const s_schema_node_descriptor& selected_node = schema->nodes[selected];
-    if (selected_node.kind == CONFIG_NODE_NAMESPACE) {
+    if (selected_variable == CONFIG_NO_VARIABLE &&
+        selected_node.kind == CONFIG_NODE_NAMESPACE) {
         return Fail_(statement->path.back().location,
                      "configuration namespaces are not assignable", write_set, diagnostic);
     }
-    if (!selected_node.has_terminator) {
+    if (selected_variable == CONFIG_NO_VARIABLE && !selected_node.has_terminator) {
         for (size_t node_index = 0; node_index < schema->node_count; ++node_index) {
             if (schema->nodes[node_index].parent == selected &&
                 schema->nodes[node_index].has_terminator) {
@@ -555,10 +572,13 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
         }
     }
     uint32_t boundary = selected;
-    if (selected_node.kind == CONFIG_NODE_SCALAR && selected_node.parent != CONFIG_NO_NODE) {
+    if (selected_variable == CONFIG_NO_VARIABLE &&
+        selected_node.kind == CONFIG_NODE_SCALAR &&
+        selected_node.parent != CONFIG_NO_NODE) {
         boundary = selected_node.parent;
     }
-    const t_variable_id first_variable = selected_node.first_variable;
+    const t_variable_id first_variable = selected_variable != CONFIG_NO_VARIABLE ?
+        selected_variable : selected_node.first_variable;
     const t_variable_id last_variable = schema->nodes[boundary].last_variable;
     if (first_variable == CONFIG_NO_VARIABLE || first_variable > last_variable) {
         return Fail_(root.location, "selected configuration object has no writable values",
@@ -566,7 +586,8 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
     }
     const size_t available = static_cast<size_t>(last_variable - first_variable) + 1;
     if (statement->values.size() > available) {
-        if (selected_node.kind == CONFIG_NODE_SCALAR &&
+        if ((selected_variable != CONFIG_NO_VARIABLE ||
+             selected_node.kind == CONFIG_NODE_SCALAR) &&
             selected_node.parent == CONFIG_NO_NODE) {
             return Fail_(statement->values[available].location,
                          "value " + std::to_string(available + 1) +
@@ -610,7 +631,7 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
                          write_set, diagnostic);
         }
         has_terminator = has_terminator ||
-            (selected_node.has_terminator &&
+            (selected_variable == CONFIG_NO_VARIABLE && selected_node.has_terminator &&
              write.value.integer_value == selected_node.terminator);
         write_set->writes.push_back(std::move(write));
         has_write = true;
@@ -620,7 +641,8 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
                      "an assignment containing only skips has no effect",
                      write_set, diagnostic);
     }
-    if (selected_node.has_terminator && !has_terminator) {
+    if (selected_variable == CONFIG_NO_VARIABLE &&
+        selected_node.has_terminator && !has_terminator) {
         return Fail_(statement->values.back().location,
                      "assignment to '" + canonical_path +
                      "' requires its terminator value",

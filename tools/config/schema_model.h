@@ -177,6 +177,7 @@ struct s_node {
     uint32_t parent = UINT32_MAX;
     int32_t external_index = 0;
     int64_t array_count = 0;
+    int64_t array_index_base = 0;
     size_t explicit_default_count = 0;
     bool scalar_array = false;
     std::vector<std::string> native_targets;

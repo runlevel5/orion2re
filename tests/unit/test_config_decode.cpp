@@ -268,8 +268,31 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     const config::s_schema_node_descriptor* queue =
         config::Get_Variable_Node(config::Get_Runtime_Schema(), queue_id);
     DOCTEST_REQUIRE(queue != nullptr);
-    DOCTEST_CHECK(queue->first_variable == queue_id);
-    DOCTEST_CHECK(queue->last_variable == queue_id);
+    DOCTEST_CHECK(queue->first_variable <= queue_id);
+    DOCTEST_CHECK(queue->last_variable >= queue_id);
+    DOCTEST_CHECK(queue->array_index_base == 0);
+    DOCTEST_CHECK(queue->array_element_count == BUILD_QUEUE::INSTRUCTION_CAPACITY);
+    DOCTEST_CHECK(queue->type == config::Get_Variable_Type(queue_id));
+    const config::s_runtime_schema* schema = config::Get_Runtime_Schema();
+    const config::s_schema_node_descriptor* build_queue = nullptr;
+    for (size_t index = 0; index < schema->node_count; ++index) {
+        if (schema->nodes[index].parent == config::CONFIG_NO_NODE &&
+            std::strcmp(schema->nodes[index].id, "build_queue") == 0) {
+            build_queue = &schema->nodes[index];
+            break;
+        }
+    }
+    DOCTEST_REQUIRE(build_queue != nullptr);
+    size_t row_count = 0;
+    for (uint32_t child = build_queue->first_child;
+         child != config::CONFIG_NO_NODE;
+         child = schema->nodes[child].next_sibling) {
+        ++row_count;
+        DOCTEST_CHECK(schema->nodes[child].array_element_count ==
+                      BUILD_QUEUE::INSTRUCTION_CAPACITY);
+        DOCTEST_CHECK(schema->nodes[child].first_child == config::CONFIG_NO_NODE);
+    }
+    DOCTEST_CHECK(row_count == BUILD_QUEUE::PRESET_COUNT);
     DOCTEST_CHECK_FALSE(config::Find_Variable("music", 5, &music_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable("MUSIC_VOLUME", 12, &music_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable(
@@ -426,6 +449,12 @@ DOCTEST_TEST_CASE("build queue lists decode comments multiline values and requir
     DOCTEST_CHECK(writes.writes[1].value.integer_value == BUILD_QUEUE::INSTRUCTION_DESIGN1);
     DOCTEST_CHECK(writes.writes[2].value.integer_value == BUILD_QUEUE::INSTRUCTION_BUY10);
     DOCTEST_CHECK(writes.writes[3].value.integer_value == BUILD_QUEUE::INSTRUCTION_END);
+
+    DOCTEST_REQUIRE(Decode_(
+        "build_queue 1 199 = end;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 1);
+    DOCTEST_CHECK(writes.writes[0].canonical_path == "build_queue.1.199");
+    DOCTEST_CHECK(writes.writes[0].value.integer_value == BUILD_QUEUE::INSTRUCTION_END);
 
     DOCTEST_CHECK_FALSE(Decode_(
         "build_queue 1 = prepend design1;", &writes, &diagnostic));

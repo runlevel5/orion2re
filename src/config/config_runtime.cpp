@@ -214,6 +214,10 @@ const s_schema_node_descriptor* Get_Variable_Node(const s_runtime_schema* schema
         if (node.kind == CONFIG_NODE_SCALAR) {
             return node.variable_id == variable_id ? &node : nullptr;
         }
+        if (node.array_element_count != 0) {
+            return variable_id >= node.first_variable && variable_id <= node.last_variable ?
+                &node : nullptr;
+        }
         uint32_t selected = CONFIG_NO_NODE;
         for (uint32_t child = node.first_child; child != CONFIG_NO_NODE;
              child = schema->nodes[child].next_sibling) {
@@ -271,6 +275,17 @@ bool Find_Variable(const char* name, size_t name_length, t_variable_id* variable
                     std::to_string(external_index) != component) {
                     return false;
                 }
+                if (parent.array_element_count != 0) {
+                    const int64_t offset = static_cast<int64_t>(external_index) -
+                                           parent.array_index_base;
+                    if (offset < 0 || offset >= parent.array_element_count ||
+                        separator != std::string_view::npos) {
+                        return false;
+                    }
+                    *variable_id = parent.first_variable +
+                        static_cast<t_variable_id>(offset);
+                    return true;
+                }
             }
             for (uint32_t child = parent.first_child; child != CONFIG_NO_NODE;
                  child = schema_nodes[child].next_sibling) {
@@ -308,6 +323,10 @@ bool Get_Variable_Name(const s_runtime_schema* schema, t_variable_id variable_id
     }
     std::vector<std::string> components;
     uint32_t node_index = static_cast<uint32_t>(leaf - schema->nodes);
+    if (leaf->array_element_count != 0) {
+        components.push_back(std::to_string(
+            leaf->array_index_base + variable_id - leaf->first_variable));
+    }
     while (node_index != CONFIG_NO_NODE) {
         const s_schema_node_descriptor& node = schema->nodes[node_index];
         if (node.parent != CONFIG_NO_NODE &&

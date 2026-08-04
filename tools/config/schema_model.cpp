@@ -1233,6 +1233,7 @@ namespace {
                 return false;
             }
             schema->nodes[node_index].array_count = count;
+            schema->nodes[node_index].array_index_base = index_base;
             schema->nodes[node_index].explicit_default_count =
                 local_default != nullptr ? local_default->values.size() : 0;
             schema->nodes[node_index].scalar_array =

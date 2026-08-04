@@ -464,6 +464,22 @@ namespace {
         }
         output += "static_assert(CONFIG_MAX_VARIABLE_TARGETS >= " +
                   std::to_string(maximum_target_count) + ");\n\n";
+        std::vector<bool> omitted_nodes(schema->nodes.size(), false);
+        for (const s_scalar_array_range& range : scalar_array_ranges) {
+            for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+                if (schema->nodes[node_index].parent == range.node_index) {
+                    omitted_nodes[node_index] = true;
+                }
+            }
+        }
+        std::vector<uint32_t> runtime_node_ids(schema->nodes.size(), UINT32_MAX);
+        std::vector<uint32_t> runtime_nodes;
+        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            if (!omitted_nodes[node_index]) {
+                runtime_node_ids[node_index] = static_cast<uint32_t>(runtime_nodes.size());
+                runtime_nodes.push_back(node_index);
+            }
+        }
         for (const s_parameter& parameter : schema->parameters) {
             if (parameter.scalar_kind != SCALAR_BITMAP) {
                 continue;
@@ -483,7 +499,7 @@ namespace {
             output += "static const s_array_index_alias_descriptor generated_array_index_aliases[] = {\n";
             for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
                 for (const s_symbol& alias : schema->nodes[node_index].index_aliases) {
-                    output += "    { " + std::to_string(node_index) + ", " +
+                    output += "    { " + std::to_string(runtime_node_ids[node_index]) + ", " +
                               Cpp_String_(alias.name) + ", " +
                               std::to_string(alias.value) + " },\n";
                 }
@@ -498,20 +514,22 @@ namespace {
         output += "const size_t array_index_alias_count = " +
                   std::to_string(array_index_alias_count) + ";\n\n";
         output += "const s_schema_node_descriptor schema_nodes[] = {\n";
-        std::vector<uint32_t> first_children(schema->nodes.size(), UINT32_MAX);
-        std::vector<uint32_t> next_siblings(schema->nodes.size(), UINT32_MAX);
-        std::vector<uint32_t> last_children(schema->nodes.size(), UINT32_MAX);
-        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+        std::vector<uint32_t> first_children(runtime_nodes.size(), UINT32_MAX);
+        std::vector<uint32_t> next_siblings(runtime_nodes.size(), UINT32_MAX);
+        std::vector<uint32_t> last_children(runtime_nodes.size(), UINT32_MAX);
+        for (uint32_t runtime_index = 0; runtime_index < runtime_nodes.size(); ++runtime_index) {
+            const uint32_t node_index = runtime_nodes[runtime_index];
             const uint32_t parent = schema->nodes[node_index].parent;
             if (parent == UINT32_MAX) {
                 continue;
             }
-            if (first_children[parent] == UINT32_MAX) {
-                first_children[parent] = node_index;
+            const uint32_t runtime_parent = runtime_node_ids[parent];
+            if (first_children[runtime_parent] == UINT32_MAX) {
+                first_children[runtime_parent] = runtime_index;
             } else {
-                next_siblings[last_children[parent]] = node_index;
+                next_siblings[last_children[runtime_parent]] = runtime_index;
             }
-            last_children[parent] = node_index;
+            last_children[runtime_parent] = runtime_index;
         }
         if (schema->nodes.empty()) {
             for (size_t index = 0; index < schema->parameters.size(); ++index) {
@@ -521,13 +539,14 @@ namespace {
                           std::to_string(index) + ", " + std::to_string(index) +
                           ", " + std::to_string(index) + ", false, 0, CONFIG_NO_NODE, " +
                           "CONFIG_NO_NODE, &generated_type_" +
-                          std::to_string(type_ids[index]) + " },\n";
+                          std::to_string(type_ids[index]) + ", 0, 0 },\n";
             }
         } else {
-            for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            for (size_t runtime_index = 0; runtime_index < runtime_nodes.size(); ++runtime_index) {
+                const size_t node_index = runtime_nodes[runtime_index];
                 const s_node& node = schema->nodes[node_index];
                 const std::string parent = node.parent == UINT32_MAX ? "CONFIG_NO_NODE" :
-                                           std::to_string(node.parent);
+                                           std::to_string(runtime_node_ids[node.parent]);
                 const std::string first = node.first_parameter == UINT32_MAX ?
                                           "CONFIG_NO_VARIABLE" :
                                           std::to_string(node.first_parameter);
@@ -537,21 +556,30 @@ namespace {
                 const std::string parameter = node.parameter == UINT32_MAX ?
                                               "CONFIG_NO_VARIABLE" :
                                               std::to_string(node.parameter);
-                const std::string first_child = first_children[node_index] == UINT32_MAX ?
+                const std::string first_child = first_children[runtime_index] == UINT32_MAX ?
                                                 "CONFIG_NO_NODE" :
-                                                std::to_string(first_children[node_index]);
-                const std::string next_sibling = next_siblings[node_index] == UINT32_MAX ?
+                                                std::to_string(first_children[runtime_index]);
+                const std::string next_sibling = next_siblings[runtime_index] == UINT32_MAX ?
                                                  "CONFIG_NO_NODE" :
-                                                 std::to_string(next_siblings[node_index]);
-                const std::string runtime_type = node.parameter == UINT32_MAX ? "nullptr" :
-                    "&generated_type_" + std::to_string(type_ids[node.parameter]);
+                                                 std::to_string(next_siblings[runtime_index]);
+                const bool implicit_scalar_array =
+                    node.scalar_array && first_children[runtime_index] == UINT32_MAX;
+                const std::string runtime_type = node.parameter != UINT32_MAX ?
+                    "&generated_type_" + std::to_string(type_ids[node.parameter]) :
+                    implicit_scalar_array ?
+                    "&generated_type_" + std::to_string(type_ids[node.first_parameter]) :
+                    "nullptr";
                 output += "    { " + Cpp_String_(node.id) + ", " +
                           Node_Kind_(node.kind) + ", " + parent + ", " +
                           std::to_string(node.external_index) + ", " + first +
                           ", " + last + ", " + parameter + ", " +
                           (node.has_terminator ? "true" : "false") + ", " +
                           std::to_string(node.terminator) + ", " + first_child + ", " +
-                          next_sibling + ", " + runtime_type + " },\n";
+                          next_sibling + ", " + runtime_type + ", " +
+                          std::to_string(implicit_scalar_array ? node.array_index_base : 0) +
+                          ", " +
+                          std::to_string(implicit_scalar_array ? node.array_count : 0) +
+                          " },\n";
             }
         }
         output +=
@@ -601,7 +629,7 @@ namespace {
                   "    if (state == nullptr) return false;\n"
                   "    switch (node_index) {\n";
         for (const s_scalar_array_range& range : scalar_array_ranges) {
-            output += "    case " + std::to_string(range.node_index) + ":\n"
+            output += "    case " + std::to_string(runtime_node_ids[range.node_index]) + ":\n"
                       "        for (t_variable_id id = " +
                       std::to_string(range.first_parameter) + "; id < " +
                       std::to_string(range.first_parameter + range.count) + "; ++id) {\n"
