@@ -175,6 +175,12 @@ namespace MAINSCR {
         s_influence_source sources[MAX_STARS] = {};
 
         const bool viewer_is_omniscient = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
+        int16_t max_non_thorium_range = 0;
+        for (int16_t fuel_idx = FUEL_NO_FUEL_CELLS; fuel_idx < FUEL_THORIUM_FUEL_CELLS; ++fuel_idx) {
+            if (TECHDATA::_fuel[fuel_idx].ship_range > max_non_thorium_range) {
+                max_non_thorium_range = TECHDATA::_fuel[fuel_idx].ship_range;
+            }
+        }
 
         for (int16_t star_idx = 0; star_idx < MAX_STARS; ++star_idx) {
             sources[star_idx].owner = -1;
@@ -196,8 +202,17 @@ namespace MAINSCR {
             }
 
             s_influence_source& source = sources[star_idx];
+            const bool cap_thorium_range =
+                draw_automatic_outline &&
+                MOX::_player[owner].tech_applications[TECH_APP_THORIUM_FUEL_CELLS] ==
+                    TECH_RESEARCH_STATUS_RESEARCHED;
+            const int16_t influence_range = MAP_SCALE::Influence_Overlay_Range_(
+                MOX::_player[owner].ship_range,
+                max_non_thorium_range,
+                cap_thorium_range
+            );
             source.radius = static_cast<int16_t>(
-                HAROLD::Get_Scaled_Value_(static_cast<int16_t>(MOX::_player[owner].ship_range * 30))
+                HAROLD::Get_Scaled_Value_(static_cast<int16_t>(influence_range * 30))
             );
             if (source.radius < 1) {
                 continue;

@@ -6,6 +6,7 @@
 #include "config/config_decode.h"
 #include "config/config_runtime.h"
 #include "doctest/doctest.h"
+#include "game/build_queue.h"
 
 namespace {
     const config::s_symbol_descriptor WEAPON_VALUES[] = {
@@ -394,6 +395,50 @@ DOCTEST_TEST_CASE("record and array assignments follow declaration order and bou
     DOCTEST_REQUIRE(writes.writes.size() == 10);
     DOCTEST_CHECK(writes.writes[5].canonical_path == "guardian.weapon.2.type");
     DOCTEST_CHECK(writes.writes[5].value.integer_value == 4);
+}
+
+DOCTEST_TEST_CASE("build queue lists decode comments multiline values and required end markers") {
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Decode_(
+        "build_queue 1 = prepend # put ships first\n"
+        "  design1\n"
+        "  buy10 end;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(writes.writes.size() == 4);
+    DOCTEST_CHECK(writes.writes[0].canonical_path == "build_queue.1.0");
+    DOCTEST_CHECK(writes.writes[0].value.integer_value == BUILD_QUEUE::INSTRUCTION_PREPEND);
+    DOCTEST_CHECK(writes.writes[1].value.integer_value == BUILD_QUEUE::INSTRUCTION_DESIGN1);
+    DOCTEST_CHECK(writes.writes[2].value.integer_value == BUILD_QUEUE::INSTRUCTION_BUY10);
+    DOCTEST_CHECK(writes.writes[3].value.integer_value == BUILD_QUEUE::INSTRUCTION_END);
+
+    DOCTEST_CHECK_FALSE(Decode_(
+        "build_queue 1 = prepend design1;", &writes, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+                  "assignment to 'build_queue.1' requires its terminator value");
+
+    DOCTEST_CHECK_FALSE(Decode_(
+        "build_queue 11 = end;", &writes, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+                  "unknown configuration variable 'build_queue.11'");
+}
+
+DOCTEST_TEST_CASE("build queue list capacity includes its end marker") {
+    std::string source = "build_queue 2 = ";
+    for (int index = 0; index < BUILD_QUEUE::INSTRUCTION_CAPACITY - 1; ++index) {
+        source += "append ";
+    }
+    source += "end;";
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Decode_(source.c_str(), &writes, &diagnostic));
+    DOCTEST_CHECK(writes.writes.size() == BUILD_QUEUE::INSTRUCTION_CAPACITY);
+
+    source.insert(source.size() - 4, "append ");
+    DOCTEST_CHECK_FALSE(Decode_(source.c_str(), &writes, &diagnostic));
+    DOCTEST_CHECK(diagnostic.message ==
+                  "value 201 exceeds selected configuration object 'build_queue.2'");
 }
 
 DOCTEST_TEST_CASE("enum-backed array aliases resolve to numeric canonical paths") {

@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "build_queue.h"
+
 namespace COLSUM {
     int16_t _x_fields[14];
     int16_t _g_sort_index;
@@ -19,6 +21,7 @@ namespace COLSUM {
     int16_t _list_buy_data[10];
     int16_t _list_col_job_fields[30];
     int16_t _colony_summary_saved_screen;
+    int16_t _build_queue_hotkeys[10];
 
     uint8_t _colsum_strings_been_loaded;
 
@@ -269,6 +272,12 @@ namespace COLSUM {
         }
 
         _x_fields[13] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(596));
+
+        static const char shifted_digits[] = "!@#$%^&*()";
+        for (int index = 0; index < 10; ++index) {
+            const char hotkey[2] = {shifted_digits[index], '\0'};
+            _build_queue_hotkeys[index] = fields::Add_Hot_Key_(hotkey);
+        }
 
         int16_t y_row_end = 65;
         for (int16_t i = 0; i < 10; ++i) {
@@ -750,6 +759,17 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
 
     bool __cdecl Evaluate_Input_(int16_t* field_ptr, int16_t* scan_val) {
         int16_t field = *field_ptr;
+
+        for (int index = 0; index < 10; ++index) {
+            if (field == _build_queue_hotkeys[index]) {
+                const int preset = index == 9 ? 10 : index + 1;
+                BUILD_QUEUE::Apply_Preset_To_Empire_(MOX::_PLAYER_NUM, preset);
+                Update_Col_List_();
+                COLONY::_full_draw = 1;
+                *field_ptr = 0;
+                return true;
+            }
+        }
 
         if (field == _x_fields[1]) {
             Decrement_First_(10);

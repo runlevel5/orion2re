@@ -450,7 +450,7 @@ namespace {
                 output += "    { " + Cpp_String_(parameter.path) +
                           ", CONFIG_NODE_SCALAR, CONFIG_NO_NODE, 0, " +
                           std::to_string(index) + ", " + std::to_string(index) +
-                          ", " + std::to_string(index) + " },\n";
+                          ", " + std::to_string(index) + ", false, 0 },\n";
             }
         } else {
             for (const s_node& node : schema->nodes) {
@@ -468,7 +468,9 @@ namespace {
                 output += "    { " + Cpp_String_(node.id) + ", " +
                           Node_Kind_(node.kind) + ", " + parent + ", " +
                           std::to_string(node.external_index) + ", " + first +
-                          ", " + last + ", " + parameter + " },\n";
+                          ", " + last + ", " + parameter + ", " +
+                          (node.has_terminator ? "true" : "false") + ", " +
+                          std::to_string(node.terminator) + " },\n";
             }
         }
         output +=

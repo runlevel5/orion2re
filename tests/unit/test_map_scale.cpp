@@ -42,4 +42,11 @@ DOCTEST_TEST_CASE("maximum extended zoom enables the overview and delays black h
     DOCTEST_CHECK_FALSE(MAP_SCALE::Advance_Black_Hole_Animation_(99));
 }
 
+DOCTEST_TEST_CASE("maximum zoom influence overlay can replace thorium range") {
+    DOCTEST_CHECK(MAP_SCALE::Influence_Overlay_Range_(255, 12, true) == 12);
+    DOCTEST_CHECK(MAP_SCALE::Influence_Overlay_Range_(9, 12, true) == 9);
+    DOCTEST_CHECK(MAP_SCALE::Influence_Overlay_Range_(255, 12, false) == 255);
+    DOCTEST_CHECK(MAP_SCALE::Influence_Overlay_Range_(9, 12, false) == 9);
+}
+
 }

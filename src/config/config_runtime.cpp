@@ -281,6 +281,20 @@ bool Commit_State(const s_config_state* state) {
             return false;
         }
     }
+    for (size_t node_index = 0; node_index < schema_node_count; ++node_index) {
+        const s_schema_node_descriptor& node = schema_nodes[node_index];
+        if (!node.has_terminator) {
+            continue;
+        }
+        bool found = false;
+        for (t_variable_id variable_id = node.first_variable;
+             variable_id <= node.last_variable; ++variable_id) {
+            found = found || state->values[variable_id].integer_value == node.terminator;
+        }
+        if (!found) {
+            return false;
+        }
+    }
     for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
         generated::Set_Value(variable_id, &state->values[variable_id]);
     }

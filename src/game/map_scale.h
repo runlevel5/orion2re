@@ -56,6 +56,16 @@ namespace MAP_SCALE {
         return Uses_Extended_Scaling_(star_count, original_max_stars) && map_scale == max_map_scale;
     }
 
+    inline int16_t Influence_Overlay_Range_(
+        int16_t ship_range,
+        int16_t max_non_thorium_range,
+        bool use_max_non_thorium_range
+    ) {
+        return use_max_non_thorium_range && ship_range > max_non_thorium_range
+            ? max_non_thorium_range
+            : ship_range;
+    }
+
     inline bool Advance_Black_Hole_Animation_(int16_t star_scale_percent) {
         return star_scale_percent >= 100;
     }

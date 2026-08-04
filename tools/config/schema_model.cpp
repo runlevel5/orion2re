@@ -1215,6 +1215,8 @@ namespace {
             const s_json_value* index_value = Member_(type.aggregate, "index_base");
             const s_json_value* index_type_value = Member_(type.aggregate, "index_type");
             const s_json_value* element = Member_(type.aggregate, "element");
+            const s_json_value* fill = Member_(type.aggregate, "fill");
+            const s_json_value* terminator = Member_(type.aggregate, "terminator");
             if (count_value == nullptr || !Integer_(count_value, &count) || count <= 0 ||
                 count > INT32_MAX || element == nullptr || element->kind != JSON_OBJECT ||
                 (index_value != nullptr && !Integer_(index_value, &index_base)) ||
@@ -1257,11 +1259,38 @@ namespace {
                 }
                 schema->nodes[node_index].index_aliases = index_type.values;
             }
-            if (local_default != nullptr &&
-                (local_default->kind != JSON_ARRAY ||
-                 local_default->values.size() != static_cast<size_t>(count))) {
-                *diagnostic = schema_path + ".default: exact array default has the wrong length";
+            if (local_default != nullptr) {
+                if (local_default->kind != JSON_ARRAY ||
+                    local_default->values.size() > static_cast<size_t>(count) ||
+                    (fill == nullptr &&
+                     local_default->values.size() != static_cast<size_t>(count))) {
+                    *diagnostic = schema_path + ".default: array default has the wrong length";
+                    return false;
+                }
+            } else if (fill == nullptr) {
+                *diagnostic = schema_path + ".default: array requires an exact default or fill value";
                 return false;
+            }
+            if (terminator != nullptr) {
+                std::vector<std::string> element_stack;
+                s_resolved_type element_type;
+                s_parameter decoded;
+                if (!Resolve_Type_(root, Member_(element, "type"),
+                                   schema_path + ".element.type", &element_stack,
+                                   &element_type, diagnostic) ||
+                    element_type.node_kind != NODE_SCALAR ||
+                    element_type.scalar_kind != SCALAR_ENUM ||
+                    !Decode_Default_(element_type, terminator,
+                                     schema_path + ".terminator", &decoded,
+                                     diagnostic)) {
+                    if (diagnostic->empty()) {
+                        *diagnostic = schema_path +
+                                      ".terminator: requires an enum array element";
+                    }
+                    return false;
+                }
+                schema->nodes[node_index].has_terminator = true;
+                schema->nodes[node_index].terminator = decoded.default_integer;
             }
             for (int64_t index = 0; index < count; ++index) {
                 const int64_t external = index_base + index;
@@ -1269,8 +1298,10 @@ namespace {
                 for (const std::string& target : targets) {
                     element_targets.push_back(target + "[" + std::to_string(index) + "]");
                 }
-                const s_json_value* element_default = local_default != nullptr ?
-                    &local_default->values[static_cast<size_t>(index)] : nullptr;
+                const s_json_value* element_default =
+                    local_default != nullptr &&
+                    static_cast<size_t>(index) < local_default->values.size() ?
+                    &local_default->values[static_cast<size_t>(index)] : fill;
                 if (!Build_Node_(root, "", element, element_default,
                                  canonical_path + "." + std::to_string(external),
                                  schema_path + ".element", group, inherited_metadata,

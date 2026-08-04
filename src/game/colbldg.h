@@ -106,6 +106,7 @@ namespace COLBLDG {
     extern int16_t _refitting_ship_n;
     extern int16_t _colony_auto_building;
     extern int16_t _fields[11];
+    extern int16_t _build_queue_hotkeys[11];
     extern s_colors _l_font_color_array;
     extern s_colors _l_font_dim_color_array;
     extern int16_t _queue_fields[7];
@@ -132,6 +133,8 @@ namespace COLBLDG {
     void __cdecl Clear_Last_App_Desc_();
 
     void __cdecl Update_Fields_();
+
+    bool __cdecl Apply_Build_Queue_Hotkey_(int16_t field_id);
 
     void __cdecl Draw_Build_Queue_Popup_();
 

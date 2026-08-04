@@ -8,14 +8,16 @@
 * Configuration
 
   * [ ] Expose the galaxy star-count soft limit as a configuration variable, validate it against the compile-time `MAX_STARS` capacity, and use it consistently in map generation and new-game setup.
-  * [ ] Add typed build-queue presets as one configuration parameter instead of loading `BUILD.CFG` and `BUILD0.CFG` through `BUILD9.CFG` at keypress time.
-    * Model the parameter as an outer fixed array of 11 presets and an inner fixed-capacity array of generated `build_queue_instruction` enum values.
-    * Give the outer array semantic selectors `q`, `key0`, ..., `key9`, so assignments use syntax such as `build_queue_presets q = merge automated_factory research_lab end;` and `build_queue_presets key0 = clear end;`.
-    * Represent modes, commands, products, designs, and buildings as single enum tokens. Keep `append`, `prepend`, `merge`, `clear`, `clear_refits`, `buy`, `buy10`, `buy50`, `buy75`, `unbuy`, `repeat`, `design1` through `design6`, and the documented product names; do not expose the 1.50 internal `print` and `flush` operations.
-    * Use unique instruction values rather than native production IDs, and decode them explicitly in the queue interpreter.
-    * Require an explicit `end` sentinel because configuration assignments are layered and may replace a longer preset with a shorter one; execution ignores all trailing array elements after the first `end`.
-    * Let generated configuration parsing validate selectors, array bounds, token spelling, and enum membership. Add post-configuration validation that every preset contains `end`; retain runtime checks for sequence rules and colony-dependent legality such as `repeat`, research, buildability, ship capacity, and buying.
-    * Treat the presets as synchronized configuration because applying them can alter queues, ships, and treasury state.
+  * [x] Add typed automatic build queues as one configuration parameter instead of loading `BUILD.CFG` and `BUILD0.CFG` through `BUILD9.CFG` at keypress time.
+    * Model `build_queue` as an outer fixed array of 11 numerically selected lists and an inner 200-cell array of generated `build_queue_instruction` enum values. Assign lists with syntax such as `build_queue 1 = prepend design1 end;`.
+    * Map Q to list 0, keys 1 through 9 to matching list numbers, and key 0 to list 10 in the colony build popup. Map Shift+1 through Shift+0 to lists 1 through 10 for empire-wide application from the colony summary.
+    * Represent modes, commands, products, designs, and buildings as single enum tokens. Support `append`, `prepend`, `merge`, `clear`, `clear_refits`, `buy`, `buy10`, `buy50`, `buy75`, `unbuy`, `stop`, `repeat`, `design1` through `design6`, all documented products, and every native building; do not expose the 1.50 internal `print` and `flush` operations.
+    * Use unique instruction values rather than native production IDs, followed by a contiguous building-token range decoded explicitly by the queue interpreter.
+    * Require an explicit `end` sentinel in each assignment. The sentinel occupies one list cell, so a list can contain at most 199 executable instructions; execution ignores stale trailing cells after the first `end`.
+    * Let generated configuration parsing validate numeric selectors, array bounds, token spelling, enum membership, and the per-assignment terminator. Retain runtime checks for sequence rules and colony-dependent legality such as `repeat`, research, buildability, duplicate buildings, colony-base capacity, ship capacity, and buying.
+    * Apply lists through a separate noninteractive queue interpreter that reuses `Colony_Can_Build_Product_` and existing ship, cost, purchase, and colony-calculation functions without changing the original interactive build-queue logic. This interpreter is also the integration point for future custom autobuild behavior.
+    * Initialize the lists from the 1.50 defaults: merge-priority buildings on Q, designs 1 through 6 on keys 1 through 6, freighters on 7, spies on 8, housing on 9, and clear on 0.
+    * Treat the parameter as synchronized gameplay configuration because applying a list can alter queues, ships, and treasury state.
   * [x] Generate a human-facing, self-contained HTML configuration reference from the JSON5 schema.
     * [x] Replace the current flattened Markdown-style parameter dump with one offline `config-reference.html` containing embedded CSS and JavaScript and no external assets or network dependencies.
     * [x] Extend the schema model with a declaration-level documentation representation for public parameters, named scalar types, records, record fields, arrays, and their references. Keep the existing flattened leaf representation for runtime code generation, but do not use it as the primary documentation hierarchy or expand large arrays into repetitive entries.

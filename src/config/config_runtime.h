@@ -110,6 +110,8 @@ struct s_schema_node_descriptor {
     t_variable_id first_variable;
     t_variable_id last_variable;
     t_variable_id variable_id;
+    bool has_terminator;
+    int64_t terminator;
 };
 
 struct s_array_index_alias_descriptor {

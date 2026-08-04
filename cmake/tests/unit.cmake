@@ -162,6 +162,15 @@ orion2re_add_unit_test(test_colony_production_helpers
         tests/unit/test_colony_production_helpers.cpp
 )
 
+orion2re_add_unit_test(test_build_queue
+    SOURCES
+        tests/unit/test_build_queue.cpp
+    PRODUCTION_SOURCES
+        src/game/build_queue.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_build_queue_runtime.cpp
+)
+
 orion2re_add_unit_test(test_map_scale
     SOURCES
         tests/unit/test_map_scale.cpp

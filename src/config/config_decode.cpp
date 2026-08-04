@@ -544,6 +544,16 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
         return Fail_(statement->path.back().location,
                      "configuration namespaces are not assignable", write_set, diagnostic);
     }
+    if (!selected_node.has_terminator) {
+        for (size_t node_index = 0; node_index < schema->node_count; ++node_index) {
+            if (schema->nodes[node_index].parent == selected &&
+                schema->nodes[node_index].has_terminator) {
+                return Fail_(statement->path.back().location,
+                             "terminated arrays must be selected directly",
+                             write_set, diagnostic);
+            }
+        }
+    }
     uint32_t boundary = selected;
     if (selected_node.kind == CONFIG_NODE_SCALAR && selected_node.parent != CONFIG_NO_NODE) {
         boundary = selected_node.parent;
@@ -570,6 +580,7 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
     }
 
     bool has_write = false;
+    bool has_terminator = false;
     for (size_t value_index = 0; value_index < statement->values.size(); ++value_index) {
         const s_cfg_token& token = statement->values[value_index];
         if (token.kind == CFG_TOKEN_SKIP) {
@@ -588,12 +599,21 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
                          std::string(variable->name) + "'; expected " + expected,
                          write_set, diagnostic);
         }
+        has_terminator = has_terminator ||
+            (selected_node.has_terminator &&
+             write.value.integer_value == selected_node.terminator);
         write_set->writes.push_back(std::move(write));
         has_write = true;
     }
     if (!has_write) {
         return Fail_(statement->values.front().location,
                      "an assignment containing only skips has no effect",
+                     write_set, diagnostic);
+    }
+    if (selected_node.has_terminator && !has_terminator) {
+        return Fail_(statement->values.back().location,
+                     "assignment to '" + canonical_path +
+                     "' requires its terminator value",
                      write_set, diagnostic);
     }
     return true;

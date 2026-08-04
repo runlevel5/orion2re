@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "build_queue.h"
 #include "strbuild.h"
 
 namespace COLBLDG {
@@ -44,6 +45,7 @@ namespace COLBLDG {
     uint8_t* _desc_record_ptr;
     int16_t _colony_auto_building;
     int16_t _fields[11];
+    int16_t _build_queue_hotkeys[11];
     char _g_msg[800];
     s_animation_header* _colsum_pal_anim;
     s_animation_header* _bldg_bitm;
@@ -355,9 +357,35 @@ namespace COLBLDG {
         _fields[6] = fields::Add_Button_Field_(503, 411, ESTRINGS::E_Strings_(12), _anims[6], (char*)"e", 40);
         _fields[7] = -1000;
 
+        _build_queue_hotkeys[0] = fields::Add_Hot_Key_("q");
+        for (int preset = 1; preset <= 9; ++preset) {
+            const char hotkey[2] = {static_cast<char>('0' + preset), '\0'};
+            _build_queue_hotkeys[preset] = fields::Add_Hot_Key_(hotkey);
+        }
+        _build_queue_hotkeys[10] = fields::Add_Hot_Key_("0");
+
         Add_Build_Queue_Fields_();
         Add_Buildings_Fields_();
         Add_Militarys_Fields_();
+    }
+
+    bool __cdecl Apply_Build_Queue_Hotkey_(int16_t field_id) {
+        for (int preset = 0; preset < BUILD_QUEUE::PRESET_COUNT; ++preset) {
+            if (field_id != _build_queue_hotkeys[preset]) {
+                continue;
+            }
+            Do_Exit_Screen_Cleanup_();
+            if (BUILD_QUEUE::Apply_Preset_To_Colony_(COLONY::_colony_handle, preset)) {
+                memcpy(_current_item, MOX::_colony[COLONY::_colony_handle].producing,
+                       sizeof(_current_item));
+                _active_prod[0] = -1;
+                _field_mode = 0;
+                Build_Arrays_();
+                Do_Draw_Build_Queue_();
+            }
+            return true;
+        }
+        return false;
     }
 
     void __cdecl Build_Arrays_() {
@@ -1419,6 +1447,11 @@ namespace COLBLDG {
         }
 
         int16_t input_field = *selected_field_id;
+
+        if (Apply_Build_Queue_Hotkey_(input_field)) {
+            *selected_field_id = 0;
+            return;
+        }
 
         if (_fields[3] == input_field) {
             _field_mode = 0;

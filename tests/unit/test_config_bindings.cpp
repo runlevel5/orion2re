@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "game/build_queue.h"
+
 #include <cstring>
 
 #include "config/cfg_parser.h"
@@ -59,6 +61,52 @@ namespace {
         write.provenance.column = 9;
         return write;
     }
+}
+
+DOCTEST_TEST_CASE("build queue defaults match the eleven 1.50 hotkey lists") {
+    config::s_config_state defaults;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&defaults));
+    DOCTEST_REQUIRE(config::Commit_State(&defaults));
+
+    DOCTEST_CHECK(BUILD_QUEUE::presets[0][0] == BUILD_QUEUE::INSTRUCTION_MERGE);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[0][1] ==
+                  BUILD_QUEUE::INSTRUCTION_BUILDING_BASE + BUILDING_ALIEN_CONTROL_CENTER);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[1][0] == BUILD_QUEUE::INSTRUCTION_PREPEND);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[1][1] == BUILD_QUEUE::INSTRUCTION_DESIGN1);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[7][1] == BUILD_QUEUE::INSTRUCTION_FREIGHTER_FLEET);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[8][1] == BUILD_QUEUE::INSTRUCTION_SPY);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[9][0] == BUILD_QUEUE::INSTRUCTION_HOUSING);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[10][0] == BUILD_QUEUE::INSTRUCTION_CLEAR);
+    for (int preset = 0; preset < BUILD_QUEUE::PRESET_COUNT; ++preset) {
+        bool found_end = false;
+        for (int instruction = 0; instruction < BUILD_QUEUE::INSTRUCTION_CAPACITY;
+             ++instruction) {
+            found_end = found_end ||
+                BUILD_QUEUE::presets[preset][instruction] == BUILD_QUEUE::INSTRUCTION_END;
+        }
+        DOCTEST_CHECK(found_end);
+    }
+}
+
+DOCTEST_TEST_CASE("shorter build queue assignments replace execution through an earlier end") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "build_queue 1 = prepend design1 design2 design3 end;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "build_queue 1 = housing end;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(BUILD_QUEUE::presets[1][0] == BUILD_QUEUE::INSTRUCTION_HOUSING);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[1][1] == BUILD_QUEUE::INSTRUCTION_END);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[1][2] == BUILD_QUEUE::INSTRUCTION_DESIGN2);
 }
 
 DOCTEST_TEST_SUITE("generated configuration bindings") {

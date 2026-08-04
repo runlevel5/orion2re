@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "game/build_queue.h"
 #include "doctest/doctest.h"
 
 DOCTEST_TEST_SUITE("colony production helpers") {
@@ -50,6 +51,25 @@ DOCTEST_TEST_CASE("ship product encodings round trip through their matching rang
         DOCTEST_CHECK(COLBLDG::Colony_Production_Is_Ship_Design_(production_id));
         DOCTEST_CHECK(COLBLDG::Colony_Production_Ship_Design_Index_(production_id) == design_idx);
     }
+}
+
+DOCTEST_TEST_CASE("build queue hotkeys map to all eleven numeric presets") {
+    DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Hotkey_('q') == 0);
+    DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Hotkey_('Q') == 0);
+    for (char digit = '1'; digit <= '9'; ++digit) {
+        DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Hotkey_(digit) == digit - '0');
+    }
+    DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Hotkey_('0') == 10);
+    DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Hotkey_('x') == -1);
+}
+
+DOCTEST_TEST_CASE("shifted digits map to empire build queue presets") {
+    constexpr char shifted[] = "!@#$%^&*()";
+    for (int index = 0; index < 9; ++index) {
+        DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Empire_Hotkey_(shifted[index]) == index + 1);
+    }
+    DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Empire_Hotkey_(')') == 10);
+    DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Empire_Hotkey_('1') == -1);
 }
 
 }
