@@ -73,6 +73,18 @@ struct s_binding {
     std::string symbol;
 };
 
+struct s_native_target_component {
+    bool array_index = false;
+    std::string member;
+    uint32_t array_node = UINT32_MAX;
+    int64_t index = 0;
+};
+
+struct s_native_target_expression {
+    std::string root;
+    std::vector<s_native_target_component> components;
+};
+
 struct s_documented_type;
 
 struct s_documented_field {
@@ -169,6 +181,7 @@ struct s_parameter {
     uint64_t known_bits = 0;
     s_binding binding;
     std::vector<std::string> native_targets;
+    std::vector<s_native_target_expression> native_target_expressions;
 };
 
 struct s_node {
@@ -181,6 +194,7 @@ struct s_node {
     size_t explicit_default_count = 0;
     bool scalar_array = false;
     std::vector<std::string> native_targets;
+    std::vector<s_native_target_expression> native_target_expressions;
     bool has_terminator = false;
     int64_t terminator = 0;
     std::vector<s_symbol> index_aliases;

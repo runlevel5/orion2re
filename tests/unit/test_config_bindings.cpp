@@ -111,6 +111,19 @@ DOCTEST_TEST_CASE("shorter build queue assignments replace execution through an 
     DOCTEST_CHECK(BUILD_QUEUE::presets[1][2] == BUILD_QUEUE::INSTRUCTION_DESIGN2);
 }
 
+DOCTEST_TEST_CASE("shared build queue layouts validate every row terminator") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    config::t_variable_id first = config::CONFIG_NO_VARIABLE;
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "build_queue.10.0", std::strlen("build_queue.10.0"), &first));
+    for (int instruction = 0; instruction < BUILD_QUEUE::INSTRUCTION_CAPACITY;
+         ++instruction) {
+        state.values[first + instruction].integer_value = BUILD_QUEUE::INSTRUCTION_CLEAR;
+    }
+    DOCTEST_CHECK_FALSE(config::Commit_State(&state));
+}
+
 DOCTEST_TEST_SUITE("generated configuration bindings") {
 
 DOCTEST_TEST_CASE("predefined ship templates have native defaults before configuration") {

@@ -164,21 +164,31 @@ namespace {
         return true;
     }
 
-    bool Initialize_Node_Defaults_(uint32_t node_index, s_config_state* state) {
+    bool Validate_Node_Terminators_(uint32_t node_index, t_variable_id variable_offset,
+                                    const s_config_state* state) {
         const s_schema_node_descriptor& node = schema_nodes[node_index];
-        if (node.kind == CONFIG_NODE_SCALAR) {
-            return generated::Get_Default_Value(node.variable_id,
-                                                &state->values[node.variable_id]);
+        if (node.has_terminator) {
+            bool found = false;
+            for (t_variable_id variable_id = node.first_variable + variable_offset;
+                 variable_id <= node.last_variable + variable_offset; ++variable_id) {
+                found = found || state->values[variable_id].integer_value == node.terminator;
+            }
+            if (!found) return false;
         }
-        if (node.kind == CONFIG_NODE_ARRAY &&
-            generated::Initialize_Scalar_Array_Defaults(node_index, state)) {
+        if (node.kind == CONFIG_NODE_ARRAY && node.array_element_variable_count != 0) {
+            for (uint32_t element = 0; element < node.array_element_count; ++element) {
+                if (!Validate_Node_Terminators_(
+                        node.first_child,
+                        variable_offset + element * node.array_element_variable_count,
+                        state)) {
+                    return false;
+                }
+            }
             return true;
         }
         for (uint32_t child = node.first_child; child != CONFIG_NO_NODE;
              child = schema_nodes[child].next_sibling) {
-            if (!Initialize_Node_Defaults_(child, state)) {
-                return false;
-            }
+            if (!Validate_Node_Terminators_(child, variable_offset, state)) return false;
         }
         return true;
     }
@@ -195,10 +205,10 @@ const s_runtime_schema* Get_Runtime_Schema() {
     return &schema;
 }
 
-const s_schema_node_descriptor* Get_Variable_Node(const s_runtime_schema* schema,
-                                                  t_variable_id variable_id) {
-    if (schema == nullptr || variable_id >= schema->variable_count) {
-        return nullptr;
+bool Get_Variable_Location(const s_runtime_schema* schema, t_variable_id variable_id,
+                           s_variable_location* location) {
+    if (schema == nullptr || location == nullptr || variable_id >= schema->variable_count) {
+        return false;
     }
     uint32_t node_index = CONFIG_NO_NODE;
     for (uint32_t index = 0; index < schema->node_count; ++index) {
@@ -209,28 +219,98 @@ const s_schema_node_descriptor* Get_Variable_Node(const s_runtime_schema* schema
             break;
         }
     }
+    t_variable_id variable_offset = 0;
     while (node_index != CONFIG_NO_NODE) {
         const s_schema_node_descriptor& node = schema->nodes[node_index];
         if (node.kind == CONFIG_NODE_SCALAR) {
-            return node.variable_id == variable_id ? &node : nullptr;
+            if (node.variable_id + variable_offset != variable_id) return false;
+            *location = {&node, variable_offset};
+            return true;
         }
-        if (node.array_element_count != 0) {
-            return variable_id >= node.first_variable && variable_id <= node.last_variable ?
-                &node : nullptr;
+        if (node.array_element_count != 0 && node.array_element_variable_count == 0) {
+            if (variable_id < node.first_variable + variable_offset ||
+                variable_id > node.last_variable + variable_offset) return false;
+            *location = {&node, variable_offset};
+            return true;
+        }
+        if (node.kind == CONFIG_NODE_ARRAY && node.array_element_variable_count != 0) {
+            const t_variable_id first = node.first_variable + variable_offset;
+            if (variable_id < first || variable_id > node.last_variable + variable_offset) {
+                return false;
+            }
+            const t_variable_id element =
+                (variable_id - first) / node.array_element_variable_count;
+            variable_offset += element * node.array_element_variable_count;
+            node_index = node.first_child;
+            continue;
         }
         uint32_t selected = CONFIG_NO_NODE;
         for (uint32_t child = node.first_child; child != CONFIG_NO_NODE;
              child = schema->nodes[child].next_sibling) {
             const s_schema_node_descriptor& candidate = schema->nodes[child];
-            if (variable_id >= candidate.first_variable &&
-                variable_id <= candidate.last_variable) {
+            if (variable_id >= candidate.first_variable + variable_offset &&
+                variable_id <= candidate.last_variable + variable_offset) {
                 selected = child;
                 break;
             }
         }
         node_index = selected;
     }
-    return nullptr;
+    return false;
+}
+
+const s_schema_node_descriptor* Get_Variable_Node(const s_runtime_schema* schema,
+                                                  t_variable_id variable_id) {
+    s_variable_location location = {};
+    return Get_Variable_Location(schema, variable_id, &location) ? location.node : nullptr;
+}
+
+bool Get_Array_Element_Offset(const s_runtime_schema* schema, t_variable_id variable_id,
+                              uint32_t array_node, uint32_t* element_offset) {
+    if (schema == nullptr || element_offset == nullptr || array_node >= schema->node_count) {
+        return false;
+    }
+    uint32_t node_index = CONFIG_NO_NODE;
+    for (uint32_t index = 0; index < schema->node_count; ++index) {
+        const s_schema_node_descriptor& node = schema->nodes[index];
+        if (node.parent == CONFIG_NO_NODE && variable_id >= node.first_variable &&
+            variable_id <= node.last_variable) {
+            node_index = index;
+            break;
+        }
+    }
+    t_variable_id variable_offset = 0;
+    while (node_index != CONFIG_NO_NODE) {
+        const s_schema_node_descriptor& node = schema->nodes[node_index];
+        if (node.kind == CONFIG_NODE_ARRAY) {
+            const t_variable_id first = node.first_variable + variable_offset;
+            const uint32_t stride = node.array_element_variable_count == 0 ? 1 :
+                                    node.array_element_variable_count;
+            if (stride == 0 || variable_id < first ||
+                variable_id > node.last_variable + variable_offset) return false;
+            const uint32_t element = (variable_id - first) / stride;
+            if (node_index == array_node) {
+                *element_offset = element;
+                return true;
+            }
+            if (node.array_element_variable_count == 0) return false;
+            variable_offset += element * stride;
+            node_index = node.first_child;
+            continue;
+        }
+        uint32_t selected = CONFIG_NO_NODE;
+        for (uint32_t child = node.first_child; child != CONFIG_NO_NODE;
+             child = schema->nodes[child].next_sibling) {
+            const s_schema_node_descriptor& candidate = schema->nodes[child];
+            if (variable_id >= candidate.first_variable + variable_offset &&
+                variable_id <= candidate.last_variable + variable_offset) {
+                selected = child;
+                break;
+            }
+        }
+        node_index = selected;
+    }
+    return false;
 }
 
 const s_type_descriptor* Get_Variable_Type(t_variable_id variable_id) {
@@ -246,6 +326,7 @@ bool Find_Variable(const char* name, size_t name_length, t_variable_id* variable
     const std::string_view requested(name, name_length);
     size_t offset = 0;
     uint32_t selected = CONFIG_NO_NODE;
+    t_variable_id variable_offset = 0;
     while (offset < requested.size()) {
         const size_t separator = requested.find('.', offset);
         const size_t end = separator == std::string_view::npos ? requested.size() : separator;
@@ -275,17 +356,31 @@ bool Find_Variable(const char* name, size_t name_length, t_variable_id* variable
                     std::to_string(external_index) != component) {
                     return false;
                 }
-                if (parent.array_element_count != 0) {
+                if (parent.array_element_count != 0 &&
+                    parent.array_element_variable_count == 0) {
                     const int64_t offset = static_cast<int64_t>(external_index) -
                                            parent.array_index_base;
                     if (offset < 0 || offset >= parent.array_element_count ||
                         separator != std::string_view::npos) {
                         return false;
                     }
-                    *variable_id = parent.first_variable +
+                    *variable_id = parent.first_variable + variable_offset +
                         static_cast<t_variable_id>(offset);
                     return true;
                 }
+                if (parent.array_element_variable_count != 0) {
+                    const int64_t offset = static_cast<int64_t>(external_index) -
+                                           parent.array_index_base;
+                    if (offset < 0 || offset >= parent.array_element_count) return false;
+                    variable_offset += static_cast<t_variable_id>(offset) *
+                                       parent.array_element_variable_count;
+                    match = parent.first_child;
+                }
+            }
+            if (match != CONFIG_NO_NODE) {
+                selected = match;
+                offset = end + 1;
+                continue;
             }
             for (uint32_t child = parent.first_child; child != CONFIG_NO_NODE;
                  child = schema_nodes[child].next_sibling) {
@@ -308,7 +403,7 @@ bool Find_Variable(const char* name, size_t name_length, t_variable_id* variable
         schema_nodes[selected].kind != CONFIG_NODE_SCALAR) {
         return false;
     }
-    *variable_id = schema_nodes[selected].variable_id;
+    *variable_id = schema_nodes[selected].variable_id + variable_offset;
     return true;
 }
 
@@ -317,34 +412,68 @@ bool Get_Variable_Name(const s_runtime_schema* schema, t_variable_id variable_id
     if (name == nullptr) {
         return false;
     }
-    const s_schema_node_descriptor* leaf = Get_Variable_Node(schema, variable_id);
-    if (leaf == nullptr) {
-        return false;
+    name->clear();
+    uint32_t node_index = CONFIG_NO_NODE;
+    for (uint32_t index = 0; index < schema->node_count; ++index) {
+        const s_schema_node_descriptor& node = schema->nodes[index];
+        if (node.parent == CONFIG_NO_NODE && variable_id >= node.first_variable &&
+            variable_id <= node.last_variable) {
+            node_index = index;
+            break;
+        }
     }
-    std::vector<std::string> components;
-    uint32_t node_index = static_cast<uint32_t>(leaf - schema->nodes);
-    if (leaf->array_element_count != 0) {
-        components.push_back(std::to_string(
-            leaf->array_index_base + variable_id - leaf->first_variable));
-    }
+    t_variable_id variable_offset = 0;
     while (node_index != CONFIG_NO_NODE) {
         const s_schema_node_descriptor& node = schema->nodes[node_index];
-        if (node.parent != CONFIG_NO_NODE &&
-            schema->nodes[node.parent].kind == CONFIG_NODE_ARRAY) {
-            components.push_back(std::to_string(node.external_index));
-        } else if (node.id[0] != '\0') {
-            components.emplace_back(node.id);
+        if (node.id[0] != '\0') {
+            if (!name->empty()) name->push_back('.');
+            *name += node.id;
         }
-        node_index = node.parent;
-    }
-    name->clear();
-    for (auto component = components.rbegin(); component != components.rend(); ++component) {
-        if (!name->empty()) {
-            name->push_back('.');
+        if (node.kind == CONFIG_NODE_SCALAR) {
+            return node.variable_id + variable_offset == variable_id;
         }
-        *name += *component;
+        if (node.kind == CONFIG_NODE_ARRAY) {
+            if (node.array_element_count != 0) {
+                const uint32_t stride = node.array_element_variable_count == 0 ? 1 :
+                                        node.array_element_variable_count;
+                const uint32_t element =
+                    (variable_id - node.first_variable - variable_offset) / stride;
+                if (!name->empty()) name->push_back('.');
+                *name += std::to_string(node.array_index_base + element);
+                if (node.array_element_variable_count == 0) return true;
+                variable_offset += element * stride;
+                node_index = node.first_child;
+                continue;
+            }
+            uint32_t element = CONFIG_NO_NODE;
+            for (uint32_t child = node.first_child; child != CONFIG_NO_NODE;
+                 child = schema->nodes[child].next_sibling) {
+                const s_schema_node_descriptor& candidate = schema->nodes[child];
+                if (variable_id >= candidate.first_variable + variable_offset &&
+                    variable_id <= candidate.last_variable + variable_offset) {
+                    element = child;
+                    break;
+                }
+            }
+            if (element == CONFIG_NO_NODE) return false;
+            if (!name->empty()) name->push_back('.');
+            *name += std::to_string(schema->nodes[element].external_index);
+            node_index = element;
+            continue;
+        }
+        uint32_t selected = CONFIG_NO_NODE;
+        for (uint32_t child = node.first_child; child != CONFIG_NO_NODE;
+             child = schema->nodes[child].next_sibling) {
+            const s_schema_node_descriptor& candidate = schema->nodes[child];
+            if (variable_id >= candidate.first_variable + variable_offset &&
+                variable_id <= candidate.last_variable + variable_offset) {
+                selected = child;
+                break;
+            }
+        }
+        node_index = selected;
     }
-    return true;
+    return false;
 }
 
 bool Get_Variable_Name(t_variable_id variable_id, std::string* name) {
@@ -371,9 +500,8 @@ bool Initialize_Defaults(s_config_state* state) {
     }
     state->values.clear();
     state->values.resize(variable_count);
-    for (uint32_t node_index = 0; node_index < schema_node_count; ++node_index) {
-        if (schema_nodes[node_index].parent == CONFIG_NO_NODE &&
-            !Initialize_Node_Defaults_(node_index, state)) {
+    for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
+        if (!generated::Get_Default_Value(variable_id, &state->values[variable_id])) {
             state->values.clear();
             return false;
         }
@@ -441,17 +569,9 @@ bool Commit_State(const s_config_state* state) {
             return false;
         }
     }
-    for (size_t node_index = 0; node_index < schema_node_count; ++node_index) {
-        const s_schema_node_descriptor& node = schema_nodes[node_index];
-        if (!node.has_terminator) {
-            continue;
-        }
-        bool found = false;
-        for (t_variable_id variable_id = node.first_variable;
-             variable_id <= node.last_variable; ++variable_id) {
-            found = found || state->values[variable_id].integer_value == node.terminator;
-        }
-        if (!found) {
+    for (uint32_t node_index = 0; node_index < schema_node_count; ++node_index) {
+        if (schema_nodes[node_index].parent == CONFIG_NO_NODE &&
+            !Validate_Node_Terminators_(node_index, 0, state)) {
             return false;
         }
     }

@@ -1041,11 +1041,29 @@ namespace {
         return targets;
     }
 
+    std::vector<s_native_target_expression> Append_Binding_Expressions_(
+        const std::vector<s_native_target_expression>& bases,
+        const std::vector<std::string>& members) {
+        if (members.empty()) {
+            return bases;
+        }
+        std::vector<s_native_target_expression> targets;
+        for (const s_native_target_expression& base : bases) {
+            for (const std::string& member : members) {
+                s_native_target_expression target = base;
+                target.components.push_back({false, member, UINT32_MAX, 0});
+                targets.push_back(std::move(target));
+            }
+        }
+        return targets;
+    }
+
     bool Build_Node_(const s_json_value* root, const std::string& id,
                      const s_json_value* declaration, const s_json_value* inherited_default,
                      const std::string& canonical_path, const std::string& schema_path,
                      const std::string& group, const s_metadata& inherited_metadata,
                      const s_binding& root_binding, const std::vector<std::string>& bases,
+                     const std::vector<s_native_target_expression>& base_expressions,
                      uint32_t parent, int32_t external_index,
                      std::vector<const s_json_value*>* aggregate_stack, s_schema* schema,
                      std::string* diagnostic) {
@@ -1088,6 +1106,8 @@ namespace {
             return false;
         }
         const std::vector<std::string> targets = Append_Bindings_(bases, members);
+        const std::vector<s_native_target_expression> target_expressions =
+            Append_Binding_Expressions_(base_expressions, members);
         const uint32_t node_index = static_cast<uint32_t>(schema->nodes.size());
         s_node node;
         node.id = id;
@@ -1137,6 +1157,7 @@ namespace {
             parameter.ratio_component_type = type.ratio_component_type;
             parameter.binding = root_binding;
             parameter.native_targets = targets;
+            parameter.native_target_expressions = target_expressions;
             if (type.scalar_kind == SCALAR_RATIO && targets.size() != 2) {
                 *diagnostic = schema_path +
                               ".bind: ratio leaves require numerator and denominator targets";
@@ -1190,7 +1211,8 @@ namespace {
                 if (!Build_Node_(root, field_id, &field, field_default,
                                  canonical_path + "." + field_id,
                                  schema_path + ".fields." + field_id, group,
-                                 inherited_metadata, root_binding, targets, node_index, 0,
+                                 inherited_metadata, root_binding, targets,
+                                 target_expressions, node_index, 0,
                                  aggregate_stack, schema, diagnostic)) {
                     return false;
                 }
@@ -1239,6 +1261,7 @@ namespace {
             schema->nodes[node_index].scalar_array =
                 element_type.node_kind == NODE_SCALAR;
             schema->nodes[node_index].native_targets = targets;
+            schema->nodes[node_index].native_target_expressions = target_expressions;
             if (index_type_value != nullptr) {
                 if (index_type_value->kind != JSON_STRING) {
                     *diagnostic = schema_path + ".index_type: expected an enum type name";
@@ -1307,6 +1330,12 @@ namespace {
                 for (const std::string& target : targets) {
                     element_targets.push_back(target + "[" + std::to_string(index) + "]");
                 }
+                std::vector<s_native_target_expression> element_target_expressions =
+                    target_expressions;
+                for (s_native_target_expression& target : element_target_expressions) {
+                    target.components.push_back(
+                        {true, {}, node_index, index});
+                }
                 const s_json_value* element_default =
                     local_default != nullptr &&
                     static_cast<size_t>(index) < local_default->values.size() ?
@@ -1314,7 +1343,8 @@ namespace {
                 if (!Build_Node_(root, "", element, element_default,
                                  canonical_path + "." + std::to_string(external),
                                  schema_path + ".element", group, inherited_metadata,
-                                 root_binding, element_targets, node_index,
+                                 root_binding, element_targets, element_target_expressions,
+                                 node_index,
                                  static_cast<int32_t>(external), aggregate_stack,
                                  schema, diagnostic)) {
                     return false;
@@ -1364,10 +1394,14 @@ namespace {
             return false;
         }
         std::vector<std::string> bases = {binding.symbol};
+        std::vector<s_native_target_expression> base_expressions = {
+            {binding.symbol, {}},
+        };
         std::vector<const s_json_value*> aggregate_stack;
         const std::string canonical_path = name_space.empty() ? id : name_space + "." + id;
         return Build_Node_(root, id, value, nullptr, canonical_path, path, group, metadata,
-                           binding, bases, parent, 0, &aggregate_stack, schema, diagnostic);
+                           binding, bases, base_expressions, parent, 0, &aggregate_stack,
+                           schema, diagnostic);
     }
 
     std::string Default_Text_(const s_json_value* value) {

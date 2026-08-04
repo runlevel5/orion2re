@@ -122,6 +122,12 @@ struct s_schema_node_descriptor {
     const s_type_descriptor* type;
     int32_t array_index_base;
     uint32_t array_element_count;
+    uint32_t array_element_variable_count;
+};
+
+struct s_variable_location {
+    const s_schema_node_descriptor* node;
+    t_variable_id variable_offset;
 };
 
 struct s_array_index_alias_descriptor {
@@ -156,6 +162,10 @@ constexpr uint32_t CONFIG_NO_NODE = UINT32_MAX;
 constexpr t_variable_id CONFIG_NO_VARIABLE = UINT32_MAX;
 
 const s_runtime_schema* Get_Runtime_Schema();
+bool Get_Variable_Location(const s_runtime_schema* schema, t_variable_id variable_id,
+                           s_variable_location* location);
+bool Get_Array_Element_Offset(const s_runtime_schema* schema, t_variable_id variable_id,
+                              uint32_t array_node, uint32_t* element_offset);
 const s_schema_node_descriptor* Get_Variable_Node(const s_runtime_schema* schema,
                                                   t_variable_id variable_id);
 const s_type_descriptor* Get_Variable_Type(t_variable_id variable_id);
@@ -176,7 +186,6 @@ bool Commit_State(const s_config_state* state);
 namespace generated {
 
 bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value);
-bool Initialize_Scalar_Array_Defaults(uint32_t node_index, s_config_state* state);
 bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable);
 void Set_Value(t_variable_id variable_id, const s_typed_value* value);
 bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value);

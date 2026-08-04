@@ -448,7 +448,8 @@ namespace {
     }
 
     uint32_t Find_Child_(const s_runtime_schema* schema, uint32_t parent,
-                         const s_cfg_token& token, int32_t* resolved_index) {
+                         const s_cfg_token& token, int32_t* resolved_index,
+                         t_variable_id* variable_offset) {
         bool has_index = false;
         int32_t external_index = 0;
         if (schema->nodes[parent].kind == CONFIG_NODE_ARRAY) {
@@ -470,7 +471,10 @@ namespace {
             if (has_index && array.array_element_count != 0 && offset >= 0 &&
                 offset < array.array_element_count) {
                 *resolved_index = external_index;
-                return parent;
+                if (array.array_element_variable_count == 0) return parent;
+                *variable_offset += static_cast<t_variable_id>(offset) *
+                                    array.array_element_variable_count;
+                return array.first_child;
             }
         }
         for (uint32_t index = 0; index < schema->node_count; ++index) {
@@ -524,6 +528,7 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
     }
     std::string canonical_path = root.value;
     t_variable_id selected_variable = CONFIG_NO_VARIABLE;
+    t_variable_id variable_offset = 0;
     if (selected == CONFIG_NO_NODE) {
         return Fail_(root.location, "unknown configuration variable '" + canonical_path + "'",
                      write_set, diagnostic);
@@ -539,7 +544,7 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
         const bool array_selector = schema->nodes[selected].kind == CONFIG_NODE_ARRAY;
         int32_t resolved_index = 0;
         const uint32_t parent = selected;
-        selected = Find_Child_(schema, parent, token, &resolved_index);
+        selected = Find_Child_(schema, parent, token, &resolved_index, &variable_offset);
         if (selected == CONFIG_NO_NODE) {
             canonical_path += "." + token.value;
             return Fail_(token.location, "unknown configuration variable '" + canonical_path + "'",
@@ -547,7 +552,7 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
         }
         canonical_path += "." + (array_selector ? std::to_string(resolved_index) : token.value);
         if (selected == parent && schema->nodes[parent].array_element_count != 0) {
-            selected_variable = schema->nodes[parent].first_variable +
+            selected_variable = schema->nodes[parent].first_variable + variable_offset +
                 static_cast<t_variable_id>(resolved_index -
                                            schema->nodes[parent].array_index_base);
         }
@@ -578,8 +583,8 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
         boundary = selected_node.parent;
     }
     const t_variable_id first_variable = selected_variable != CONFIG_NO_VARIABLE ?
-        selected_variable : selected_node.first_variable;
-    const t_variable_id last_variable = schema->nodes[boundary].last_variable;
+        selected_variable : selected_node.first_variable + variable_offset;
+    const t_variable_id last_variable = schema->nodes[boundary].last_variable + variable_offset;
     if (first_variable == CONFIG_NO_VARIABLE || first_variable > last_variable) {
         return Fail_(root.location, "selected configuration object has no writable values",
                      write_set, diagnostic);

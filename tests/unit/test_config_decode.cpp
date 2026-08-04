@@ -229,9 +229,9 @@ DOCTEST_TEST_CASE("configuration namespaces group paths without becoming assigna
                   "ships.guardian.weapons.1.amount");
     DOCTEST_CHECK(writes.writes[0].value.integer_value == 3);
 
-    DOCTEST_REQUIRE(Decode_(
+    DOCTEST_REQUIRE_MESSAGE(Decode_(
         "ships antaran impossible titan weapons 8 amount = 12;",
-        &writes, &diagnostic));
+        &writes, &diagnostic), diagnostic.message);
     DOCTEST_REQUIRE(writes.writes.size() == 1);
     DOCTEST_CHECK(writes.writes[0].canonical_path ==
                   "ships.antaran.4.4.weapons.8.amount");
@@ -268,8 +268,11 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     const config::s_schema_node_descriptor* queue =
         config::Get_Variable_Node(config::Get_Runtime_Schema(), queue_id);
     DOCTEST_REQUIRE(queue != nullptr);
-    DOCTEST_CHECK(queue->first_variable <= queue_id);
-    DOCTEST_CHECK(queue->last_variable >= queue_id);
+    config::s_variable_location queue_location = {};
+    DOCTEST_REQUIRE(config::Get_Variable_Location(
+        config::Get_Runtime_Schema(), queue_id, &queue_location));
+    DOCTEST_CHECK(queue->first_variable + queue_location.variable_offset <= queue_id);
+    DOCTEST_CHECK(queue->last_variable + queue_location.variable_offset >= queue_id);
     DOCTEST_CHECK(queue->array_index_base == 0);
     DOCTEST_CHECK(queue->array_element_count == BUILD_QUEUE::INSTRUCTION_CAPACITY);
     DOCTEST_CHECK(queue->type == config::Get_Variable_Type(queue_id));
@@ -283,16 +286,19 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
         }
     }
     DOCTEST_REQUIRE(build_queue != nullptr);
-    size_t row_count = 0;
+    size_t template_count = 0;
     for (uint32_t child = build_queue->first_child;
          child != config::CONFIG_NO_NODE;
          child = schema->nodes[child].next_sibling) {
-        ++row_count;
+        ++template_count;
         DOCTEST_CHECK(schema->nodes[child].array_element_count ==
                       BUILD_QUEUE::INSTRUCTION_CAPACITY);
         DOCTEST_CHECK(schema->nodes[child].first_child == config::CONFIG_NO_NODE);
     }
-    DOCTEST_CHECK(row_count == BUILD_QUEUE::PRESET_COUNT);
+    DOCTEST_CHECK(build_queue->array_element_count == BUILD_QUEUE::PRESET_COUNT);
+    DOCTEST_CHECK(build_queue->array_element_variable_count ==
+                  BUILD_QUEUE::INSTRUCTION_CAPACITY);
+    DOCTEST_CHECK(template_count == 1);
     DOCTEST_CHECK_FALSE(config::Find_Variable("music", 5, &music_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable("MUSIC_VOLUME", 12, &music_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable(

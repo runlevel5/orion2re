@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <filesystem>
+#include <functional>
 #include <set>
 
 #include "file_util.h"
@@ -224,6 +225,33 @@ namespace {
             *output += "        value->integer_value = " + value + ";\n";
         }
         *output += "        return true;\n";
+    }
+
+    bool Same_Target_Expression_(const s_native_target_expression& left,
+                                 const s_native_target_expression& right) {
+        if (left.root != right.root || left.components.size() != right.components.size()) {
+            return false;
+        }
+        for (size_t index = 0; index < left.components.size(); ++index) {
+            if (left.components[index].array_index != right.components[index].array_index ||
+                left.components[index].member != right.components[index].member) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool Same_Target_Expressions_(const s_parameter& left, const s_parameter& right) {
+        if (left.native_target_expressions.size() != right.native_target_expressions.size()) {
+            return false;
+        }
+        for (size_t index = 0; index < left.native_target_expressions.size(); ++index) {
+            if (!Same_Target_Expression_(left.native_target_expressions[index],
+                                         right.native_target_expressions[index])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     void Append_Direct_Default_(const s_parameter& parameter, std::string* output) {
@@ -464,12 +492,87 @@ namespace {
         }
         output += "static_assert(CONFIG_MAX_VARIABLE_TARGETS >= " +
                   std::to_string(maximum_target_count) + ");\n\n";
+        std::vector<std::vector<uint32_t>> model_children(schema->nodes.size());
+        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            const uint32_t parent = schema->nodes[node_index].parent;
+            if (parent != UINT32_MAX) model_children[parent].push_back(node_index);
+        }
         std::vector<bool> omitted_nodes(schema->nodes.size(), false);
+        std::vector<uint32_t> node_representatives(schema->nodes.size());
+        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            node_representatives[node_index] = node_index;
+        }
+        std::vector<bool> repeated_layout_arrays(schema->nodes.size(), false);
         for (const s_scalar_array_range& range : scalar_array_ranges) {
-            for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
-                if (schema->nodes[node_index].parent == range.node_index) {
-                    omitted_nodes[node_index] = true;
+            for (uint32_t child : model_children[range.node_index]) {
+                omitted_nodes[child] = true;
+            }
+        }
+        std::function<bool(uint32_t, uint32_t)> same_layout =
+            [&](uint32_t left_index, uint32_t right_index) {
+                const s_node& left = schema->nodes[left_index];
+                const s_node& right = schema->nodes[right_index];
+                if (left.id != right.id || left.kind != right.kind ||
+                    left.last_parameter - left.first_parameter !=
+                        right.last_parameter - right.first_parameter ||
+                    left.array_count != right.array_count ||
+                    left.array_index_base != right.array_index_base ||
+                    left.has_terminator != right.has_terminator ||
+                    left.terminator != right.terminator ||
+                    !Same_Symbols_(left.index_aliases, right.index_aliases) ||
+                    model_children[left_index].size() != model_children[right_index].size()) {
+                    return false;
                 }
+                if (left.kind == NODE_SCALAR) {
+                    return Same_Runtime_Type_(schema->parameters[left.parameter],
+                                              schema->parameters[right.parameter]) &&
+                           Same_Target_Expressions_(schema->parameters[left.parameter],
+                                                    schema->parameters[right.parameter]);
+                }
+                for (size_t child = 0; child < model_children[left_index].size(); ++child) {
+                    const uint32_t left_child = model_children[left_index][child];
+                    const uint32_t right_child = model_children[right_index][child];
+                    if (schema->nodes[left_child].external_index !=
+                            schema->nodes[right_child].external_index ||
+                        !same_layout(left_child, right_child)) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+        std::function<void(uint32_t, uint32_t)> map_subtree =
+            [&](uint32_t representative, uint32_t duplicate) {
+                omitted_nodes[duplicate] = true;
+                node_representatives[duplicate] = representative;
+                for (size_t child = 0; child < model_children[representative].size(); ++child) {
+                    map_subtree(model_children[representative][child],
+                                model_children[duplicate][child]);
+                }
+        };
+        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            const s_node& node = schema->nodes[node_index];
+            if (omitted_nodes[node_index] || node.kind != NODE_ARRAY || node.scalar_array ||
+                model_children[node_index].size() != static_cast<size_t>(node.array_count) ||
+                model_children[node_index].empty()) {
+                continue;
+            }
+            const uint32_t representative = model_children[node_index].front();
+            bool equivalent = true;
+            for (size_t element = 1; element < model_children[node_index].size(); ++element) {
+                equivalent = equivalent &&
+                    same_layout(representative, model_children[node_index][element]);
+            }
+            if (!equivalent) continue;
+            repeated_layout_arrays[node_index] = true;
+            for (size_t element = 1; element < model_children[node_index].size(); ++element) {
+                map_subtree(representative, model_children[node_index][element]);
+            }
+        }
+        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            while (node_representatives[node_index] !=
+                   node_representatives[node_representatives[node_index]]) {
+                node_representatives[node_index] =
+                    node_representatives[node_representatives[node_index]];
             }
         }
         std::vector<uint32_t> runtime_node_ids(schema->nodes.size(), UINT32_MAX);
@@ -480,6 +583,79 @@ namespace {
                 runtime_nodes.push_back(node_index);
             }
         }
+        std::vector<uint32_t> compact_ranges;
+        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            if (!repeated_layout_arrays[node_index]) continue;
+            bool nested = false;
+            for (uint32_t parent = schema->nodes[node_index].parent;
+                 parent != UINT32_MAX; parent = schema->nodes[parent].parent) {
+                nested = nested || repeated_layout_arrays[parent];
+            }
+            bool entirely_scalar_ranged = true;
+            for (uint32_t parameter = schema->nodes[node_index].first_parameter;
+                 parameter <= schema->nodes[node_index].last_parameter; ++parameter) {
+                entirely_scalar_ranged = entirely_scalar_ranged && ranged_parameters[parameter];
+            }
+            if (!nested && !entirely_scalar_ranged) compact_ranges.push_back(node_index);
+        }
+        auto compact_leaf_count = [&](uint32_t node_index) {
+            uint32_t layout = model_children[node_index].front();
+            while (schema->nodes[layout].kind == NODE_ARRAY &&
+                   repeated_layout_arrays[layout]) {
+                layout = model_children[layout].front();
+            }
+            return schema->nodes[layout].last_parameter -
+                   schema->nodes[layout].first_parameter + 1;
+        };
+        std::vector<bool> compact_parameters(schema->parameters.size(), false);
+        for (uint32_t node_index : compact_ranges) {
+            const s_node& node = schema->nodes[node_index];
+            for (uint32_t parameter = node.first_parameter;
+                 parameter <= node.last_parameter; ++parameter) {
+                compact_parameters[parameter] = true;
+            }
+        }
+        for (size_t range_index = 0; range_index < compact_ranges.size(); ++range_index) {
+            const s_node& range = schema->nodes[compact_ranges[range_index]];
+            const uint32_t leaf_count = compact_leaf_count(compact_ranges[range_index]);
+            const uint32_t instance_count =
+                (range.last_parameter - range.first_parameter + 1) / leaf_count;
+            for (uint32_t leaf = 0; leaf < leaf_count; ++leaf) {
+                const s_parameter& parameter = schema->parameters[range.first_parameter + leaf];
+                const std::string name = "generated_compact_defaults_" +
+                                         std::to_string(range_index) + "_" +
+                                         std::to_string(leaf);
+                if (parameter.type == PRIMITIVE_BITMAP) {
+                    output += "static const uint8_t " + name + "[][" +
+                              std::to_string((parameter.bitmap_bit_count + 7) / 8) + "] = {\n";
+                } else if (parameter.type == PRIMITIVE_RATIO) {
+                    output += "static const s_ratio_value " + name + "[] = {\n";
+                } else if (parameter.type == PRIMITIVE_STRING) {
+                    output += "static const char* const " + name + "[] = {\n";
+                } else {
+                    output += std::string("static const ") + Native_Type_(parameter.type) +
+                              " " + name + "[] = {\n";
+                }
+                for (uint32_t instance = 0; instance < instance_count; ++instance) {
+                    const s_parameter& value = schema->parameters[
+                        range.first_parameter + instance * leaf_count + leaf];
+                    output += "    ";
+                    if (value.type == PRIMITIVE_BITMAP) {
+                        output += Byte_Array_(value.default_bitmap);
+                    } else if (value.type == PRIMITIVE_RATIO) {
+                        output += "{ " + std::to_string(value.default_ratio_numerator) +
+                                  ", " + std::to_string(value.default_ratio_denominator) + " }";
+                    } else if (value.type == PRIMITIVE_STRING) {
+                        output += Cpp_String_(Encode_Game_String(value.default_string));
+                    } else {
+                        output += Default_Value_(value);
+                    }
+                    output += ",\n";
+                }
+                output += "};\n";
+            }
+        }
+        output += "\n";
         for (const s_parameter& parameter : schema->parameters) {
             if (parameter.scalar_kind != SCALAR_BITMAP) {
                 continue;
@@ -492,13 +668,16 @@ namespace {
         }
         output += "\n";
         size_t array_index_alias_count = 0;
-        for (const s_node& node : schema->nodes) {
-            array_index_alias_count += node.index_aliases.size();
+        for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            if (!omitted_nodes[node_index]) {
+                array_index_alias_count += schema->nodes[node_index].index_aliases.size();
+            }
         }
         if (array_index_alias_count != 0) {
             output += "static const s_array_index_alias_descriptor generated_array_index_aliases[] = {\n";
             for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
                 for (const s_symbol& alias : schema->nodes[node_index].index_aliases) {
+                    if (omitted_nodes[node_index]) continue;
                     output += "    { " + std::to_string(runtime_node_ids[node_index]) + ", " +
                               Cpp_String_(alias.name) + ", " +
                               std::to_string(alias.value) + " },\n";
@@ -539,7 +718,7 @@ namespace {
                           std::to_string(index) + ", " + std::to_string(index) +
                           ", " + std::to_string(index) + ", false, 0, CONFIG_NO_NODE, " +
                           "CONFIG_NO_NODE, &generated_type_" +
-                          std::to_string(type_ids[index]) + ", 0, 0 },\n";
+                          std::to_string(type_ids[index]) + ", 0, 0, 0 },\n";
             }
         } else {
             for (size_t runtime_index = 0; runtime_index < runtime_nodes.size(); ++runtime_index) {
@@ -564,6 +743,9 @@ namespace {
                                                  std::to_string(next_siblings[runtime_index]);
                 const bool implicit_scalar_array =
                     node.scalar_array && first_children[runtime_index] == UINT32_MAX;
+                const uint32_t element_variable_count = repeated_layout_arrays[node_index] ?
+                    static_cast<uint32_t>((node.last_parameter - node.first_parameter + 1) /
+                                          node.array_count) : 0;
                 const std::string runtime_type = node.parameter != UINT32_MAX ?
                     "&generated_type_" + std::to_string(type_ids[node.parameter]) :
                     implicit_scalar_array ?
@@ -576,10 +758,14 @@ namespace {
                           (node.has_terminator ? "true" : "false") + ", " +
                           std::to_string(node.terminator) + ", " + first_child + ", " +
                           next_sibling + ", " + runtime_type + ", " +
-                          std::to_string(implicit_scalar_array ? node.array_index_base : 0) +
+                          std::to_string((implicit_scalar_array ||
+                                          repeated_layout_arrays[node_index]) ?
+                                         node.array_index_base : 0) +
                           ", " +
-                          std::to_string(implicit_scalar_array ? node.array_count : 0) +
-                          " },\n";
+                          std::to_string((implicit_scalar_array ||
+                                          repeated_layout_arrays[node_index]) ?
+                                         node.array_count : 0) + ", " +
+                          std::to_string(element_variable_count) + " },\n";
             }
         }
         output +=
@@ -617,25 +803,54 @@ namespace {
             }
             output += "    }\n";
         }
+        for (size_t range_index = 0; range_index < compact_ranges.size(); ++range_index) {
+            const s_node& range = schema->nodes[compact_ranges[range_index]];
+            const uint32_t leaf_count = compact_leaf_count(compact_ranges[range_index]);
+            output += "    if (variable_id >= " + std::to_string(range.first_parameter) +
+                      " && variable_id <= " + std::to_string(range.last_parameter) + ") {\n"
+                      "        const size_t instance = (variable_id - " +
+                      std::to_string(range.first_parameter) + ") / " +
+                      std::to_string(leaf_count) + ";\n"
+                      "        const size_t leaf = (variable_id - " +
+                      std::to_string(range.first_parameter) + ") % " +
+                      std::to_string(leaf_count) + ";\n"
+                      "        *value = {};\n"
+                      "        switch (leaf) {\n";
+            for (uint32_t leaf = 0; leaf < leaf_count; ++leaf) {
+                const s_parameter& parameter = schema->parameters[range.first_parameter + leaf];
+                const std::string defaults = "generated_compact_defaults_" +
+                                             std::to_string(range_index) + "_" +
+                                             std::to_string(leaf);
+                output += "        case " + std::to_string(leaf) + ":\n"
+                          "            value->type = " + Cpp_Type_(parameter.type) + ";\n";
+                if (parameter.type == PRIMITIVE_BOOL) {
+                    output += "            value->bool_value = " + defaults + "[instance];\n";
+                } else if (parameter.type == PRIMITIVE_STRING) {
+                    output += "            value->string_value = " + defaults + "[instance];\n";
+                } else if (parameter.type == PRIMITIVE_BITMAP) {
+                    output += "            value->bitmap_value.assign(" + defaults +
+                              "[instance], " + defaults + "[instance] + sizeof(" +
+                              defaults + "[instance]));\n";
+                } else if (parameter.type == PRIMITIVE_RATIO) {
+                    output += "            value->ratio_numerator = " + defaults +
+                              "[instance].numerator;\n"
+                              "            value->ratio_denominator = " + defaults +
+                              "[instance].denominator;\n";
+                } else {
+                    output += "            value->integer_value = " + defaults +
+                              "[instance];\n";
+                }
+                output += "            return true;\n";
+            }
+            output += "        default: return false;\n"
+                      "        }\n"
+                      "    }\n";
+        }
         output += "    switch (variable_id) {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            if (ranged_parameters[index]) continue;
+            if (ranged_parameters[index] || compact_parameters[index]) continue;
             output += "    case " + std::to_string(index) + ":\n";
             Append_Direct_Default_(schema->parameters[index], &output);
-        }
-        output += "    default: return false;\n    }\n}\n\n";
-        output += "bool Initialize_Scalar_Array_Defaults(uint32_t node_index, "
-                  "s_config_state* state) {\n"
-                  "    if (state == nullptr) return false;\n"
-                  "    switch (node_index) {\n";
-        for (const s_scalar_array_range& range : scalar_array_ranges) {
-            output += "    case " + std::to_string(runtime_node_ids[range.node_index]) + ":\n"
-                      "        for (t_variable_id id = " +
-                      std::to_string(range.first_parameter) + "; id < " +
-                      std::to_string(range.first_parameter + range.count) + "; ++id) {\n"
-                      "            if (!Get_Default_Value(id, &state->values[id])) return false;\n"
-                      "        }\n"
-                      "        return true;\n";
         }
         output += "    default: return false;\n    }\n}\n\n";
         output += "bool Resolve_Variable(t_variable_id variable_id, "
@@ -662,9 +877,66 @@ namespace {
                       "        return true;\n"
                       "    }\n";
         }
+        for (uint32_t node_index : compact_ranges) {
+            const s_node& range_node = schema->nodes[node_index];
+            const uint32_t element_variable_count = compact_leaf_count(node_index);
+            output += "    if (variable_id >= " +
+                      std::to_string(range_node.first_parameter) +
+                      " && variable_id <= " +
+                      std::to_string(range_node.last_parameter) + ") {\n"
+                      "        const t_variable_id leaf = (variable_id - " +
+                      std::to_string(range_node.first_parameter) + ") % " +
+                      std::to_string(element_variable_count) + ";\n"
+                      "        switch (leaf) {\n";
+            const uint32_t first = range_node.first_parameter;
+            const uint32_t last = first + element_variable_count;
+            for (uint32_t parameter_index = first; parameter_index < last;
+                 ++parameter_index) {
+                const s_parameter& parameter = schema->parameters[parameter_index];
+                output += "        case " + std::to_string(parameter_index - first) + ": {\n"
+                          "            variable->type = &generated_type_" +
+                          std::to_string(type_ids[parameter_index]) + ";\n";
+                std::set<uint32_t> emitted_indices;
+                for (size_t target_index = 0;
+                     target_index < parameter.native_target_expressions.size(); ++target_index) {
+                    const s_native_target_expression& target =
+                        parameter.native_target_expressions[target_index];
+                    std::string expression = target.root;
+                    for (const s_native_target_component& component : target.components) {
+                        if (!component.array_index) {
+                            expression += "." + component.member;
+                            continue;
+                        }
+                        const uint32_t representative =
+                            node_representatives[component.array_node];
+                        const uint32_t runtime_node = runtime_node_ids[representative];
+                        const std::string index_name =
+                            "generated_index_" + std::to_string(runtime_node);
+                        if (emitted_indices.insert(runtime_node).second) {
+                            output += "            uint32_t " + index_name + " = 0;\n"
+                                      "            if (!Get_Array_Element_Offset("
+                                      "Get_Runtime_Schema(), variable_id, " +
+                                      std::to_string(runtime_node) + ", &" + index_name +
+                                      ")) return false;\n";
+                        }
+                        expression += "[" + index_name + "]";
+                    }
+                    output += "            variable->targets[" +
+                              std::to_string(target_index) + "] = { (void*)&" +
+                              expression + ", sizeof(" + expression + ") };\n";
+                }
+                output += "            variable->target_count = " +
+                          std::to_string(parameter.native_targets.size()) + ";\n"
+                          "            return true;\n"
+                          "        }\n";
+            }
+            output += "        default: return false;\n"
+                      "        }\n"
+                      "    }\n";
+        }
         output += "    switch (variable_id) {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            if (ranged_parameters[index]) continue;
+            if (ranged_parameters[index] || compact_parameters[index]) continue;
             const s_parameter& parameter = schema->parameters[index];
             output += "    case " + std::to_string(index) + ":\n"
                       "        variable->type = &generated_type_" +
