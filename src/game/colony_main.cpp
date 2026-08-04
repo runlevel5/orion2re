@@ -1,6 +1,47 @@
 #include "pch.h"
 
+#include "build_queue.h"
+
 namespace COLONY {
+    bool __cdecl Prompt_For_Autobuild_Queue_(int16_t colony_idx) {
+        if (colony_idx < 0 || colony_idx >= MOX::_NUM_COLONIES) {
+            return false;
+        }
+
+        s_colony& colony = MOX::_colony[colony_idx];
+        int preset = BUILD_QUEUE::Decode_Autobuild_Preset_(colony.auto_building);
+        if (preset < 0) {
+            preset = BUILD_QUEUE::autobuild_settings.default_preset;
+        }
+
+        char input[4];
+        snprintf(input, sizeof(input), "%d", preset);
+        char prompt[] = "Autobuild queue: 0-10";
+        char invalid[] = "Enter a queue number from 0 to 10, or leave it blank to disable autobuild.";
+
+        fonts::Set_Font_Style_(3, &COLONY::_font_color_array);
+        const int16_t input_width = fonts::Get_String_Width_("000");
+        fields::Clear_Mouse_Buffer_();
+
+        while (namestar::Input_Box_Popup_Animated_(
+                   input, sizeof(input), 2, input_width, prompt,
+                   namestar::Star_Name_Popup_Screen_Center_X_(),
+                   namestar::Star_Name_Popup_Screen_Center_Y_()) != 0) {
+            const int selected = BUILD_QUEUE::Parse_Autobuild_Preset_(input);
+            if (selected == -1) {
+                colony.auto_building = BUILD_QUEUE::AUTOBUILD_DISABLED;
+                return true;
+            }
+            if (selected >= 0) {
+                colony.auto_building = BUILD_QUEUE::Encode_Autobuild_Preset_(selected);
+                BUILD_QUEUE::Apply_Custom_Autobuild_(colony_idx);
+                return true;
+            }
+            GENDRAW::Help_(invalid);
+        }
+        return false;
+    }
+
     void __cdecl Draw_Colony_Bldg_(int16_t col, int16_t row) {
         if (col >= 0 && col < 6 && row >= 0 && row < 6) {
             int32_t building_id = _colony_bldgs[col].buildings[row];
@@ -915,10 +956,19 @@ namespace COLONY {
         fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
         BILL::Squeeze_Print_Paragraph_(0x20a /* 522 */, 0x26 /* 38 */, 0x70 /* 112 */, 0x8d /* 141 */, name_buffer, 2);
 
-        if (colony.auto_building != 0) {
+        const int autobuild_preset = BUILD_QUEUE::autobuild_settings.enabled != 0
+            ? BUILD_QUEUE::Decode_Autobuild_Preset_(colony.auto_building)
+            : -1;
+        if (BUILD_QUEUE::Is_Legacy_Autobuild_(colony.auto_building) || autobuild_preset >= 0) {
             fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_bright_blue_font_color_array);
-            char* auto_msg = ESTRINGS::E_Strings_(0xbd);
-            fonts::Print_Centered_(0x242 /* 578 */, 0x1c /* 28 */, auto_msg);
+            if (autobuild_preset >= 0) {
+                char auto_msg[40];
+                snprintf(auto_msg, sizeof(auto_msg), "Autobuild queue %d", autobuild_preset);
+                fonts::Print_Centered_(0x242 /* 578 */, 0x1c /* 28 */, auto_msg);
+            } else {
+                fonts::Print_Centered_(0x242 /* 578 */, 0x1c /* 28 */,
+                                       ESTRINGS::E_Strings_(0xbd));
+            }
         }
 
         COLONY::Draw_Turn_Count_();
@@ -1025,7 +1075,18 @@ namespace COLONY {
         }
 
         if (_colony_fields[18] == field_val) {
-            MOX::_colony[_colony_handle].auto_building = (MOX::_colony[_colony_handle].auto_building == 0);
+            if (BUILD_QUEUE::autobuild_settings.enabled != 0) {
+                if (MOX::_colony[_colony_handle].auto_building !=
+                    BUILD_QUEUE::AUTOBUILD_DISABLED) {
+                    MOX::_colony[_colony_handle].auto_building =
+                        BUILD_QUEUE::AUTOBUILD_DISABLED;
+                } else {
+                    Prompt_For_Autobuild_Queue_(_colony_handle);
+                }
+            } else {
+                MOX::_colony[_colony_handle].auto_building =
+                    (MOX::_colony[_colony_handle].auto_building == 0);
+            }
             Show_Colony_Screen_();
             return 1;
         }

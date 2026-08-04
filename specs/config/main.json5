@@ -540,7 +540,7 @@
         android_farmer: 16, android_worker: 17, android_scientist: 18,
         repeat: 19, colony_ship: 20, outpost_ship: 21, transport: 22,
         design1: 23, design2: 24, design3: 25, design4: 26,
-        design5: 27, design6: 28,
+        design5: 27, design6: 28, clear_continuous: 29,
         alien_control_center: 32, armor_barracks: 33, artemis_system_net: 34,
         astro_university: 35, atmosphere_renewer: 36, autolab: 37,
         automated_factory: 38, battlestation: 39, capitol: 40,
@@ -561,6 +561,14 @@
     },
   },
   records: {
+    autobuild_settings: {
+      title: "Experimental autobuild settings",
+      description: "Controls queue-driven colony autobuild behavior.",
+      fields: [
+        { id: "enabled", title: "Enabled", description: "Enables queue-driven colony autobuild.", type: "bool", bind: ["enabled"] },
+        { id: "default", title: "Default queue", description: "Queue number prefilled when assigning autobuild to a colony.", type: "uint8", constraints: { min: 0, max: 10 }, bind: ["default_preset"] },
+      ],
+    },
     predefined_ship_weapon: {
       title: "Predefined ship weapon slot",
       description: "One of the eight weapon slots in a predefined ship design.",
@@ -597,7 +605,7 @@
     build_queue: {
       title: "Automatic build queues",
       description: "Defines the eleven build lists applied by Q and the digit hotkeys.",
-      remarks: "Q selects list 0; keys 1 through 9 select matching list numbers; key 0 selects list 10. Shift plus a digit applies that list to every owned colony from the colony summary.",
+      remarks: "Q selects list 0; keys 1 through 9 select matching list numbers; key 0 selects list 10. Shift plus a digit applies that list to every owned colony from the colony summary. clear_continuous removes Housing and Trade Goods from the editable queue while preserving a purchased front item.",
       examples: [
         "build_queue 1 = prepend design1 end;",
         "build_queue 9 = housing end;",
@@ -613,7 +621,7 @@
         } },
       },
       default: [
-        ["merge", "alien_control_center", "marine_barracks", "automated_factory", "robo_miner_plant", "pollution_processor", "deep_core_mine", "gravity_generator", "robotic_factory", "atmosphere_renewer", "biospheres", "hydroponic_farm", "subterranean_farms", "holo_simulator", "pleasure_dome", "research_lab", "supercomputer", "autolab", "galactic_cybernet", "recyclotron", "astro_university", "core_waste_dump", "spaceport", "stock_exchange", "soil_enrichment", "weather_controller", "terraforming", "gaia_transformation", "stellar_converter", "missile_base", "ground_batteries", "fighter_garrison", "star_base", "battlestation", "star_fortress", "radiation_shield", "flux_shield", "barrier_shield", "artemis_system_net", "armor_barracks", "colony_base", "colony_base", "colony_base", "colony_base", "artificial_planet", "space_academy", "end"],
+        ["clear_continuous", "merge", "alien_control_center", "marine_barracks", "automated_factory", "robo_miner_plant", "pollution_processor", "deep_core_mine", "gravity_generator", "robotic_factory", "atmosphere_renewer", "biospheres", "hydroponic_farm", "subterranean_farms", "holo_simulator", "pleasure_dome", "research_lab", "supercomputer", "autolab", "galactic_cybernet", "recyclotron", "astro_university", "core_waste_dump", "spaceport", "stock_exchange", "soil_enrichment", "weather_controller", "terraforming", "gaia_transformation", "stellar_converter", "missile_base", "ground_batteries", "fighter_garrison", "star_base", "battlestation", "star_fortress", "radiation_shield", "flux_shield", "barrier_shield", "artemis_system_net", "armor_barracks", "colony_base", "colony_base", "colony_base", "colony_base", "artificial_planet", "space_academy", "end"],
         ["prepend", "design1", "end"],
         ["prepend", "design2", "end"],
         ["prepend", "design3", "end"],
@@ -949,6 +957,17 @@
         symbol: "MOX::_settings",
       },
       bind: ["sound_fx_level"],
+    },
+
+    autobuild: {
+      title: "Experimental autobuild",
+      description: "Assigns automatic build queues to individual colonies.",
+      examples: ["experiment autobuild enabled = true;", "experiment autobuild default = 0;"],
+      group: "gameplay",
+      namespace: "experiment",
+      type: "autobuild_settings",
+      bind_root: { header: "game/build_queue.h", symbol: "BUILD_QUEUE::autobuild_settings" },
+      default: { enabled: false, default: 0 },
     },
   },
 }

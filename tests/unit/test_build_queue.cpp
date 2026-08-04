@@ -45,6 +45,90 @@ DOCTEST_TEST_CASE("append rejects unavailable and duplicate buildings without ov
     DOCTEST_CHECK(MOX::_colony[0].producing[6] == BUILDING_ALIEN_CONTROL_CENTER + 6);
 }
 
+DOCTEST_TEST_CASE("continuous projects are unique and can be cleared explicitly") {
+    TEST_BUILD_QUEUE::Reset_();
+    MOX::_colony[0].producing[0] = COLONY_PRODUCTION_HOUSING;
+    MOX::_colony[0].producing[1] = BUILDING_AUTOMATED_FACTORY;
+    MOX::_colony[0].producing[2] = COLONY_PRODUCTION_TRADE_GOODS;
+    Set_List_(0, {
+        BUILD_QUEUE::INSTRUCTION_APPEND,
+        BUILD_QUEUE::INSTRUCTION_HOUSING,
+        BUILD_QUEUE::INSTRUCTION_TRADE_GOODS,
+        BUILD_QUEUE::INSTRUCTION_END,
+    });
+
+    DOCTEST_REQUIRE(BUILD_QUEUE::Apply_Preset_To_Colony_(0, 0));
+    DOCTEST_CHECK(MOX::_colony[0].producing[0] == COLONY_PRODUCTION_HOUSING);
+    DOCTEST_CHECK(MOX::_colony[0].producing[1] == BUILDING_AUTOMATED_FACTORY);
+    DOCTEST_CHECK(MOX::_colony[0].producing[2] == COLONY_PRODUCTION_TRADE_GOODS);
+    DOCTEST_CHECK(MOX::_colony[0].producing[3] == COLONY_PRODUCTION_NONE);
+
+    Set_List_(0, {
+        BUILD_QUEUE::INSTRUCTION_CLEAR_CONTINUOUS,
+        BUILD_QUEUE::INSTRUCTION_PREPEND,
+        BUILD_QUEUE::INSTRUCTION_HOUSING,
+        BUILD_QUEUE::INSTRUCTION_END,
+    });
+    DOCTEST_REQUIRE(BUILD_QUEUE::Apply_Preset_To_Colony_(0, 0));
+    DOCTEST_CHECK(MOX::_colony[0].producing[0] == COLONY_PRODUCTION_HOUSING);
+    DOCTEST_CHECK(MOX::_colony[0].producing[1] == BUILDING_AUTOMATED_FACTORY);
+    DOCTEST_CHECK(MOX::_colony[0].producing[2] == COLONY_PRODUCTION_NONE);
+}
+
+DOCTEST_TEST_CASE("clear continuous preserves a bought front product") {
+    TEST_BUILD_QUEUE::Reset_();
+    MOX::_colony[0].producing[0] = COLONY_PRODUCTION_TRADE_GOODS;
+    MOX::_colony[0].producing[1] = COLONY_PRODUCTION_HOUSING;
+    MOX::_colony[0].bought_outright = 50;
+    Set_List_(0, {
+        BUILD_QUEUE::INSTRUCTION_CLEAR_CONTINUOUS,
+        BUILD_QUEUE::INSTRUCTION_END,
+    });
+
+    DOCTEST_REQUIRE(BUILD_QUEUE::Apply_Preset_To_Colony_(0, 0));
+    DOCTEST_CHECK(MOX::_colony[0].producing[0] == COLONY_PRODUCTION_TRADE_GOODS);
+    DOCTEST_CHECK(MOX::_colony[0].producing[1] == COLONY_PRODUCTION_NONE);
+    DOCTEST_CHECK(MOX::_colony[0].bought_outright == 50);
+}
+
+DOCTEST_TEST_CASE("autobuild queue values encode all presets without changing legacy mode") {
+    DOCTEST_CHECK(BUILD_QUEUE::Encode_Autobuild_Preset_(0) == 2);
+    DOCTEST_CHECK(BUILD_QUEUE::Encode_Autobuild_Preset_(10) == 12);
+    DOCTEST_CHECK(BUILD_QUEUE::Decode_Autobuild_Preset_(2) == 0);
+    DOCTEST_CHECK(BUILD_QUEUE::Decode_Autobuild_Preset_(12) == 10);
+    DOCTEST_CHECK(BUILD_QUEUE::Decode_Autobuild_Preset_(BUILD_QUEUE::AUTOBUILD_LEGACY) == -1);
+    DOCTEST_CHECK(BUILD_QUEUE::Encode_Autobuild_Preset_(11) == BUILD_QUEUE::AUTOBUILD_DISABLED);
+
+    BUILD_QUEUE::autobuild_settings.enabled = 0;
+    DOCTEST_CHECK(BUILD_QUEUE::Is_Legacy_Autobuild_(12));
+    BUILD_QUEUE::autobuild_settings.enabled = 1;
+    DOCTEST_CHECK_FALSE(BUILD_QUEUE::Is_Legacy_Autobuild_(12));
+    DOCTEST_CHECK(BUILD_QUEUE::Is_Legacy_Autobuild_(BUILD_QUEUE::AUTOBUILD_LEGACY));
+}
+
+DOCTEST_TEST_CASE("autobuild queue input accepts only complete queue numbers") {
+    DOCTEST_CHECK(BUILD_QUEUE::Parse_Autobuild_Preset_("") == -1);
+    DOCTEST_CHECK(BUILD_QUEUE::Parse_Autobuild_Preset_("0") == 0);
+    DOCTEST_CHECK(BUILD_QUEUE::Parse_Autobuild_Preset_("10") == 10);
+    DOCTEST_CHECK(BUILD_QUEUE::Parse_Autobuild_Preset_("01") == 1);
+    DOCTEST_CHECK(BUILD_QUEUE::Parse_Autobuild_Preset_("11") == -2);
+    DOCTEST_CHECK(BUILD_QUEUE::Parse_Autobuild_Preset_("1x") == -2);
+}
+
+DOCTEST_TEST_CASE("custom autobuild applies only when the experiment is enabled") {
+    TEST_BUILD_QUEUE::Reset_();
+    Set_List_(3, {BUILD_QUEUE::INSTRUCTION_HOUSING, BUILD_QUEUE::INSTRUCTION_END});
+    MOX::_colony[0].auto_building = BUILD_QUEUE::Encode_Autobuild_Preset_(3);
+
+    BUILD_QUEUE::autobuild_settings.enabled = 0;
+    DOCTEST_CHECK_FALSE(BUILD_QUEUE::Apply_Custom_Autobuild_(0));
+    DOCTEST_CHECK(MOX::_colony[0].producing[0] == COLONY_PRODUCTION_NONE);
+
+    BUILD_QUEUE::autobuild_settings.enabled = 1;
+    DOCTEST_REQUIRE(BUILD_QUEUE::Apply_Custom_Autobuild_(0));
+    DOCTEST_CHECK(MOX::_colony[0].producing[0] == COLONY_PRODUCTION_HOUSING);
+}
+
 DOCTEST_TEST_CASE("prepend and merge preserve deterministic build-list order") {
     TEST_BUILD_QUEUE::Reset_();
     MOX::_colony[0].producing[0] = BUILDING_SPACEPORT;

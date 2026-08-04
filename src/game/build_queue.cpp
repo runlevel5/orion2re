@@ -164,6 +164,10 @@ namespace {
             if (COLCALC::Colony_Can_Build_Product_(&colony, product) != 1) {
                 return COLONY_PRODUCTION_NONE;
             }
+            if (Colony_Production_Is_Continuous_Project_(product) &&
+                Queue_Contains_(queue, product)) {
+                return COLONY_PRODUCTION_NONE;
+            }
             if (Is_Building_(instruction) && product != BUILDING_COLONY_BASE &&
                 Queue_Contains_(queue, product)) {
                 return COLONY_PRODUCTION_NONE;
@@ -392,6 +396,21 @@ namespace {
                 insertion_position = 0;
                 continue;
             }
+            if (instruction == INSTRUCTION_CLEAR_CONTINUOUS) {
+                const int first = First_Unbought_Slot_(colony, queue);
+                for (int position = first; position < QUEUE_CAPACITY; ++position) {
+                    if (Colony_Production_Is_Continuous_Project_(queue[position])) {
+                        Delete_At_(queue, position, false);
+                    }
+                }
+                Defragment_(queue);
+                memset(merge_cells, 0, sizeof(merge_cells));
+                insertion_position = 0;
+                if (mode == MODE_MERGE) {
+                    Start_Merge_(colony, queue, list, index + 1, merge_cells);
+                }
+                continue;
+            }
             if (instruction >= INSTRUCTION_BUY && instruction <= INSTRUCTION_BUY75) {
                 if (mode == MODE_MERGE && !merge_cells[0]) {
                     continue;
@@ -468,6 +487,28 @@ namespace {
     }
 }
 
+    bool Colony_Production_Is_Continuous_Project_(int16_t product) {
+        return product == COLONY_PRODUCTION_HOUSING ||
+               product == COLONY_PRODUCTION_TRADE_GOODS;
+    }
+
+    int Parse_Autobuild_Preset_(const char* text) {
+        if (text == nullptr || text[0] == '\0') {
+            return -1;
+        }
+        int preset = 0;
+        for (const char* cursor = text; *cursor != '\0'; ++cursor) {
+            if (*cursor < '0' || *cursor > '9') {
+                return -2;
+            }
+            preset = preset * 10 + (*cursor - '0');
+            if (preset >= PRESET_COUNT) {
+                return -2;
+            }
+        }
+        return preset;
+    }
+
     bool Apply_Preset_To_Colony_(int16_t colony_idx, int preset_idx) {
         return preset_idx >= 0 && preset_idx < PRESET_COUNT &&
                Apply_(colony_idx, presets[preset_idx]);
@@ -484,5 +525,15 @@ namespace {
             }
         }
         COLCALC::Do_Player_Colony_Calculations_(player_idx);
+    }
+
+    bool Apply_Custom_Autobuild_(int16_t colony_idx) {
+        if (autobuild_settings.enabled == 0 ||
+            colony_idx < 0 || colony_idx >= MOX::_NUM_COLONIES) {
+            return false;
+        }
+        const int preset_idx = Decode_Autobuild_Preset_(
+            MOX::_colony[colony_idx].auto_building);
+        return preset_idx >= 0 && Apply_Preset_To_Colony_(colony_idx, preset_idx);
     }
 }

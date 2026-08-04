@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "fake_build_queue_runtime.h"
+#include "game/build_queue.h"
 
 namespace {
     s_colony colonies[4];
@@ -29,6 +30,7 @@ namespace TEST_BUILD_QUEUE {
         next_ship = 0;
         colony_calculations = 0;
         player_calculations = 0;
+        BUILD_QUEUE::autobuild_settings = {};
         for (int colony_idx = 0; colony_idx < 4; ++colony_idx) {
             colonies[colony_idx].owner = 0;
             colonies[colony_idx].planet = colony_idx;

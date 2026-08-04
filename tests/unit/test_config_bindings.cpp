@@ -68,8 +68,9 @@ DOCTEST_TEST_CASE("build queue defaults match the eleven 1.50 hotkey lists") {
     DOCTEST_REQUIRE(config::Initialize_Defaults(&defaults));
     DOCTEST_REQUIRE(config::Commit_State(&defaults));
 
-    DOCTEST_CHECK(BUILD_QUEUE::presets[0][0] == BUILD_QUEUE::INSTRUCTION_MERGE);
-    DOCTEST_CHECK(BUILD_QUEUE::presets[0][1] ==
+    DOCTEST_CHECK(BUILD_QUEUE::presets[0][0] == BUILD_QUEUE::INSTRUCTION_CLEAR_CONTINUOUS);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[0][1] == BUILD_QUEUE::INSTRUCTION_MERGE);
+    DOCTEST_CHECK(BUILD_QUEUE::presets[0][2] ==
                   BUILD_QUEUE::INSTRUCTION_BUILDING_BASE + BUILDING_ALIEN_CONTROL_CENTER);
     DOCTEST_CHECK(BUILD_QUEUE::presets[1][0] == BUILD_QUEUE::INSTRUCTION_PREPEND);
     DOCTEST_CHECK(BUILD_QUEUE::presets[1][1] == BUILD_QUEUE::INSTRUCTION_DESIGN1);
@@ -88,6 +89,28 @@ DOCTEST_TEST_CASE("build queue defaults match the eleven 1.50 hotkey lists") {
         }
         DOCTEST_CHECK(found_end);
     }
+}
+
+DOCTEST_TEST_CASE("experimental autobuild settings bind and validate queue defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(BUILD_QUEUE::autobuild_settings.enabled == 0);
+    DOCTEST_CHECK(BUILD_QUEUE::autobuild_settings.default_preset == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "experiment autobuild enabled = true; experiment autobuild default = 10;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(BUILD_QUEUE::autobuild_settings.enabled == 1);
+    DOCTEST_CHECK(BUILD_QUEUE::autobuild_settings.default_preset == 10);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "experiment autobuild default = 11;", &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("shorter build queue assignments replace execution through an earlier end") {

@@ -21,7 +21,7 @@ namespace COLSUM {
     int16_t _list_buy_data[10];
     int16_t _list_col_job_fields[30];
     int16_t _colony_summary_saved_screen;
-    int16_t _build_queue_hotkeys[10];
+    int16_t _build_queue_hotkeys[BUILD_QUEUE::PRESET_COUNT];
 
     uint8_t _colsum_strings_been_loaded;
 
@@ -253,6 +253,13 @@ namespace COLSUM {
 
         static const int16_t buy_btn_y_coords[] = {35, 65, 96, 128, 159, 190, 221, 251, 283, 314};
 
+        _build_queue_hotkeys[0] = fields::Add_Hot_Key_("q");
+        static const char shifted_digits[] = "!@#$%^&*()";
+        for (int index = 0; index < 10; ++index) {
+            const char hotkey[2] = {shifted_digits[index], '\0'};
+            _build_queue_hotkeys[index + 1] = fields::Add_Hot_Key_(hotkey);
+        }
+
         _x_fields[1] = fields::Add_Button_Field_(619, 15, ESTRINGS::E_Strings_(12), _anims[2], ESTRINGS::E_Strings_(137), 40);
         _x_fields[2] = fields::Add_Button_Field_(619, 316, ESTRINGS::E_Strings_(12), _anims[3], ESTRINGS::E_Strings_(11), 40);
         _x_fields[3] = fields::Add_Button_Field_(531, 445, ESTRINGS::E_Strings_(12), _anims[1], ESTRINGS::E_Strings_(40), 40);
@@ -272,12 +279,6 @@ namespace COLSUM {
         }
 
         _x_fields[13] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(596));
-
-        static const char shifted_digits[] = "!@#$%^&*()";
-        for (int index = 0; index < 10; ++index) {
-            const char hotkey[2] = {shifted_digits[index], '\0'};
-            _build_queue_hotkeys[index] = fields::Add_Hot_Key_(hotkey);
-        }
 
         int16_t y_row_end = 65;
         for (int16_t i = 0; i < 10; ++i) {
@@ -588,30 +589,46 @@ namespace COLSUM {
             COLONY::Set_Colony_Font_To_(1);
 
             int16_t item_producing = colony->producing[0];
+            const int autobuild_preset = BUILD_QUEUE::autobuild_settings.enabled != 0
+                ? BUILD_QUEUE::Decode_Autobuild_Preset_(colony->auto_building)
+                : -1;
+            const bool autobuild_active =
+                BUILD_QUEUE::Is_Legacy_Autobuild_(colony->auto_building) ||
+                autobuild_preset >= 0;
             if (item_producing != COLONY_PRODUCTION_NONE) {
                 /* Fmtpara: these inline "\x1B?" sequences apply specific color attributes to the auto-build text. */
                 if (turn_count < 1 || turn_count > 9999) {
-                    if (colony->auto_building == 0) {
+                    if (!autobuild_active) {
                         snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x46), COLBLDG::Selection_Name_(item_producing));
                     } else {
                         snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(item_producing));
                     }
                 } else {
-                    if (colony->auto_building == 0) {
+                    if (!autobuild_active) {
                         snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x27), COLBLDG::Selection_Name_(item_producing), (int)turn_count);
                     } else {
                         snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x5C), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(item_producing), (int)turn_count);
                     }
                 }
 
+                if (autobuild_preset >= 0) {
+                    strlcat(buffer, " [Q", sizeof(buffer));
+                    char preset_text[8];
+                    snprintf(preset_text, sizeof(preset_text), "%d]", autobuild_preset);
+                    strlcat(buffer, preset_text, sizeof(buffer));
+                }
                 COLONY::Set_Colony_Font_To_Blue_(2, 0);
                 BILL::Squeeze_Print_Formatted_Paragraph_(0x200, y_pos, 0x55, 0x16, buffer, 0);
                 fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
                 return;
             }
 
-            if (colony->auto_building != 0) {
-                snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(COLONY_PRODUCTION_NONE));
+            if (autobuild_active) {
+                if (autobuild_preset >= 0) {
+                    snprintf(buffer, sizeof(buffer), "Autobuild queue %d", autobuild_preset);
+                } else {
+                    snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x5D), "\x1B" "1", "\x1B" "0", COLBLDG::Selection_Name_(COLONY_PRODUCTION_NONE));
+                }
                 BILL::Squeeze_Print_Formatted_Paragraph_(0x200, y_pos, 0x55, 0x16, buffer, 0);
                 fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
             }
@@ -760,9 +777,8 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
     bool __cdecl Evaluate_Input_(int16_t* field_ptr, int16_t* scan_val) {
         int16_t field = *field_ptr;
 
-        for (int index = 0; index < 10; ++index) {
-            if (field == _build_queue_hotkeys[index]) {
-                const int preset = index == 9 ? 10 : index + 1;
+        for (int preset = 0; preset < BUILD_QUEUE::PRESET_COUNT; ++preset) {
+            if (field == _build_queue_hotkeys[preset]) {
                 BUILD_QUEUE::Apply_Preset_To_Empire_(MOX::_PLAYER_NUM, preset);
                 Update_Col_List_();
                 COLONY::_full_draw = 1;

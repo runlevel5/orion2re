@@ -5,6 +5,13 @@
 
 namespace COLBLDG {
 
+    void Commit_Autobuild_State_() {
+        if (BUILD_QUEUE::autobuild_settings.enabled == 0) {
+            MOX::_colony[COLONY::_colony_handle].auto_building =
+                static_cast<uint8_t>(_colony_auto_building);
+        }
+    }
+
     s_mouse_list _mouse_list_to[4] = {
         {18, 0, 199, 324, 465, 472},
         {16, 0, 476, 10, 632, 306},
@@ -490,7 +497,8 @@ namespace COLBLDG {
         COLBLDG::Build_Arrays_();
 
         if (COLBLDG::_return_to_build_popup_from_custom_design == 0) {
-            COLBLDG::_colony_auto_building = MOX::_colony[colony_idx].auto_building;
+            COLBLDG::_colony_auto_building =
+                MOX::_colony[colony_idx].auto_building != 0;
         }
 
         COLONY::Make_Bldg_Array_For_Colony_(COLONY::_colony_handle, 0);
@@ -1453,10 +1461,32 @@ namespace COLBLDG {
             return;
         }
 
+        if (_fields[2] == input_field && BUILD_QUEUE::autobuild_settings.enabled != 0) {
+            if (MOX::_colony[COLONY::_colony_handle].auto_building !=
+                BUILD_QUEUE::AUTOBUILD_DISABLED) {
+                MOX::_colony[COLONY::_colony_handle].auto_building =
+                    BUILD_QUEUE::AUTOBUILD_DISABLED;
+            } else {
+                if (COLONY::Prompt_For_Autobuild_Queue_(COLONY::_colony_handle)) {
+                    memcpy(_current_item,
+                           MOX::_colony[COLONY::_colony_handle].producing,
+                           sizeof(_current_item));
+                    _active_prod[0] = -1;
+                    _field_mode = 0;
+                    Build_Arrays_();
+                }
+            }
+            _colony_auto_building =
+                MOX::_colony[COLONY::_colony_handle].auto_building != 0;
+            Do_Draw_Build_Queue_();
+            *selected_field_id = 0;
+            return;
+        }
+
         if (_fields[3] == input_field) {
             _field_mode = 0;
             COLONY::Reset_Mouse_Picture_();
-            MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
+            Commit_Autobuild_State_();
 
             if (Something_Behind_Settting_() == 0) {
                 Do_Exit_Screen_Cleanup_();
@@ -1590,7 +1620,7 @@ namespace COLBLDG {
                 int16_t next_colony = COLONY::Get_Next_Colony_(COLONY::_colony_handle, 0);
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
-                MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
+                Commit_Autobuild_State_();
                 Do_Exit_Screen_Cleanup_();
                 if (next_colony != COLONY::_colony_handle) {
                     COLONY::Set_Colony_Screen_To_New_Colony_(next_colony);
@@ -1603,7 +1633,7 @@ namespace COLBLDG {
                 }
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
-                MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
+                Commit_Autobuild_State_();
                 Do_Exit_Screen_Cleanup_();
                 COLONY::_full_draw = 1;
             } else if (_fields[7] == input_field) {
@@ -2047,7 +2077,7 @@ namespace COLBLDG {
                 } else {
                     MOX::_temp_star_handle = 4;
                     COLBLDG::_return_to_build_popup_from_custom_design = 1;
-                    MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)COLBLDG::_colony_auto_building;
+                    COLBLDG::Commit_Autobuild_State_();
                     return 1;
                 }
             }

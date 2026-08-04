@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "build_queue.h"
+
 namespace COLCALC {
     ColonyBaseFunc _colony_empire_base_functions[3] = {
         Colony_Empire_Base_Food2_Produced_,
@@ -3474,8 +3476,10 @@ namespace COLCALC {
             return;
         }
 
+        BUILD_QUEUE::Apply_Custom_Autobuild_(colony_idx);
+
         int16_t current_product = colony->producing[0];
-        if (colony->auto_building != 0 &&
+        if (BUILD_QUEUE::Is_Legacy_Autobuild_(colony->auto_building) &&
             (current_product == COLONY_PRODUCTION_HOUSING ||
              current_product == COLONY_PRODUCTION_TRADE_GOODS ||
              current_product == COLONY_PRODUCTION_NONE)) {
@@ -3722,7 +3726,8 @@ namespace COLCALC {
             production_pool -= product_cost;
             COLONY::Fix_Colony_Queue_(colony_idx);
 
-            if (colony->producing[0] == COLONY_PRODUCTION_NONE && colony->auto_building != 0) {
+            if (colony->producing[0] == COLONY_PRODUCTION_NONE &&
+                BUILD_QUEUE::Is_Legacy_Autobuild_(colony->auto_building)) {
                 AIBUILD::Player_Colony_Autobuild_(colony);
                 build_msg.u.colony.c.build.append_fmt = 1;
             }

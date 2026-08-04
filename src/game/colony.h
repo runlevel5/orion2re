@@ -338,6 +338,8 @@ namespace COLONY {
 
     void __cdecl Update_Fields_();
 
+    bool __cdecl Prompt_For_Autobuild_Queue_(int16_t colony_idx);
+
     void __cdecl Do_Informational_And_Decision_Popups_();
 
     bool __cdecl Colony_Has_Natives_(int16_t colony_idx);

@@ -37,6 +37,7 @@ static const s_symbol_descriptor generated_values_0[] = {
     { "design4", 26 },
     { "design5", 27 },
     { "design6", 28 },
+    { "clear_continuous", 29 },
     { "alien_control_center", 32 },
     { "armor_barracks", 33 },
     { "artemis_system_net", 34 },
@@ -304,7 +305,7 @@ static const uint8_t generated_bitmap_known_bits_0[] = { 254, 255, 255, 255, 255
 
 static const s_type_descriptor generated_type_0 = { CONFIG_VALUE_BOOL, false, false, 0, 0, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 static const s_type_descriptor generated_type_1 = { CONFIG_VALUE_INT8, true, true, 0, 100, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
-static const s_type_descriptor generated_type_2 = { CONFIG_VALUE_UINT8, false, false, 0, 0, CONFIG_SCALAR_ENUM, generated_values_0, 77, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
+static const s_type_descriptor generated_type_2 = { CONFIG_VALUE_UINT8, false, false, 0, 0, CONFIG_SCALAR_ENUM, generated_values_0, 78, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 static const s_type_descriptor generated_type_3 = { CONFIG_VALUE_INT8, false, false, 0, 0, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 static const s_type_descriptor generated_type_4 = { CONFIG_VALUE_UINT8, false, false, 0, 0, CONFIG_SCALAR_ENUM, generated_values_1, 5, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, true, true, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 static const s_type_descriptor generated_type_5 = { CONFIG_VALUE_UINT8, false, false, 0, 0, CONFIG_SCALAR_ENUM, generated_values_2, 7, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, true, true, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
@@ -316,8 +317,9 @@ static const s_type_descriptor generated_type_10 = { CONFIG_VALUE_UINT8, false, 
 static const s_type_descriptor generated_type_11 = { CONFIG_VALUE_INT16, false, false, 0, 0, CONFIG_SCALAR_MASK, generated_values_8, 1, generated_flags_0, 15, nullptr, 0, nullptr, 0, nullptr, 0, true, true, 32767, false, false, 0, 0, CONFIG_VALUE_INT16 };
 static const s_type_descriptor generated_type_12 = { CONFIG_VALUE_INT8, true, false, 0, 0, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 static const s_type_descriptor generated_type_13 = { CONFIG_VALUE_BITMAP, false, false, 0, 0, CONFIG_SCALAR_BITMAP, nullptr, 0, nullptr, 0, generated_bitmap_values_0, 1, generated_bitmap_flags_0, 39, generated_bitmap_known_bits_0, 40, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
+static const s_type_descriptor generated_type_14 = { CONFIG_VALUE_UINT8, true, true, 0, 10, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 
-static const uint8_t generated_array_defaults_0[] = { 3, 32, 53, 38, 67, 63, 43, 56, 65, 36, 46, 52, 74, 51, 62, 66, 61, 37, 50, 64, 35, 44, 70, 60, 68, 77, 75, 48, 73, 57, 58, 78, 71, 39, 72, 59, 55, 54, 34, 33, 42, 42, 42, 42, 79, 69, 0 };
+static const uint8_t generated_array_defaults_0[] = { 29, 3, 32, 53, 38, 67, 63, 43, 56, 65, 36, 46, 52, 74, 51, 62, 66, 61, 37, 50, 64, 35, 44, 70, 60, 68, 77, 75, 48, 73, 57, 58, 78, 71, 39, 72, 59, 55, 54, 34, 33, 42, 42, 42, 42, 79, 69, 0 };
 static const uint8_t generated_array_defaults_1[] = { 2, 23, 0 };
 static const uint8_t generated_array_defaults_2[] = { 2, 24, 0 };
 static const uint8_t generated_array_defaults_3[] = { 2, 25, 0 };
@@ -329,7 +331,7 @@ static const uint8_t generated_array_defaults_8[] = { 2, 15, 0 };
 static const uint8_t generated_array_defaults_9[] = { 12, 0 };
 static const uint8_t generated_array_defaults_10[] = { 9, 0 };
 
-const size_t variable_count = 3943;
+const size_t variable_count = 3945;
 
 static_assert(CONFIG_MAX_VARIABLE_TARGETS >= 2);
 
@@ -2844,6 +2846,10 @@ const s_schema_node_descriptor schema_nodes[] = {
     { "ammo", CONFIG_NODE_SCALAR, 128, 0, 2777, 2777, 2777, false, 0, CONFIG_NO_NODE, 133, &generated_type_3, 0, 0, 0 },
     { "amount", CONFIG_NODE_SCALAR, 128, 0, 2778, 2778, 2778, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
     { "specials", CONFIG_NODE_SCALAR, 120, 0, 2814, 2814, 2814, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "experiment", CONFIG_NODE_NAMESPACE, CONFIG_NO_NODE, 0, 3943, 3944, CONFIG_NO_VARIABLE, false, 0, 136, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "autobuild", CONFIG_NODE_RECORD, 135, 0, 3943, 3944, CONFIG_NO_VARIABLE, false, 0, 137, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "enabled", CONFIG_NODE_SCALAR, 136, 0, 3943, 3943, 3943, false, 0, CONFIG_NO_NODE, 138, &generated_type_0, 0, 0, 0 },
+    { "default", CONFIG_NODE_SCALAR, 136, 0, 3944, 3944, 3944, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_14, 0, 0, 0 },
 };
 
 const size_t schema_node_count = sizeof(schema_nodes) / sizeof(schema_nodes[0]);
@@ -2854,7 +2860,7 @@ bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
     if (value == nullptr) return false;
     if (variable_id >= 4 && variable_id < 204) {
         const size_t offset = variable_id - 4;
-        if (offset < 47) {
+        if (offset < 48) {
         *value = {};
         value->type = CONFIG_VALUE_UINT8;
         value->integer_value = generated_array_defaults_0[offset];
@@ -4317,6 +4323,16 @@ bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
         *value = {};
         value->type = CONFIG_VALUE_BITMAP;
         value->bitmap_value = { 128, 0, 0, 1, 2 };
+        return true;
+    case 3943:
+        *value = {};
+        value->type = CONFIG_VALUE_BOOL;
+        value->bool_value = false;
+        return true;
+    case 3944:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT8;
+        value->integer_value = 0;
         return true;
     default: return false;
     }
@@ -7438,6 +7454,16 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
     case 2297:
         variable->type = &generated_type_13;
         variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.special_device_flags, sizeof(SHIP_CONFIG::avenger_template.special_device_flags) };
+        variable->target_count = 1;
+        return true;
+    case 3943:
+        variable->type = &generated_type_0;
+        variable->targets[0] = { (void*)&BUILD_QUEUE::autobuild_settings.enabled, sizeof(BUILD_QUEUE::autobuild_settings.enabled) };
+        variable->target_count = 1;
+        return true;
+    case 3944:
+        variable->type = &generated_type_14;
+        variable->targets[0] = { (void*)&BUILD_QUEUE::autobuild_settings.default_preset, sizeof(BUILD_QUEUE::autobuild_settings.default_preset) };
         variable->target_count = 1;
         return true;
     default: return false;

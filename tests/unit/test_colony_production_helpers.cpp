@@ -64,6 +64,8 @@ DOCTEST_TEST_CASE("build queue hotkeys map to all eleven numeric presets") {
 }
 
 DOCTEST_TEST_CASE("shifted digits map to empire build queue presets") {
+    DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Empire_Hotkey_('q') == 0);
+    DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Empire_Hotkey_('Q') == 0);
     constexpr char shifted[] = "!@#$%^&*()";
     for (int index = 0; index < 9; ++index) {
         DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Empire_Hotkey_(shifted[index]) == index + 1);
