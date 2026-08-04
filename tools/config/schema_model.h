@@ -176,6 +176,10 @@ struct s_node {
     e_node_kind kind = NODE_SCALAR;
     uint32_t parent = UINT32_MAX;
     int32_t external_index = 0;
+    int64_t array_count = 0;
+    size_t explicit_default_count = 0;
+    bool scalar_array = false;
+    std::vector<std::string> native_targets;
     bool has_terminator = false;
     int64_t terminator = 0;
     std::vector<s_symbol> index_aliases;

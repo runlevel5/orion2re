@@ -54,31 +54,10 @@ namespace {
         {21, "plasma_cannon", 11},
     };
 
-    config::s_variable_descriptor Variable_(const char* name,
-                                            const config::s_type_descriptor* type) {
-        config::s_variable_descriptor variable = {};
-        variable.name = name;
-        variable.type = type;
-        return variable;
-    }
-
     const config::s_runtime_schema* Aggregate_Schema_() {
-        static config::s_variable_descriptor variables[18];
         static config::s_type_descriptor types[18];
         static bool initialized = false;
         if (!initialized) {
-            const char* names[] = {
-                "guardian.appearance",
-                "guardian.weapon.1.type", "guardian.weapon.1.arc",
-                "guardian.weapon.1.mods", "guardian.weapon.1.ammo",
-                "guardian.weapon.1.amount", "guardian.weapon.2.type",
-                "guardian.weapon.2.arc", "guardian.weapon.2.mods",
-                "guardian.weapon.2.ammo", "guardian.weapon.2.amount",
-                "guardian.special.1", "guardian.special.2", "guardian.special.3",
-                "guardian.label", "guardian.reduction",
-                "weapon.11.available_mods",
-                "special_devices",
-            };
             const config::e_value_type value_types[] = {
                 config::CONFIG_VALUE_UINT8,
                 config::CONFIG_VALUE_UINT8, config::CONFIG_VALUE_UINT8,
@@ -96,7 +75,6 @@ namespace {
                 types[index].value_type = value_types[index];
                 types[index].scalar_kind = config::CONFIG_SCALAR_PRIMITIVE;
                 types[index].ratio_component_type = config::CONFIG_VALUE_INT16;
-                variables[index] = Variable_(names[index], &types[index]);
             }
             for (size_t index : {size_t(1), size_t(6)}) {
                 types[index].scalar_kind = config::CONFIG_SCALAR_ENUM;
@@ -147,7 +125,7 @@ namespace {
             initialized = true;
         }
 
-        static const config::s_schema_node_descriptor nodes[] = {
+        static config::s_schema_node_descriptor nodes[] = {
             {"guardian", config::CONFIG_NODE_RECORD, config::CONFIG_NO_NODE, 0, 0, 15, config::CONFIG_NO_VARIABLE},
             {"appearance", config::CONFIG_NODE_SCALAR, 0, 0, 0, 0, 0},
             {"weapon", config::CONFIG_NODE_ARRAY, 0, 0, 1, 10, config::CONFIG_NO_VARIABLE},
@@ -174,8 +152,30 @@ namespace {
             {"available_mods", config::CONFIG_NODE_SCALAR, 22, 0, 16, 16, 16},
             {"special_devices", config::CONFIG_NODE_SCALAR, config::CONFIG_NO_NODE, 0, 17, 17, 17},
         };
+        static bool nodes_initialized = false;
+        if (!nodes_initialized) {
+            uint32_t last_children[sizeof(nodes) / sizeof(nodes[0])];
+            for (size_t index = 0; index < sizeof(nodes) / sizeof(nodes[0]); ++index) {
+                nodes[index].first_child = config::CONFIG_NO_NODE;
+                nodes[index].next_sibling = config::CONFIG_NO_NODE;
+                nodes[index].type = nodes[index].kind == config::CONFIG_NODE_SCALAR ?
+                    &types[nodes[index].variable_id] : nullptr;
+                last_children[index] = config::CONFIG_NO_NODE;
+            }
+            for (uint32_t index = 0; index < sizeof(nodes) / sizeof(nodes[0]); ++index) {
+                const uint32_t parent = nodes[index].parent;
+                if (parent == config::CONFIG_NO_NODE) continue;
+                if (nodes[parent].first_child == config::CONFIG_NO_NODE) {
+                    nodes[parent].first_child = index;
+                } else {
+                    nodes[last_children[parent]].next_sibling = index;
+                }
+                last_children[parent] = index;
+            }
+            nodes_initialized = true;
+        }
         static const config::s_runtime_schema schema = {
-            nodes, sizeof(nodes) / sizeof(nodes[0]), variables, 18,
+            nodes, sizeof(nodes) / sizeof(nodes[0]), 18,
             ARRAY_INDEX_ALIASES,
             sizeof(ARRAY_INDEX_ALIASES) / sizeof(ARRAY_INDEX_ALIASES[0]),
         };
@@ -249,18 +249,33 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     DOCTEST_REQUIRE(config::Find_Variable(
         "music_volume", std::strlen("music_volume"), &music_id));
     DOCTEST_CHECK(music_id == 1);
-    const config::s_variable_descriptor* music = config::Get_Variable(music_id);
+    const config::s_type_descriptor* music = config::Get_Variable_Type(music_id);
     DOCTEST_REQUIRE(music != nullptr);
-    DOCTEST_CHECK(music->type->value_type == config::CONFIG_VALUE_INT8);
-    DOCTEST_CHECK(music->type->min == 0);
-    DOCTEST_CHECK(music->type->max == 100);
-    DOCTEST_CHECK(config::variables[0].type == config::variables[2].type);
-    DOCTEST_CHECK(config::variables[1].type == config::variables[3].type);
-    DOCTEST_CHECK(std::strcmp(config::Get_Variable_Name(music_id), "music_volume") == 0);
+    DOCTEST_CHECK(music->value_type == config::CONFIG_VALUE_INT8);
+    DOCTEST_CHECK(music->min == 0);
+    DOCTEST_CHECK(music->max == 100);
+    DOCTEST_CHECK(config::Get_Variable_Type(0) == config::Get_Variable_Type(2));
+    DOCTEST_CHECK(config::Get_Variable_Type(1) == config::Get_Variable_Type(3));
+    std::string music_name;
+    DOCTEST_REQUIRE(config::Get_Variable_Name(music_id, &music_name));
+    DOCTEST_CHECK(music_name == "music_volume");
+    config::t_variable_id queue_id = config::CONFIG_NO_VARIABLE;
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "build_queue.1.199", std::strlen("build_queue.1.199"), &queue_id));
+    std::string queue_name;
+    DOCTEST_REQUIRE(config::Get_Variable_Name(queue_id, &queue_name));
+    DOCTEST_CHECK(queue_name == "build_queue.1.199");
+    const config::s_schema_node_descriptor* queue =
+        config::Get_Variable_Node(config::Get_Runtime_Schema(), queue_id);
+    DOCTEST_REQUIRE(queue != nullptr);
+    DOCTEST_CHECK(queue->first_variable == queue_id);
+    DOCTEST_CHECK(queue->last_variable == queue_id);
     DOCTEST_CHECK_FALSE(config::Find_Variable("music", 5, &music_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable("MUSIC_VOLUME", 12, &music_id));
+    DOCTEST_CHECK_FALSE(config::Find_Variable(
+        "build_queue.01.199", std::strlen("build_queue.01.199"), &queue_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable(nullptr, 0, &music_id));
-    DOCTEST_CHECK(config::Get_Variable(config::variable_count) == nullptr);
+    DOCTEST_CHECK(config::Get_Variable_Type(config::variable_count) == nullptr);
 }
 
 DOCTEST_TEST_CASE("stable path writes resolve for replay in the current build") {

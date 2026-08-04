@@ -97,8 +97,13 @@ struct s_variable_target {
 struct s_variable_descriptor {
     const char* name;
     const s_type_descriptor* type;
-    const void* default_value;
-    const s_variable_target* targets;
+};
+
+constexpr size_t CONFIG_MAX_VARIABLE_TARGETS = 2;
+
+struct s_resolved_variable {
+    const s_type_descriptor* type;
+    s_variable_target targets[CONFIG_MAX_VARIABLE_TARGETS];
     size_t target_count;
 };
 
@@ -112,6 +117,9 @@ struct s_schema_node_descriptor {
     t_variable_id variable_id;
     bool has_terminator;
     int64_t terminator;
+    uint32_t first_child;
+    uint32_t next_sibling;
+    const s_type_descriptor* type;
 };
 
 struct s_array_index_alias_descriptor {
@@ -123,7 +131,6 @@ struct s_array_index_alias_descriptor {
 struct s_runtime_schema {
     const s_schema_node_descriptor* nodes;
     size_t node_count;
-    const s_variable_descriptor* variables;
     size_t variable_count;
     const s_array_index_alias_descriptor* array_index_aliases;
     size_t array_index_alias_count;
@@ -137,7 +144,6 @@ struct s_config_write;
 struct s_config_write_set;
 struct s_cfg_diagnostic;
 
-extern const s_variable_descriptor variables[];
 extern const size_t variable_count;
 extern const s_schema_node_descriptor schema_nodes[];
 extern const size_t schema_node_count;
@@ -147,10 +153,14 @@ extern const size_t array_index_alias_count;
 constexpr uint32_t CONFIG_NO_NODE = UINT32_MAX;
 constexpr t_variable_id CONFIG_NO_VARIABLE = UINT32_MAX;
 
-const s_variable_descriptor* Get_Variable(t_variable_id variable_id);
 const s_runtime_schema* Get_Runtime_Schema();
+const s_schema_node_descriptor* Get_Variable_Node(const s_runtime_schema* schema,
+                                                  t_variable_id variable_id);
+const s_type_descriptor* Get_Variable_Type(t_variable_id variable_id);
 bool Find_Variable(const char* name, size_t name_length, t_variable_id* variable_id);
-const char* Get_Variable_Name(t_variable_id variable_id);
+bool Get_Variable_Name(const s_runtime_schema* schema, t_variable_id variable_id,
+                       std::string* name);
+bool Get_Variable_Name(t_variable_id variable_id, std::string* name);
 bool Resolve_Write_Path(s_config_write* write, s_cfg_diagnostic* diagnostic);
 
 bool Initialize_Defaults(s_config_state* state);
@@ -164,6 +174,8 @@ bool Commit_State(const s_config_state* state);
 namespace generated {
 
 bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value);
+bool Initialize_Scalar_Array_Defaults(uint32_t node_index, s_config_state* state);
+bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable);
 void Set_Value(t_variable_id variable_id, const s_typed_value* value);
 bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value);
 

@@ -1225,6 +1225,19 @@ namespace {
                 *diagnostic = schema_path + ": invalid array count, index base, or element";
                 return false;
             }
+            std::vector<std::string> element_stack;
+            s_resolved_type element_type;
+            if (!Resolve_Type_(root, Member_(element, "type"),
+                               schema_path + ".element.type", &element_stack,
+                               &element_type, diagnostic)) {
+                return false;
+            }
+            schema->nodes[node_index].array_count = count;
+            schema->nodes[node_index].explicit_default_count =
+                local_default != nullptr ? local_default->values.size() : 0;
+            schema->nodes[node_index].scalar_array =
+                element_type.node_kind == NODE_SCALAR;
+            schema->nodes[node_index].native_targets = targets;
             if (index_type_value != nullptr) {
                 if (index_type_value->kind != JSON_STRING) {
                     *diagnostic = schema_path + ".index_type: expected an enum type name";
@@ -1272,13 +1285,8 @@ namespace {
                 return false;
             }
             if (terminator != nullptr) {
-                std::vector<std::string> element_stack;
-                s_resolved_type element_type;
                 s_parameter decoded;
-                if (!Resolve_Type_(root, Member_(element, "type"),
-                                   schema_path + ".element.type", &element_stack,
-                                   &element_type, diagnostic) ||
-                    element_type.node_kind != NODE_SCALAR ||
+                if (element_type.node_kind != NODE_SCALAR ||
                     element_type.scalar_kind != SCALAR_ENUM ||
                     !Decode_Default_(element_type, terminator,
                                      schema_path + ".terminator", &decoded,

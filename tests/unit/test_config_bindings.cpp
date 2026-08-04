@@ -78,6 +78,8 @@ DOCTEST_TEST_CASE("build queue defaults match the eleven 1.50 hotkey lists") {
     DOCTEST_CHECK(BUILD_QUEUE::presets[9][0] == BUILD_QUEUE::INSTRUCTION_HOUSING);
     DOCTEST_CHECK(BUILD_QUEUE::presets[10][0] == BUILD_QUEUE::INSTRUCTION_CLEAR);
     for (int preset = 0; preset < BUILD_QUEUE::PRESET_COUNT; ++preset) {
+        DOCTEST_CHECK(BUILD_QUEUE::presets[preset][BUILD_QUEUE::INSTRUCTION_CAPACITY - 1] ==
+                      BUILD_QUEUE::INSTRUCTION_END);
         bool found_end = false;
         for (int instruction = 0; instruction < BUILD_QUEUE::INSTRUCTION_CAPACITY;
              ++instruction) {

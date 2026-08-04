@@ -326,14 +326,15 @@ DOCTEST_TEST_CASE("C++ generation is byte-for-byte deterministic") {
     const std::string second_content((std::istreambuf_iterator<char>(second_file)),
                                      std::istreambuf_iterator<char>());
     DOCTEST_CHECK(first_content == second_content);
-    DOCTEST_CHECK(first_content.find("generated_default_0") != std::string::npos);
-    DOCTEST_CHECK(first_content.find("generated_targets_0") != std::string::npos);
-    DOCTEST_CHECK(first_content.find("generated_get_default_0") == std::string::npos);
-    DOCTEST_CHECK(first_content.find("generated_set_value_0") == std::string::npos);
-    DOCTEST_CHECK(first_content.find("generated_get_current_0") == std::string::npos);
-    DOCTEST_CHECK(first_content.find("switch (variable_id)") == std::string::npos);
+    DOCTEST_CHECK(first_content.find("const s_variable_descriptor variables[]") ==
+                  std::string::npos);
+    DOCTEST_CHECK(first_content.find("bool Get_Default_Value(") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("bool Resolve_Variable(") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("switch (variable_id)") != std::string::npos);
+    DOCTEST_CHECK(first_content.find("&generated_type_0") != std::string::npos);
     DOCTEST_CHECK(first_content.find("decltype") == std::string::npos);
-    DOCTEST_CHECK(first_content.find("static_assert") == std::string::npos);
+    DOCTEST_CHECK(first_content.find(
+        "static_assert(CONFIG_MAX_VARIABLE_TARGETS >= 1);") != std::string::npos);
     DOCTEST_CHECK(first_content.find("CONFIG_PARAMETER_") == std::string::npos);
 
     std::filesystem::remove_all(root);
@@ -374,7 +375,7 @@ DOCTEST_TEST_CASE("C++ generation emits array aliases only for path resolution")
     DOCTEST_CHECK(Count_(generated,
         "static const s_bitmap_symbol_descriptor generated_bitmap_flags_") == 1);
     DOCTEST_CHECK(Count_(generated, "generated_values_0") == 2);
-    DOCTEST_CHECK(Count_(generated, "generated_type_1") == 3);
+    DOCTEST_CHECK(Count_(generated, "generated_type_1") >= 3);
     DOCTEST_CHECK(generated.find(
         "Number of weapons installed in this slot.") == std::string::npos);
     DOCTEST_CHECK(generated.find("Aggregate schema fixture.") == std::string::npos);

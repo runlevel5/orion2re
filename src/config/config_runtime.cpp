@@ -1,8 +1,10 @@
 #include "config_runtime.h"
 
 #include <algorithm>
+#include <charconv>
 #include <climits>
 #include <cstring>
+#include <string_view>
 #include <utility>
 
 #include "config/config_decode.h"
@@ -76,14 +78,15 @@ namespace {
     }
 
     bool Validate_Write_(const s_config_write* write, s_cfg_diagnostic* diagnostic) {
-        const s_variable_descriptor* variable = Get_Variable(write->variable_id);
-        if (variable == nullptr) {
+        const s_type_descriptor* type = Get_Variable_Type(write->variable_id);
+        if (type == nullptr) {
             return Fail_(write, "unknown typed write variable", diagnostic);
         }
-        const s_type_descriptor* type = variable->type;
         if (write->value.type != type->value_type) {
             diagnostic->location = write->provenance;
-            diagnostic->message = "typed write mismatch for " + std::string(variable->name);
+            std::string name;
+            Get_Variable_Name(write->variable_id, &name);
+            diagnostic->message = "typed write mismatch for " + name;
             return false;
         }
         if (type->value_type == CONFIG_VALUE_BOOL) {
@@ -137,7 +140,9 @@ namespace {
         const int64_t maximum = type->has_max ? type->max : primitive_maximum;
         if (write->value.integer_value < minimum || write->value.integer_value > maximum) {
             diagnostic->location = write->provenance;
-            diagnostic->message = "typed write range error for " + std::string(variable->name);
+            std::string name;
+            Get_Variable_Name(write->variable_id, &name);
+            diagnostic->message = "typed write range error for " + name;
             return false;
         }
         if (type->scalar_kind == CONFIG_SCALAR_ENUM &&
@@ -158,13 +163,31 @@ namespace {
         }
         return true;
     }
+
+    bool Initialize_Node_Defaults_(uint32_t node_index, s_config_state* state) {
+        const s_schema_node_descriptor& node = schema_nodes[node_index];
+        if (node.kind == CONFIG_NODE_SCALAR) {
+            return generated::Get_Default_Value(node.variable_id,
+                                                &state->values[node.variable_id]);
+        }
+        if (node.kind == CONFIG_NODE_ARRAY &&
+            generated::Initialize_Scalar_Array_Defaults(node_index, state)) {
+            return true;
+        }
+        for (uint32_t child = node.first_child; child != CONFIG_NO_NODE;
+             child = schema_nodes[child].next_sibling) {
+            if (!Initialize_Node_Defaults_(child, state)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 const s_runtime_schema* Get_Runtime_Schema() {
     static const s_runtime_schema schema = {
         schema_nodes,
         schema_node_count,
-        variables,
         variable_count,
         array_index_aliases,
         array_index_alias_count,
@@ -172,27 +195,141 @@ const s_runtime_schema* Get_Runtime_Schema() {
     return &schema;
 }
 
-const s_variable_descriptor* Get_Variable(t_variable_id variable_id) {
-    return variable_id < variable_count ? &variables[variable_id] : nullptr;
+const s_schema_node_descriptor* Get_Variable_Node(const s_runtime_schema* schema,
+                                                  t_variable_id variable_id) {
+    if (schema == nullptr || variable_id >= schema->variable_count) {
+        return nullptr;
+    }
+    uint32_t node_index = CONFIG_NO_NODE;
+    for (uint32_t index = 0; index < schema->node_count; ++index) {
+        const s_schema_node_descriptor& node = schema->nodes[index];
+        if (node.parent == CONFIG_NO_NODE && variable_id >= node.first_variable &&
+            variable_id <= node.last_variable) {
+            node_index = index;
+            break;
+        }
+    }
+    while (node_index != CONFIG_NO_NODE) {
+        const s_schema_node_descriptor& node = schema->nodes[node_index];
+        if (node.kind == CONFIG_NODE_SCALAR) {
+            return node.variable_id == variable_id ? &node : nullptr;
+        }
+        uint32_t selected = CONFIG_NO_NODE;
+        for (uint32_t child = node.first_child; child != CONFIG_NO_NODE;
+             child = schema->nodes[child].next_sibling) {
+            const s_schema_node_descriptor& candidate = schema->nodes[child];
+            if (variable_id >= candidate.first_variable &&
+                variable_id <= candidate.last_variable) {
+                selected = child;
+                break;
+            }
+        }
+        node_index = selected;
+    }
+    return nullptr;
+}
+
+const s_type_descriptor* Get_Variable_Type(t_variable_id variable_id) {
+    const s_schema_node_descriptor* node =
+        Get_Variable_Node(Get_Runtime_Schema(), variable_id);
+    return node != nullptr ? node->type : nullptr;
 }
 
 bool Find_Variable(const char* name, size_t name_length, t_variable_id* variable_id) {
     if (name == nullptr || variable_id == nullptr) {
         return false;
     }
-    for (size_t index = 0; index < variable_count; ++index) {
-        if (std::strlen(variables[index].name) == name_length &&
-            std::memcmp(variables[index].name, name, name_length) == 0) {
-            *variable_id = (t_variable_id)index;
-            return true;
+    const std::string_view requested(name, name_length);
+    size_t offset = 0;
+    uint32_t selected = CONFIG_NO_NODE;
+    while (offset < requested.size()) {
+        const size_t separator = requested.find('.', offset);
+        const size_t end = separator == std::string_view::npos ? requested.size() : separator;
+        const std::string_view component = requested.substr(offset, end - offset);
+        if (component.empty() ||
+            (separator != std::string_view::npos && separator + 1 == requested.size())) {
+            return false;
         }
+        uint32_t match = CONFIG_NO_NODE;
+        if (selected == CONFIG_NO_NODE) {
+            for (uint32_t index = 0; index < schema_node_count; ++index) {
+                const s_schema_node_descriptor& node = schema_nodes[index];
+                if (node.parent == CONFIG_NO_NODE && component == node.id) {
+                    match = index;
+                    break;
+                }
+            }
+        } else {
+            const s_schema_node_descriptor& parent = schema_nodes[selected];
+            int32_t external_index = 0;
+            if (parent.kind == CONFIG_NODE_ARRAY) {
+                const char* begin = component.data();
+                const char* component_end = begin + component.size();
+                const std::from_chars_result parsed =
+                    std::from_chars(begin, component_end, external_index);
+                if (parsed.ec != std::errc() || parsed.ptr != component_end ||
+                    std::to_string(external_index) != component) {
+                    return false;
+                }
+            }
+            for (uint32_t child = parent.first_child; child != CONFIG_NO_NODE;
+                 child = schema_nodes[child].next_sibling) {
+                const s_schema_node_descriptor& node = schema_nodes[child];
+                if ((parent.kind == CONFIG_NODE_ARRAY &&
+                     node.external_index == external_index) ||
+                    (parent.kind != CONFIG_NODE_ARRAY && component == node.id)) {
+                    match = child;
+                    break;
+                }
+            }
+        }
+        if (match == CONFIG_NO_NODE) {
+            return false;
+        }
+        selected = match;
+        offset = end + 1;
     }
-    return false;
+    if (selected == CONFIG_NO_NODE ||
+        schema_nodes[selected].kind != CONFIG_NODE_SCALAR) {
+        return false;
+    }
+    *variable_id = schema_nodes[selected].variable_id;
+    return true;
 }
 
-const char* Get_Variable_Name(t_variable_id variable_id) {
-    const s_variable_descriptor* variable = Get_Variable(variable_id);
-    return variable != nullptr ? variable->name : nullptr;
+bool Get_Variable_Name(const s_runtime_schema* schema, t_variable_id variable_id,
+                       std::string* name) {
+    if (name == nullptr) {
+        return false;
+    }
+    const s_schema_node_descriptor* leaf = Get_Variable_Node(schema, variable_id);
+    if (leaf == nullptr) {
+        return false;
+    }
+    std::vector<std::string> components;
+    uint32_t node_index = static_cast<uint32_t>(leaf - schema->nodes);
+    while (node_index != CONFIG_NO_NODE) {
+        const s_schema_node_descriptor& node = schema->nodes[node_index];
+        if (node.parent != CONFIG_NO_NODE &&
+            schema->nodes[node.parent].kind == CONFIG_NODE_ARRAY) {
+            components.push_back(std::to_string(node.external_index));
+        } else if (node.id[0] != '\0') {
+            components.emplace_back(node.id);
+        }
+        node_index = node.parent;
+    }
+    name->clear();
+    for (auto component = components.rbegin(); component != components.rend(); ++component) {
+        if (!name->empty()) {
+            name->push_back('.');
+        }
+        *name += *component;
+    }
+    return true;
+}
+
+bool Get_Variable_Name(t_variable_id variable_id, std::string* name) {
+    return Get_Variable_Name(Get_Runtime_Schema(), variable_id, name);
 }
 
 bool Resolve_Write_Path(s_config_write* write, s_cfg_diagnostic* diagnostic) {
@@ -215,8 +352,9 @@ bool Initialize_Defaults(s_config_state* state) {
     }
     state->values.clear();
     state->values.resize(variable_count);
-    for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
-        if (!generated::Get_Default_Value(variable_id, &state->values[variable_id])) {
+    for (uint32_t node_index = 0; node_index < schema_node_count; ++node_index) {
+        if (schema_nodes[node_index].parent == CONFIG_NO_NODE &&
+            !Initialize_Node_Defaults_(node_index, state)) {
             state->values.clear();
             return false;
         }
@@ -271,7 +409,10 @@ bool Commit_State(const s_config_state* state) {
         return false;
     }
     for (t_variable_id variable_id = 0; variable_id < variable_count; ++variable_id) {
-        const s_type_descriptor* type = variables[variable_id].type;
+        const s_type_descriptor* type = Get_Variable_Type(variable_id);
+        if (type == nullptr) {
+            return false;
+        }
         if (state->values[variable_id].type != type->value_type) {
             return false;
         }
@@ -303,54 +444,15 @@ bool Commit_State(const s_config_state* state) {
 
 namespace generated {
 
-bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
-    const s_variable_descriptor* variable = Get_Variable(variable_id);
-    if (value == nullptr || variable == nullptr || variable->default_value == nullptr) {
-        return false;
-    }
-    *value = {};
-    value->type = variable->type->value_type;
-    switch (value->type) {
-    case CONFIG_VALUE_BOOL: {
-        int64_t integer = 0;
-        if (!Read_Integer_(variable->default_value, value->type, &integer)) return false;
-        value->bool_value = integer != 0;
-        return true;
-    }
-    case CONFIG_VALUE_INT8:
-    case CONFIG_VALUE_UINT8:
-    case CONFIG_VALUE_INT16:
-    case CONFIG_VALUE_UINT16:
-    case CONFIG_VALUE_INT32:
-    case CONFIG_VALUE_UINT32:
-        return Read_Integer_(variable->default_value, value->type, &value->integer_value);
-    case CONFIG_VALUE_STRING:
-        value->string_value = (const char*)variable->default_value;
-        return true;
-    case CONFIG_VALUE_BITMAP: {
-        const size_t size = (variable->type->bitmap_bit_count + 7) / 8;
-        const uint8_t* bytes = (const uint8_t*)variable->default_value;
-        value->bitmap_value.assign(bytes, bytes + size);
-        return true;
-    }
-    case CONFIG_VALUE_RATIO: {
-        const s_ratio_value* ratio = (const s_ratio_value*)variable->default_value;
-        value->ratio_numerator = ratio->numerator;
-        value->ratio_denominator = ratio->denominator;
-        return true;
-    }
-    }
-    return false;
-}
-
 void Set_Value(t_variable_id variable_id, const s_typed_value* value) {
-    const s_variable_descriptor* variable = Get_Variable(variable_id);
-    if (value == nullptr || variable == nullptr || value->type != variable->type->value_type) {
+    s_resolved_variable variable = {};
+    if (value == nullptr || !Resolve_Variable(variable_id, &variable) ||
+        value->type != variable.type->value_type) {
         return;
     }
     if (value->type == CONFIG_VALUE_STRING) {
-        for (size_t index = 0; index < variable->target_count; ++index) {
-            const s_variable_target& target = variable->targets[index];
+        for (size_t index = 0; index < variable.target_count; ++index) {
+            const s_variable_target& target = variable.targets[index];
             if (target.size == 0) continue;
             const size_t copy_size = std::min(value->string_value.size(), target.size - 1);
             std::memcpy(target.address, value->string_value.data(), copy_size);
@@ -359,8 +461,8 @@ void Set_Value(t_variable_id variable_id, const s_typed_value* value) {
         return;
     }
     if (value->type == CONFIG_VALUE_BITMAP) {
-        for (size_t index = 0; index < variable->target_count; ++index) {
-            const s_variable_target& target = variable->targets[index];
+        for (size_t index = 0; index < variable.target_count; ++index) {
+            const s_variable_target& target = variable.targets[index];
             if (target.size == value->bitmap_value.size()) {
                 std::memcpy(target.address, value->bitmap_value.data(), target.size);
             }
@@ -368,30 +470,31 @@ void Set_Value(t_variable_id variable_id, const s_typed_value* value) {
         return;
     }
     if (value->type == CONFIG_VALUE_RATIO) {
-        if (variable->target_count == 2) {
-            Write_Integer_(variable->targets[0].address, variable->targets[0].size,
-                           variable->type->ratio_component_type, value->ratio_numerator);
-            Write_Integer_(variable->targets[1].address, variable->targets[1].size,
-                           variable->type->ratio_component_type, value->ratio_denominator);
+        if (variable.target_count == 2) {
+            Write_Integer_(variable.targets[0].address, variable.targets[0].size,
+                           variable.type->ratio_component_type, value->ratio_numerator);
+            Write_Integer_(variable.targets[1].address, variable.targets[1].size,
+                           variable.type->ratio_component_type, value->ratio_denominator);
         }
         return;
     }
     const int64_t integer = value->type == CONFIG_VALUE_BOOL ?
         (value->bool_value ? 1 : 0) : value->integer_value;
-    for (size_t index = 0; index < variable->target_count; ++index) {
-        Write_Integer_(variable->targets[index].address, variable->targets[index].size,
+    for (size_t index = 0; index < variable.target_count; ++index) {
+        Write_Integer_(variable.targets[index].address, variable.targets[index].size,
                        value->type, integer);
     }
 }
 
 bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value) {
-    const s_variable_descriptor* variable = Get_Variable(variable_id);
-    if (value == nullptr || variable == nullptr || variable->target_count == 0) {
+    s_resolved_variable variable = {};
+    if (value == nullptr || !Resolve_Variable(variable_id, &variable) ||
+        variable.target_count == 0) {
         return false;
     }
     *value = {};
-    value->type = variable->type->value_type;
-    const s_variable_target& target = variable->targets[0];
+    value->type = variable.type->value_type;
+    const s_variable_target& target = variable.targets[0];
     switch (value->type) {
     case CONFIG_VALUE_BOOL: {
         int64_t integer = 0;
@@ -415,12 +518,12 @@ bool Get_Current_Value(t_variable_id variable_id, s_typed_value* value) {
         return true;
     }
     case CONFIG_VALUE_RATIO:
-        if (variable->target_count != 2) return false;
-        return Read_Integer_(variable->targets[0].address,
-                             variable->type->ratio_component_type,
+        if (variable.target_count != 2) return false;
+        return Read_Integer_(variable.targets[0].address,
+                             variable.type->ratio_component_type,
                              &value->ratio_numerator) &&
-               Read_Integer_(variable->targets[1].address,
-                             variable->type->ratio_component_type,
+               Read_Integer_(variable.targets[1].address,
+                             variable.type->ratio_component_type,
                              &value->ratio_denominator);
     }
     return false;

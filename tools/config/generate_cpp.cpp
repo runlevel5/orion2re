@@ -1,5 +1,6 @@
 #include "generate_cpp.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <filesystem>
 #include <set>
@@ -107,47 +108,7 @@ namespace {
         return "CONFIG_NODE_SCALAR";
     }
 
-    std::string Native_Target_(const s_parameter& parameter, size_t index) {
-        return parameter.native_targets[index];
-    }
-
-    std::string Default_Name_(size_t index) {
-        return "generated_default_" + std::to_string(index);
-    }
-
-    std::string Targets_Name_(size_t index) {
-        return "generated_targets_" + std::to_string(index);
-    }
-
     std::string Byte_Array_(const std::vector<uint8_t>& value);
-
-    void Append_Default_(const s_parameter& parameter, size_t index,
-                         std::string* output) {
-        const std::string name = Default_Name_(index);
-        if (parameter.type == PRIMITIVE_STRING) {
-            *output += "static const char " + name + "[] = " +
-                       Cpp_String_(Encode_Game_String(parameter.default_string)) + ";\n";
-        } else if (parameter.type == PRIMITIVE_BITMAP) {
-            *output += "static const uint8_t " + name + "[] = " +
-                       Byte_Array_(parameter.default_bitmap) + ";\n";
-        } else if (parameter.type == PRIMITIVE_RATIO) {
-            *output += "static const s_ratio_value " + name + " = { " +
-                       std::to_string(parameter.default_ratio_numerator) + ", " +
-                       std::to_string(parameter.default_ratio_denominator) + " };\n";
-        } else {
-            *output += std::string("static const ") + Native_Type_(parameter.type) + " " + name +
-                       " = " + Default_Value_(parameter) + ";\n";
-        }
-    }
-
-    void Append_Targets_(const s_parameter& parameter, size_t index,
-                         std::string* output) {
-        *output += "static const s_variable_target " + Targets_Name_(index) + "[] = {\n";
-        for (const std::string& target : parameter.native_targets) {
-            *output += "    { (void*)&" + target + ", sizeof(" + target + ") },\n";
-        }
-        *output += "};\n\n";
-    }
 
     std::string Byte_Array_(const std::vector<uint8_t>& value) {
         std::string output = "{ ";
@@ -207,6 +168,87 @@ namespace {
                left.constraints.min_length == right.constraints.min_length &&
                left.constraints.max_length == right.constraints.max_length &&
                left.ratio_component_type == right.ratio_component_type;
+    }
+
+    struct s_scalar_array_range {
+        size_t node_index;
+        size_t first_parameter;
+        size_t count;
+        size_t explicit_default_count;
+    };
+
+    std::vector<s_scalar_array_range> Scalar_Array_Ranges_(const s_schema* schema) {
+        std::vector<s_scalar_array_range> ranges;
+        for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            const s_node& node = schema->nodes[node_index];
+            if (!node.scalar_array || node.array_count <= 0 ||
+                node.first_parameter == UINT32_MAX ||
+                node.last_parameter - node.first_parameter + 1 !=
+                    static_cast<uint32_t>(node.array_count)) {
+                continue;
+            }
+            const s_parameter& first = schema->parameters[node.first_parameter];
+            if (first.type == PRIMITIVE_STRING || first.type == PRIMITIVE_BITMAP ||
+                first.type == PRIMITIVE_RATIO ||
+                first.native_targets.size() != node.native_targets.size()) {
+                continue;
+            }
+            bool compatible = true;
+            for (size_t offset = 0; offset < static_cast<size_t>(node.array_count); ++offset) {
+                const s_parameter& parameter = schema->parameters[node.first_parameter + offset];
+                compatible = compatible && Same_Runtime_Type_(first, parameter) &&
+                    parameter.native_targets.size() == node.native_targets.size();
+                for (size_t target = 0;
+                     compatible && target < node.native_targets.size(); ++target) {
+                    compatible = parameter.native_targets[target] ==
+                        node.native_targets[target] + "[" + std::to_string(offset) + "]";
+                }
+            }
+            if (compatible) {
+                ranges.push_back({node_index, node.first_parameter,
+                                  static_cast<size_t>(node.array_count),
+                                  node.explicit_default_count});
+            }
+        }
+        return ranges;
+    }
+
+    void Append_Typed_Default_(const s_parameter& parameter,
+                               const std::string& value, std::string* output) {
+        *output += "        *value = {};\n";
+        *output += std::string("        value->type = ") +
+                   Cpp_Type_(parameter.type) + ";\n";
+        if (parameter.type == PRIMITIVE_BOOL) {
+            *output += "        value->bool_value = " + value + ";\n";
+        } else {
+            *output += "        value->integer_value = " + value + ";\n";
+        }
+        *output += "        return true;\n";
+    }
+
+    void Append_Direct_Default_(const s_parameter& parameter, std::string* output) {
+        *output += "        *value = {};\n";
+        *output += std::string("        value->type = ") +
+                   Cpp_Type_(parameter.type) + ";\n";
+        if (parameter.type == PRIMITIVE_BOOL) {
+            *output += std::string("        value->bool_value = ") +
+                       (parameter.default_bool ? "true" : "false") + ";\n";
+        } else if (parameter.type == PRIMITIVE_STRING) {
+            *output += "        value->string_value = " +
+                       Cpp_String_(Encode_Game_String(parameter.default_string)) + ";\n";
+        } else if (parameter.type == PRIMITIVE_BITMAP) {
+            *output += "        value->bitmap_value = " +
+                       Byte_Array_(parameter.default_bitmap) + ";\n";
+        } else if (parameter.type == PRIMITIVE_RATIO) {
+            *output += "        value->ratio_numerator = " +
+                       std::to_string(parameter.default_ratio_numerator) + ";\n";
+            *output += "        value->ratio_denominator = " +
+                       std::to_string(parameter.default_ratio_denominator) + ";\n";
+        } else {
+            *output += "        value->integer_value = " +
+                       std::to_string(parameter.default_integer) + ";\n";
+        }
+        *output += "        return true;\n";
     }
 
     template<typename T, typename Equal>
@@ -393,23 +435,35 @@ namespace {
                       Cpp_Type_(parameter.ratio_component_type) + " };\n";
         }
         output += "\n";
-        for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            const s_parameter& parameter = schema->parameters[index];
-            Append_Default_(parameter, index, &output);
-            Append_Targets_(parameter, index, &output);
+        const std::vector<s_scalar_array_range> scalar_array_ranges =
+            Scalar_Array_Ranges_(schema);
+        std::vector<bool> ranged_parameters(schema->parameters.size(), false);
+        for (size_t range_index = 0; range_index < scalar_array_ranges.size(); ++range_index) {
+            const s_scalar_array_range& range = scalar_array_ranges[range_index];
+            for (size_t offset = 0; offset < range.count; ++offset) {
+                ranged_parameters[range.first_parameter + offset] = true;
+            }
+            if (range.explicit_default_count == 0) {
+                continue;
+            }
+            const s_parameter& parameter = schema->parameters[range.first_parameter];
+            output += std::string("static const ") + Native_Type_(parameter.type) +
+                      " generated_array_defaults_" + std::to_string(range_index) + "[] = { ";
+            for (size_t offset = 0; offset < range.explicit_default_count; ++offset) {
+                output += offset == 0 ? "" : ", ";
+                output += Default_Value_(schema->parameters[range.first_parameter + offset]);
+            }
+            output += " };\n";
         }
-        output += "const s_variable_descriptor variables[] = {\n";
-        for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            const s_parameter& parameter = schema->parameters[index];
-            output += "    { " + Cpp_String_(parameter.path) + ", " +
-                      "&generated_type_" + std::to_string(type_ids[index]) + ", " +
-                      "&" + Default_Name_(index) + ", " + Targets_Name_(index) + ", " +
-                      std::to_string(parameter.native_targets.size()) + " },\n";
+        output += "\nconst size_t variable_count = " +
+                  std::to_string(schema->parameters.size()) + ";\n\n";
+        size_t maximum_target_count = 0;
+        for (const s_parameter& parameter : schema->parameters) {
+            maximum_target_count = std::max(maximum_target_count,
+                                            parameter.native_targets.size());
         }
-        output +=
-            "};\n\n"
-            "const size_t variable_count = sizeof(variables) / sizeof(variables[0]);\n\n"
-            "";
+        output += "static_assert(CONFIG_MAX_VARIABLE_TARGETS >= " +
+                  std::to_string(maximum_target_count) + ");\n\n";
         for (const s_parameter& parameter : schema->parameters) {
             if (parameter.scalar_kind != SCALAR_BITMAP) {
                 continue;
@@ -444,16 +498,34 @@ namespace {
         output += "const size_t array_index_alias_count = " +
                   std::to_string(array_index_alias_count) + ";\n\n";
         output += "const s_schema_node_descriptor schema_nodes[] = {\n";
+        std::vector<uint32_t> first_children(schema->nodes.size(), UINT32_MAX);
+        std::vector<uint32_t> next_siblings(schema->nodes.size(), UINT32_MAX);
+        std::vector<uint32_t> last_children(schema->nodes.size(), UINT32_MAX);
+        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            const uint32_t parent = schema->nodes[node_index].parent;
+            if (parent == UINT32_MAX) {
+                continue;
+            }
+            if (first_children[parent] == UINT32_MAX) {
+                first_children[parent] = node_index;
+            } else {
+                next_siblings[last_children[parent]] = node_index;
+            }
+            last_children[parent] = node_index;
+        }
         if (schema->nodes.empty()) {
             for (size_t index = 0; index < schema->parameters.size(); ++index) {
                 const s_parameter& parameter = schema->parameters[index];
                 output += "    { " + Cpp_String_(parameter.path) +
                           ", CONFIG_NODE_SCALAR, CONFIG_NO_NODE, 0, " +
                           std::to_string(index) + ", " + std::to_string(index) +
-                          ", " + std::to_string(index) + ", false, 0 },\n";
+                          ", " + std::to_string(index) + ", false, 0, CONFIG_NO_NODE, " +
+                          "CONFIG_NO_NODE, &generated_type_" +
+                          std::to_string(type_ids[index]) + " },\n";
             }
         } else {
-            for (const s_node& node : schema->nodes) {
+            for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+                const s_node& node = schema->nodes[node_index];
                 const std::string parent = node.parent == UINT32_MAX ? "CONFIG_NO_NODE" :
                                            std::to_string(node.parent);
                 const std::string first = node.first_parameter == UINT32_MAX ?
@@ -465,18 +537,122 @@ namespace {
                 const std::string parameter = node.parameter == UINT32_MAX ?
                                               "CONFIG_NO_VARIABLE" :
                                               std::to_string(node.parameter);
+                const std::string first_child = first_children[node_index] == UINT32_MAX ?
+                                                "CONFIG_NO_NODE" :
+                                                std::to_string(first_children[node_index]);
+                const std::string next_sibling = next_siblings[node_index] == UINT32_MAX ?
+                                                 "CONFIG_NO_NODE" :
+                                                 std::to_string(next_siblings[node_index]);
+                const std::string runtime_type = node.parameter == UINT32_MAX ? "nullptr" :
+                    "&generated_type_" + std::to_string(type_ids[node.parameter]);
                 output += "    { " + Cpp_String_(node.id) + ", " +
                           Node_Kind_(node.kind) + ", " + parent + ", " +
                           std::to_string(node.external_index) + ", " + first +
                           ", " + last + ", " + parameter + ", " +
                           (node.has_terminator ? "true" : "false") + ", " +
-                          std::to_string(node.terminator) + " },\n";
+                          std::to_string(node.terminator) + ", " + first_child + ", " +
+                          next_sibling + ", " + runtime_type + " },\n";
             }
         }
         output +=
             "};\n\n"
             "const size_t schema_node_count = sizeof(schema_nodes) / sizeof(schema_nodes[0]);\n\n"
-            "}\n";
+            "namespace generated {\n\n";
+        output += "bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {\n"
+                  "    if (value == nullptr) return false;\n";
+        for (size_t range_index = 0; range_index < scalar_array_ranges.size(); ++range_index) {
+            const s_scalar_array_range& range = scalar_array_ranges[range_index];
+            const s_parameter& first = schema->parameters[range.first_parameter];
+            output += "    if (variable_id >= " + std::to_string(range.first_parameter) +
+                      " && variable_id < " +
+                      std::to_string(range.first_parameter + range.count) + ") {\n";
+            output += "        const size_t offset = variable_id - " +
+                      std::to_string(range.first_parameter) + ";\n";
+            if (range.explicit_default_count == range.count) {
+                Append_Typed_Default_(first,
+                    "generated_array_defaults_" + std::to_string(range_index) + "[offset]",
+                    &output);
+            } else {
+                output += "        if (offset < " +
+                          std::to_string(range.explicit_default_count) + ") {\n";
+                if (range.explicit_default_count != 0) {
+                    Append_Typed_Default_(first,
+                        "generated_array_defaults_" + std::to_string(range_index) + "[offset]",
+                        &output);
+                } else {
+                    output += "            return false;\n";
+                }
+                output += "        }\n";
+                Append_Direct_Default_(
+                    schema->parameters[range.first_parameter + range.explicit_default_count],
+                    &output);
+            }
+            output += "    }\n";
+        }
+        output += "    switch (variable_id) {\n";
+        for (size_t index = 0; index < schema->parameters.size(); ++index) {
+            if (ranged_parameters[index]) continue;
+            output += "    case " + std::to_string(index) + ":\n";
+            Append_Direct_Default_(schema->parameters[index], &output);
+        }
+        output += "    default: return false;\n    }\n}\n\n";
+        output += "bool Initialize_Scalar_Array_Defaults(uint32_t node_index, "
+                  "s_config_state* state) {\n"
+                  "    if (state == nullptr) return false;\n"
+                  "    switch (node_index) {\n";
+        for (const s_scalar_array_range& range : scalar_array_ranges) {
+            output += "    case " + std::to_string(range.node_index) + ":\n"
+                      "        for (t_variable_id id = " +
+                      std::to_string(range.first_parameter) + "; id < " +
+                      std::to_string(range.first_parameter + range.count) + "; ++id) {\n"
+                      "            if (!Get_Default_Value(id, &state->values[id])) return false;\n"
+                      "        }\n"
+                      "        return true;\n";
+        }
+        output += "    default: return false;\n    }\n}\n\n";
+        output += "bool Resolve_Variable(t_variable_id variable_id, "
+                  "s_resolved_variable* variable) {\n"
+                  "    if (variable == nullptr) return false;\n"
+                  "    *variable = {};\n";
+        for (const s_scalar_array_range& range : scalar_array_ranges) {
+            const s_parameter& first = schema->parameters[range.first_parameter];
+            const s_node& node = schema->nodes[range.node_index];
+            output += "    if (variable_id >= " + std::to_string(range.first_parameter) +
+                      " && variable_id < " +
+                      std::to_string(range.first_parameter + range.count) + ") {\n"
+                      "        const size_t offset = variable_id - " +
+                      std::to_string(range.first_parameter) + ";\n"
+                      "        variable->type = &generated_type_" +
+                      std::to_string(type_ids[range.first_parameter]) + ";\n";
+            for (size_t target = 0; target < node.native_targets.size(); ++target) {
+                const std::string expression = node.native_targets[target] + "[offset]";
+                output += "        variable->targets[" + std::to_string(target) +
+                          "] = { (void*)&" + expression + ", sizeof(" + expression + ") };\n";
+            }
+            output += "        variable->target_count = " +
+                      std::to_string(first.native_targets.size()) + ";\n"
+                      "        return true;\n"
+                      "    }\n";
+        }
+        output += "    switch (variable_id) {\n";
+        for (size_t index = 0; index < schema->parameters.size(); ++index) {
+            if (ranged_parameters[index]) continue;
+            const s_parameter& parameter = schema->parameters[index];
+            output += "    case " + std::to_string(index) + ":\n"
+                      "        variable->type = &generated_type_" +
+                      std::to_string(type_ids[index]) + ";\n";
+            for (size_t target = 0; target < parameter.native_targets.size(); ++target) {
+                const std::string& expression = parameter.native_targets[target];
+                output += "        variable->targets[" + std::to_string(target) +
+                          "] = { (void*)&" + expression + ", sizeof(" + expression + ") };\n";
+            }
+            output += "        variable->target_count = " +
+                      std::to_string(parameter.native_targets.size()) + ";\n"
+                      "        return true;\n";
+        }
+        output += "    default: return false;\n    }\n}\n\n"
+                  "}\n\n"
+                  "}\n";
         return output;
     }
 }

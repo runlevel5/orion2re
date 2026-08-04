@@ -588,15 +588,25 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
         }
         const t_variable_id variable_id = first_variable +
                                           static_cast<t_variable_id>(value_index);
-        const s_variable_descriptor* variable = &schema->variables[variable_id];
+        const s_schema_node_descriptor* variable = Get_Variable_Node(schema, variable_id);
+        if (variable == nullptr || variable->type == nullptr) {
+            return Fail_(token.location, "configuration schema has an invalid leaf range",
+                         write_set, diagnostic);
+        }
         s_config_write write;
         write.variable_id = variable_id;
-        write.canonical_path = variable->name;
+        if (!Get_Variable_Name(schema, variable_id, &write.canonical_path)) {
+            return Fail_(token.location, "configuration schema has an invalid leaf path",
+                         write_set, diagnostic);
+        }
         write.provenance = token.location;
         std::string expected;
-        if (!Decode_Value_(variable, token, &write.value, &expected)) {
+        s_variable_descriptor descriptor = {};
+        descriptor.name = write.canonical_path.c_str();
+        descriptor.type = variable->type;
+        if (!Decode_Value_(&descriptor, token, &write.value, &expected)) {
             return Fail_(token.location, "invalid value '" + token.raw + "' for '" +
-                         std::string(variable->name) + "'; expected " + expected,
+                         write.canonical_path + "'; expected " + expected,
                          write_set, diagnostic);
         }
         has_terminator = has_terminator ||
