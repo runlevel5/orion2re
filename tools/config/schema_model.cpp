@@ -1258,8 +1258,6 @@ namespace {
             schema->nodes[node_index].array_index_base = index_base;
             schema->nodes[node_index].explicit_default_count =
                 local_default != nullptr ? local_default->values.size() : 0;
-            schema->nodes[node_index].scalar_array =
-                element_type.node_kind == NODE_SCALAR;
             schema->nodes[node_index].native_targets = targets;
             schema->nodes[node_index].native_target_expressions = target_expressions;
             if (index_type_value != nullptr) {

@@ -471,7 +471,6 @@ namespace {
             if (has_index && array.array_element_count != 0 && offset >= 0 &&
                 offset < array.array_element_count) {
                 *resolved_index = external_index;
-                if (array.array_element_variable_count == 0) return parent;
                 *variable_offset += static_cast<t_variable_id>(offset) *
                                     array.array_element_variable_count;
                 return array.first_child;
@@ -551,11 +550,6 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
                          write_set, diagnostic);
         }
         canonical_path += "." + (array_selector ? std::to_string(resolved_index) : token.value);
-        if (selected == parent && schema->nodes[parent].array_element_count != 0) {
-            selected_variable = schema->nodes[parent].first_variable + variable_offset +
-                static_cast<t_variable_id>(resolved_index -
-                                           schema->nodes[parent].array_index_base);
-        }
     }
     if (statement->values.empty()) {
         return Fail_(statement->location, "assignment requires a value", write_set, diagnostic);

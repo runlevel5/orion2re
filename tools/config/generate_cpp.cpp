@@ -171,21 +171,33 @@ namespace {
                left.ratio_component_type == right.ratio_component_type;
     }
 
-    struct s_scalar_array_range {
+    struct s_prefix_fill_range {
         size_t node_index;
         size_t first_parameter;
         size_t count;
         size_t explicit_default_count;
     };
 
-    std::vector<s_scalar_array_range> Scalar_Array_Ranges_(const s_schema* schema) {
-        std::vector<s_scalar_array_range> ranges;
+    std::vector<s_prefix_fill_range> Prefix_Fill_Ranges_(const s_schema* schema) {
+        std::vector<s_prefix_fill_range> ranges;
         for (size_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
             const s_node& node = schema->nodes[node_index];
-            if (!node.scalar_array || node.array_count <= 0 ||
+            if (node.kind != NODE_ARRAY || node.array_count <= 0 ||
                 node.first_parameter == UINT32_MAX ||
                 node.last_parameter - node.first_parameter + 1 !=
-                    static_cast<uint32_t>(node.array_count)) {
+                    static_cast<uint32_t>(node.array_count) ||
+                node.first_parameter >= schema->parameters.size()) {
+                continue;
+            }
+            size_t child_count = 0;
+            bool scalar_elements = true;
+            for (const s_node& child : schema->nodes) {
+                if (child.parent == node_index) {
+                    ++child_count;
+                    scalar_elements = scalar_elements && child.kind == NODE_SCALAR;
+                }
+            }
+            if (!scalar_elements || child_count != static_cast<size_t>(node.array_count)) {
                 continue;
             }
             const s_parameter& first = schema->parameters[node.first_parameter];
@@ -463,13 +475,13 @@ namespace {
                       Cpp_Type_(parameter.ratio_component_type) + " };\n";
         }
         output += "\n";
-        const std::vector<s_scalar_array_range> scalar_array_ranges =
-            Scalar_Array_Ranges_(schema);
-        std::vector<bool> ranged_parameters(schema->parameters.size(), false);
-        for (size_t range_index = 0; range_index < scalar_array_ranges.size(); ++range_index) {
-            const s_scalar_array_range& range = scalar_array_ranges[range_index];
+        const std::vector<s_prefix_fill_range> prefix_fill_ranges =
+            Prefix_Fill_Ranges_(schema);
+        std::vector<bool> prefix_fill_parameters(schema->parameters.size(), false);
+        for (size_t range_index = 0; range_index < prefix_fill_ranges.size(); ++range_index) {
+            const s_prefix_fill_range& range = prefix_fill_ranges[range_index];
             for (size_t offset = 0; offset < range.count; ++offset) {
-                ranged_parameters[range.first_parameter + offset] = true;
+                prefix_fill_parameters[range.first_parameter + offset] = true;
             }
             if (range.explicit_default_count == 0) {
                 continue;
@@ -503,11 +515,6 @@ namespace {
             node_representatives[node_index] = node_index;
         }
         std::vector<bool> repeated_layout_arrays(schema->nodes.size(), false);
-        for (const s_scalar_array_range& range : scalar_array_ranges) {
-            for (uint32_t child : model_children[range.node_index]) {
-                omitted_nodes[child] = true;
-            }
-        }
         std::function<bool(uint32_t, uint32_t)> same_layout =
             [&](uint32_t left_index, uint32_t right_index) {
                 const s_node& left = schema->nodes[left_index];
@@ -551,7 +558,7 @@ namespace {
         };
         for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
             const s_node& node = schema->nodes[node_index];
-            if (omitted_nodes[node_index] || node.kind != NODE_ARRAY || node.scalar_array ||
+            if (omitted_nodes[node_index] || node.kind != NODE_ARRAY ||
                 model_children[node_index].size() != static_cast<size_t>(node.array_count) ||
                 model_children[node_index].empty()) {
                 continue;
@@ -584,6 +591,7 @@ namespace {
             }
         }
         std::vector<uint32_t> compact_ranges;
+        std::vector<uint32_t> compact_default_ranges;
         for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
             if (!repeated_layout_arrays[node_index]) continue;
             bool nested = false;
@@ -591,12 +599,16 @@ namespace {
                  parent != UINT32_MAX; parent = schema->nodes[parent].parent) {
                 nested = nested || repeated_layout_arrays[parent];
             }
-            bool entirely_scalar_ranged = true;
+            bool entirely_prefix_fill = true;
             for (uint32_t parameter = schema->nodes[node_index].first_parameter;
                  parameter <= schema->nodes[node_index].last_parameter; ++parameter) {
-                entirely_scalar_ranged = entirely_scalar_ranged && ranged_parameters[parameter];
+                entirely_prefix_fill = entirely_prefix_fill &&
+                    prefix_fill_parameters[parameter];
             }
-            if (!nested && !entirely_scalar_ranged) compact_ranges.push_back(node_index);
+            if (!nested) {
+                compact_ranges.push_back(node_index);
+                if (!entirely_prefix_fill) compact_default_ranges.push_back(node_index);
+            }
         }
         auto compact_leaf_count = [&](uint32_t node_index) {
             uint32_t layout = model_children[node_index].front();
@@ -615,9 +627,17 @@ namespace {
                 compact_parameters[parameter] = true;
             }
         }
-        for (size_t range_index = 0; range_index < compact_ranges.size(); ++range_index) {
-            const s_node& range = schema->nodes[compact_ranges[range_index]];
-            const uint32_t leaf_count = compact_leaf_count(compact_ranges[range_index]);
+        std::vector<bool> compact_default_parameters(schema->parameters.size(), false);
+        for (uint32_t node_index : compact_default_ranges) {
+            const s_node& node = schema->nodes[node_index];
+            for (uint32_t parameter = node.first_parameter;
+                 parameter <= node.last_parameter; ++parameter) {
+                compact_default_parameters[parameter] = true;
+            }
+        }
+        for (size_t range_index = 0; range_index < compact_default_ranges.size(); ++range_index) {
+            const s_node& range = schema->nodes[compact_default_ranges[range_index]];
+            const uint32_t leaf_count = compact_leaf_count(compact_default_ranges[range_index]);
             const uint32_t instance_count =
                 (range.last_parameter - range.first_parameter + 1) / leaf_count;
             for (uint32_t leaf = 0; leaf < leaf_count; ++leaf) {
@@ -741,15 +761,11 @@ namespace {
                 const std::string next_sibling = next_siblings[runtime_index] == UINT32_MAX ?
                                                  "CONFIG_NO_NODE" :
                                                  std::to_string(next_siblings[runtime_index]);
-                const bool implicit_scalar_array =
-                    node.scalar_array && first_children[runtime_index] == UINT32_MAX;
                 const uint32_t element_variable_count = repeated_layout_arrays[node_index] ?
                     static_cast<uint32_t>((node.last_parameter - node.first_parameter + 1) /
                                           node.array_count) : 0;
                 const std::string runtime_type = node.parameter != UINT32_MAX ?
                     "&generated_type_" + std::to_string(type_ids[node.parameter]) :
-                    implicit_scalar_array ?
-                    "&generated_type_" + std::to_string(type_ids[node.first_parameter]) :
                     "nullptr";
                 output += "    { " + Cpp_String_(node.id) + ", " +
                           Node_Kind_(node.kind) + ", " + parent + ", " +
@@ -758,12 +774,10 @@ namespace {
                           (node.has_terminator ? "true" : "false") + ", " +
                           std::to_string(node.terminator) + ", " + first_child + ", " +
                           next_sibling + ", " + runtime_type + ", " +
-                          std::to_string((implicit_scalar_array ||
-                                          repeated_layout_arrays[node_index]) ?
+                          std::to_string(repeated_layout_arrays[node_index] ?
                                          node.array_index_base : 0) +
                           ", " +
-                          std::to_string((implicit_scalar_array ||
-                                          repeated_layout_arrays[node_index]) ?
+                          std::to_string(repeated_layout_arrays[node_index] ?
                                          node.array_count : 0) + ", " +
                           std::to_string(element_variable_count) + " },\n";
             }
@@ -774,8 +788,8 @@ namespace {
             "namespace generated {\n\n";
         output += "bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {\n"
                   "    if (value == nullptr) return false;\n";
-        for (size_t range_index = 0; range_index < scalar_array_ranges.size(); ++range_index) {
-            const s_scalar_array_range& range = scalar_array_ranges[range_index];
+        for (size_t range_index = 0; range_index < prefix_fill_ranges.size(); ++range_index) {
+            const s_prefix_fill_range& range = prefix_fill_ranges[range_index];
             const s_parameter& first = schema->parameters[range.first_parameter];
             output += "    if (variable_id >= " + std::to_string(range.first_parameter) +
                       " && variable_id < " +
@@ -803,9 +817,9 @@ namespace {
             }
             output += "    }\n";
         }
-        for (size_t range_index = 0; range_index < compact_ranges.size(); ++range_index) {
-            const s_node& range = schema->nodes[compact_ranges[range_index]];
-            const uint32_t leaf_count = compact_leaf_count(compact_ranges[range_index]);
+        for (size_t range_index = 0; range_index < compact_default_ranges.size(); ++range_index) {
+            const s_node& range = schema->nodes[compact_default_ranges[range_index]];
+            const uint32_t leaf_count = compact_leaf_count(compact_default_ranges[range_index]);
             output += "    if (variable_id >= " + std::to_string(range.first_parameter) +
                       " && variable_id <= " + std::to_string(range.last_parameter) + ") {\n"
                       "        const size_t instance = (variable_id - " +
@@ -848,7 +862,7 @@ namespace {
         }
         output += "    switch (variable_id) {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            if (ranged_parameters[index] || compact_parameters[index]) continue;
+            if (prefix_fill_parameters[index] || compact_default_parameters[index]) continue;
             output += "    case " + std::to_string(index) + ":\n";
             Append_Direct_Default_(schema->parameters[index], &output);
         }
@@ -857,26 +871,6 @@ namespace {
                   "s_resolved_variable* variable) {\n"
                   "    if (variable == nullptr) return false;\n"
                   "    *variable = {};\n";
-        for (const s_scalar_array_range& range : scalar_array_ranges) {
-            const s_parameter& first = schema->parameters[range.first_parameter];
-            const s_node& node = schema->nodes[range.node_index];
-            output += "    if (variable_id >= " + std::to_string(range.first_parameter) +
-                      " && variable_id < " +
-                      std::to_string(range.first_parameter + range.count) + ") {\n"
-                      "        const size_t offset = variable_id - " +
-                      std::to_string(range.first_parameter) + ";\n"
-                      "        variable->type = &generated_type_" +
-                      std::to_string(type_ids[range.first_parameter]) + ";\n";
-            for (size_t target = 0; target < node.native_targets.size(); ++target) {
-                const std::string expression = node.native_targets[target] + "[offset]";
-                output += "        variable->targets[" + std::to_string(target) +
-                          "] = { (void*)&" + expression + ", sizeof(" + expression + ") };\n";
-            }
-            output += "        variable->target_count = " +
-                      std::to_string(first.native_targets.size()) + ";\n"
-                      "        return true;\n"
-                      "    }\n";
-        }
         for (uint32_t node_index : compact_ranges) {
             const s_node& range_node = schema->nodes[node_index];
             const uint32_t element_variable_count = compact_leaf_count(node_index);
@@ -936,7 +930,7 @@ namespace {
         }
         output += "    switch (variable_id) {\n";
         for (size_t index = 0; index < schema->parameters.size(); ++index) {
-            if (ranged_parameters[index] || compact_parameters[index]) continue;
+            if (compact_parameters[index]) continue;
             const s_parameter& parameter = schema->parameters[index];
             output += "    case " + std::to_string(index) + ":\n"
                       "        variable->type = &generated_type_" +

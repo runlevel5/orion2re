@@ -192,7 +192,6 @@ struct s_node {
     int64_t array_count = 0;
     int64_t array_index_base = 0;
     size_t explicit_default_count = 0;
-    bool scalar_array = false;
     std::vector<std::string> native_targets;
     std::vector<s_native_target_expression> native_target_expressions;
     bool has_terminator = false;

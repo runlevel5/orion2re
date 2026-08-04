@@ -227,12 +227,6 @@ bool Get_Variable_Location(const s_runtime_schema* schema, t_variable_id variabl
             *location = {&node, variable_offset};
             return true;
         }
-        if (node.array_element_count != 0 && node.array_element_variable_count == 0) {
-            if (variable_id < node.first_variable + variable_offset ||
-                variable_id > node.last_variable + variable_offset) return false;
-            *location = {&node, variable_offset};
-            return true;
-        }
         if (node.kind == CONFIG_NODE_ARRAY && node.array_element_variable_count != 0) {
             const t_variable_id first = node.first_variable + variable_offset;
             if (variable_id < first || variable_id > node.last_variable + variable_offset) {
@@ -284,8 +278,7 @@ bool Get_Array_Element_Offset(const s_runtime_schema* schema, t_variable_id vari
         const s_schema_node_descriptor& node = schema->nodes[node_index];
         if (node.kind == CONFIG_NODE_ARRAY) {
             const t_variable_id first = node.first_variable + variable_offset;
-            const uint32_t stride = node.array_element_variable_count == 0 ? 1 :
-                                    node.array_element_variable_count;
+            const uint32_t stride = node.array_element_variable_count;
             if (stride == 0 || variable_id < first ||
                 variable_id > node.last_variable + variable_offset) return false;
             const uint32_t element = (variable_id - first) / stride;
@@ -293,7 +286,6 @@ bool Get_Array_Element_Offset(const s_runtime_schema* schema, t_variable_id vari
                 *element_offset = element;
                 return true;
             }
-            if (node.array_element_variable_count == 0) return false;
             variable_offset += element * stride;
             node_index = node.first_child;
             continue;
@@ -355,18 +347,6 @@ bool Find_Variable(const char* name, size_t name_length, t_variable_id* variable
                 if (parsed.ec != std::errc() || parsed.ptr != component_end ||
                     std::to_string(external_index) != component) {
                     return false;
-                }
-                if (parent.array_element_count != 0 &&
-                    parent.array_element_variable_count == 0) {
-                    const int64_t offset = static_cast<int64_t>(external_index) -
-                                           parent.array_index_base;
-                    if (offset < 0 || offset >= parent.array_element_count ||
-                        separator != std::string_view::npos) {
-                        return false;
-                    }
-                    *variable_id = parent.first_variable + variable_offset +
-                        static_cast<t_variable_id>(offset);
-                    return true;
                 }
                 if (parent.array_element_variable_count != 0) {
                     const int64_t offset = static_cast<int64_t>(external_index) -
@@ -434,13 +414,12 @@ bool Get_Variable_Name(const s_runtime_schema* schema, t_variable_id variable_id
         }
         if (node.kind == CONFIG_NODE_ARRAY) {
             if (node.array_element_count != 0) {
-                const uint32_t stride = node.array_element_variable_count == 0 ? 1 :
-                                        node.array_element_variable_count;
+                const uint32_t stride = node.array_element_variable_count;
+                if (stride == 0) return false;
                 const uint32_t element =
                     (variable_id - node.first_variable - variable_offset) / stride;
                 if (!name->empty()) name->push_back('.');
                 *name += std::to_string(node.array_index_base + element);
-                if (node.array_element_variable_count == 0) return true;
                 variable_offset += element * stride;
                 node_index = node.first_child;
                 continue;

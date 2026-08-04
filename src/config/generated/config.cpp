@@ -2682,26 +2682,26 @@ static_assert(sizeof(SHIP_CONFIG::antaran_templates[4][3].special_device_flags) 
 static_assert(sizeof(SHIP_CONFIG::antaran_templates[4][4].special_device_flags) == 5);
 
 static const s_array_index_alias_descriptor generated_array_index_aliases[] = {
-    { 37, "system", 0 },
-    { 37, "event", 1 },
-    { 53, "system", 0 },
-    { 53, "event", 1 },
-    { 69, "system", 0 },
-    { 69, "event", 1 },
-    { 85, "system", 0 },
-    { 85, "event", 1 },
-    { 101, "system", 0 },
-    { 101, "event", 1 },
-    { 117, "tutor", 0 },
-    { 117, "easy", 1 },
-    { 117, "average", 2 },
-    { 117, "hard", 3 },
-    { 117, "impossible", 4 },
-    { 118, "frigate", 0 },
-    { 118, "destroyer", 1 },
-    { 118, "cruiser", 2 },
-    { 118, "battleship", 3 },
-    { 118, "titan", 4 },
+    { 38, "system", 0 },
+    { 38, "event", 1 },
+    { 54, "system", 0 },
+    { 54, "event", 1 },
+    { 70, "system", 0 },
+    { 70, "event", 1 },
+    { 86, "system", 0 },
+    { 86, "event", 1 },
+    { 102, "system", 0 },
+    { 102, "event", 1 },
+    { 118, "tutor", 0 },
+    { 118, "easy", 1 },
+    { 118, "average", 2 },
+    { 118, "hard", 3 },
+    { 118, "impossible", 4 },
+    { 119, "frigate", 0 },
+    { 119, "destroyer", 1 },
+    { 119, "cruiser", 2 },
+    { 119, "battleship", 3 },
+    { 119, "titan", 4 },
 };
 
 const s_array_index_alias_descriptor* const array_index_aliases = generated_array_index_aliases;
@@ -2714,135 +2714,136 @@ const s_schema_node_descriptor schema_nodes[] = {
     { "sound_effects_enabled", CONFIG_NODE_SCALAR, CONFIG_NO_NODE, 0, 2, 2, 2, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_0, 0, 0, 0 },
     { "sound_effects_volume", CONFIG_NODE_SCALAR, CONFIG_NO_NODE, 0, 3, 3, 3, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_1, 0, 0, 0 },
     { "build_queue", CONFIG_NODE_ARRAY, CONFIG_NO_NODE, 0, 4, 2203, CONFIG_NO_VARIABLE, false, 0, 5, CONFIG_NO_NODE, nullptr, 0, 11, 200 },
-    { "", CONFIG_NODE_ARRAY, 4, 0, 4, 203, CONFIG_NO_VARIABLE, true, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_2, 0, 200, 0 },
-    { "ships", CONFIG_NODE_NAMESPACE, CONFIG_NO_NODE, 0, 2204, 3942, CONFIG_NO_VARIABLE, false, 0, 7, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "guardian", CONFIG_NODE_RECORD, 6, 0, 2204, 2250, CONFIG_NO_VARIABLE, false, 0, 8, 22, nullptr, 0, 0, 0 },
-    { "appearance", CONFIG_NODE_SCALAR, 7, 0, 2204, 2204, 2204, false, 0, CONFIG_NO_NODE, 9, &generated_type_3, 0, 0, 0 },
-    { "hull_size", CONFIG_NODE_SCALAR, 7, 0, 2205, 2205, 2205, false, 0, CONFIG_NO_NODE, 10, &generated_type_4, 0, 0, 0 },
-    { "drive", CONFIG_NODE_SCALAR, 7, 0, 2206, 2206, 2206, false, 0, CONFIG_NO_NODE, 11, &generated_type_5, 0, 0, 0 },
-    { "armor", CONFIG_NODE_SCALAR, 7, 0, 2207, 2207, 2207, false, 0, CONFIG_NO_NODE, 12, &generated_type_6, 0, 0, 0 },
-    { "shield", CONFIG_NODE_SCALAR, 7, 0, 2208, 2208, 2208, false, 0, CONFIG_NO_NODE, 13, &generated_type_7, 0, 0, 0 },
-    { "computer", CONFIG_NODE_SCALAR, 7, 0, 2209, 2209, 2209, false, 0, CONFIG_NO_NODE, 14, &generated_type_8, 0, 0, 0 },
-    { "weapons", CONFIG_NODE_ARRAY, 7, 0, 2210, 2249, CONFIG_NO_VARIABLE, false, 0, 15, 21, nullptr, 1, 8, 5 },
-    { "", CONFIG_NODE_RECORD, 14, 1, 2210, 2214, CONFIG_NO_VARIABLE, false, 0, 16, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "type", CONFIG_NODE_SCALAR, 15, 0, 2210, 2210, 2210, false, 0, CONFIG_NO_NODE, 17, &generated_type_9, 0, 0, 0 },
-    { "arc", CONFIG_NODE_SCALAR, 15, 0, 2211, 2211, 2211, false, 0, CONFIG_NO_NODE, 18, &generated_type_10, 0, 0, 0 },
-    { "mods", CONFIG_NODE_SCALAR, 15, 0, 2212, 2212, 2212, false, 0, CONFIG_NO_NODE, 19, &generated_type_11, 0, 0, 0 },
-    { "ammo", CONFIG_NODE_SCALAR, 15, 0, 2213, 2213, 2213, false, 0, CONFIG_NO_NODE, 20, &generated_type_3, 0, 0, 0 },
-    { "amount", CONFIG_NODE_SCALAR, 15, 0, 2214, 2214, 2214, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
-    { "specials", CONFIG_NODE_SCALAR, 7, 0, 2250, 2250, 2250, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
-    { "avenger", CONFIG_NODE_RECORD, 6, 0, 2251, 2297, CONFIG_NO_VARIABLE, false, 0, 23, 37, nullptr, 0, 0, 0 },
-    { "appearance", CONFIG_NODE_SCALAR, 22, 0, 2251, 2251, 2251, false, 0, CONFIG_NO_NODE, 24, &generated_type_3, 0, 0, 0 },
-    { "hull_size", CONFIG_NODE_SCALAR, 22, 0, 2252, 2252, 2252, false, 0, CONFIG_NO_NODE, 25, &generated_type_4, 0, 0, 0 },
-    { "drive", CONFIG_NODE_SCALAR, 22, 0, 2253, 2253, 2253, false, 0, CONFIG_NO_NODE, 26, &generated_type_5, 0, 0, 0 },
-    { "armor", CONFIG_NODE_SCALAR, 22, 0, 2254, 2254, 2254, false, 0, CONFIG_NO_NODE, 27, &generated_type_6, 0, 0, 0 },
-    { "shield", CONFIG_NODE_SCALAR, 22, 0, 2255, 2255, 2255, false, 0, CONFIG_NO_NODE, 28, &generated_type_7, 0, 0, 0 },
-    { "computer", CONFIG_NODE_SCALAR, 22, 0, 2256, 2256, 2256, false, 0, CONFIG_NO_NODE, 29, &generated_type_8, 0, 0, 0 },
-    { "weapons", CONFIG_NODE_ARRAY, 22, 0, 2257, 2296, CONFIG_NO_VARIABLE, false, 0, 30, 36, nullptr, 1, 8, 5 },
-    { "", CONFIG_NODE_RECORD, 29, 1, 2257, 2261, CONFIG_NO_VARIABLE, false, 0, 31, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "type", CONFIG_NODE_SCALAR, 30, 0, 2257, 2257, 2257, false, 0, CONFIG_NO_NODE, 32, &generated_type_9, 0, 0, 0 },
-    { "arc", CONFIG_NODE_SCALAR, 30, 0, 2258, 2258, 2258, false, 0, CONFIG_NO_NODE, 33, &generated_type_10, 0, 0, 0 },
-    { "mods", CONFIG_NODE_SCALAR, 30, 0, 2259, 2259, 2259, false, 0, CONFIG_NO_NODE, 34, &generated_type_11, 0, 0, 0 },
-    { "ammo", CONFIG_NODE_SCALAR, 30, 0, 2260, 2260, 2260, false, 0, CONFIG_NO_NODE, 35, &generated_type_3, 0, 0, 0 },
-    { "amount", CONFIG_NODE_SCALAR, 30, 0, 2261, 2261, 2261, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
-    { "specials", CONFIG_NODE_SCALAR, 22, 0, 2297, 2297, 2297, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
-    { "amoeba", CONFIG_NODE_ARRAY, 6, 0, 2298, 2391, CONFIG_NO_VARIABLE, false, 0, 38, 53, nullptr, 0, 2, 47 },
-    { "", CONFIG_NODE_RECORD, 37, 0, 2298, 2344, CONFIG_NO_VARIABLE, false, 0, 39, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "appearance", CONFIG_NODE_SCALAR, 38, 0, 2298, 2298, 2298, false, 0, CONFIG_NO_NODE, 40, &generated_type_3, 0, 0, 0 },
-    { "hull_size", CONFIG_NODE_SCALAR, 38, 0, 2299, 2299, 2299, false, 0, CONFIG_NO_NODE, 41, &generated_type_4, 0, 0, 0 },
-    { "drive", CONFIG_NODE_SCALAR, 38, 0, 2300, 2300, 2300, false, 0, CONFIG_NO_NODE, 42, &generated_type_5, 0, 0, 0 },
-    { "armor", CONFIG_NODE_SCALAR, 38, 0, 2301, 2301, 2301, false, 0, CONFIG_NO_NODE, 43, &generated_type_6, 0, 0, 0 },
-    { "shield", CONFIG_NODE_SCALAR, 38, 0, 2302, 2302, 2302, false, 0, CONFIG_NO_NODE, 44, &generated_type_7, 0, 0, 0 },
-    { "computer", CONFIG_NODE_SCALAR, 38, 0, 2303, 2303, 2303, false, 0, CONFIG_NO_NODE, 45, &generated_type_8, 0, 0, 0 },
-    { "weapons", CONFIG_NODE_ARRAY, 38, 0, 2304, 2343, CONFIG_NO_VARIABLE, false, 0, 46, 52, nullptr, 1, 8, 5 },
-    { "", CONFIG_NODE_RECORD, 45, 1, 2304, 2308, CONFIG_NO_VARIABLE, false, 0, 47, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "type", CONFIG_NODE_SCALAR, 46, 0, 2304, 2304, 2304, false, 0, CONFIG_NO_NODE, 48, &generated_type_9, 0, 0, 0 },
-    { "arc", CONFIG_NODE_SCALAR, 46, 0, 2305, 2305, 2305, false, 0, CONFIG_NO_NODE, 49, &generated_type_10, 0, 0, 0 },
-    { "mods", CONFIG_NODE_SCALAR, 46, 0, 2306, 2306, 2306, false, 0, CONFIG_NO_NODE, 50, &generated_type_11, 0, 0, 0 },
-    { "ammo", CONFIG_NODE_SCALAR, 46, 0, 2307, 2307, 2307, false, 0, CONFIG_NO_NODE, 51, &generated_type_3, 0, 0, 0 },
-    { "amount", CONFIG_NODE_SCALAR, 46, 0, 2308, 2308, 2308, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
-    { "specials", CONFIG_NODE_SCALAR, 38, 0, 2344, 2344, 2344, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
-    { "crystal", CONFIG_NODE_ARRAY, 6, 0, 2392, 2485, CONFIG_NO_VARIABLE, false, 0, 54, 69, nullptr, 0, 2, 47 },
-    { "", CONFIG_NODE_RECORD, 53, 0, 2392, 2438, CONFIG_NO_VARIABLE, false, 0, 55, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "appearance", CONFIG_NODE_SCALAR, 54, 0, 2392, 2392, 2392, false, 0, CONFIG_NO_NODE, 56, &generated_type_3, 0, 0, 0 },
-    { "hull_size", CONFIG_NODE_SCALAR, 54, 0, 2393, 2393, 2393, false, 0, CONFIG_NO_NODE, 57, &generated_type_4, 0, 0, 0 },
-    { "drive", CONFIG_NODE_SCALAR, 54, 0, 2394, 2394, 2394, false, 0, CONFIG_NO_NODE, 58, &generated_type_5, 0, 0, 0 },
-    { "armor", CONFIG_NODE_SCALAR, 54, 0, 2395, 2395, 2395, false, 0, CONFIG_NO_NODE, 59, &generated_type_6, 0, 0, 0 },
-    { "shield", CONFIG_NODE_SCALAR, 54, 0, 2396, 2396, 2396, false, 0, CONFIG_NO_NODE, 60, &generated_type_7, 0, 0, 0 },
-    { "computer", CONFIG_NODE_SCALAR, 54, 0, 2397, 2397, 2397, false, 0, CONFIG_NO_NODE, 61, &generated_type_8, 0, 0, 0 },
-    { "weapons", CONFIG_NODE_ARRAY, 54, 0, 2398, 2437, CONFIG_NO_VARIABLE, false, 0, 62, 68, nullptr, 1, 8, 5 },
-    { "", CONFIG_NODE_RECORD, 61, 1, 2398, 2402, CONFIG_NO_VARIABLE, false, 0, 63, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "type", CONFIG_NODE_SCALAR, 62, 0, 2398, 2398, 2398, false, 0, CONFIG_NO_NODE, 64, &generated_type_9, 0, 0, 0 },
-    { "arc", CONFIG_NODE_SCALAR, 62, 0, 2399, 2399, 2399, false, 0, CONFIG_NO_NODE, 65, &generated_type_10, 0, 0, 0 },
-    { "mods", CONFIG_NODE_SCALAR, 62, 0, 2400, 2400, 2400, false, 0, CONFIG_NO_NODE, 66, &generated_type_11, 0, 0, 0 },
-    { "ammo", CONFIG_NODE_SCALAR, 62, 0, 2401, 2401, 2401, false, 0, CONFIG_NO_NODE, 67, &generated_type_3, 0, 0, 0 },
-    { "amount", CONFIG_NODE_SCALAR, 62, 0, 2402, 2402, 2402, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
-    { "specials", CONFIG_NODE_SCALAR, 54, 0, 2438, 2438, 2438, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
-    { "dragon", CONFIG_NODE_ARRAY, 6, 0, 2486, 2579, CONFIG_NO_VARIABLE, false, 0, 70, 85, nullptr, 0, 2, 47 },
-    { "", CONFIG_NODE_RECORD, 69, 0, 2486, 2532, CONFIG_NO_VARIABLE, false, 0, 71, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "appearance", CONFIG_NODE_SCALAR, 70, 0, 2486, 2486, 2486, false, 0, CONFIG_NO_NODE, 72, &generated_type_3, 0, 0, 0 },
-    { "hull_size", CONFIG_NODE_SCALAR, 70, 0, 2487, 2487, 2487, false, 0, CONFIG_NO_NODE, 73, &generated_type_4, 0, 0, 0 },
-    { "drive", CONFIG_NODE_SCALAR, 70, 0, 2488, 2488, 2488, false, 0, CONFIG_NO_NODE, 74, &generated_type_5, 0, 0, 0 },
-    { "armor", CONFIG_NODE_SCALAR, 70, 0, 2489, 2489, 2489, false, 0, CONFIG_NO_NODE, 75, &generated_type_6, 0, 0, 0 },
-    { "shield", CONFIG_NODE_SCALAR, 70, 0, 2490, 2490, 2490, false, 0, CONFIG_NO_NODE, 76, &generated_type_7, 0, 0, 0 },
-    { "computer", CONFIG_NODE_SCALAR, 70, 0, 2491, 2491, 2491, false, 0, CONFIG_NO_NODE, 77, &generated_type_8, 0, 0, 0 },
-    { "weapons", CONFIG_NODE_ARRAY, 70, 0, 2492, 2531, CONFIG_NO_VARIABLE, false, 0, 78, 84, nullptr, 1, 8, 5 },
-    { "", CONFIG_NODE_RECORD, 77, 1, 2492, 2496, CONFIG_NO_VARIABLE, false, 0, 79, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "type", CONFIG_NODE_SCALAR, 78, 0, 2492, 2492, 2492, false, 0, CONFIG_NO_NODE, 80, &generated_type_9, 0, 0, 0 },
-    { "arc", CONFIG_NODE_SCALAR, 78, 0, 2493, 2493, 2493, false, 0, CONFIG_NO_NODE, 81, &generated_type_10, 0, 0, 0 },
-    { "mods", CONFIG_NODE_SCALAR, 78, 0, 2494, 2494, 2494, false, 0, CONFIG_NO_NODE, 82, &generated_type_11, 0, 0, 0 },
-    { "ammo", CONFIG_NODE_SCALAR, 78, 0, 2495, 2495, 2495, false, 0, CONFIG_NO_NODE, 83, &generated_type_3, 0, 0, 0 },
-    { "amount", CONFIG_NODE_SCALAR, 78, 0, 2496, 2496, 2496, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
-    { "specials", CONFIG_NODE_SCALAR, 70, 0, 2532, 2532, 2532, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
-    { "eel", CONFIG_NODE_ARRAY, 6, 0, 2580, 2673, CONFIG_NO_VARIABLE, false, 0, 86, 101, nullptr, 0, 2, 47 },
-    { "", CONFIG_NODE_RECORD, 85, 0, 2580, 2626, CONFIG_NO_VARIABLE, false, 0, 87, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "appearance", CONFIG_NODE_SCALAR, 86, 0, 2580, 2580, 2580, false, 0, CONFIG_NO_NODE, 88, &generated_type_3, 0, 0, 0 },
-    { "hull_size", CONFIG_NODE_SCALAR, 86, 0, 2581, 2581, 2581, false, 0, CONFIG_NO_NODE, 89, &generated_type_4, 0, 0, 0 },
-    { "drive", CONFIG_NODE_SCALAR, 86, 0, 2582, 2582, 2582, false, 0, CONFIG_NO_NODE, 90, &generated_type_5, 0, 0, 0 },
-    { "armor", CONFIG_NODE_SCALAR, 86, 0, 2583, 2583, 2583, false, 0, CONFIG_NO_NODE, 91, &generated_type_6, 0, 0, 0 },
-    { "shield", CONFIG_NODE_SCALAR, 86, 0, 2584, 2584, 2584, false, 0, CONFIG_NO_NODE, 92, &generated_type_7, 0, 0, 0 },
-    { "computer", CONFIG_NODE_SCALAR, 86, 0, 2585, 2585, 2585, false, 0, CONFIG_NO_NODE, 93, &generated_type_8, 0, 0, 0 },
-    { "weapons", CONFIG_NODE_ARRAY, 86, 0, 2586, 2625, CONFIG_NO_VARIABLE, false, 0, 94, 100, nullptr, 1, 8, 5 },
-    { "", CONFIG_NODE_RECORD, 93, 1, 2586, 2590, CONFIG_NO_VARIABLE, false, 0, 95, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "type", CONFIG_NODE_SCALAR, 94, 0, 2586, 2586, 2586, false, 0, CONFIG_NO_NODE, 96, &generated_type_9, 0, 0, 0 },
-    { "arc", CONFIG_NODE_SCALAR, 94, 0, 2587, 2587, 2587, false, 0, CONFIG_NO_NODE, 97, &generated_type_10, 0, 0, 0 },
-    { "mods", CONFIG_NODE_SCALAR, 94, 0, 2588, 2588, 2588, false, 0, CONFIG_NO_NODE, 98, &generated_type_11, 0, 0, 0 },
-    { "ammo", CONFIG_NODE_SCALAR, 94, 0, 2589, 2589, 2589, false, 0, CONFIG_NO_NODE, 99, &generated_type_3, 0, 0, 0 },
-    { "amount", CONFIG_NODE_SCALAR, 94, 0, 2590, 2590, 2590, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
-    { "specials", CONFIG_NODE_SCALAR, 86, 0, 2626, 2626, 2626, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
-    { "hydra", CONFIG_NODE_ARRAY, 6, 0, 2674, 2767, CONFIG_NO_VARIABLE, false, 0, 102, 117, nullptr, 0, 2, 47 },
-    { "", CONFIG_NODE_RECORD, 101, 0, 2674, 2720, CONFIG_NO_VARIABLE, false, 0, 103, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "appearance", CONFIG_NODE_SCALAR, 102, 0, 2674, 2674, 2674, false, 0, CONFIG_NO_NODE, 104, &generated_type_3, 0, 0, 0 },
-    { "hull_size", CONFIG_NODE_SCALAR, 102, 0, 2675, 2675, 2675, false, 0, CONFIG_NO_NODE, 105, &generated_type_4, 0, 0, 0 },
-    { "drive", CONFIG_NODE_SCALAR, 102, 0, 2676, 2676, 2676, false, 0, CONFIG_NO_NODE, 106, &generated_type_5, 0, 0, 0 },
-    { "armor", CONFIG_NODE_SCALAR, 102, 0, 2677, 2677, 2677, false, 0, CONFIG_NO_NODE, 107, &generated_type_6, 0, 0, 0 },
-    { "shield", CONFIG_NODE_SCALAR, 102, 0, 2678, 2678, 2678, false, 0, CONFIG_NO_NODE, 108, &generated_type_7, 0, 0, 0 },
-    { "computer", CONFIG_NODE_SCALAR, 102, 0, 2679, 2679, 2679, false, 0, CONFIG_NO_NODE, 109, &generated_type_8, 0, 0, 0 },
-    { "weapons", CONFIG_NODE_ARRAY, 102, 0, 2680, 2719, CONFIG_NO_VARIABLE, false, 0, 110, 116, nullptr, 1, 8, 5 },
-    { "", CONFIG_NODE_RECORD, 109, 1, 2680, 2684, CONFIG_NO_VARIABLE, false, 0, 111, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "type", CONFIG_NODE_SCALAR, 110, 0, 2680, 2680, 2680, false, 0, CONFIG_NO_NODE, 112, &generated_type_9, 0, 0, 0 },
-    { "arc", CONFIG_NODE_SCALAR, 110, 0, 2681, 2681, 2681, false, 0, CONFIG_NO_NODE, 113, &generated_type_10, 0, 0, 0 },
-    { "mods", CONFIG_NODE_SCALAR, 110, 0, 2682, 2682, 2682, false, 0, CONFIG_NO_NODE, 114, &generated_type_11, 0, 0, 0 },
-    { "ammo", CONFIG_NODE_SCALAR, 110, 0, 2683, 2683, 2683, false, 0, CONFIG_NO_NODE, 115, &generated_type_3, 0, 0, 0 },
-    { "amount", CONFIG_NODE_SCALAR, 110, 0, 2684, 2684, 2684, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
-    { "specials", CONFIG_NODE_SCALAR, 102, 0, 2720, 2720, 2720, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
-    { "antaran", CONFIG_NODE_ARRAY, 6, 0, 2768, 3942, CONFIG_NO_VARIABLE, false, 0, 118, CONFIG_NO_NODE, nullptr, 0, 5, 235 },
-    { "", CONFIG_NODE_ARRAY, 117, 0, 2768, 3002, CONFIG_NO_VARIABLE, false, 0, 119, CONFIG_NO_NODE, nullptr, 0, 5, 47 },
-    { "", CONFIG_NODE_RECORD, 118, 0, 2768, 2814, CONFIG_NO_VARIABLE, false, 0, 120, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "appearance", CONFIG_NODE_SCALAR, 119, 0, 2768, 2768, 2768, false, 0, CONFIG_NO_NODE, 121, &generated_type_3, 0, 0, 0 },
-    { "hull_size", CONFIG_NODE_SCALAR, 119, 0, 2769, 2769, 2769, false, 0, CONFIG_NO_NODE, 122, &generated_type_4, 0, 0, 0 },
-    { "drive", CONFIG_NODE_SCALAR, 119, 0, 2770, 2770, 2770, false, 0, CONFIG_NO_NODE, 123, &generated_type_5, 0, 0, 0 },
-    { "armor", CONFIG_NODE_SCALAR, 119, 0, 2771, 2771, 2771, false, 0, CONFIG_NO_NODE, 124, &generated_type_6, 0, 0, 0 },
-    { "shield", CONFIG_NODE_SCALAR, 119, 0, 2772, 2772, 2772, false, 0, CONFIG_NO_NODE, 125, &generated_type_7, 0, 0, 0 },
-    { "computer", CONFIG_NODE_SCALAR, 119, 0, 2773, 2773, 2773, false, 0, CONFIG_NO_NODE, 126, &generated_type_8, 0, 0, 0 },
-    { "weapons", CONFIG_NODE_ARRAY, 119, 0, 2774, 2813, CONFIG_NO_VARIABLE, false, 0, 127, 133, nullptr, 1, 8, 5 },
-    { "", CONFIG_NODE_RECORD, 126, 1, 2774, 2778, CONFIG_NO_VARIABLE, false, 0, 128, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "type", CONFIG_NODE_SCALAR, 127, 0, 2774, 2774, 2774, false, 0, CONFIG_NO_NODE, 129, &generated_type_9, 0, 0, 0 },
-    { "arc", CONFIG_NODE_SCALAR, 127, 0, 2775, 2775, 2775, false, 0, CONFIG_NO_NODE, 130, &generated_type_10, 0, 0, 0 },
-    { "mods", CONFIG_NODE_SCALAR, 127, 0, 2776, 2776, 2776, false, 0, CONFIG_NO_NODE, 131, &generated_type_11, 0, 0, 0 },
-    { "ammo", CONFIG_NODE_SCALAR, 127, 0, 2777, 2777, 2777, false, 0, CONFIG_NO_NODE, 132, &generated_type_3, 0, 0, 0 },
-    { "amount", CONFIG_NODE_SCALAR, 127, 0, 2778, 2778, 2778, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
-    { "specials", CONFIG_NODE_SCALAR, 119, 0, 2814, 2814, 2814, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "", CONFIG_NODE_ARRAY, 4, 0, 4, 203, CONFIG_NO_VARIABLE, true, 0, 6, CONFIG_NO_NODE, nullptr, 0, 200, 1 },
+    { "", CONFIG_NODE_SCALAR, 5, 0, 4, 4, 4, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_2, 0, 0, 0 },
+    { "ships", CONFIG_NODE_NAMESPACE, CONFIG_NO_NODE, 0, 2204, 3942, CONFIG_NO_VARIABLE, false, 0, 8, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "guardian", CONFIG_NODE_RECORD, 7, 0, 2204, 2250, CONFIG_NO_VARIABLE, false, 0, 9, 23, nullptr, 0, 0, 0 },
+    { "appearance", CONFIG_NODE_SCALAR, 8, 0, 2204, 2204, 2204, false, 0, CONFIG_NO_NODE, 10, &generated_type_3, 0, 0, 0 },
+    { "hull_size", CONFIG_NODE_SCALAR, 8, 0, 2205, 2205, 2205, false, 0, CONFIG_NO_NODE, 11, &generated_type_4, 0, 0, 0 },
+    { "drive", CONFIG_NODE_SCALAR, 8, 0, 2206, 2206, 2206, false, 0, CONFIG_NO_NODE, 12, &generated_type_5, 0, 0, 0 },
+    { "armor", CONFIG_NODE_SCALAR, 8, 0, 2207, 2207, 2207, false, 0, CONFIG_NO_NODE, 13, &generated_type_6, 0, 0, 0 },
+    { "shield", CONFIG_NODE_SCALAR, 8, 0, 2208, 2208, 2208, false, 0, CONFIG_NO_NODE, 14, &generated_type_7, 0, 0, 0 },
+    { "computer", CONFIG_NODE_SCALAR, 8, 0, 2209, 2209, 2209, false, 0, CONFIG_NO_NODE, 15, &generated_type_8, 0, 0, 0 },
+    { "weapons", CONFIG_NODE_ARRAY, 8, 0, 2210, 2249, CONFIG_NO_VARIABLE, false, 0, 16, 22, nullptr, 1, 8, 5 },
+    { "", CONFIG_NODE_RECORD, 15, 1, 2210, 2214, CONFIG_NO_VARIABLE, false, 0, 17, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "type", CONFIG_NODE_SCALAR, 16, 0, 2210, 2210, 2210, false, 0, CONFIG_NO_NODE, 18, &generated_type_9, 0, 0, 0 },
+    { "arc", CONFIG_NODE_SCALAR, 16, 0, 2211, 2211, 2211, false, 0, CONFIG_NO_NODE, 19, &generated_type_10, 0, 0, 0 },
+    { "mods", CONFIG_NODE_SCALAR, 16, 0, 2212, 2212, 2212, false, 0, CONFIG_NO_NODE, 20, &generated_type_11, 0, 0, 0 },
+    { "ammo", CONFIG_NODE_SCALAR, 16, 0, 2213, 2213, 2213, false, 0, CONFIG_NO_NODE, 21, &generated_type_3, 0, 0, 0 },
+    { "amount", CONFIG_NODE_SCALAR, 16, 0, 2214, 2214, 2214, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
+    { "specials", CONFIG_NODE_SCALAR, 8, 0, 2250, 2250, 2250, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "avenger", CONFIG_NODE_RECORD, 7, 0, 2251, 2297, CONFIG_NO_VARIABLE, false, 0, 24, 38, nullptr, 0, 0, 0 },
+    { "appearance", CONFIG_NODE_SCALAR, 23, 0, 2251, 2251, 2251, false, 0, CONFIG_NO_NODE, 25, &generated_type_3, 0, 0, 0 },
+    { "hull_size", CONFIG_NODE_SCALAR, 23, 0, 2252, 2252, 2252, false, 0, CONFIG_NO_NODE, 26, &generated_type_4, 0, 0, 0 },
+    { "drive", CONFIG_NODE_SCALAR, 23, 0, 2253, 2253, 2253, false, 0, CONFIG_NO_NODE, 27, &generated_type_5, 0, 0, 0 },
+    { "armor", CONFIG_NODE_SCALAR, 23, 0, 2254, 2254, 2254, false, 0, CONFIG_NO_NODE, 28, &generated_type_6, 0, 0, 0 },
+    { "shield", CONFIG_NODE_SCALAR, 23, 0, 2255, 2255, 2255, false, 0, CONFIG_NO_NODE, 29, &generated_type_7, 0, 0, 0 },
+    { "computer", CONFIG_NODE_SCALAR, 23, 0, 2256, 2256, 2256, false, 0, CONFIG_NO_NODE, 30, &generated_type_8, 0, 0, 0 },
+    { "weapons", CONFIG_NODE_ARRAY, 23, 0, 2257, 2296, CONFIG_NO_VARIABLE, false, 0, 31, 37, nullptr, 1, 8, 5 },
+    { "", CONFIG_NODE_RECORD, 30, 1, 2257, 2261, CONFIG_NO_VARIABLE, false, 0, 32, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "type", CONFIG_NODE_SCALAR, 31, 0, 2257, 2257, 2257, false, 0, CONFIG_NO_NODE, 33, &generated_type_9, 0, 0, 0 },
+    { "arc", CONFIG_NODE_SCALAR, 31, 0, 2258, 2258, 2258, false, 0, CONFIG_NO_NODE, 34, &generated_type_10, 0, 0, 0 },
+    { "mods", CONFIG_NODE_SCALAR, 31, 0, 2259, 2259, 2259, false, 0, CONFIG_NO_NODE, 35, &generated_type_11, 0, 0, 0 },
+    { "ammo", CONFIG_NODE_SCALAR, 31, 0, 2260, 2260, 2260, false, 0, CONFIG_NO_NODE, 36, &generated_type_3, 0, 0, 0 },
+    { "amount", CONFIG_NODE_SCALAR, 31, 0, 2261, 2261, 2261, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
+    { "specials", CONFIG_NODE_SCALAR, 23, 0, 2297, 2297, 2297, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "amoeba", CONFIG_NODE_ARRAY, 7, 0, 2298, 2391, CONFIG_NO_VARIABLE, false, 0, 39, 54, nullptr, 0, 2, 47 },
+    { "", CONFIG_NODE_RECORD, 38, 0, 2298, 2344, CONFIG_NO_VARIABLE, false, 0, 40, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "appearance", CONFIG_NODE_SCALAR, 39, 0, 2298, 2298, 2298, false, 0, CONFIG_NO_NODE, 41, &generated_type_3, 0, 0, 0 },
+    { "hull_size", CONFIG_NODE_SCALAR, 39, 0, 2299, 2299, 2299, false, 0, CONFIG_NO_NODE, 42, &generated_type_4, 0, 0, 0 },
+    { "drive", CONFIG_NODE_SCALAR, 39, 0, 2300, 2300, 2300, false, 0, CONFIG_NO_NODE, 43, &generated_type_5, 0, 0, 0 },
+    { "armor", CONFIG_NODE_SCALAR, 39, 0, 2301, 2301, 2301, false, 0, CONFIG_NO_NODE, 44, &generated_type_6, 0, 0, 0 },
+    { "shield", CONFIG_NODE_SCALAR, 39, 0, 2302, 2302, 2302, false, 0, CONFIG_NO_NODE, 45, &generated_type_7, 0, 0, 0 },
+    { "computer", CONFIG_NODE_SCALAR, 39, 0, 2303, 2303, 2303, false, 0, CONFIG_NO_NODE, 46, &generated_type_8, 0, 0, 0 },
+    { "weapons", CONFIG_NODE_ARRAY, 39, 0, 2304, 2343, CONFIG_NO_VARIABLE, false, 0, 47, 53, nullptr, 1, 8, 5 },
+    { "", CONFIG_NODE_RECORD, 46, 1, 2304, 2308, CONFIG_NO_VARIABLE, false, 0, 48, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "type", CONFIG_NODE_SCALAR, 47, 0, 2304, 2304, 2304, false, 0, CONFIG_NO_NODE, 49, &generated_type_9, 0, 0, 0 },
+    { "arc", CONFIG_NODE_SCALAR, 47, 0, 2305, 2305, 2305, false, 0, CONFIG_NO_NODE, 50, &generated_type_10, 0, 0, 0 },
+    { "mods", CONFIG_NODE_SCALAR, 47, 0, 2306, 2306, 2306, false, 0, CONFIG_NO_NODE, 51, &generated_type_11, 0, 0, 0 },
+    { "ammo", CONFIG_NODE_SCALAR, 47, 0, 2307, 2307, 2307, false, 0, CONFIG_NO_NODE, 52, &generated_type_3, 0, 0, 0 },
+    { "amount", CONFIG_NODE_SCALAR, 47, 0, 2308, 2308, 2308, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
+    { "specials", CONFIG_NODE_SCALAR, 39, 0, 2344, 2344, 2344, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "crystal", CONFIG_NODE_ARRAY, 7, 0, 2392, 2485, CONFIG_NO_VARIABLE, false, 0, 55, 70, nullptr, 0, 2, 47 },
+    { "", CONFIG_NODE_RECORD, 54, 0, 2392, 2438, CONFIG_NO_VARIABLE, false, 0, 56, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "appearance", CONFIG_NODE_SCALAR, 55, 0, 2392, 2392, 2392, false, 0, CONFIG_NO_NODE, 57, &generated_type_3, 0, 0, 0 },
+    { "hull_size", CONFIG_NODE_SCALAR, 55, 0, 2393, 2393, 2393, false, 0, CONFIG_NO_NODE, 58, &generated_type_4, 0, 0, 0 },
+    { "drive", CONFIG_NODE_SCALAR, 55, 0, 2394, 2394, 2394, false, 0, CONFIG_NO_NODE, 59, &generated_type_5, 0, 0, 0 },
+    { "armor", CONFIG_NODE_SCALAR, 55, 0, 2395, 2395, 2395, false, 0, CONFIG_NO_NODE, 60, &generated_type_6, 0, 0, 0 },
+    { "shield", CONFIG_NODE_SCALAR, 55, 0, 2396, 2396, 2396, false, 0, CONFIG_NO_NODE, 61, &generated_type_7, 0, 0, 0 },
+    { "computer", CONFIG_NODE_SCALAR, 55, 0, 2397, 2397, 2397, false, 0, CONFIG_NO_NODE, 62, &generated_type_8, 0, 0, 0 },
+    { "weapons", CONFIG_NODE_ARRAY, 55, 0, 2398, 2437, CONFIG_NO_VARIABLE, false, 0, 63, 69, nullptr, 1, 8, 5 },
+    { "", CONFIG_NODE_RECORD, 62, 1, 2398, 2402, CONFIG_NO_VARIABLE, false, 0, 64, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "type", CONFIG_NODE_SCALAR, 63, 0, 2398, 2398, 2398, false, 0, CONFIG_NO_NODE, 65, &generated_type_9, 0, 0, 0 },
+    { "arc", CONFIG_NODE_SCALAR, 63, 0, 2399, 2399, 2399, false, 0, CONFIG_NO_NODE, 66, &generated_type_10, 0, 0, 0 },
+    { "mods", CONFIG_NODE_SCALAR, 63, 0, 2400, 2400, 2400, false, 0, CONFIG_NO_NODE, 67, &generated_type_11, 0, 0, 0 },
+    { "ammo", CONFIG_NODE_SCALAR, 63, 0, 2401, 2401, 2401, false, 0, CONFIG_NO_NODE, 68, &generated_type_3, 0, 0, 0 },
+    { "amount", CONFIG_NODE_SCALAR, 63, 0, 2402, 2402, 2402, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
+    { "specials", CONFIG_NODE_SCALAR, 55, 0, 2438, 2438, 2438, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "dragon", CONFIG_NODE_ARRAY, 7, 0, 2486, 2579, CONFIG_NO_VARIABLE, false, 0, 71, 86, nullptr, 0, 2, 47 },
+    { "", CONFIG_NODE_RECORD, 70, 0, 2486, 2532, CONFIG_NO_VARIABLE, false, 0, 72, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "appearance", CONFIG_NODE_SCALAR, 71, 0, 2486, 2486, 2486, false, 0, CONFIG_NO_NODE, 73, &generated_type_3, 0, 0, 0 },
+    { "hull_size", CONFIG_NODE_SCALAR, 71, 0, 2487, 2487, 2487, false, 0, CONFIG_NO_NODE, 74, &generated_type_4, 0, 0, 0 },
+    { "drive", CONFIG_NODE_SCALAR, 71, 0, 2488, 2488, 2488, false, 0, CONFIG_NO_NODE, 75, &generated_type_5, 0, 0, 0 },
+    { "armor", CONFIG_NODE_SCALAR, 71, 0, 2489, 2489, 2489, false, 0, CONFIG_NO_NODE, 76, &generated_type_6, 0, 0, 0 },
+    { "shield", CONFIG_NODE_SCALAR, 71, 0, 2490, 2490, 2490, false, 0, CONFIG_NO_NODE, 77, &generated_type_7, 0, 0, 0 },
+    { "computer", CONFIG_NODE_SCALAR, 71, 0, 2491, 2491, 2491, false, 0, CONFIG_NO_NODE, 78, &generated_type_8, 0, 0, 0 },
+    { "weapons", CONFIG_NODE_ARRAY, 71, 0, 2492, 2531, CONFIG_NO_VARIABLE, false, 0, 79, 85, nullptr, 1, 8, 5 },
+    { "", CONFIG_NODE_RECORD, 78, 1, 2492, 2496, CONFIG_NO_VARIABLE, false, 0, 80, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "type", CONFIG_NODE_SCALAR, 79, 0, 2492, 2492, 2492, false, 0, CONFIG_NO_NODE, 81, &generated_type_9, 0, 0, 0 },
+    { "arc", CONFIG_NODE_SCALAR, 79, 0, 2493, 2493, 2493, false, 0, CONFIG_NO_NODE, 82, &generated_type_10, 0, 0, 0 },
+    { "mods", CONFIG_NODE_SCALAR, 79, 0, 2494, 2494, 2494, false, 0, CONFIG_NO_NODE, 83, &generated_type_11, 0, 0, 0 },
+    { "ammo", CONFIG_NODE_SCALAR, 79, 0, 2495, 2495, 2495, false, 0, CONFIG_NO_NODE, 84, &generated_type_3, 0, 0, 0 },
+    { "amount", CONFIG_NODE_SCALAR, 79, 0, 2496, 2496, 2496, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
+    { "specials", CONFIG_NODE_SCALAR, 71, 0, 2532, 2532, 2532, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "eel", CONFIG_NODE_ARRAY, 7, 0, 2580, 2673, CONFIG_NO_VARIABLE, false, 0, 87, 102, nullptr, 0, 2, 47 },
+    { "", CONFIG_NODE_RECORD, 86, 0, 2580, 2626, CONFIG_NO_VARIABLE, false, 0, 88, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "appearance", CONFIG_NODE_SCALAR, 87, 0, 2580, 2580, 2580, false, 0, CONFIG_NO_NODE, 89, &generated_type_3, 0, 0, 0 },
+    { "hull_size", CONFIG_NODE_SCALAR, 87, 0, 2581, 2581, 2581, false, 0, CONFIG_NO_NODE, 90, &generated_type_4, 0, 0, 0 },
+    { "drive", CONFIG_NODE_SCALAR, 87, 0, 2582, 2582, 2582, false, 0, CONFIG_NO_NODE, 91, &generated_type_5, 0, 0, 0 },
+    { "armor", CONFIG_NODE_SCALAR, 87, 0, 2583, 2583, 2583, false, 0, CONFIG_NO_NODE, 92, &generated_type_6, 0, 0, 0 },
+    { "shield", CONFIG_NODE_SCALAR, 87, 0, 2584, 2584, 2584, false, 0, CONFIG_NO_NODE, 93, &generated_type_7, 0, 0, 0 },
+    { "computer", CONFIG_NODE_SCALAR, 87, 0, 2585, 2585, 2585, false, 0, CONFIG_NO_NODE, 94, &generated_type_8, 0, 0, 0 },
+    { "weapons", CONFIG_NODE_ARRAY, 87, 0, 2586, 2625, CONFIG_NO_VARIABLE, false, 0, 95, 101, nullptr, 1, 8, 5 },
+    { "", CONFIG_NODE_RECORD, 94, 1, 2586, 2590, CONFIG_NO_VARIABLE, false, 0, 96, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "type", CONFIG_NODE_SCALAR, 95, 0, 2586, 2586, 2586, false, 0, CONFIG_NO_NODE, 97, &generated_type_9, 0, 0, 0 },
+    { "arc", CONFIG_NODE_SCALAR, 95, 0, 2587, 2587, 2587, false, 0, CONFIG_NO_NODE, 98, &generated_type_10, 0, 0, 0 },
+    { "mods", CONFIG_NODE_SCALAR, 95, 0, 2588, 2588, 2588, false, 0, CONFIG_NO_NODE, 99, &generated_type_11, 0, 0, 0 },
+    { "ammo", CONFIG_NODE_SCALAR, 95, 0, 2589, 2589, 2589, false, 0, CONFIG_NO_NODE, 100, &generated_type_3, 0, 0, 0 },
+    { "amount", CONFIG_NODE_SCALAR, 95, 0, 2590, 2590, 2590, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
+    { "specials", CONFIG_NODE_SCALAR, 87, 0, 2626, 2626, 2626, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "hydra", CONFIG_NODE_ARRAY, 7, 0, 2674, 2767, CONFIG_NO_VARIABLE, false, 0, 103, 118, nullptr, 0, 2, 47 },
+    { "", CONFIG_NODE_RECORD, 102, 0, 2674, 2720, CONFIG_NO_VARIABLE, false, 0, 104, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "appearance", CONFIG_NODE_SCALAR, 103, 0, 2674, 2674, 2674, false, 0, CONFIG_NO_NODE, 105, &generated_type_3, 0, 0, 0 },
+    { "hull_size", CONFIG_NODE_SCALAR, 103, 0, 2675, 2675, 2675, false, 0, CONFIG_NO_NODE, 106, &generated_type_4, 0, 0, 0 },
+    { "drive", CONFIG_NODE_SCALAR, 103, 0, 2676, 2676, 2676, false, 0, CONFIG_NO_NODE, 107, &generated_type_5, 0, 0, 0 },
+    { "armor", CONFIG_NODE_SCALAR, 103, 0, 2677, 2677, 2677, false, 0, CONFIG_NO_NODE, 108, &generated_type_6, 0, 0, 0 },
+    { "shield", CONFIG_NODE_SCALAR, 103, 0, 2678, 2678, 2678, false, 0, CONFIG_NO_NODE, 109, &generated_type_7, 0, 0, 0 },
+    { "computer", CONFIG_NODE_SCALAR, 103, 0, 2679, 2679, 2679, false, 0, CONFIG_NO_NODE, 110, &generated_type_8, 0, 0, 0 },
+    { "weapons", CONFIG_NODE_ARRAY, 103, 0, 2680, 2719, CONFIG_NO_VARIABLE, false, 0, 111, 117, nullptr, 1, 8, 5 },
+    { "", CONFIG_NODE_RECORD, 110, 1, 2680, 2684, CONFIG_NO_VARIABLE, false, 0, 112, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "type", CONFIG_NODE_SCALAR, 111, 0, 2680, 2680, 2680, false, 0, CONFIG_NO_NODE, 113, &generated_type_9, 0, 0, 0 },
+    { "arc", CONFIG_NODE_SCALAR, 111, 0, 2681, 2681, 2681, false, 0, CONFIG_NO_NODE, 114, &generated_type_10, 0, 0, 0 },
+    { "mods", CONFIG_NODE_SCALAR, 111, 0, 2682, 2682, 2682, false, 0, CONFIG_NO_NODE, 115, &generated_type_11, 0, 0, 0 },
+    { "ammo", CONFIG_NODE_SCALAR, 111, 0, 2683, 2683, 2683, false, 0, CONFIG_NO_NODE, 116, &generated_type_3, 0, 0, 0 },
+    { "amount", CONFIG_NODE_SCALAR, 111, 0, 2684, 2684, 2684, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
+    { "specials", CONFIG_NODE_SCALAR, 103, 0, 2720, 2720, 2720, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
+    { "antaran", CONFIG_NODE_ARRAY, 7, 0, 2768, 3942, CONFIG_NO_VARIABLE, false, 0, 119, CONFIG_NO_NODE, nullptr, 0, 5, 235 },
+    { "", CONFIG_NODE_ARRAY, 118, 0, 2768, 3002, CONFIG_NO_VARIABLE, false, 0, 120, CONFIG_NO_NODE, nullptr, 0, 5, 47 },
+    { "", CONFIG_NODE_RECORD, 119, 0, 2768, 2814, CONFIG_NO_VARIABLE, false, 0, 121, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "appearance", CONFIG_NODE_SCALAR, 120, 0, 2768, 2768, 2768, false, 0, CONFIG_NO_NODE, 122, &generated_type_3, 0, 0, 0 },
+    { "hull_size", CONFIG_NODE_SCALAR, 120, 0, 2769, 2769, 2769, false, 0, CONFIG_NO_NODE, 123, &generated_type_4, 0, 0, 0 },
+    { "drive", CONFIG_NODE_SCALAR, 120, 0, 2770, 2770, 2770, false, 0, CONFIG_NO_NODE, 124, &generated_type_5, 0, 0, 0 },
+    { "armor", CONFIG_NODE_SCALAR, 120, 0, 2771, 2771, 2771, false, 0, CONFIG_NO_NODE, 125, &generated_type_6, 0, 0, 0 },
+    { "shield", CONFIG_NODE_SCALAR, 120, 0, 2772, 2772, 2772, false, 0, CONFIG_NO_NODE, 126, &generated_type_7, 0, 0, 0 },
+    { "computer", CONFIG_NODE_SCALAR, 120, 0, 2773, 2773, 2773, false, 0, CONFIG_NO_NODE, 127, &generated_type_8, 0, 0, 0 },
+    { "weapons", CONFIG_NODE_ARRAY, 120, 0, 2774, 2813, CONFIG_NO_VARIABLE, false, 0, 128, 134, nullptr, 1, 8, 5 },
+    { "", CONFIG_NODE_RECORD, 127, 1, 2774, 2778, CONFIG_NO_VARIABLE, false, 0, 129, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "type", CONFIG_NODE_SCALAR, 128, 0, 2774, 2774, 2774, false, 0, CONFIG_NO_NODE, 130, &generated_type_9, 0, 0, 0 },
+    { "arc", CONFIG_NODE_SCALAR, 128, 0, 2775, 2775, 2775, false, 0, CONFIG_NO_NODE, 131, &generated_type_10, 0, 0, 0 },
+    { "mods", CONFIG_NODE_SCALAR, 128, 0, 2776, 2776, 2776, false, 0, CONFIG_NO_NODE, 132, &generated_type_11, 0, 0, 0 },
+    { "ammo", CONFIG_NODE_SCALAR, 128, 0, 2777, 2777, 2777, false, 0, CONFIG_NO_NODE, 133, &generated_type_3, 0, 0, 0 },
+    { "amount", CONFIG_NODE_SCALAR, 128, 0, 2778, 2778, 2778, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_12, 0, 0, 0 },
+    { "specials", CONFIG_NODE_SCALAR, 120, 0, 2814, 2814, 2814, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_13, 0, 0, 0 },
 };
 
 const size_t schema_node_count = sizeof(schema_nodes) / sizeof(schema_nodes[0]);
@@ -4324,124 +4325,63 @@ bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
 bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) {
     if (variable == nullptr) return false;
     *variable = {};
-    if (variable_id >= 4 && variable_id < 204) {
-        const size_t offset = variable_id - 4;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[0][offset], sizeof(BUILD_QUEUE::presets[0][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 204 && variable_id < 404) {
-        const size_t offset = variable_id - 204;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[1][offset], sizeof(BUILD_QUEUE::presets[1][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 404 && variable_id < 604) {
-        const size_t offset = variable_id - 404;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[2][offset], sizeof(BUILD_QUEUE::presets[2][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 604 && variable_id < 804) {
-        const size_t offset = variable_id - 604;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[3][offset], sizeof(BUILD_QUEUE::presets[3][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 804 && variable_id < 1004) {
-        const size_t offset = variable_id - 804;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[4][offset], sizeof(BUILD_QUEUE::presets[4][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 1004 && variable_id < 1204) {
-        const size_t offset = variable_id - 1004;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[5][offset], sizeof(BUILD_QUEUE::presets[5][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 1204 && variable_id < 1404) {
-        const size_t offset = variable_id - 1204;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[6][offset], sizeof(BUILD_QUEUE::presets[6][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 1404 && variable_id < 1604) {
-        const size_t offset = variable_id - 1404;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[7][offset], sizeof(BUILD_QUEUE::presets[7][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 1604 && variable_id < 1804) {
-        const size_t offset = variable_id - 1604;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[8][offset], sizeof(BUILD_QUEUE::presets[8][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 1804 && variable_id < 2004) {
-        const size_t offset = variable_id - 1804;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[9][offset], sizeof(BUILD_QUEUE::presets[9][offset]) };
-        variable->target_count = 1;
-        return true;
-    }
-    if (variable_id >= 2004 && variable_id < 2204) {
-        const size_t offset = variable_id - 2004;
-        variable->type = &generated_type_2;
-        variable->targets[0] = { (void*)&BUILD_QUEUE::presets[10][offset], sizeof(BUILD_QUEUE::presets[10][offset]) };
-        variable->target_count = 1;
-        return true;
+    if (variable_id >= 4 && variable_id <= 2203) {
+        const t_variable_id leaf = (variable_id - 4) % 1;
+        switch (leaf) {
+        case 0: {
+            variable->type = &generated_type_2;
+            uint32_t generated_index_4 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 4, &generated_index_4)) return false;
+            uint32_t generated_index_5 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 5, &generated_index_5)) return false;
+            variable->targets[0] = { (void*)&BUILD_QUEUE::presets[generated_index_4][generated_index_5], sizeof(BUILD_QUEUE::presets[generated_index_4][generated_index_5]) };
+            variable->target_count = 1;
+            return true;
+        }
+        default: return false;
+        }
     }
     if (variable_id >= 2210 && variable_id <= 2249) {
         const t_variable_id leaf = (variable_id - 2210) % 5;
         switch (leaf) {
         case 0: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_14 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 14, &generated_index_14)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].type, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].type) };
+            uint32_t generated_index_15 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 15, &generated_index_15)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].type, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].type) };
             variable->target_count = 1;
             return true;
         }
         case 1: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_14 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 14, &generated_index_14)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].firing_arc, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].firing_arc) };
+            uint32_t generated_index_15 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 15, &generated_index_15)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].firing_arc, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 2: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_14 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 14, &generated_index_14)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].specials, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].specials) };
+            uint32_t generated_index_15 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 15, &generated_index_15)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].specials, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].specials) };
             variable->target_count = 1;
             return true;
         }
         case 3: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_14 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 14, &generated_index_14)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].ammo, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].ammo) };
+            uint32_t generated_index_15 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 15, &generated_index_15)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].ammo, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 4: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_14 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 14, &generated_index_14)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].count, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].current_count, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_14].current_count) };
+            uint32_t generated_index_15 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 15, &generated_index_15)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].count, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].current_count, sizeof(SHIP_CONFIG::guardian_template.ship_weapon[generated_index_15].current_count) };
             variable->target_count = 2;
             return true;
         }
@@ -4453,42 +4393,42 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
         switch (leaf) {
         case 0: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_29 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 29, &generated_index_29)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].type, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].type) };
+            uint32_t generated_index_30 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 30, &generated_index_30)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].type, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].type) };
             variable->target_count = 1;
             return true;
         }
         case 1: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_29 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 29, &generated_index_29)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].firing_arc, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].firing_arc) };
+            uint32_t generated_index_30 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 30, &generated_index_30)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].firing_arc, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 2: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_29 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 29, &generated_index_29)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].specials, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].specials) };
+            uint32_t generated_index_30 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 30, &generated_index_30)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].specials, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].specials) };
             variable->target_count = 1;
             return true;
         }
         case 3: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_29 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 29, &generated_index_29)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].ammo, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].ammo) };
+            uint32_t generated_index_30 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 30, &generated_index_30)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].ammo, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 4: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_29 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 29, &generated_index_29)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].count, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].current_count, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_29].current_count) };
+            uint32_t generated_index_30 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 30, &generated_index_30)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].count, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].current_count, sizeof(SHIP_CONFIG::avenger_template.ship_weapon[generated_index_30].current_count) };
             variable->target_count = 2;
             return true;
         }
@@ -4500,465 +4440,465 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
         switch (leaf) {
         case 0: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].picture_num, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].picture_num) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].picture_num, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].picture_num) };
             variable->target_count = 1;
             return true;
         }
         case 1: {
             variable->type = &generated_type_4;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].size, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].size) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].size, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].size) };
             variable->target_count = 1;
             return true;
         }
         case 2: {
             variable->type = &generated_type_5;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ftl_type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ftl_type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ftl_type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ftl_type) };
             variable->target_count = 1;
             return true;
         }
         case 3: {
             variable->type = &generated_type_6;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].armor_type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].armor_type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].armor_type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].armor_type) };
             variable->target_count = 1;
             return true;
         }
         case 4: {
             variable->type = &generated_type_7;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].shield_type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].shield_type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].shield_type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].shield_type) };
             variable->target_count = 1;
             return true;
         }
         case 5: {
             variable->type = &generated_type_8;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].computer_type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].computer_type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].computer_type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].computer_type) };
             variable->target_count = 1;
             return true;
         }
         case 6: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type) };
             variable->target_count = 1;
             return true;
         }
         case 7: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 8: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials) };
             variable->target_count = 1;
             return true;
         }
         case 9: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 10: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 11: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type) };
             variable->target_count = 1;
             return true;
         }
         case 12: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 13: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials) };
             variable->target_count = 1;
             return true;
         }
         case 14: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 15: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 16: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type) };
             variable->target_count = 1;
             return true;
         }
         case 17: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 18: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials) };
             variable->target_count = 1;
             return true;
         }
         case 19: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 20: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 21: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type) };
             variable->target_count = 1;
             return true;
         }
         case 22: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 23: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials) };
             variable->target_count = 1;
             return true;
         }
         case 24: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 25: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 26: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type) };
             variable->target_count = 1;
             return true;
         }
         case 27: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 28: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials) };
             variable->target_count = 1;
             return true;
         }
         case 29: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 30: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 31: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type) };
             variable->target_count = 1;
             return true;
         }
         case 32: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 33: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials) };
             variable->target_count = 1;
             return true;
         }
         case 34: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 35: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 36: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type) };
             variable->target_count = 1;
             return true;
         }
         case 37: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 38: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials) };
             variable->target_count = 1;
             return true;
         }
         case 39: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 40: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 41: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].type) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].type) };
             variable->target_count = 1;
             return true;
         }
         case 42: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].firing_arc) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 43: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].specials) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].specials) };
             variable->target_count = 1;
             return true;
         }
         case 44: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].ammo) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 45: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            uint32_t generated_index_45 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 45, &generated_index_45)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].ship_weapon[generated_index_45].current_count) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            uint32_t generated_index_46 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 46, &generated_index_46)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].ship_weapon[generated_index_46].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 46: {
             variable->type = &generated_type_13;
-            uint32_t generated_index_37 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 37, &generated_index_37)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_37].special_device_flags, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_37].special_device_flags) };
+            uint32_t generated_index_38 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 38, &generated_index_38)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::amoeba_templates[generated_index_38].special_device_flags, sizeof(SHIP_CONFIG::amoeba_templates[generated_index_38].special_device_flags) };
             variable->target_count = 1;
             return true;
         }
@@ -4970,465 +4910,465 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
         switch (leaf) {
         case 0: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].picture_num, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].picture_num) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].picture_num, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].picture_num) };
             variable->target_count = 1;
             return true;
         }
         case 1: {
             variable->type = &generated_type_4;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].size, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].size) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].size, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].size) };
             variable->target_count = 1;
             return true;
         }
         case 2: {
             variable->type = &generated_type_5;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ftl_type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ftl_type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ftl_type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ftl_type) };
             variable->target_count = 1;
             return true;
         }
         case 3: {
             variable->type = &generated_type_6;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].armor_type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].armor_type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].armor_type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].armor_type) };
             variable->target_count = 1;
             return true;
         }
         case 4: {
             variable->type = &generated_type_7;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].shield_type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].shield_type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].shield_type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].shield_type) };
             variable->target_count = 1;
             return true;
         }
         case 5: {
             variable->type = &generated_type_8;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].computer_type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].computer_type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].computer_type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].computer_type) };
             variable->target_count = 1;
             return true;
         }
         case 6: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type) };
             variable->target_count = 1;
             return true;
         }
         case 7: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 8: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials) };
             variable->target_count = 1;
             return true;
         }
         case 9: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 10: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 11: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type) };
             variable->target_count = 1;
             return true;
         }
         case 12: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 13: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials) };
             variable->target_count = 1;
             return true;
         }
         case 14: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 15: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 16: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type) };
             variable->target_count = 1;
             return true;
         }
         case 17: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 18: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials) };
             variable->target_count = 1;
             return true;
         }
         case 19: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 20: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 21: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type) };
             variable->target_count = 1;
             return true;
         }
         case 22: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 23: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials) };
             variable->target_count = 1;
             return true;
         }
         case 24: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 25: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 26: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type) };
             variable->target_count = 1;
             return true;
         }
         case 27: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 28: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials) };
             variable->target_count = 1;
             return true;
         }
         case 29: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 30: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 31: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type) };
             variable->target_count = 1;
             return true;
         }
         case 32: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 33: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials) };
             variable->target_count = 1;
             return true;
         }
         case 34: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 35: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 36: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type) };
             variable->target_count = 1;
             return true;
         }
         case 37: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 38: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials) };
             variable->target_count = 1;
             return true;
         }
         case 39: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 40: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 41: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].type) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].type) };
             variable->target_count = 1;
             return true;
         }
         case 42: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].firing_arc) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 43: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].specials) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].specials) };
             variable->target_count = 1;
             return true;
         }
         case 44: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].ammo) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 45: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            uint32_t generated_index_61 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 61, &generated_index_61)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].ship_weapon[generated_index_61].current_count) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            uint32_t generated_index_62 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 62, &generated_index_62)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].ship_weapon[generated_index_62].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 46: {
             variable->type = &generated_type_13;
-            uint32_t generated_index_53 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 53, &generated_index_53)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_53].special_device_flags, sizeof(SHIP_CONFIG::crystal_templates[generated_index_53].special_device_flags) };
+            uint32_t generated_index_54 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 54, &generated_index_54)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::crystal_templates[generated_index_54].special_device_flags, sizeof(SHIP_CONFIG::crystal_templates[generated_index_54].special_device_flags) };
             variable->target_count = 1;
             return true;
         }
@@ -5440,465 +5380,465 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
         switch (leaf) {
         case 0: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].picture_num, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].picture_num) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].picture_num, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].picture_num) };
             variable->target_count = 1;
             return true;
         }
         case 1: {
             variable->type = &generated_type_4;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].size, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].size) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].size, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].size) };
             variable->target_count = 1;
             return true;
         }
         case 2: {
             variable->type = &generated_type_5;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ftl_type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ftl_type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ftl_type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ftl_type) };
             variable->target_count = 1;
             return true;
         }
         case 3: {
             variable->type = &generated_type_6;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].armor_type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].armor_type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].armor_type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].armor_type) };
             variable->target_count = 1;
             return true;
         }
         case 4: {
             variable->type = &generated_type_7;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].shield_type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].shield_type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].shield_type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].shield_type) };
             variable->target_count = 1;
             return true;
         }
         case 5: {
             variable->type = &generated_type_8;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].computer_type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].computer_type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].computer_type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].computer_type) };
             variable->target_count = 1;
             return true;
         }
         case 6: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type) };
             variable->target_count = 1;
             return true;
         }
         case 7: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 8: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials) };
             variable->target_count = 1;
             return true;
         }
         case 9: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 10: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 11: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type) };
             variable->target_count = 1;
             return true;
         }
         case 12: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 13: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials) };
             variable->target_count = 1;
             return true;
         }
         case 14: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 15: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 16: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type) };
             variable->target_count = 1;
             return true;
         }
         case 17: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 18: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials) };
             variable->target_count = 1;
             return true;
         }
         case 19: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 20: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 21: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type) };
             variable->target_count = 1;
             return true;
         }
         case 22: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 23: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials) };
             variable->target_count = 1;
             return true;
         }
         case 24: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 25: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 26: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type) };
             variable->target_count = 1;
             return true;
         }
         case 27: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 28: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials) };
             variable->target_count = 1;
             return true;
         }
         case 29: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 30: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 31: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type) };
             variable->target_count = 1;
             return true;
         }
         case 32: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 33: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials) };
             variable->target_count = 1;
             return true;
         }
         case 34: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 35: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 36: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type) };
             variable->target_count = 1;
             return true;
         }
         case 37: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 38: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials) };
             variable->target_count = 1;
             return true;
         }
         case 39: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 40: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 41: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].type) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].type) };
             variable->target_count = 1;
             return true;
         }
         case 42: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].firing_arc) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 43: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].specials) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].specials) };
             variable->target_count = 1;
             return true;
         }
         case 44: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].ammo) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 45: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            uint32_t generated_index_77 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 77, &generated_index_77)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].ship_weapon[generated_index_77].current_count) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            uint32_t generated_index_78 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 78, &generated_index_78)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].ship_weapon[generated_index_78].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 46: {
             variable->type = &generated_type_13;
-            uint32_t generated_index_69 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 69, &generated_index_69)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_69].special_device_flags, sizeof(SHIP_CONFIG::dragon_templates[generated_index_69].special_device_flags) };
+            uint32_t generated_index_70 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 70, &generated_index_70)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::dragon_templates[generated_index_70].special_device_flags, sizeof(SHIP_CONFIG::dragon_templates[generated_index_70].special_device_flags) };
             variable->target_count = 1;
             return true;
         }
@@ -5910,465 +5850,465 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
         switch (leaf) {
         case 0: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].picture_num, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].picture_num) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].picture_num, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].picture_num) };
             variable->target_count = 1;
             return true;
         }
         case 1: {
             variable->type = &generated_type_4;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].size, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].size) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].size, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].size) };
             variable->target_count = 1;
             return true;
         }
         case 2: {
             variable->type = &generated_type_5;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ftl_type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ftl_type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ftl_type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ftl_type) };
             variable->target_count = 1;
             return true;
         }
         case 3: {
             variable->type = &generated_type_6;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].armor_type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].armor_type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].armor_type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].armor_type) };
             variable->target_count = 1;
             return true;
         }
         case 4: {
             variable->type = &generated_type_7;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].shield_type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].shield_type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].shield_type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].shield_type) };
             variable->target_count = 1;
             return true;
         }
         case 5: {
             variable->type = &generated_type_8;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].computer_type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].computer_type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].computer_type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].computer_type) };
             variable->target_count = 1;
             return true;
         }
         case 6: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type) };
             variable->target_count = 1;
             return true;
         }
         case 7: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 8: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials) };
             variable->target_count = 1;
             return true;
         }
         case 9: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 10: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 11: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type) };
             variable->target_count = 1;
             return true;
         }
         case 12: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 13: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials) };
             variable->target_count = 1;
             return true;
         }
         case 14: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 15: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 16: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type) };
             variable->target_count = 1;
             return true;
         }
         case 17: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 18: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials) };
             variable->target_count = 1;
             return true;
         }
         case 19: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 20: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 21: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type) };
             variable->target_count = 1;
             return true;
         }
         case 22: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 23: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials) };
             variable->target_count = 1;
             return true;
         }
         case 24: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 25: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 26: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type) };
             variable->target_count = 1;
             return true;
         }
         case 27: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 28: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials) };
             variable->target_count = 1;
             return true;
         }
         case 29: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 30: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 31: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type) };
             variable->target_count = 1;
             return true;
         }
         case 32: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 33: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials) };
             variable->target_count = 1;
             return true;
         }
         case 34: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 35: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 36: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type) };
             variable->target_count = 1;
             return true;
         }
         case 37: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 38: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials) };
             variable->target_count = 1;
             return true;
         }
         case 39: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 40: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 41: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].type) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].type) };
             variable->target_count = 1;
             return true;
         }
         case 42: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].firing_arc) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 43: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].specials) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].specials) };
             variable->target_count = 1;
             return true;
         }
         case 44: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].ammo) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 45: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            uint32_t generated_index_93 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 93, &generated_index_93)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].ship_weapon[generated_index_93].current_count) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            uint32_t generated_index_94 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 94, &generated_index_94)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].ship_weapon[generated_index_94].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 46: {
             variable->type = &generated_type_13;
-            uint32_t generated_index_85 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 85, &generated_index_85)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_85].special_device_flags, sizeof(SHIP_CONFIG::eel_templates[generated_index_85].special_device_flags) };
+            uint32_t generated_index_86 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 86, &generated_index_86)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::eel_templates[generated_index_86].special_device_flags, sizeof(SHIP_CONFIG::eel_templates[generated_index_86].special_device_flags) };
             variable->target_count = 1;
             return true;
         }
@@ -6380,465 +6320,465 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
         switch (leaf) {
         case 0: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].picture_num, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].picture_num) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].picture_num, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].picture_num) };
             variable->target_count = 1;
             return true;
         }
         case 1: {
             variable->type = &generated_type_4;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].size, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].size) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].size, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].size) };
             variable->target_count = 1;
             return true;
         }
         case 2: {
             variable->type = &generated_type_5;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ftl_type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ftl_type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ftl_type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ftl_type) };
             variable->target_count = 1;
             return true;
         }
         case 3: {
             variable->type = &generated_type_6;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].armor_type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].armor_type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].armor_type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].armor_type) };
             variable->target_count = 1;
             return true;
         }
         case 4: {
             variable->type = &generated_type_7;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].shield_type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].shield_type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].shield_type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].shield_type) };
             variable->target_count = 1;
             return true;
         }
         case 5: {
             variable->type = &generated_type_8;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].computer_type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].computer_type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].computer_type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].computer_type) };
             variable->target_count = 1;
             return true;
         }
         case 6: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type) };
             variable->target_count = 1;
             return true;
         }
         case 7: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 8: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials) };
             variable->target_count = 1;
             return true;
         }
         case 9: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 10: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 11: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type) };
             variable->target_count = 1;
             return true;
         }
         case 12: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 13: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials) };
             variable->target_count = 1;
             return true;
         }
         case 14: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 15: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 16: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type) };
             variable->target_count = 1;
             return true;
         }
         case 17: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 18: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials) };
             variable->target_count = 1;
             return true;
         }
         case 19: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 20: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 21: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type) };
             variable->target_count = 1;
             return true;
         }
         case 22: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 23: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials) };
             variable->target_count = 1;
             return true;
         }
         case 24: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 25: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 26: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type) };
             variable->target_count = 1;
             return true;
         }
         case 27: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 28: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials) };
             variable->target_count = 1;
             return true;
         }
         case 29: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 30: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 31: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type) };
             variable->target_count = 1;
             return true;
         }
         case 32: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 33: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials) };
             variable->target_count = 1;
             return true;
         }
         case 34: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 35: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 36: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type) };
             variable->target_count = 1;
             return true;
         }
         case 37: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 38: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials) };
             variable->target_count = 1;
             return true;
         }
         case 39: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 40: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 41: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].type) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].type) };
             variable->target_count = 1;
             return true;
         }
         case 42: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].firing_arc) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 43: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].specials) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].specials) };
             variable->target_count = 1;
             return true;
         }
         case 44: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].ammo) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 45: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            uint32_t generated_index_109 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 109, &generated_index_109)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].ship_weapon[generated_index_109].current_count) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            uint32_t generated_index_110 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 110, &generated_index_110)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].ship_weapon[generated_index_110].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 46: {
             variable->type = &generated_type_13;
-            uint32_t generated_index_101 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 101, &generated_index_101)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_101].special_device_flags, sizeof(SHIP_CONFIG::hydra_templates[generated_index_101].special_device_flags) };
+            uint32_t generated_index_102 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 102, &generated_index_102)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::hydra_templates[generated_index_102].special_device_flags, sizeof(SHIP_CONFIG::hydra_templates[generated_index_102].special_device_flags) };
             variable->target_count = 1;
             return true;
         }
@@ -6850,559 +6790,559 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
         switch (leaf) {
         case 0: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].picture_num, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].picture_num) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].picture_num, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].picture_num) };
             variable->target_count = 1;
             return true;
         }
         case 1: {
             variable->type = &generated_type_4;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].size, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].size) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].size, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].size) };
             variable->target_count = 1;
             return true;
         }
         case 2: {
             variable->type = &generated_type_5;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ftl_type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ftl_type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ftl_type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ftl_type) };
             variable->target_count = 1;
             return true;
         }
         case 3: {
             variable->type = &generated_type_6;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].armor_type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].armor_type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].armor_type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].armor_type) };
             variable->target_count = 1;
             return true;
         }
         case 4: {
             variable->type = &generated_type_7;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].shield_type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].shield_type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].shield_type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].shield_type) };
             variable->target_count = 1;
             return true;
         }
         case 5: {
             variable->type = &generated_type_8;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].computer_type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].computer_type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].computer_type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].computer_type) };
             variable->target_count = 1;
             return true;
         }
         case 6: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type) };
             variable->target_count = 1;
             return true;
         }
         case 7: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 8: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials) };
             variable->target_count = 1;
             return true;
         }
         case 9: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 10: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 11: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type) };
             variable->target_count = 1;
             return true;
         }
         case 12: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 13: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials) };
             variable->target_count = 1;
             return true;
         }
         case 14: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 15: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 16: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type) };
             variable->target_count = 1;
             return true;
         }
         case 17: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 18: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials) };
             variable->target_count = 1;
             return true;
         }
         case 19: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 20: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 21: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type) };
             variable->target_count = 1;
             return true;
         }
         case 22: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 23: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials) };
             variable->target_count = 1;
             return true;
         }
         case 24: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 25: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 26: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type) };
             variable->target_count = 1;
             return true;
         }
         case 27: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 28: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials) };
             variable->target_count = 1;
             return true;
         }
         case 29: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 30: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 31: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type) };
             variable->target_count = 1;
             return true;
         }
         case 32: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 33: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials) };
             variable->target_count = 1;
             return true;
         }
         case 34: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 35: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 36: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type) };
             variable->target_count = 1;
             return true;
         }
         case 37: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 38: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials) };
             variable->target_count = 1;
             return true;
         }
         case 39: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 40: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 41: {
             variable->type = &generated_type_9;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].type) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].type) };
             variable->target_count = 1;
             return true;
         }
         case 42: {
             variable->type = &generated_type_10;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].firing_arc) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].firing_arc) };
             variable->target_count = 1;
             return true;
         }
         case 43: {
             variable->type = &generated_type_11;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].specials) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].specials) };
             variable->target_count = 1;
             return true;
         }
         case 44: {
             variable->type = &generated_type_3;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].ammo) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].ammo) };
             variable->target_count = 1;
             return true;
         }
         case 45: {
             variable->type = &generated_type_12;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            uint32_t generated_index_126 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 126, &generated_index_126)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].count) };
-            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].ship_weapon[generated_index_126].current_count) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            uint32_t generated_index_127 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 127, &generated_index_127)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].count) };
+            variable->targets[1] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].ship_weapon[generated_index_127].current_count) };
             variable->target_count = 2;
             return true;
         }
         case 46: {
             variable->type = &generated_type_13;
-            uint32_t generated_index_117 = 0;
-            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 117, &generated_index_117)) return false;
             uint32_t generated_index_118 = 0;
             if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 118, &generated_index_118)) return false;
-            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].special_device_flags, sizeof(SHIP_CONFIG::antaran_templates[generated_index_117][generated_index_118].special_device_flags) };
+            uint32_t generated_index_119 = 0;
+            if (!Get_Array_Element_Offset(Get_Runtime_Schema(), variable_id, 119, &generated_index_119)) return false;
+            variable->targets[0] = { (void*)&SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].special_device_flags, sizeof(SHIP_CONFIG::antaran_templates[generated_index_118][generated_index_119].special_device_flags) };
             variable->target_count = 1;
             return true;
         }

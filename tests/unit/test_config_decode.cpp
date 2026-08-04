@@ -265,17 +265,15 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     std::string queue_name;
     DOCTEST_REQUIRE(config::Get_Variable_Name(queue_id, &queue_name));
     DOCTEST_CHECK(queue_name == "build_queue.1.199");
-    const config::s_schema_node_descriptor* queue =
+    const config::s_schema_node_descriptor* queue_leaf =
         config::Get_Variable_Node(config::Get_Runtime_Schema(), queue_id);
-    DOCTEST_REQUIRE(queue != nullptr);
+    DOCTEST_REQUIRE(queue_leaf != nullptr);
     config::s_variable_location queue_location = {};
     DOCTEST_REQUIRE(config::Get_Variable_Location(
         config::Get_Runtime_Schema(), queue_id, &queue_location));
-    DOCTEST_CHECK(queue->first_variable + queue_location.variable_offset <= queue_id);
-    DOCTEST_CHECK(queue->last_variable + queue_location.variable_offset >= queue_id);
-    DOCTEST_CHECK(queue->array_index_base == 0);
-    DOCTEST_CHECK(queue->array_element_count == BUILD_QUEUE::INSTRUCTION_CAPACITY);
-    DOCTEST_CHECK(queue->type == config::Get_Variable_Type(queue_id));
+    DOCTEST_CHECK(queue_leaf->kind == config::CONFIG_NODE_SCALAR);
+    DOCTEST_CHECK(queue_leaf->variable_id + queue_location.variable_offset == queue_id);
+    DOCTEST_CHECK(queue_leaf->type == config::Get_Variable_Type(queue_id));
     const config::s_runtime_schema* schema = config::Get_Runtime_Schema();
     const config::s_schema_node_descriptor* build_queue = nullptr;
     for (size_t index = 0; index < schema->node_count; ++index) {
@@ -293,7 +291,10 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
         ++template_count;
         DOCTEST_CHECK(schema->nodes[child].array_element_count ==
                       BUILD_QUEUE::INSTRUCTION_CAPACITY);
-        DOCTEST_CHECK(schema->nodes[child].first_child == config::CONFIG_NO_NODE);
+        DOCTEST_CHECK(schema->nodes[child].array_element_variable_count == 1);
+        DOCTEST_REQUIRE(schema->nodes[child].first_child != config::CONFIG_NO_NODE);
+        DOCTEST_CHECK(schema->nodes[schema->nodes[child].first_child].kind ==
+                      config::CONFIG_NODE_SCALAR);
     }
     DOCTEST_CHECK(build_queue->array_element_count == BUILD_QUEUE::PRESET_COUNT);
     DOCTEST_CHECK(build_queue->array_element_variable_count ==
