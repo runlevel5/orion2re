@@ -1598,9 +1598,8 @@ namespace COLCALC {
 
         results->pop_growth_bonus = static_cast<int16_t>(plr->traits[TRAIT_POP_GROWTH_BONUS]);
 
-        if (plr->traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
-            results->maintenance += static_cast<int16_t>(_climate_maintenance_modifiers[planet->climate]);
-        }
+        results->maintenance =
+            static_cast<int16_t>(_climate_maintenance_modifiers[planet->climate]);
 
         if (planet->gravity_class == PLANET_GRAVITY_LOW_G) {
             if (plr->traits[TRAIT_LOW_G_WORLD] == 0) {
