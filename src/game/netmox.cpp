@@ -848,7 +848,17 @@ namespace NETMOX {
 
         MOX::_NUM_NEBULAS = reader.Read_Uint8_();
 
+        if (MOX::_NUM_NEBULAS > MAX_NEBULAS) {
+            exitm::Exit_With_Message("invalid broadcast nebula count");
+        }
+
         reader.Read_Bytes_(MOX::_nebula, MOX::_NUM_NEBULAS * sizeof(s_nebula));
+
+        for (int16_t i = 0; i < (int16_t)(uint16_t)MOX::_NUM_NEBULAS; ++i) {
+            if (MOX::_nebula[i].type < 0 || MOX::_nebula[i].type >= 12) {
+                exitm::Exit_With_Message("invalid broadcast nebula type");
+            }
+        }
 
         EVENTS::_last_event_year = reader.Read_Uint32_();
 

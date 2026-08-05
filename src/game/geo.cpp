@@ -131,7 +131,7 @@ namespace GEO {
         }
 
         // Access the 4th variant of the nebula animation
-        s_animation_header* anim = MOX::_nebula_pict_seg[nebula_idx][3];
+        s_animation_header* anim = MOX::_nebula_pict_seg[(uint8_t)nebula->type % 12][3];
 
         // Check if the relative coordinates are within the animation frame dimensions
         if (rel_x < (int32_t)anim->width && rel_y < (int32_t)anim->height) {

@@ -85,7 +85,7 @@ namespace allocate {
         MOX::_colony = (s_colony*)Allocate_Space_(MAX_COLONIES * sizeof(s_colony));
         struct_::Clear_Structure_(MOX::_colony, MAX_COLONIES * sizeof(s_colony));
 
-        MOX::_nebula_screen_seg = Allocate_Space_(MAX_NEBULAS * 0x10000);
+        MOX::_nebula_screen_seg = Allocate_Space_(12 * 0x10000);
 
         // Global cache allocation
         MOX::_global_cache_seg = buffer::Allocate_Buffer_Space_(0x174508);

@@ -209,6 +209,9 @@ namespace {
         Fill_Bytes_(state.players, sizeof(state.players), 5);
         Fill_Bytes_(state.ships, sizeof(state.ships), 6);
         Fill_Bytes_(state.nebulas, sizeof(state.nebulas), 7);
+        for (int i = 0; i < MAX_NEBULAS; ++i) {
+            state.nebulas[i].type = static_cast<int8_t>(i % 12);
+        }
         Fill_Bytes_(&MOX::_settings, sizeof(MOX::_settings), 8);
         Fill_Bytes_(&MOX::_antarans, sizeof(MOX::_antarans), 9);
         Fill_Bytes_(MOX::_moveable_box, sizeof(MOX::_moveable_box), 10);
@@ -235,7 +238,7 @@ namespace {
         MOX::_MAP_MAX_X = 311;
         MOX::_MAP_MAX_Y = 177;
         MOX::_fleet_icon_button_count = 421;
-        MOX::_NUM_NEBULAS = 4;
+        MOX::_NUM_NEBULAS = MAX_NEBULAS;
         REPORT::_n_reports = MAX_REPORTS;
         REPORT::_done_player_reports = 0xA5;
         REPORT::_displayed_msgs = 0x5A;
@@ -354,7 +357,7 @@ namespace {
         }
     }
 
-    void Check_Version_1_State_(const State_& expected, const State_& actual) {
+    void Check_Versioned_State_(const State_& expected, const State_& actual) {
         DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies,
                              MOX::_NUM_COLONIES * sizeof(*expected.colonies)) == 0);
         DOCTEST_CHECK(Is_Zero_(&actual.colonies[MOX::_NUM_COLONIES],
@@ -380,8 +383,10 @@ namespace {
     void Check_Legacy_State_Except_Players_(const State_& expected, const State_& actual) {
         s_planet_data expected_planets[MAX_PLANETS] = {};
         s_star_data expected_stars[MAX_STARS] = {};
+        s_nebula expected_nebulas[MAX_NEBULAS] = {};
         Expand_Legacy_Planets_(expected_planets);
         Expand_Legacy_Stars_(expected_stars);
+        Fill_Bytes_(expected_nebulas, sizeof(expected_nebulas), 7);
         DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies,
                              ORIGINAL_MAX_COLONIES * sizeof(*expected.colonies)) == 0);
         DOCTEST_CHECK(Is_Zero_(&actual.colonies[ORIGINAL_MAX_COLONIES],
@@ -401,7 +406,10 @@ namespace {
             DOCTEST_CHECK(Is_Unused_Ship_(actual.ships[i]));
         }
         DOCTEST_CHECK(converted_locations > 0);
-        DOCTEST_CHECK(memcmp(expected.nebulas, actual.nebulas, sizeof(expected.nebulas)) == 0);
+        DOCTEST_CHECK(memcmp(expected_nebulas, actual.nebulas,
+                             ORIGINAL_MAX_NEBULAS * sizeof(*expected_nebulas)) == 0);
+        DOCTEST_CHECK(Is_Zero_(&actual.nebulas[ORIGINAL_MAX_NEBULAS],
+                               (MAX_NEBULAS - ORIGINAL_MAX_NEBULAS) * sizeof(*actual.nebulas)));
     }
 
     void Check_Reports_(const s_report* expected) {
@@ -579,6 +587,16 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     SAVEGAME::Write_Game_(&writer, description, random_seed);
     DOCTEST_CHECK(writer.Length_() < SAVEGAME::BUFFER_CAPACITY);
 
+    uint8_t* short_nebula_save = static_cast<uint8_t*>(malloc(SAVEGAME::BUFFER_CAPACITY));
+    DOCTEST_REQUIRE(short_nebula_save != nullptr);
+    SERIAL::Writer_ short_nebula_writer(short_nebula_save, SAVEGAME::BUFFER_CAPACITY, "test save overflow");
+    MOX::_NUM_NEBULAS = ORIGINAL_MAX_NEBULAS;
+    SAVEGAME::Write_Game_(&short_nebula_writer, description, random_seed);
+    MOX::_NUM_NEBULAS = MAX_NEBULAS;
+    DOCTEST_CHECK(writer.Length_() - short_nebula_writer.Length_() ==
+                  (MAX_NEBULAS - ORIGINAL_MAX_NEBULAS) * sizeof(s_nebula));
+    free(short_nebula_save);
+
     FILE* legacy_file = fopen(SAVEGAME_TEST_DATA_DIR "/savegame_v0.sav", "rb");
     DOCTEST_REQUIRE(legacy_file != nullptr);
     DOCTEST_REQUIRE(fseek(legacy_file, 0, SEEK_END) == 0);
@@ -640,7 +658,7 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
         DOCTEST_CHECK(loaded_seed == random_seed);
         DOCTEST_CHECK(memcmp(&loaded_settings, &expected_settings, sizeof(expected_settings)) == 0);
         if (format == 0) {
-            Check_Version_1_State_(expected, actual);
+            Check_Versioned_State_(expected, actual);
             DOCTEST_CHECK(SETTLER::Get_Source_Colony(actual.players[0].settlers[0].val) == 699);
             DOCTEST_CHECK(SETTLER::Get_Dest_Planet(actual.players[0].settlers[0].val) == 899);
         } else {
@@ -684,7 +702,7 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
         DOCTEST_CHECK(MOX::_MAP_MAX_X == 311);
         DOCTEST_CHECK(MOX::_MAP_MAX_Y == 177);
         DOCTEST_CHECK(MOX::_fleet_icon_button_count == 421);
-        DOCTEST_CHECK(MOX::_NUM_NEBULAS == 4);
+        DOCTEST_CHECK(MOX::_NUM_NEBULAS == (format == 0 ? MAX_NEBULAS : ORIGINAL_MAX_NEBULAS));
         DOCTEST_CHECK(REPORT::_n_reports == MAX_REPORTS);
         DOCTEST_CHECK(REPORT::_done_player_reports == 0xA5);
         DOCTEST_CHECK(REPORT::_displayed_msgs == 0x5A);

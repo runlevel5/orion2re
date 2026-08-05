@@ -1349,8 +1349,8 @@ namespace SAVEGAME {
             writer->Write_Int16_(MOX::_MAP_MAX_X);
             writer->Write_Int16_(MOX::_MAP_MAX_Y);
             writer->Write_Uint16_(MOX::_fleet_icon_button_count);
-            for (int i = 0; i < MAX_NEBULAS; ++i) Write_Nebula_(writer, &MOX::_nebula[i]);
             writer->Write_Uint8_(MOX::_NUM_NEBULAS);
+            for (int i = 0; i < MOX::_NUM_NEBULAS; ++i) Write_Nebula_(writer, &MOX::_nebula[i]);
             Write_Int16_Array_(writer, MOX::_bill_savegame, 6);
             writer->Write_Int16_(REPORT::_n_reports);
             for (int i = 0; i < MAX_REPORTS; ++i) Write_Report_(writer, &REPORT::_reports[i]);
@@ -1422,8 +1422,23 @@ namespace SAVEGAME {
             MOX::_MAP_MAX_X = reader->Read_Int16_();
             MOX::_MAP_MAX_Y = reader->Read_Int16_();
             MOX::_fleet_icon_button_count = reader->Read_Uint16_();
-            for (int i = 0; i < MAX_NEBULAS; ++i) Read_Nebula_(reader, &MOX::_nebula[i]);
-            MOX::_NUM_NEBULAS = reader->Read_Uint8_();
+            if (version == LEGACY_VERSION) {
+                for (int i = 0; i < ORIGINAL_MAX_NEBULAS; ++i) Read_Nebula_(reader, &MOX::_nebula[i]);
+                MOX::_NUM_NEBULAS = reader->Read_Uint8_();
+                if (MOX::_NUM_NEBULAS > ORIGINAL_MAX_NEBULAS) return false;
+            }
+            else {
+                MOX::_NUM_NEBULAS = reader->Read_Uint8_();
+                if (MOX::_NUM_NEBULAS > MAX_NEBULAS) return false;
+                for (int i = 0; i < MOX::_NUM_NEBULAS; ++i) Read_Nebula_(reader, &MOX::_nebula[i]);
+            }
+            memset(&MOX::_nebula[MOX::_NUM_NEBULAS], 0,
+                   (MAX_NEBULAS - MOX::_NUM_NEBULAS) * sizeof(*MOX::_nebula));
+            if (version != LEGACY_VERSION) {
+                for (int i = 0; i < MOX::_NUM_NEBULAS; ++i) {
+                    if (MOX::_nebula[i].type < 0 || MOX::_nebula[i].type >= 12) return false;
+                }
+            }
             Read_Int16_Array_(reader, MOX::_bill_savegame, 6);
             REPORT::_n_reports = reader->Read_Int16_();
             for (int i = 0; i < MAX_REPORTS; ++i) Read_Report_(reader, &REPORT::_reports[i], version);

@@ -947,7 +947,7 @@ namespace MAINSCR {
 
         for (uint16_t i = 0; i < static_cast<uint16_t>(MOX::_NUM_NEBULAS); ++i) {
             int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
-            s_animation_header* sprite_ptr = MOX::_nebula_pict_seg[i][zoom_level];
+            s_animation_header* sprite_ptr = MOX::_nebula_pict_seg[(uint8_t)nebula_list[i].type % 12][zoom_level];
 
             animate::Get_Width_(sprite_ptr);
             animate::Get_Height_(sprite_ptr);

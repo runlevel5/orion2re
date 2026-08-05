@@ -21,7 +21,7 @@ namespace MAPGEN {
     uint32_t _n_planets;
     int16_t _t_roll;
     uint32_t _satellite_stat[6];
-    uint32_t _nebula_stat[5];
+    uint32_t _nebula_stat[MAX_NEBULAS + 1];
     int16_t _star_count;
     s_planet_data* _pl;
     const char s_raceopt_lbx[12] = "raceopt.lbx";
@@ -848,6 +848,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 #if MAX_STARS > ORIGINAL_MAX_STARS
         case GALAXY_SIZE_MAXIMUM:
             MOX::_NUM_NEBULAS = (uint8_t)(game_random::Random_(3) + 1);
+            MOX::_NUM_NEBULAS = (uint8_t)std::min<int32_t>(
+                MAX_NEBULAS,
+                ((int32_t)MOX::_NUM_NEBULAS * MOX::_NUM_STARS + ORIGINAL_MAX_STARS * 2 - 1) /
+                    (ORIGINAL_MAX_STARS * 2));
             break;
 #endif
         default:
@@ -858,7 +862,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
     void __cdecl Generate_Nebulas_() {
         int16_t widths[12];
         int16_t heights[12];
-        uint8_t nebula_types[4];
+        uint8_t nebula_types[MAX_NEBULAS];
         int16_t min_dist_param = 0x14;
         int16_t attempts = 0;
         const int32_t point_buffer_value_count = 30000 * 2;
@@ -886,6 +890,64 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 nebula_types[i] = (uint8_t)((int16_t)game_random::Random_(12) - 1);
                 RUSS::Mox_Update_();
             }
+        }
+
+        if (MOX::_NUM_STARS > ORIGINAL_MAX_STARS) {
+            int16_t scaled_map_max_x = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_X);
+            int16_t scaled_map_max_y = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_Y);
+            int16_t nebula_width = HAROLD::Get_Scaled_Value_(0xA5);
+            int16_t nebula_height = HAROLD::Get_Scaled_Value_(0x82);
+            int16_t min_x = 10;
+            int16_t min_y = 10;
+            int16_t max_x = scaled_map_max_x - nebula_width;
+            int16_t max_y = scaled_map_max_y - nebula_height;
+            int16_t placed_x[MAX_NEBULAS];
+            int16_t placed_y[MAX_NEBULAS];
+            int32_t initial_dx = nebula_width + 40;
+            int32_t initial_dy = nebula_height + 40;
+            int32_t initial_min_dist_sq = initial_dx * initial_dx + initial_dy * initial_dy;
+
+            for (int16_t i = 0; i < (int16_t)(uint16_t)MOX::_NUM_NEBULAS; ++i) {
+                bool placed = false;
+                int32_t min_dist_sq = initial_min_dist_sq;
+
+                for (int16_t relaxation = 0; relaxation < 8 && !placed; ++relaxation) {
+                    for (int16_t attempt = 0; attempt < 500 && !placed; ++attempt) {
+                        int16_t x = (int16_t)(game_random::Random_(max_x - min_x + 1) + min_x - 1);
+                        int16_t y = (int16_t)(game_random::Random_(max_y - min_y + 1) + min_y - 1);
+                        bool too_close = false;
+
+                        for (int16_t j = 0; j < i; ++j) {
+                            if (HOMEGEN::Dist_Between_Points_(x, y, placed_x[j], placed_y[j]) < min_dist_sq) {
+                                too_close = true;
+                                break;
+                            }
+                        }
+
+                        if (!too_close) {
+                            placed_x[i] = x;
+                            placed_y[i] = y;
+                            placed = true;
+                        }
+                    }
+
+                    min_dist_sq = min_dist_sq * 3 / 4;
+                }
+
+                if (!placed) {
+                    placed_x[i] = (int16_t)(game_random::Random_(max_x - min_x + 1) + min_x - 1);
+                    placed_y[i] = (int16_t)(game_random::Random_(max_y - min_y + 1) + min_y - 1);
+                }
+
+                MOX::_nebula[i].type = (int8_t)nebula_types[i];
+                MOX::_nebula[i].x = (int16_t)HAROLD::Get_Up_Scaled_Value_(placed_x[i]);
+                MOX::_nebula[i].y = (int16_t)HAROLD::Get_Up_Scaled_Value_(placed_y[i]);
+            }
+
+            RUSS::Mox_Update_();
+            allocate::Pop_Block_(MOX::_screen_seg);
+            Load_Nebula_Pictures_();
+            return;
         }
 
         int16_t scaled_x_limit = HAROLD::Get_Scaled_Value_(0xA5);
@@ -1048,37 +1110,24 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
     void __cdecl Load_Nebula_Pictures_() {
         bool first_load = true;
-        uint8_t num_nebulas = MOX::_NUM_NEBULAS;
 
-        if (num_nebulas == 0) {
+        if (MOX::_NUM_NEBULAS == 0) {
             return;
         }
 
-        for (int16_t neb_idx = 0; neb_idx < (int16_t)(uint16_t)num_nebulas; ++neb_idx) {
-            int16_t entry_counter = 0;
-            for (int16_t type_val = 0; type_val < 12; ++type_val) {
-                // Update system twice per inner loop set
+        for (int16_t type_val = 0; type_val < 12; ++type_val) {
+            for (int16_t frame_idx = 0; frame_idx < 4; ++frame_idx) {
                 RUSS::Mox_Update_();
-                for (int16_t frame_idx = 0; frame_idx < 4; ++frame_idx) {
-                    RUSS::Mox_Update_();
+                int entry_num = type_val * 4 + frame_idx + 6;
 
-                    // If the current nebula matches this nebula type index (0-11)
-                    if (MOX::_nebula[neb_idx].type == type_val) {
-                        s_animation_header* loaded_segment;
-                        int entry_num = entry_counter + 6;
-
-                        if (first_load) {
-                            loaded_segment = (s_animation_header*)farload::Far_Reload_("starbg.lbx", entry_num, MOX::_nebula_screen_seg);
-                            first_load = false;
-                        }
-                        else {
-                            loaded_segment = (s_animation_header*)farload::Far_Reload_Next_("starbg.lbx", entry_num, MOX::_nebula_screen_seg);
-                        }
-
-                        // Store the segment for the specific frame of this nebula
-                        MOX::_nebula_pict_seg[neb_idx][frame_idx] = loaded_segment;
-                    }
-                    entry_counter++;
+                if (first_load) {
+                    MOX::_nebula_pict_seg[type_val][frame_idx] =
+                        (s_animation_header*)farload::Far_Reload_("starbg.lbx", entry_num, MOX::_nebula_screen_seg);
+                    first_load = false;
+                }
+                else {
+                    MOX::_nebula_pict_seg[type_val][frame_idx] =
+                        (s_animation_header*)farload::Far_Reload_Next_("starbg.lbx", entry_num, MOX::_nebula_screen_seg);
                 }
             }
         }
