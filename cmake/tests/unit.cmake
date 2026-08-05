@@ -171,6 +171,15 @@ orion2re_add_unit_test(test_build_queue
         tests/fakes/fake_build_queue_runtime.cpp
 )
 
+orion2re_add_unit_test(test_colonize
+    SOURCES
+        tests/unit/test_colonize.cpp
+    PRODUCTION_SOURCES
+        src/game/colonize.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colonize_runtime.cpp
+)
+
 orion2re_add_unit_test(test_map_scale
     SOURCES
         tests/unit/test_map_scale.cpp

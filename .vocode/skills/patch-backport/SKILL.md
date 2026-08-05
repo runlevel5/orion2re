@@ -13,19 +13,27 @@ Use the `grpc` skill for all Ghidra access and follow its read-only and assembly
 
 ## Required inputs
 
-Before analysis, obtain both:
+Before analysis, obtain:
 
-1. Ghidra RPC connection information:
-   - host or base URL
-   - port
-   - bearer token
-2. The specific MOO2 1.50 change to backport:
+1. The specific MOO2 1.50 change to backport:
    - preferably an exact `docs/patches.md` topic name
    - otherwise a description, `asm.pl` line, function, address, or patch name
 
-If either input is missing, ask the user for it before proceeding. If both are missing, ask for both in one concise message. Do not guess a port, token, or desired patch.
+For Orion2, this workflow runs in WSL. Unless the user supplies different Ghidra RPC connection information, use the Windows gateway, port `47633`, and bearer token `None`. Test the default connection with:
+
+```bash
+WIN_HOST=$(ip route show default | awk '{print $3}')
+curl -H "Authorization: Bearer None" http://$WIN_HOST:47633/status
+```
+
+If the specific patch is missing, ask the user for it before proceeding. Do not guess the desired patch. If the default Ghidra connection fails, report the failure and ask the user for alternate host, port, or token information.
 
 Treat connection information already supplied in the conversation as valid input. If only host is omitted, explain that WSL commonly needs the Windows gateway rather than `127.0.0.1`, as documented by the `grpc` skill.
+
+## Environment constraints
+
+- The Orion2 binary open in Ghidra is a slightly different 1.40 version, not the exact executable used as the MOO2 1.50 patch base. It should be very close to that base, but this expected version difference must be recorded rather than treated as exact equivalence.
+- Do not build the project in WSL; WSL builds are too slow. After implementation and static checks, ask the user to build the project in Visual Studio and report the result.
 
 ## Scope
 
@@ -102,12 +110,12 @@ Use the `grpc` skill to:
 
 - call `/status`
 - read `/docs` if helper behavior is unknown
-- confirm the open program is the DOS `orion2.exe` version expected by MOO2 1.50
+- confirm the open program is the DOS `orion2.exe` 1.40 variant expected for this workflow
 - record the program name, image format, language/compiler specification, and image base
 
 Default every Ghidra request to `write=false`.
 
-If the program is missing, differs from the expected executable, or the server cannot be reached, stop and report the exact issue. Do not continue by assuming addresses or bytes.
+The known 1.40-versus-1.50-base version difference is expected and is not by itself a stop condition. If the program is missing, is not the expected Orion2 1.40 variant, or the server cannot be reached, stop and report the exact issue. Do not continue by assuming addresses or bytes.
 
 ### 2. Locate the authoritative patch topic
 
@@ -144,11 +152,11 @@ If `cchunk` contains assembly rather than literal bytes, compare the expected in
 If original bytes or instructions do not match:
 
 - retry the file-offset/address mapping
-- confirm the executable version
+- confirm and account for the expected 1.40-versus-1.50-base executable difference
 - account for relocations only with evidence
 - stop and ask the user if the mismatch remains
 
-Never silently analyze a near match.
+Never silently analyze a near match. Document any version-related differences, and proceed only when the affected sequence and surrounding control flow can still be mapped with evidence sufficient to reconstruct the same behavior.
 
 ### 4. Reconstruct the complete semantic change
 
@@ -217,8 +225,9 @@ After approval:
 - retain existing project style and abstractions
 - avoid unrelated cleanup
 - add the approved regression tests
-- run the narrowest relevant tests first
-- run formatting or broader tests when appropriate
+- run formatting and static checks that do not build the project
+- do not run builds or compiled tests in WSL
+- ask the user to build and run relevant tests in Visual Studio, and request the result
 
 If implementation requires a material departure from the approved diffs, stop and obtain approval for the revised proposal before continuing.
 
@@ -247,14 +256,15 @@ If the topic is absent from `docs/patches.md`, do not invent a duplicate topic a
 Before finishing:
 
 - run `git diff --check`
-- run relevant tests/builds
+- run applicable non-build static checks and formatting in WSL
+- ask the user to run the relevant build and tests in Visual Studio; do not build in WSL
 - verify the catalog entry describes the implemented fix accurately
 - confirm no unrelated files changed
 
 Report:
 
 - the restored semantic fix
-- tests and build commands run
+- static checks run and the Visual Studio build/test result, or clearly state that user validation is pending
 - catalog status update
 - any unresolved uncertainty or follow-up topic
 
@@ -265,6 +275,7 @@ Do not show a final diff after applying; summarize the result concisely.
 Stop and request user input when:
 
 - Ghidra connection information is missing
+- the default WSL-to-Windows Ghidra connection fails and no alternate connection information is available
 - the desired 1.50 topic is missing or ambiguous
 - Ghidra has the wrong or no program open
 - original bytes/instructions do not match `asm.pl`
@@ -277,9 +288,9 @@ Do not weaken a stop condition merely to make progress.
 
 ## Completion checklist
 
-- [ ] Ghidra host/base URL, port, and bearer token obtained.
+- [ ] Default WSL Ghidra connection verified, or alternate host/base URL, port, and bearer token obtained.
 - [ ] Specific 1.50 topic selected.
-- [ ] Open Ghidra program and executable version confirmed.
+- [ ] Open Ghidra program confirmed as the expected Orion2 1.40 variant and the difference from the 1.50 patch base recorded.
 - [ ] Every patch block in the topic inventoried.
 - [ ] Original locations and bytes/instructions verified.
 - [ ] Patched behavior reconstructed, including C implementation refinements.
@@ -288,5 +299,5 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Plan and focused suggested diffs shown before modification.
 - [ ] Explicit user approval received.
 - [ ] Approved source and tests implemented.
-- [ ] Relevant tests/builds and `git diff --check` passed.
+- [ ] WSL static checks and `git diff --check` passed; Visual Studio build and test results requested from the user.
 - [ ] Matching `docs/patches.md` item completed with a short semantic descriptor.

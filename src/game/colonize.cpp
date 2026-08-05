@@ -81,12 +81,15 @@ namespace COLONIZE {
                         s_star_data* star = &MOX::_star[star_idx];
                         if (star->colonize_player == MAX_PLAYERS) {
                             star->colonize_player = ship->owner;
+                        }
+
+                        if (star->colonize_player == ship->owner) {
                             if (ship->d.ship_type == SHIP_TYPE_OUTPOST) {
                                 outpost_bits[star_idx] |= (1 << (ship->owner & 0x1F));
                             } else {
                                 colony_bits[star_idx] |= (1 << (ship->owner & 0x1F));
                             }
-                        } else if (star->colonize_player != ship->owner) {
+                        } else {
                             star->colonize_player = -1; // Conflict
                         }
                     }
