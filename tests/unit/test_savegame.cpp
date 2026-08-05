@@ -49,6 +49,39 @@ namespace {
         return memcmp(&ship, &expected, sizeof(ship)) == 0;
     }
 
+    bool Is_Unused_Colony_(const s_colony& colony) {
+        s_colony expected = {};
+        expected.owner = -1;
+        expected.allocated_to = -1;
+        expected.planet = -1;
+        expected.officer = -1;
+        return memcmp(&colony, &expected, sizeof(colony)) == 0;
+    }
+
+    bool Is_Unused_Planet_(const s_planet_data& planet) {
+        s_planet_data expected = {};
+        expected.colony_index = -1;
+        expected.star_index = -1;
+        return memcmp(&planet, &expected, sizeof(planet)) == 0;
+    }
+
+    bool Is_Unused_Star_(const s_star_data& star) {
+        s_star_data expected = {};
+        expected.owner = -1;
+        expected.colonize_player = -1;
+        expected.wormhole_star_id = -1;
+        expected.next_wfi_in_list = -1;
+        memset(expected.officer_index, 0xFF, sizeof(expected.officer_index));
+        for (int16_t& planet_index : expected.planet_index) {
+            planet_index = -1;
+        }
+        for (int16_t& relocation : expected.relocate_ship_to) {
+            relocation = -1;
+        }
+        memset(expected.surrender_to, 0xFF, sizeof(expected.surrender_to));
+        return memcmp(&star, &expected, sizeof(star)) == 0;
+    }
+
     void Fill_Messages_() {
         memset(MSG_::_msgs, 0, sizeof(MSG_::_msgs));
         for (int i = 0; i < MAX_MESSAGES; ++i) {
@@ -360,16 +393,19 @@ namespace {
     void Check_Versioned_State_(const State_& expected, const State_& actual) {
         DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies,
                              MOX::_NUM_COLONIES * sizeof(*expected.colonies)) == 0);
-        DOCTEST_CHECK(Is_Zero_(&actual.colonies[MOX::_NUM_COLONIES],
-                               (MAX_COLONIES - MOX::_NUM_COLONIES) * sizeof(*actual.colonies)));
+        for (int i = MOX::_NUM_COLONIES; i < MAX_COLONIES; ++i) {
+            DOCTEST_CHECK(Is_Unused_Colony_(actual.colonies[i]));
+        }
         DOCTEST_CHECK(memcmp(expected.planets, actual.planets,
                              MOX::_planet_count * sizeof(*expected.planets)) == 0);
-        DOCTEST_CHECK(Is_Zero_(&actual.planets[MOX::_planet_count],
-                               (MAX_PLANETS - MOX::_planet_count) * sizeof(*actual.planets)));
+        for (int i = MOX::_planet_count; i < MAX_PLANETS; ++i) {
+            DOCTEST_CHECK(Is_Unused_Planet_(actual.planets[i]));
+        }
         DOCTEST_CHECK(memcmp(expected.stars, actual.stars,
                              MOX::_NUM_STARS * sizeof(*expected.stars)) == 0);
-        DOCTEST_CHECK(Is_Zero_(&actual.stars[MOX::_NUM_STARS],
-                               (MAX_STARS - MOX::_NUM_STARS) * sizeof(*actual.stars)));
+        for (int i = MOX::_NUM_STARS; i < MAX_STARS; ++i) {
+            DOCTEST_CHECK(Is_Unused_Star_(actual.stars[i]));
+        }
         DOCTEST_CHECK(memcmp(expected.leaders, actual.leaders, sizeof(expected.leaders)) == 0);
         DOCTEST_CHECK(memcmp(expected.players, actual.players, sizeof(expected.players)) == 0);
         DOCTEST_CHECK(memcmp(expected.ships, actual.ships,
@@ -389,10 +425,19 @@ namespace {
         Fill_Bytes_(expected_nebulas, sizeof(expected_nebulas), 7);
         DOCTEST_CHECK(memcmp(expected.colonies, actual.colonies,
                              ORIGINAL_MAX_COLONIES * sizeof(*expected.colonies)) == 0);
-        DOCTEST_CHECK(Is_Zero_(&actual.colonies[ORIGINAL_MAX_COLONIES],
-                               (MAX_COLONIES - ORIGINAL_MAX_COLONIES) * sizeof(*actual.colonies)));
-        DOCTEST_CHECK(memcmp(expected_planets, actual.planets, sizeof(expected_planets)) == 0);
-        DOCTEST_CHECK(memcmp(expected_stars, actual.stars, sizeof(expected_stars)) == 0);
+        for (int i = ORIGINAL_MAX_COLONIES; i < MAX_COLONIES; ++i) {
+            DOCTEST_CHECK(Is_Unused_Colony_(actual.colonies[i]));
+        }
+        DOCTEST_CHECK(memcmp(expected_planets, actual.planets,
+                             ORIGINAL_MAX_PLANETS * sizeof(*expected_planets)) == 0);
+        for (int i = ORIGINAL_MAX_PLANETS; i < MAX_PLANETS; ++i) {
+            DOCTEST_CHECK(Is_Unused_Planet_(actual.planets[i]));
+        }
+        DOCTEST_CHECK(memcmp(expected_stars, actual.stars,
+                             ORIGINAL_MAX_STARS * sizeof(*expected_stars)) == 0);
+        for (int i = ORIGINAL_MAX_STARS; i < MAX_STARS; ++i) {
+            DOCTEST_CHECK(Is_Unused_Star_(actual.stars[i]));
+        }
         DOCTEST_CHECK(memcmp(expected.leaders, actual.leaders, sizeof(expected.leaders)) == 0);
         int converted_locations = 0;
         for (int i = 0; i < ORIGINAL_MAX_SHIPS; ++i) {
@@ -584,7 +629,14 @@ DOCTEST_TEST_CASE("latest and version 0 save streams restore the complete persis
     SERIAL::Writer_ writer(versioned, SAVEGAME::BUFFER_CAPACITY, "test save overflow");
     char description[37] = "Exhaustive save state";
     constexpr uint32_t random_seed = 0xCAFEBABE;
+    memset(&expected.colonies[699], 0, sizeof(expected.colonies[699]));
+    expected.colonies[699].allocated_to = 5;
     SAVEGAME::Write_Game_(&writer, description, random_seed);
+    memset(&expected.colonies[699], 0, sizeof(expected.colonies[699]));
+    expected.colonies[699].owner = -1;
+    expected.colonies[699].allocated_to = -1;
+    expected.colonies[699].planet = -1;
+    expected.colonies[699].officer = -1;
     DOCTEST_CHECK(writer.Length_() < SAVEGAME::BUFFER_CAPACITY);
 
     uint8_t* short_nebula_save = static_cast<uint8_t*>(malloc(SAVEGAME::BUFFER_CAPACITY));

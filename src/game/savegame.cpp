@@ -18,6 +18,43 @@ namespace SAVEGAME {
         static_assert(MAX_SHIPS >= ORIGINAL_MAX_SHIPS, "ship capacity cannot load version 0 saves");
         static_assert(offsetof(s_settings, version) == 0xE2, "settings version offset mismatch");
 
+        void Initialize_Unused_Colony_(s_colony* colony) {
+            memset(colony, 0, sizeof(*colony));
+            colony->owner = -1;
+            colony->allocated_to = -1;
+            colony->planet = -1;
+            colony->officer = -1;
+        }
+
+        bool Is_Zeroed_Colony_Slot_(const s_colony& colony) {
+            s_colony zeroed = colony;
+            zeroed.allocated_to = 0;
+            const s_colony empty = {};
+            return memcmp(&zeroed, &empty, sizeof(zeroed)) == 0;
+        }
+
+        void Initialize_Unused_Planet_(s_planet_data* planet) {
+            memset(planet, 0, sizeof(*planet));
+            planet->colony_index = -1;
+            planet->star_index = -1;
+        }
+
+        void Initialize_Unused_Star_(s_star_data* star) {
+            memset(star, 0, sizeof(*star));
+            star->owner = -1;
+            star->colonize_player = -1;
+            star->wormhole_star_id = -1;
+            star->next_wfi_in_list = -1;
+            memset(star->officer_index, 0xFF, sizeof(star->officer_index));
+            for (int16_t& planet_index : star->planet_index) {
+                planet_index = -1;
+            }
+            for (int16_t& relocation : star->relocate_ship_to) {
+                relocation = -1;
+            }
+            memset(star->surrender_to, 0xFF, sizeof(star->surrender_to));
+        }
+
         void Write_Zeroes_(SERIAL::Writer_* writer, size_t size) {
             while (size != 0) {
                 size_t chunk = size < sizeof(ZEROES) ? size : sizeof(ZEROES);
@@ -264,6 +301,7 @@ namespace SAVEGAME {
         }
 
         void Read_Colony_(SERIAL::Reader_* reader, s_colony* colony) {
+            memset(colony, 0, sizeof(*colony));
             colony->owner = reader->Read_Int8_();
             colony->allocated_to = reader->Read_Int8_();
             colony->planet = reader->Read_Int16_();
@@ -1384,21 +1422,29 @@ namespace SAVEGAME {
             MOX::_NUM_COLONIES = reader->Read_Int16_();
             if (MOX::_NUM_COLONIES < 0 || MOX::_NUM_COLONIES > MAX_COLONIES) return false;
             const int colony_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_COLONIES : MOX::_NUM_COLONIES;
-            for (int i = 0; i < colony_record_count; ++i) Read_Colony_(reader, &MOX::_colony[i]);
-            memset(&MOX::_colony[colony_record_count], 0,
-                   (MAX_COLONIES - colony_record_count) * sizeof(*MOX::_colony));
+            for (int i = 0; i < colony_record_count; ++i) {
+                Read_Colony_(reader, &MOX::_colony[i]);
+                if (Is_Zeroed_Colony_Slot_(MOX::_colony[i])) {
+                    Initialize_Unused_Colony_(&MOX::_colony[i]);
+                }
+            }
+            for (int i = colony_record_count; i < MAX_COLONIES; ++i) {
+                Initialize_Unused_Colony_(&MOX::_colony[i]);
+            }
             MOX::_planet_count = reader->Read_Int16_();
             if (MOX::_planet_count < 0 || MOX::_planet_count > MAX_PLANETS) return false;
             const int planet_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_PLANETS : MOX::_planet_count;
             for (int i = 0; i < planet_record_count; ++i) Read_Planet_(reader, &MOX::_planet[i], version);
-            memset(&MOX::_planet[planet_record_count], 0,
-                   (MAX_PLANETS - planet_record_count) * sizeof(*MOX::_planet));
+            for (int i = planet_record_count; i < MAX_PLANETS; ++i) {
+                Initialize_Unused_Planet_(&MOX::_planet[i]);
+            }
             MOX::_NUM_STARS = reader->Read_Int16_();
             if (MOX::_NUM_STARS < 0 || MOX::_NUM_STARS > MAX_STARS) return false;
             const int star_record_count = version == LEGACY_VERSION ? ORIGINAL_MAX_STARS : MOX::_NUM_STARS;
             for (int i = 0; i < star_record_count; ++i) Read_Star_(reader, &MOX::_star[i], version);
-            memset(&MOX::_star[star_record_count], 0,
-                   (MAX_STARS - star_record_count) * sizeof(*MOX::_star));
+            for (int i = star_record_count; i < MAX_STARS; ++i) {
+                Initialize_Unused_Star_(&MOX::_star[i]);
+            }
             for (int i = 0; i < MAX_LEADERS; ++i) Read_Leader_(reader, &MOX::_leaders[i]);
             MOX::_NUM_PLAYERS = reader->Read_Int16_();
             for (int i = 0; i < MAX_PLAYERS; ++i) Read_Player_(reader, &MOX::_player[i], version);
