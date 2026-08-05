@@ -130,10 +130,6 @@ namespace CMBTMIS {
         char hit_flag = 0;
         int16_t dx, dy;
 
-        if (TECHDATA::_weapons[type].type == WEAPON_TYPE_FIGHTER && missile->is_anti_missile_rocket == 0) {
-            target_x += MOX::_missile_hit_radius[MOX::_combat_data[missile->target_unit_idx].size_class] / 2;
-        }
-
         if (missile->x == target_x && missile->y == target_y) {
             return 1;
         }

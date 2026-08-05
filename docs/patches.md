@@ -83,7 +83,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:511` - `artifacts click bonus`: fixed in `COLCALC::Colony_Job_Production_()` by keeping the artifacts value in the research breakdown without adding it again to production; this replaces the 1.50 NOP of the duplicate accumulator instruction with the equivalent source-level accounting rule.
 - [x] `asm.pl:520` - `ship cost exchange aka feudal bug`: fixed in `DESIGN::Cost_Of_Design_()` by evaluating the complete design-cost pipeline under the design owner's player context and restoring the current player afterward; this directly expresses the 1.50 save/set/call/restore wrapper in source for all three affected call paths.
 - [x] `asm.pl:539` - `planet +10 offense bonus bug`: fixed in `COMBINIT::Deploy_Ships_()` by restoring the tactical planet's synthetic size class to Doom Star after its temporary sort sentinel is removed, instead of changing it to Huge and introducing an unintended +10 offensive combat bonus; this directly expresses the default behavior of the 1.50 size-class hook in source.
-- [ ] `asm.pl:837` - `fighters point blank bug`
+- [x] `asm.pl:837` - `fighters point blank bug`: fixed in `CMBTMIS::Move_Missile_()` by moving fighters toward the unshifted target coordinates, eliminating the positive-X bias that delayed point-blank strikes only when approaching left-to-right; this directly expresses the 1.50 unconditional skip of the target-radius adjustment.
 - [ ] `asm.pl:846` - `combat repair`
 - [ ] `asm.pl:913` - `combat raid`
 - [ ] `asm.pl:978` - `fighters use pd`
