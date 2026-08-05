@@ -81,7 +81,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:397` - `plasma torpedo`: fixed in `CMBTMIS::Move_Missile_()` and `CMBTMIS::Resolve_Missile_()` by preserving the signed initiative-launch counter and including completed flight turns in plasma torpedo dissipation.
 - [x] `asm.pl:475` - `outpost ship prohibits colonizing bug`: fixed in `COLONIZE::Find_Colonize_Players_()` by recording every same-owner colony and outpost ship in its corresponding per-star eligibility mask; this replaces the 1.50 register-preserving back-edge with a direct source-level invariant.
 - [x] `asm.pl:511` - `artifacts click bonus`: fixed in `COLCALC::Colony_Job_Production_()` by keeping the artifacts value in the research breakdown without adding it again to production; this replaces the 1.50 NOP of the duplicate accumulator instruction with the equivalent source-level accounting rule.
-- [ ] `asm.pl:520` - `ship cost exchange aka feudal bug`
+- [x] `asm.pl:520` - `ship cost exchange aka feudal bug`: fixed in `DESIGN::Cost_Of_Design_()` by evaluating the complete design-cost pipeline under the design owner's player context and restoring the current player afterward; this directly expresses the 1.50 save/set/call/restore wrapper in source for all three affected call paths.
 - [ ] `asm.pl:539` - `planet +10 offense bonus bug`
 - [ ] `asm.pl:837` - `fighters point blank bug`
 - [ ] `asm.pl:846` - `combat repair`

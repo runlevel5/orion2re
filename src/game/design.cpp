@@ -98,6 +98,10 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Cost_Of_Design_(int16_t player_idx, s_ship_design* ship_design) {
+        // TODO: Pass player_idx through the design-cost helpers instead of relying on a global.
+        int16_t previous_player_idx = MOX::_PLAYER_NUM;
+        MOX::_PLAYER_NUM = player_idx;
+
         s_current_design current_design;
 
         struct_::Clear_Structure_(&current_design, sizeof(current_design));
@@ -146,7 +150,9 @@ namespace DESIGN {
         current_design.base_combat_speed = Current_Design_Combat_Speed_(MOX::_design);
         Update_Calculated_Design_Data_(player_idx);
 
-        return static_cast<int16_t>(current_design.total_cost);
+        int16_t cost = static_cast<int16_t>(current_design.total_cost);
+        MOX::_PLAYER_NUM = previous_player_idx;
+        return cost;
     }
 
     uint8_t __cdecl Current_Design_Size_(int16_t player_idx, int16_t design_idx) {
