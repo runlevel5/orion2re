@@ -78,7 +78,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 ### Backport audit
 
 - [x] `asm.pl:307` - `artemis strategic combat fix`: fixed in `COMBAT::Strategic_Combat_()` by keeping the loaded attacker-slot count separate from the live post-Artemis survivor count when deriving defenders; this replaces the 1.50 save/restore and ghost-balance assembly workaround with direct source-level accounting.
-- [ ] `asm.pl:397` - `plasma torpedo`
+- [x] `asm.pl:397` - `plasma torpedo`: fixed in `CMBTMIS::Move_Missile_()` and `CMBTMIS::Resolve_Missile_()` by preserving the signed initiative-launch counter and including completed flight turns in plasma torpedo dissipation.
 - [ ] `asm.pl:475` - `outpost ship prohibits colonizing bug`
 - [ ] `asm.pl:511` - `artifacts click bonus`
 - [ ] `asm.pl:520` - `ship cost exchange aka feudal bug`

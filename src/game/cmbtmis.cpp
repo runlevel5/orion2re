@@ -190,7 +190,7 @@ namespace CMBTMIS {
             (missile->specials & WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION) == 0) {
             int16_t owner = Missile_Owner_(missile_idx);
             int16_t speed = Missile_Speed_(type, missile->specials, owner);
-            int16_t adj_val = speed * ((uint8_t)missile->fighter_count + 1) * 20 - missile->travel_dist;
+            int16_t adj_val = speed * (missile->fighter_count + 1) * 20 - missile->travel_dist;
 
             owner = Missile_Owner_(missile_idx);
             int16_t bonus = MOX::_ordnance_bonus[owner];
@@ -407,7 +407,7 @@ namespace CMBTMIS {
                 int16_t degrad = 0;
                 if (type == WEAPON_PLASMA_TORPEDO) {
                     int16_t speed = Missile_Speed_(type, specials, Missile_Owner_(missile_idx));
-                    degrad = (speed - 1) * 20 - missile->travel_dist;
+                    degrad = speed * (missile->fighter_count + 1) * 20 - missile->travel_dist - 20;
                     if (degrad < 0) degrad = 0;
                     degrad = (degrad / -20) * 5;
                 } else {
