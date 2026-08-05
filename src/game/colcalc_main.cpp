@@ -878,7 +878,7 @@ namespace COLCALC {
                     final.difficulty_bonus += diff_bonus;
                 }
 
-                cur_stat.final_prod = cur_stat.artifacts_bonus + cur_stat.officer_bonus + cur_stat.pollution_penalty +
+                cur_stat.final_prod = cur_stat.officer_bonus + cur_stat.pollution_penalty +
                     cur_stat.difficulty_bonus + cur_stat.morale_bonus + cur_stat.govt_bonus +
                     cur_stat.gravity_penalty + cur_stat.blockaded_penalty +
                     cur_stat.conquered_penalty + scaled_base;

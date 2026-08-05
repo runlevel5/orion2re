@@ -80,7 +80,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:307` - `artemis strategic combat fix`: fixed in `COMBAT::Strategic_Combat_()` by keeping the loaded attacker-slot count separate from the live post-Artemis survivor count when deriving defenders; this replaces the 1.50 save/restore and ghost-balance assembly workaround with direct source-level accounting.
 - [x] `asm.pl:397` - `plasma torpedo`: fixed in `CMBTMIS::Move_Missile_()` and `CMBTMIS::Resolve_Missile_()` by preserving the signed initiative-launch counter and including completed flight turns in plasma torpedo dissipation.
 - [x] `asm.pl:475` - `outpost ship prohibits colonizing bug`: fixed in `COLONIZE::Find_Colonize_Players_()` by recording every same-owner colony and outpost ship in its corresponding per-star eligibility mask; this replaces the 1.50 register-preserving back-edge with a direct source-level invariant.
-- [ ] `asm.pl:511` - `artifacts click bonus`
+- [x] `asm.pl:511` - `artifacts click bonus`: fixed in `COLCALC::Colony_Job_Production_()` by keeping the artifacts value in the research breakdown without adding it again to production; this replaces the 1.50 NOP of the duplicate accumulator instruction with the equivalent source-level accounting rule.
 - [ ] `asm.pl:520` - `ship cost exchange aka feudal bug`
 - [ ] `asm.pl:539` - `planet +10 offense bonus bug`
 - [ ] `asm.pl:837` - `fighters point blank bug`
