@@ -87,7 +87,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:846` - `combat repair`: fixed in `CMBTFIR2::Repair_Combat_Ship_()` and `CMBTFIR2::Clear_Internal_Space_()` by keeping usable weapon counts synchronized with repaired weapon hit pools and restoring shield capacity when the shield generator is repaired; this replaces the 1.50 call-site wrappers with direct source-level repair invariants.
 - [x] `asm.pl:913` - `combat raid`: fixed in `CMBTFIR2::Total_Internal_Space_()` and `CMBTFIR2::Select_Raid_Internal_()` by counting an engine with exactly one hit point as one unit of current internal space and using the patched 101-point weighting so the last eligible subsystem retains a nonzero raid weight; this directly expresses the three 1.50 binary fixes in source.
 - [x] `asm.pl:978` - `fighters use pd`: implemented in `CMBTFIRE::Fire_Fighter_Beam_()` by applying the point-defense accuracy bonus and rounded half-damage bounds when `combat fighters_use_point_defense` is enabled; the setting remains disabled by default, matching classic and 1.50 defaults, while replacing the binary helper hook with direct source logic.
-- [ ] `asm.pl:1023` - `EM desync + calc correction`
+- [x] `asm.pl:1023` - `EM desync + calc correction`: fixed in `NEXTTURN::Next_Turn_Calc_()` by recalculating colony economy before applying player and colony changes and deferring evolutionary upgrades until after battle resolution; this replaces the 1.50 binary call-sequence rewrite with a direct source-level ordering invariant.
 - [ ] `asm.pl:1137` - `raid and capture`
 - [ ] `asm.pl:1263` - `mutation unclickable picks`
 - [ ] `asm.pl:1281` - `tolerant races maintenance bug`

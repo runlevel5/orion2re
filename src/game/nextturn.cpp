@@ -99,7 +99,6 @@ void __cdecl Next_Turn_Calc_() {
         antarans::Antaran_Invasion_Check_();
     }
 
-    aitech::Apply_Evolutionary_Upgrades_();
     AIDATA::Compute_AI_Data_();
     DIP_SCRN::Resolve_Delayed_Diplomacy_Orders_();
     DIP_SCRN::Set_Opportunity_Attacks_();
@@ -117,15 +116,16 @@ void __cdecl Next_Turn_Calc_() {
     TRADE::Process_Trade_And_Research_Agreements_();
     SHIPMOVE::Move_All_Ships_Toward_Stars_();
     spy::Resolve_Spies_();
+    COLCALC::All_Colony_Calculations_();
     COLCALC::Apply_All_Colony_Changes_();
     COLCALC::Do_Surrenders_();
     AIDATA::Deallocate_AI_Data_();
     COMBFIND::Search_For_Battles_();
+    aitech::Apply_Evolutionary_Upgrades_();
     EVENTS::Determine_Event_();
     ERICNET::Do_All_Ships_XP_Check_();
     EVENTS::Event_Twiddle_();
     lostship::Lose_Out_Of_Range_Ships_();
-    COLCALC::All_Colony_Calculations_();
     COLCALC::Apply_All_Player_Changes_();
     COLCALC::Compute_Blockades_();
     SETTLER::Move_Settlers_();
