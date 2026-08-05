@@ -2063,7 +2063,7 @@ void __cdecl Deploy_Ships_() {
 
     qsort(MOX::_combat_data, MOX::_combat_total_ship_count, sizeof(*MOX::_combat_data), qsort_combat_data_by_size_);
 
-    MOX::_combat_data[0].size_class = SHIP_SIZE_HUGE;
+    MOX::_combat_data[0].size_class = SHIP_SIZE_DOOM_STAR;
 
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
