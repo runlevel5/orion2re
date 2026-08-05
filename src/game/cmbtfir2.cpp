@@ -911,7 +911,8 @@ namespace CMBTFIR2 {
     int16_t __cdecl Total_Internal_Space_(int16_t ship_idx) {
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-        int16_t total = (ship->drive_current_hits / 2) + ship->computer_current_hits;
+        int16_t engine_space = ship->drive_current_hits == 1 ? 1 : ship->drive_current_hits / 2;
+        int16_t total = engine_space + ship->computer_current_hits;
 
         for (int i = 0; i < 8; ++i) {
             total += ship->weapon_hits[i];
@@ -939,7 +940,7 @@ namespace CMBTFIR2 {
 
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-        weights[0] = ship->drive_current_hits / 2;
+        weights[0] = ship->drive_current_hits == 1 ? 1 : ship->drive_current_hits / 2;
         weights[1] = ship->computer_current_hits;
 
         for (int i = 0; i < 8; ++i) {
@@ -954,8 +955,8 @@ namespace CMBTFIR2 {
 
         for (int i = 0; i < 19; ++i) {
             if (weights[i] != 0) {
-                // Calculate weight based on integrity percentage (100 - damage percentage)
-                weights[i] = 100 - ((int32_t)weights[i] * 100 / total_space);
+                // The extra point keeps a fully intact final subsystem eligible for a raid.
+                weights[i] = 101 - ((int32_t)weights[i] * 100 / total_space);
             }
         }
 
