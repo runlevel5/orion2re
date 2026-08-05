@@ -1812,9 +1812,6 @@ namespace COMBAT1 {
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, SPECIAL_DAMPER_FIELD) != 0) {
                         marines_sent = marines_sent / 3;
                     }
-                    if (marines_sent <= 0) {
-                        result = 0;
-                    }
                 }
 
                 if (MOX::_net_flag != 0 && (result == 1 || result == 2)) {
