@@ -89,7 +89,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:978` - `fighters use pd`: implemented in `CMBTFIRE::Fire_Fighter_Beam_()` by applying the point-defense accuracy bonus and rounded half-damage bounds when `combat fighters_use_point_defense` is enabled; the setting remains disabled by default, matching classic and 1.50 defaults, while replacing the binary helper hook with direct source logic.
 - [x] `asm.pl:1023` - `EM desync + calc correction`: fixed in `NEXTTURN::Next_Turn_Calc_()` by recalculating colony economy before applying player and colony changes and deferring evolutionary upgrades until after battle resolution; this replaces the 1.50 binary call-sequence rewrite with a direct source-level ordering invariant.
 - [x] `asm.pl:1137` - `raid and capture`: fixed in `COMBAT1::Initiate_Boarding_Action_()` by preserving the selected raid or capture action when Damper Field attrition leaves zero surviving marines, allowing the committed attempt to resolve normally; this replaces the 1.50 instruction suppression with a direct source-level invariant while retaining the classic one-third survival ratio.
-- [ ] `asm.pl:1263` - `mutation unclickable picks`
+- [x] `asm.pl:1263` - `mutation unclickable picks`: fixed in `raceopt::Add_Race_Options_Fields_EM_()` by subtracting the current trait group's baseline cost when checking whether an evolutionary upgrade fits the pick budget; this replaces the 1.50 byte-level index correction with the equivalent direct source-level lookup.
 - [ ] `asm.pl:1281` - `tolerant races maintenance bug`
 - [ ] `asm.pl:1290` - `telepath skill level is 1 too low bug`
 - [ ] `asm.pl:1306` - `ordinary assasin skill works`

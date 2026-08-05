@@ -1034,7 +1034,7 @@ namespace raceopt {
                 int16_t cost = 0;
 
                 if (baseline_flags[group_idx + 1] != 0) {
-                    cost = _ability_costs[baseline_flags[group_idx] + group_idx * 3 - 1];
+                    cost = _ability_costs[baseline_flags[group_idx + 1] + group_idx * 3 - 1];
                 }
 
                 int8_t ability_cost = _ability_costs[group_idx * 3 + sub_idx];
