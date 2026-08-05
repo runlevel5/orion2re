@@ -969,5 +969,19 @@
       bind_root: { header: "game/build_queue.h", symbol: "BUILD_QUEUE::autobuild_settings" },
       default: { enabled: false, default: 0 },
     },
+
+    fighters_use_point_defense: {
+      title: "Fighters use point-defense beams",
+      description: "Applies point-defense accuracy and damage modifiers to fighter beam weapons.",
+      examples: ["combat fighters_use_point_defense = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_fighters_use_point_defense",
+      },
+      default: false,
+    },
   },
 }

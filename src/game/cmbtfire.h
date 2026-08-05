@@ -7,6 +7,8 @@
 #define COMBAT_PLANET_DEFENSE_FIGHTER_GARRISON 0x8
 
 namespace CMBTFIRE {
+    inline uint8_t _fighters_use_point_defense = 0;
+
     /** Applies the supplied weapon damage to the defending planet or colony. */
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t weapon_flags);
 

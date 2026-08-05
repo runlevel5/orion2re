@@ -462,11 +462,18 @@ namespace CMBTFIRE {
             chance_to_hit = ocv - dcv;
         }
 
-        // Preserves the original unreachable bit test on specials, which appears to be a legacy bug.
-        if (specials & 0x4) {
+        if (_fighters_use_point_defense != 0) {
             chance_to_hit += 25;
-            weapon_damage = (weapon_damage + 1) / 2;
+
             weapon_min_damage = (weapon_min_damage + 1) / 2;
+            if (weapon_min_damage < 1) {
+                weapon_min_damage = 1;
+            }
+
+            weapon_damage = (weapon_damage + 1) / 2;
+            if (weapon_damage < weapon_min_damage) {
+                weapon_damage = weapon_min_damage;
+            }
         }
 
         int16_t damage_diff = weapon_damage - weapon_min_damage;

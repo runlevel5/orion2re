@@ -8,6 +8,7 @@
 #include "config/config_decode.h"
 #include "config/config_runtime.h"
 #include "doctest/doctest.h"
+#include "game/cmbtfire.h"
 #include "game/ship_config.h"
 
 namespace {
@@ -111,6 +112,21 @@ DOCTEST_TEST_CASE("experimental autobuild settings bind and validate queue defau
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
         "experiment autobuild default = 11;", &writes, &diagnostic));
+}
+
+DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat fighters_use_point_defense = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
 }
 
 DOCTEST_TEST_CASE("shorter build queue assignments replace execution through an earlier end") {

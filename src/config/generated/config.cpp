@@ -2,6 +2,7 @@
 #include "config/config_runtime.h"
 #include <cstring>
 #include "game/build_queue.h"
+#include "game/cmbtfire.h"
 #include "game/mox.h"
 #include "game/ship_config.h"
 
@@ -331,7 +332,7 @@ static const uint8_t generated_array_defaults_8[] = { 2, 15, 0 };
 static const uint8_t generated_array_defaults_9[] = { 12, 0 };
 static const uint8_t generated_array_defaults_10[] = { 9, 0 };
 
-const size_t variable_count = 3945;
+const size_t variable_count = 3946;
 
 static_assert(CONFIG_MAX_VARIABLE_TARGETS >= 2);
 
@@ -2850,6 +2851,8 @@ const s_schema_node_descriptor schema_nodes[] = {
     { "autobuild", CONFIG_NODE_RECORD, 135, 0, 3943, 3944, CONFIG_NO_VARIABLE, false, 0, 137, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
     { "enabled", CONFIG_NODE_SCALAR, 136, 0, 3943, 3943, 3943, false, 0, CONFIG_NO_NODE, 138, &generated_type_0, 0, 0, 0 },
     { "default", CONFIG_NODE_SCALAR, 136, 0, 3944, 3944, 3944, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_14, 0, 0, 0 },
+    { "combat", CONFIG_NODE_NAMESPACE, CONFIG_NO_NODE, 0, 3945, 3945, CONFIG_NO_VARIABLE, false, 0, 140, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "fighters_use_point_defense", CONFIG_NODE_SCALAR, 139, 0, 3945, 3945, 3945, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_0, 0, 0, 0 },
 };
 
 const size_t schema_node_count = sizeof(schema_nodes) / sizeof(schema_nodes[0]);
@@ -4333,6 +4336,11 @@ bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
         *value = {};
         value->type = CONFIG_VALUE_UINT8;
         value->integer_value = 0;
+        return true;
+    case 3945:
+        *value = {};
+        value->type = CONFIG_VALUE_BOOL;
+        value->bool_value = false;
         return true;
     default: return false;
     }
@@ -7464,6 +7472,11 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
     case 3944:
         variable->type = &generated_type_14;
         variable->targets[0] = { (void*)&BUILD_QUEUE::autobuild_settings.default_preset, sizeof(BUILD_QUEUE::autobuild_settings.default_preset) };
+        variable->target_count = 1;
+        return true;
+    case 3945:
+        variable->type = &generated_type_0;
+        variable->targets[0] = { (void*)&CMBTFIRE::_fighters_use_point_defense, sizeof(CMBTFIRE::_fighters_use_point_defense) };
         variable->target_count = 1;
         return true;
     default: return false;
