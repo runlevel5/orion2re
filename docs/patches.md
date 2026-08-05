@@ -84,7 +84,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:520` - `ship cost exchange aka feudal bug`: fixed in `DESIGN::Cost_Of_Design_()` by evaluating the complete design-cost pipeline under the design owner's player context and restoring the current player afterward; this directly expresses the 1.50 save/set/call/restore wrapper in source for all three affected call paths.
 - [x] `asm.pl:539` - `planet +10 offense bonus bug`: fixed in `COMBINIT::Deploy_Ships_()` by restoring the tactical planet's synthetic size class to Doom Star after its temporary sort sentinel is removed, instead of changing it to Huge and introducing an unintended +10 offensive combat bonus; this directly expresses the default behavior of the 1.50 size-class hook in source.
 - [x] `asm.pl:837` - `fighters point blank bug`: fixed in `CMBTMIS::Move_Missile_()` by moving fighters toward the unshifted target coordinates, eliminating the positive-X bias that delayed point-blank strikes only when approaching left-to-right; this directly expresses the 1.50 unconditional skip of the target-radius adjustment.
-- [ ] `asm.pl:846` - `combat repair`
+- [x] `asm.pl:846` - `combat repair`: fixed in `CMBTFIR2::Repair_Combat_Ship_()` and `CMBTFIR2::Clear_Internal_Space_()` by keeping usable weapon counts synchronized with repaired weapon hit pools and restoring shield capacity when the shield generator is repaired; this replaces the 1.50 call-site wrappers with direct source-level repair invariants.
 - [ ] `asm.pl:913` - `combat raid`
 - [ ] `asm.pl:978` - `fighters use pd`
 - [ ] `asm.pl:1023` - `EM desync + calc correction`

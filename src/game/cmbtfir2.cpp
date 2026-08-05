@@ -655,6 +655,9 @@ namespace CMBTFIR2 {
                 int16_t needed = ship->weapon_total_hits[i] - ship->weapon_hits[i];
                 int16_t amt = (pool < (int32_t)needed) ? (int16_t)pool : needed;
                 ship->weapon_hits[i] += amt;
+                ship->weapons[i].count =
+                    (ship->weapon_hits[i] + ship->weapon_hits_per_unit[i] - 1) /
+                    ship->weapon_hits_per_unit[i];
                 pool -= (int32_t)amt;
             }
         }
@@ -663,6 +666,7 @@ namespace CMBTFIR2 {
             int16_t needed = (int16_t)ship->shield_max_hits - ship->shield_current_hits;
             int16_t amt = (pool < (int32_t)needed) ? (int16_t)pool : needed;
             ship->shield_current_hits += amt;
+            ship->shield_arc_max = COMBINIT::Calc_Combat_Shield_Max_(ship_idx);
             pool -= (int32_t)amt;
         }
 
@@ -734,6 +738,13 @@ namespace CMBTFIR2 {
                 sizeof(combat_data->weapon_unit_hits) +
                 sizeof(combat_data->special_device_hits) +
                 sizeof(combat_data->shield_max_hits));
+
+        for (int i = 0; i < 8; ++i) {
+            if (combat_data->weapon_hits_per_unit[i] > 0) {
+                combat_data->weapons[i].count =
+                    combat_data->weapon_hits[i] / combat_data->weapon_hits_per_unit[i];
+            }
+        }
     }
 
     void __cdecl Final_Fire_(int16_t ship_idx, int16_t target_x, int16_t target_y, int16_t missile_idx) {
