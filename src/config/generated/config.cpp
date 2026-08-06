@@ -7,6 +7,7 @@
 #include "game/enhanced_ux.h"
 #include "game/mox.h"
 #include "game/ship_config.h"
+#include "game/shipstak.h"
 
 namespace config {
 
@@ -200,6 +201,12 @@ static const s_symbol_descriptor generated_values_8[] = {
     { "none", 0 },
 };
 
+static const s_symbol_descriptor generated_values_9[] = {
+    { "none", 0 },
+    { "race", 1 },
+    { "race_tech", 2 },
+};
+
 static const s_symbol_descriptor generated_flags_0[] = {
     { "reserved_0", 1 },
     { "hv", 2 },
@@ -321,6 +328,11 @@ static const s_type_descriptor generated_type_11 = { CONFIG_VALUE_INT16, false, 
 static const s_type_descriptor generated_type_12 = { CONFIG_VALUE_INT8, true, false, 0, 0, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 static const s_type_descriptor generated_type_13 = { CONFIG_VALUE_BITMAP, false, false, 0, 0, CONFIG_SCALAR_BITMAP, nullptr, 0, nullptr, 0, generated_bitmap_values_0, 1, generated_bitmap_flags_0, 39, generated_bitmap_known_bits_0, 40, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 static const s_type_descriptor generated_type_14 = { CONFIG_VALUE_UINT8, true, true, 0, 10, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
+static const s_type_descriptor generated_type_15 = { CONFIG_VALUE_UINT16, false, true, 0, 32767, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
+static const s_type_descriptor generated_type_16 = { CONFIG_VALUE_UINT8, false, true, 0, 127, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
+static const s_type_descriptor generated_type_17 = { CONFIG_VALUE_UINT16, false, false, 0, 0, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
+static const s_type_descriptor generated_type_18 = { CONFIG_VALUE_INT16, false, false, 0, 0, CONFIG_SCALAR_PRIMITIVE, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
+static const s_type_descriptor generated_type_19 = { CONFIG_VALUE_UINT8, false, false, 0, 0, CONFIG_SCALAR_ENUM, generated_values_9, 3, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, false, false, 0, false, false, 0, 0, CONFIG_VALUE_INT16 };
 
 static const uint8_t generated_array_defaults_0[] = { 29, 3, 32, 53, 38, 67, 63, 43, 56, 65, 36, 46, 52, 74, 51, 62, 66, 61, 37, 50, 64, 35, 44, 70, 60, 68, 77, 75, 48, 73, 57, 58, 78, 71, 39, 72, 59, 55, 54, 34, 33, 42, 42, 42, 42, 79, 69, 0 };
 static const uint8_t generated_array_defaults_1[] = { 2, 23, 0 };
@@ -334,7 +346,7 @@ static const uint8_t generated_array_defaults_8[] = { 2, 15, 0 };
 static const uint8_t generated_array_defaults_9[] = { 12, 0 };
 static const uint8_t generated_array_defaults_10[] = { 9, 0 };
 
-const size_t variable_count = 3948;
+const size_t variable_count = 3964;
 
 static_assert(CONFIG_MAX_VARIABLE_TARGETS >= 2);
 
@@ -2855,9 +2867,28 @@ const s_schema_node_descriptor schema_nodes[] = {
     { "autobuild", CONFIG_NODE_RECORD, 137, 0, 3944, 3945, CONFIG_NO_VARIABLE, false, 0, 139, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
     { "enabled", CONFIG_NODE_SCALAR, 138, 0, 3944, 3944, 3944, false, 0, CONFIG_NO_NODE, 140, &generated_type_0, 0, 0, 0 },
     { "default", CONFIG_NODE_SCALAR, 138, 0, 3945, 3945, 3945, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_14, 0, 0, 0 },
-    { "combat", CONFIG_NODE_NAMESPACE, CONFIG_NO_NODE, 0, 3946, 3947, CONFIG_NO_VARIABLE, false, 0, 142, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
-    { "board_in_black_hole", CONFIG_NODE_SCALAR, 141, 0, 3946, 3946, 3946, false, 0, CONFIG_NO_NODE, 143, &generated_type_0, 0, 0, 0 },
-    { "fighters_use_point_defense", CONFIG_NODE_SCALAR, 141, 0, 3947, 3947, 3947, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_0, 0, 0, 0 },
+    { "detection", CONFIG_NODE_NAMESPACE, CONFIG_NO_NODE, 0, 3946, 3961, CONFIG_NO_VARIABLE, false, 0, 142, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "scan_bonus", CONFIG_NODE_RECORD, 141, 0, 3946, 3956, CONFIG_NO_VARIABLE, false, 0, 143, 154, nullptr, 0, 0, 0 },
+    { "battle_scanner", CONFIG_NODE_SCALAR, 142, 0, 3946, 3946, 3946, false, 0, CONFIG_NO_NODE, 144, &generated_type_15, 0, 0, 0 },
+    { "scout_lab", CONFIG_NODE_SCALAR, 142, 0, 3947, 3947, 3947, false, 0, CONFIG_NO_NODE, 145, &generated_type_15, 0, 0, 0 },
+    { "star_base", CONFIG_NODE_SCALAR, 142, 0, 3948, 3948, 3948, false, 0, CONFIG_NO_NODE, 146, &generated_type_15, 0, 0, 0 },
+    { "battlestation", CONFIG_NODE_SCALAR, 142, 0, 3949, 3949, 3949, false, 0, CONFIG_NO_NODE, 147, &generated_type_16, 0, 0, 0 },
+    { "star_fortress", CONFIG_NODE_SCALAR, 142, 0, 3950, 3950, 3950, false, 0, CONFIG_NO_NODE, 148, &generated_type_16, 0, 0, 0 },
+    { "no_scanner", CONFIG_NODE_SCALAR, 142, 0, 3951, 3951, 3951, false, 0, CONFIG_NO_NODE, 149, &generated_type_16, 0, 0, 0 },
+    { "tachyon_scanner", CONFIG_NODE_SCALAR, 142, 0, 3952, 3952, 3952, false, 0, CONFIG_NO_NODE, 150, &generated_type_16, 0, 0, 0 },
+    { "neutron_scanner", CONFIG_NODE_SCALAR, 142, 0, 3953, 3953, 3953, false, 0, CONFIG_NO_NODE, 151, &generated_type_16, 0, 0, 0 },
+    { "sensors", CONFIG_NODE_SCALAR, 142, 0, 3954, 3954, 3954, false, 0, CONFIG_NO_NODE, 152, &generated_type_16, 0, 0, 0 },
+    { "planet", CONFIG_NODE_SCALAR, 142, 0, 3955, 3955, 3955, false, 0, CONFIG_NO_NODE, 153, &generated_type_17, 0, 0, 0 },
+    { "fleet", CONFIG_NODE_SCALAR, 142, 0, 3956, 3956, 3956, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_17, 0, 0, 0 },
+    { "stealth_bonus", CONFIG_NODE_RECORD, 141, 0, 3957, 3960, CONFIG_NO_VARIABLE, false, 0, 155, 159, nullptr, 0, 0, 0 },
+    { "stealthy_ships", CONFIG_NODE_SCALAR, 154, 0, 3957, 3957, 3957, false, 0, CONFIG_NO_NODE, 156, &generated_type_18, 0, 0, 0 },
+    { "stealth_field", CONFIG_NODE_SCALAR, 154, 0, 3958, 3958, 3958, false, 0, CONFIG_NO_NODE, 157, &generated_type_18, 0, 0, 0 },
+    { "cloaking_device", CONFIG_NODE_SCALAR, 154, 0, 3959, 3959, 3959, false, 0, CONFIG_NO_NODE, 158, &generated_type_18, 0, 0, 0 },
+    { "phasing_cloak", CONFIG_NODE_SCALAR, 154, 0, 3960, 3960, 3960, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_18, 0, 0, 0 },
+    { "stealth_size_penalty", CONFIG_NODE_SCALAR, 141, 0, 3961, 3961, 3961, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_19, 0, 0, 0 },
+    { "combat", CONFIG_NODE_NAMESPACE, CONFIG_NO_NODE, 0, 3962, 3963, CONFIG_NO_VARIABLE, false, 0, 161, CONFIG_NO_NODE, nullptr, 0, 0, 0 },
+    { "board_in_black_hole", CONFIG_NODE_SCALAR, 160, 0, 3962, 3962, 3962, false, 0, CONFIG_NO_NODE, 162, &generated_type_0, 0, 0, 0 },
+    { "fighters_use_point_defense", CONFIG_NODE_SCALAR, 160, 0, 3963, 3963, 3963, false, 0, CONFIG_NO_NODE, CONFIG_NO_NODE, &generated_type_0, 0, 0, 0 },
 };
 
 const size_t schema_node_count = sizeof(schema_nodes) / sizeof(schema_nodes[0]);
@@ -4349,10 +4380,90 @@ bool Get_Default_Value(t_variable_id variable_id, s_typed_value* value) {
         return true;
     case 3946:
         *value = {};
+        value->type = CONFIG_VALUE_UINT16;
+        value->integer_value = 2;
+        return true;
+    case 3947:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT16;
+        value->integer_value = 0;
+        return true;
+    case 3948:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT16;
+        value->integer_value = 2;
+        return true;
+    case 3949:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT8;
+        value->integer_value = 4;
+        return true;
+    case 3950:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT8;
+        value->integer_value = 6;
+        return true;
+    case 3951:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT8;
+        value->integer_value = 2;
+        return true;
+    case 3952:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT8;
+        value->integer_value = 4;
+        return true;
+    case 3953:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT8;
+        value->integer_value = 6;
+        return true;
+    case 3954:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT8;
+        value->integer_value = 9;
+        return true;
+    case 3955:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT16;
+        value->integer_value = 32000;
+        return true;
+    case 3956:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT16;
+        value->integer_value = 32000;
+        return true;
+    case 3957:
+        *value = {};
+        value->type = CONFIG_VALUE_INT16;
+        value->integer_value = 500;
+        return true;
+    case 3958:
+        *value = {};
+        value->type = CONFIG_VALUE_INT16;
+        value->integer_value = 500;
+        return true;
+    case 3959:
+        *value = {};
+        value->type = CONFIG_VALUE_INT16;
+        value->integer_value = 500;
+        return true;
+    case 3960:
+        *value = {};
+        value->type = CONFIG_VALUE_INT16;
+        value->integer_value = 500;
+        return true;
+    case 3961:
+        *value = {};
+        value->type = CONFIG_VALUE_UINT8;
+        value->integer_value = 2;
+        return true;
+    case 3962:
+        *value = {};
         value->type = CONFIG_VALUE_BOOL;
         value->bool_value = true;
         return true;
-    case 3947:
+    case 3963:
         *value = {};
         value->type = CONFIG_VALUE_BOOL;
         value->bool_value = false;
@@ -7495,11 +7606,91 @@ bool Resolve_Variable(t_variable_id variable_id, s_resolved_variable* variable) 
         variable->target_count = 1;
         return true;
     case 3946:
+        variable->type = &generated_type_15;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.battle_scanner, sizeof(SHIPSTAK::scan_bonus.battle_scanner) };
+        variable->target_count = 1;
+        return true;
+    case 3947:
+        variable->type = &generated_type_15;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.scout_lab, sizeof(SHIPSTAK::scan_bonus.scout_lab) };
+        variable->target_count = 1;
+        return true;
+    case 3948:
+        variable->type = &generated_type_15;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.star_base, sizeof(SHIPSTAK::scan_bonus.star_base) };
+        variable->target_count = 1;
+        return true;
+    case 3949:
+        variable->type = &generated_type_16;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.battlestation, sizeof(SHIPSTAK::scan_bonus.battlestation) };
+        variable->target_count = 1;
+        return true;
+    case 3950:
+        variable->type = &generated_type_16;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.star_fortress, sizeof(SHIPSTAK::scan_bonus.star_fortress) };
+        variable->target_count = 1;
+        return true;
+    case 3951:
+        variable->type = &generated_type_16;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.no_scanner, sizeof(SHIPSTAK::scan_bonus.no_scanner) };
+        variable->target_count = 1;
+        return true;
+    case 3952:
+        variable->type = &generated_type_16;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.tachyon_scanner, sizeof(SHIPSTAK::scan_bonus.tachyon_scanner) };
+        variable->target_count = 1;
+        return true;
+    case 3953:
+        variable->type = &generated_type_16;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.neutron_scanner, sizeof(SHIPSTAK::scan_bonus.neutron_scanner) };
+        variable->target_count = 1;
+        return true;
+    case 3954:
+        variable->type = &generated_type_16;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.sensors, sizeof(SHIPSTAK::scan_bonus.sensors) };
+        variable->target_count = 1;
+        return true;
+    case 3955:
+        variable->type = &generated_type_17;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.planet, sizeof(SHIPSTAK::scan_bonus.planet) };
+        variable->target_count = 1;
+        return true;
+    case 3956:
+        variable->type = &generated_type_17;
+        variable->targets[0] = { (void*)&SHIPSTAK::scan_bonus.fleet, sizeof(SHIPSTAK::scan_bonus.fleet) };
+        variable->target_count = 1;
+        return true;
+    case 3957:
+        variable->type = &generated_type_18;
+        variable->targets[0] = { (void*)&SHIPSTAK::stealth_bonus.stealthy_ships, sizeof(SHIPSTAK::stealth_bonus.stealthy_ships) };
+        variable->target_count = 1;
+        return true;
+    case 3958:
+        variable->type = &generated_type_18;
+        variable->targets[0] = { (void*)&SHIPSTAK::stealth_bonus.stealth_field, sizeof(SHIPSTAK::stealth_bonus.stealth_field) };
+        variable->target_count = 1;
+        return true;
+    case 3959:
+        variable->type = &generated_type_18;
+        variable->targets[0] = { (void*)&SHIPSTAK::stealth_bonus.cloaking_device, sizeof(SHIPSTAK::stealth_bonus.cloaking_device) };
+        variable->target_count = 1;
+        return true;
+    case 3960:
+        variable->type = &generated_type_18;
+        variable->targets[0] = { (void*)&SHIPSTAK::stealth_bonus.phasing_cloak, sizeof(SHIPSTAK::stealth_bonus.phasing_cloak) };
+        variable->target_count = 1;
+        return true;
+    case 3961:
+        variable->type = &generated_type_19;
+        variable->targets[0] = { (void*)&SHIPSTAK::stealth_size_penalty, sizeof(SHIPSTAK::stealth_size_penalty) };
+        variable->target_count = 1;
+        return true;
+    case 3962:
         variable->type = &generated_type_0;
         variable->targets[0] = { (void*)&BOARDING::_board_in_black_hole, sizeof(BOARDING::_board_in_black_hole) };
         variable->target_count = 1;
         return true;
-    case 3947:
+    case 3963:
         variable->type = &generated_type_0;
         variable->targets[0] = { (void*)&CMBTFIRE::_fighters_use_point_defense, sizeof(CMBTFIRE::_fighters_use_point_defense) };
         variable->target_count = 1;

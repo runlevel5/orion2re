@@ -99,7 +99,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1492` - `tech field desync`: fixed in `NETMOX::Send_Pick_Target_Info_()`, `NETMOX::Decode_Pick_Target_Info_()`, `NETMOX::Send_You_Are_Target_Info_()`, and `NETMOX::Decode_You_Are_Target_Info_()` by synchronizing technology-field state together with technology applications before tactical combat; this expresses the 1.50 expanded player-data copy range through named source fields.
 - [x] `asm.pl:1548` - `clip fighter damage`: fixed in `CMBTFIRE::Fire_Fighter_Beam_()` by capping weighted fighter-beam rolls at the adjusted weapon maximum; this replaces the 1.50 configurable call-site wrapper with a direct source-level damage invariant.
 - [x] `asm.pl:1577` - `bombardment hits fix`: fixed in `CMBTFIRE::Apply_Damage_To_Planet_()` by processing accumulated defense and colony damage when it exactly reaches the relevant hit-point threshold; this directly expresses the two 1.50 conditional-branch corrections in source.
-- [ ] `asm.pl:1654` - `stealth`
+- [x] `asm.pl:1654` - `stealth`: implemented in `SHIPSTAK::Remove_Non_Detected_Ships_()` with configurable scanner, base, and stealth bonuses plus the `none`/`race`/`race_tech` traveling-ship size-penalty policy; this replaces the 1.50 binary wrappers with direct source-level visibility calculation while preserving the selected topic's defaults.
 - [ ] `asm.pl:1964` - `mapedge retreat crash`
 - [ ] `asm.pl:2160` - `diplomatic event`
 - [ ] `asm.pl:2219` - `relax end of turn`

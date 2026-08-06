@@ -12,6 +12,7 @@
 #include "game/boarding.h"
 #include "game/cmbtfire.h"
 #include "game/ship_config.h"
+#include "game/shipstak.h"
 
 namespace {
     bool Append_Decoded_(const char* source, config::s_config_write_set* write_set,
@@ -159,6 +160,91 @@ DOCTEST_TEST_CASE("black-hole boarding setting preserves the classic default") {
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(BOARDING::_board_in_black_hole == 0);
+}
+
+DOCTEST_TEST_CASE("strategic detection settings preserve and replace 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.battle_scanner == 2);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.scout_lab == 0);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.star_base == 2);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.battlestation == 4);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.star_fortress == 6);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.no_scanner == 2);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.tachyon_scanner == 4);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.neutron_scanner == 6);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.sensors == 9);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.planet == 32000);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.fleet == 32000);
+    DOCTEST_CHECK(SHIPSTAK::stealth_bonus.stealthy_ships == 500);
+    DOCTEST_CHECK(SHIPSTAK::stealth_bonus.stealth_field == 500);
+    DOCTEST_CHECK(SHIPSTAK::stealth_bonus.cloaking_device == 500);
+    DOCTEST_CHECK(SHIPSTAK::stealth_bonus.phasing_cloak == 500);
+    DOCTEST_CHECK(SHIPSTAK::stealth_size_penalty ==
+                  SHIPSTAK::e_stealth_size_penalty::race_tech);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "detection scan_bonus battle_scanner = 7;"
+        "detection scan_bonus scout_lab = 3;"
+        "detection scan_bonus sensors = 12;"
+        "detection scan_bonus planet = 30000;"
+        "detection stealth_bonus stealthy_ships = 450;"
+        "detection stealth_bonus stealth_field = 650;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.battle_scanner == 7);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.scout_lab == 3);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.sensors == 12);
+    DOCTEST_CHECK(SHIPSTAK::scan_bonus.planet == 30000);
+    DOCTEST_CHECK(SHIPSTAK::stealth_bonus.stealthy_ships == 450);
+    DOCTEST_CHECK(SHIPSTAK::stealth_bonus.stealth_field == 650);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "detection scan_bonus battle_scanner = 32768;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "detection scan_bonus sensors = 128;", &writes, &diagnostic));
+}
+
+DOCTEST_TEST_CASE("strategic stealth size-penalty modes bind by name") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+
+    struct s_mode_case {
+        const char* name;
+        SHIPSTAK::e_stealth_size_penalty expected;
+        bool racial_penalty_applies;
+        bool device_penalty_applies;
+    };
+    const s_mode_case cases[] = {
+        {"none", SHIPSTAK::e_stealth_size_penalty::none, true, true},
+        {"race", SHIPSTAK::e_stealth_size_penalty::race, false, true},
+        {"race_tech", SHIPSTAK::e_stealth_size_penalty::race_tech, false, false},
+    };
+
+    for (const s_mode_case& mode : cases) {
+        const std::string source =
+            std::string("detection stealth_size_penalty = ") + mode.name + ";";
+        config::s_config_write_set writes;
+        config::s_cfg_diagnostic diagnostic;
+        DOCTEST_REQUIRE(Append_Decoded_(source.c_str(), &writes, &diagnostic));
+        DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+        DOCTEST_REQUIRE(config::Commit_State(&state));
+        DOCTEST_CHECK(SHIPSTAK::stealth_size_penalty == mode.expected);
+        DOCTEST_CHECK(SHIPSTAK::Traveling_Size_Penalty_Applies_(true, false) ==
+                      mode.racial_penalty_applies);
+        DOCTEST_CHECK(SHIPSTAK::Traveling_Size_Penalty_Applies_(false, true) ==
+                      mode.device_penalty_applies);
+        DOCTEST_CHECK(SHIPSTAK::Traveling_Size_Penalty_Applies_(false, false));
+    }
 }
 
 DOCTEST_TEST_CASE("shorter build queue assignments replace execution through an earlier end") {

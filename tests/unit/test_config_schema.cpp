@@ -172,7 +172,7 @@ DOCTEST_TEST_CASE("main schema game-domain types are documented and match native
         CONFIG_MAIN_SCHEMA_PATH, &root, &diagnostic));
     const config::tool::s_json_value* types = Member_(&root, "types");
     DOCTEST_REQUIRE(types != nullptr);
-    DOCTEST_REQUIRE(types->member_names.size() == 27);
+    DOCTEST_REQUIRE(types->member_names.size() == 28);
 
     for (const config::tool::s_json_value& type : types->values) {
         for (const char* field : {"title", "description", "remarks"}) {
