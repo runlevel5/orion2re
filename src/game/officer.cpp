@@ -987,11 +987,38 @@ namespace OFFICER {
                     key::Push_Key_Code_((uint32_t)',', g_last_scan_code);
                 } else if (key == 0x4DE0 && _officer_button_mode == -1) {
                     key::Push_Key_Code_((uint32_t)'.', g_last_scan_code);
-                } else if (key == 0x48E0 && _officer_button_mode == -1) {
-                    // Up/Down press the fleet scroll bar's buttons ('-'/'+').
-                    key::Push_Key_Code_((uint32_t)'-', g_last_scan_code);
-                } else if (key == 0x50E0 && _officer_button_mode == -1) {
-                    key::Push_Key_Code_((uint32_t)'+', g_last_scan_code);
+                } else if ((key == 0x48E0 || key == 0x50E0) && _officer_button_mode == -1) {
+                    // Up/Down move the leader selection through the list,
+                    // wrapping at the ends.
+                    int16_t dir = (key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                    int16_t count = (MOX::_n_fltscrn_officers < 4) ? (int16_t)MOX::_n_fltscrn_officers : (int16_t)4;
+                    if (count > 0) {
+                        int16_t cur = -1;
+                        for (int16_t slot = 0; slot < count; ++slot) {
+                            if (MOX::_officer_id_list[slot] == (int16_t)MOX::_officer_selected) {
+                                cur = slot;
+                            }
+                        }
+                        int16_t next = (cur < 0) ? ((dir > 0) ? (int16_t)0 : (int16_t)(count - 1))
+                                                 : (int16_t)((cur + count + dir) % count);
+                        if (MOX::_officer_id_list[next] > -1) {
+                            MOX::_officer_selected = (int8_t)MOX::_officer_id_list[next];
+                            MOX::_draw_officer_to_back = 1;
+                        }
+                    }
+                } else if (key == 0x1C0D && _officer_button_mode == -1 &&
+                           MOX::_officer_selected > -1) {
+                    // Enter clicks the selected leader's row. The selection is
+                    // cleared first so the click acts on the row (hire,
+                    // assign, ...) instead of toggling it off.
+                    for (int16_t slot = 0; slot < 4; ++slot) {
+                        if (MOX::_officer_id_list[slot] == (int16_t)MOX::_officer_selected &&
+                            big_icons_scanned[slot] > 0) {
+                            MOX::_officer_selected = -1;
+                            synth_input = big_icons_scanned[slot];
+                            break;
+                        }
+                    }
                 } else if (key != 0) {
                     key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
                 }
