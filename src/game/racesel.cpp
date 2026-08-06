@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "fields.h"
 
+#include "enhanced_ux.h"
+
 namespace RACESEL {
 
 static bool Is_Valid_Last_Race_Base_Race_(uint8_t race_idx) {
@@ -215,12 +217,60 @@ int16_t Race_Selection_Screen_(s_player* plr) {
     RUSS::Mox_Sync_Update_();
     ERIC::Fast_Fade_In_();
     
+    // Enhancement: keyboard selection over the 7x2 race grid — Up/Down move
+    // within a column, Left/Right jump between the columns. Last input wins:
+    // arrow keys drive the displayed race until the mouse moves onto one.
+    const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+    int16_t kbd_race = -1;
+    bool kbd_active = false;
+    int16_t prev_ptr_x = (int16_t)mouse::Pointer_X_();
+    int16_t prev_ptr_y = (int16_t)mouse::Pointer_Y_();
+
     while (true) {
+        if (enhanced) {
+            int32_t nav_key = key::Read_Key_();
+            if (nav_key == 0x48E0 || nav_key == 0x50E0 ||
+                nav_key == 0x4BE0 || nav_key == 0x4DE0) {
+                int16_t base = kbd_active ? kbd_race : _displayed_race;
+                if (base < 0 || base > 13) {
+                    base = 0;
+                }
+                int16_t grid_row = (int16_t)(base % 7);
+                int16_t grid_col = (int16_t)(base / 7);
+                if (nav_key == 0x48E0) { // Up
+                    grid_row = (int16_t)((grid_row + 6) % 7);
+                } else if (nav_key == 0x50E0) { // Down
+                    grid_row = (int16_t)((grid_row + 1) % 7);
+                } else { // Left/Right toggle the column
+                    grid_col = (int16_t)(1 - grid_col);
+                }
+                kbd_race = (int16_t)(grid_col * 7 + grid_row);
+                kbd_active = true;
+            } else if (nav_key != 0) {
+                key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+            }
+        }
+
         int16_t input_field = fields::Get_Input_();
         int16_t scan_idx = fields::Scan_Input_();
         _displayed_race = scan_idx - field_ids[0];
         if (_displayed_race < 0 || _displayed_race > 13) {
             _displayed_race = _old_race;
+        }
+
+        if (enhanced) {
+            int16_t ptr_x = (int16_t)mouse::Pointer_X_();
+            int16_t ptr_y = (int16_t)mouse::Pointer_Y_();
+            bool mouse_moved = (ptr_x != prev_ptr_x || ptr_y != prev_ptr_y);
+            prev_ptr_x = ptr_x;
+            prev_ptr_y = ptr_y;
+            int16_t hover_race = (int16_t)(scan_idx - field_ids[0]);
+            if (mouse_moved && hover_race >= 0 && hover_race <= 13) {
+                kbd_active = false; // the mouse takes the selection over
+            }
+            if (kbd_active) {
+                _displayed_race = kbd_race;
+            }
         }
         
         for (int i = STOCK_RACE_ALKARI; i < STOCK_RACE_COUNT; ++i) {
