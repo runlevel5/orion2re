@@ -953,6 +953,12 @@ namespace OFFICER {
         EVANHELP::Set_Officer_Screen_Help_();
 
         const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        uint32_t last_wheel_ms = 0;
+        constexpr uint32_t WHEEL_STEP_MS = 120;
+        if (enhanced) {
+            platform::Consume_Mouse_Wheel_Steps_(); // discard pre-screen movement
+            platform::Consume_Mouse_Wheel_Steps_X_();
+        }
 
         do {
             bool is_fleet = Is_Fleet_Officer_Screen_();
@@ -988,6 +994,26 @@ namespace OFFICER {
                     key::Push_Key_Code_((uint32_t)'+', g_last_scan_code);
                 } else if (key != 0) {
                     key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+
+                // The mouse wheel presses the same buttons: vertical scrolls
+                // the fleet list ('-'/'+'), horizontal (or Shift + wheel)
+                // cycles the previous/next system (','/'.'), at a readable
+                // pace.
+                if (_officer_button_mode == -1) {
+                    int16_t wheel_v = platform::Consume_Mouse_Wheel_Steps_();
+                    int16_t wheel_h = platform::Consume_Mouse_Wheel_Steps_X_();
+                    if (wheel_v != 0 || wheel_h != 0) {
+                        uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
+                        if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
+                            last_wheel_ms = wheel_now_ms;
+                            if (wheel_v != 0) {
+                                key::Push_Key_Code_((uint32_t)((wheel_v > 0) ? '-' : '+'), g_last_scan_code);
+                            } else {
+                                key::Push_Key_Code_((uint32_t)((wheel_h > 0) ? '.' : ','), g_last_scan_code);
+                            }
+                        }
+                    }
                 }
             }
 

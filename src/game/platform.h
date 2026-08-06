@@ -63,6 +63,9 @@ namespace platform {
 	void __cdecl Pump_Game_Input_Queue_();
 	// Returns and consumes whole accumulated mouse-wheel steps (positive = up).
 	int16_t __cdecl Consume_Mouse_Wheel_Steps_();
+	// Returns and consumes whole accumulated horizontal mouse-wheel steps
+	// (positive = right; Shift + vertical wheel counts as horizontal).
+	int16_t __cdecl Consume_Mouse_Wheel_Steps_X_();
 	// Returns and consumes the number of middle-button clicks since last call.
 	int16_t __cdecl Consume_Middle_Clicks_();
 

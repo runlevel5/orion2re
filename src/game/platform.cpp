@@ -65,6 +65,7 @@ namespace platform {
 		SDL_AtomicInt g_exit_requested;
 		SDL_AtomicInt g_game_thread_exited;
 		SDL_AtomicInt g_mouse_wheel_accum; // hundredths of a wheel step
+		SDL_AtomicInt g_mouse_wheel_accum_x; // hundredths, positive = right
 		SDL_AtomicInt g_middle_click_count;
 		SDL_AtomicInt g_arrow_keys_held; // ARROW_KEY_* bits, tracked across key down/up
 		struct s_observed_click {
@@ -1190,12 +1191,26 @@ namespace platform {
 
             if (event.type == SDL_EVENT_MOUSE_WHEEL) {
                 float delta = event.wheel.y;
+                float delta_x = event.wheel.x;
                 if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) {
                     delta = -delta;
+                    delta_x = -delta_x;
+                }
+                // Shift + vertical wheel means horizontal scrolling; some
+                // platforms (macOS) translate it before delivery, others
+                // deliver the vertical axis with the modifier held.
+                if (delta != 0.0f && delta_x == 0.0f &&
+                    (SDL_GetModState() & SDL_KMOD_SHIFT) != 0) {
+                    delta_x = delta;
+                    delta = 0.0f;
                 }
                 int32_t hundredths = (int32_t)SDL_lroundf(delta * 100.0f);
                 if (hundredths != 0) {
                     SDL_AddAtomicInt(&g_mouse_wheel_accum, hundredths);
+                }
+                int32_t hundredths_x = (int32_t)SDL_lroundf(delta_x * 100.0f);
+                if (hundredths_x != 0) {
+                    SDL_AddAtomicInt(&g_mouse_wheel_accum_x, hundredths_x);
                 }
                 continue;
             }
@@ -1569,6 +1584,15 @@ namespace platform {
         int32_t steps = accumulated / 100;
         if (steps != 0) {
             SDL_AddAtomicInt(&g_mouse_wheel_accum, -steps * 100);
+        }
+        return (int16_t)steps;
+    }
+
+    int16_t __cdecl Consume_Mouse_Wheel_Steps_X_() {
+        int32_t accumulated = SDL_GetAtomicInt(&g_mouse_wheel_accum_x);
+        int32_t steps = accumulated / 100;
+        if (steps != 0) {
+            SDL_AddAtomicInt(&g_mouse_wheel_accum_x, -steps * 100);
         }
         return (int16_t)steps;
     }
