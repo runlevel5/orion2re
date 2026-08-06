@@ -162,8 +162,12 @@ namespace MAINSCR {
                 constexpr int16_t ZOOM_KEY_STEP = 8;
                 uint8_t arrows = platform::Arrow_Keys_Held_();
                 if (arrows != 0) {
-                    int16_t ptr_x = (int16_t)mouse::Pointer_X();
-                    int16_t ptr_y = (int16_t)mouse::Pointer_Y();
+                    // Step from the box's actual (clamped) position, not the
+                    // raw pointer: the draw pins the box at the viewport edge
+                    // while the pointer can sit far beyond it, which would
+                    // otherwise leave a dead zone before the box moves.
+                    int16_t ptr_x = MAINSCR::zoom_box_x;
+                    int16_t ptr_y = MAINSCR::zoom_box_y;
                     if (arrows & platform::ARROW_KEY_UP) ptr_y -= ZOOM_KEY_STEP;
                     if (arrows & platform::ARROW_KEY_DOWN) ptr_y += ZOOM_KEY_STEP;
                     if (arrows & platform::ARROW_KEY_LEFT) ptr_x -= ZOOM_KEY_STEP;
