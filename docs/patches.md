@@ -103,7 +103,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1964` - `mapedge retreat crash`: already fixed in `draw::Color_Stream_Copy_()` by processing pixels only while the signed index is less than `pixel_count`, so zero or negative clipped widths return without accessing either buffer; this directly expresses the 1.50 `JLE` loop guard in source.
 - [x] `asm.pl:2160` - `diplomatic event`: fixed in `EVENTS::Event_Twiddle_()` and `diplomac::Change_Relations_()` by passing event participants in the relation updater's expected roles and adding the full signed relation delta before clamping to `-100..100`; this replaces the 1.50 register-swap wrapper and 16-bit assembly saturation with direct source-level logic.
 - [x] `asm.pl:2219` - `relax end of turn`: fixed at the `COMBAT1::Next_Ship_()` winner-check site by keeping combat active for a human-controlled surviving side while hostile missiles remain and by allowing a manual attacker to finish actions against an undefended colony; this replaces the 1.50 register-preserving diversion and C wrapper with a direct source-level end-of-combat predicate.
-- [ ] `asm.pl:2261` - `pop limit bug`
+- [x] `asm.pl:2261` - `pop limit bug`: fixed in `SETTLER::Room_For_Another_()` by counting settlers already heading to the destination and validating every applicable mixed-race capacity tier plus the 42-population bound; this replaces the 1.50 call-site wrappers with the restored function's explicit freight-inclusion parameter.
 - [ ] `asm.pl:2364` - `recalc prod`
 - [ ] `asm.pl:2885` - `displacer, cloak missile`
 - [ ] `asm.pl:3474` - `teleporter + tractor fix`

@@ -157,6 +157,15 @@ orion2re_add_unit_test(test_pop_helpers
         tests/unit/test_pop_helpers.cpp
 )
 
+orion2re_add_unit_test(test_settler
+    SOURCES
+        tests/unit/test_settler.cpp
+    PRODUCTION_SOURCES
+        src/game/settler.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_settler_runtime.cpp
+)
+
 orion2re_add_unit_test(test_colony_production_helpers
     SOURCES
         tests/unit/test_colony_production_helpers.cpp

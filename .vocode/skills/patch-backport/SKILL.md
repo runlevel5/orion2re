@@ -180,6 +180,8 @@ Distinguish facts proven by assembly from interpretations inferred from comments
 
 Locate the semantic equivalent of the original functions and data in the current project.
 
+Before designing or proposing source changes, read the repository's style documentation under `docs/`, including `docs/styleguide.md` when present. Treat those conventions as implementation requirements for source, tests, generated-code handling, naming, visibility, and organization.
+
 Follow repository read policy:
 
 - search and summarize first
