@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "enhanced_ux.h"
 #include "string_overrides.h"
 
 namespace MAINPUPS {
@@ -713,9 +714,9 @@ namespace MAINPUPS {
             g_y + 174 /* 0xae */,
             tooltip_generic,
             anims[4],
-            ESTRINGS::E_Strings(12 /* 0xc */),
-            40 /* 0x28 */
-        );
+            // Enhancement: Enter presses the Accept button.
+            (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? "\r" : ESTRINGS::E_Strings(12 /* 0xc */),
+            40 /* 0x28 */);
 
         // Hidden field covering the screen to block underlying interactions
         mp_fields[0] = fields::Add_Hidden_Field(
@@ -752,7 +753,39 @@ namespace MAINPUPS {
         Draw_Slider_Popup();
         RUSS::Mox_Sync_Update();
 
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        uint32_t last_wheel_ms = 0;
+        constexpr uint32_t WHEEL_STEP_MS = 120;
+        if (enhanced) {
+            platform::Consume_Mouse_Wheel_Steps_(); // discard pre-popup movement
+        }
+
         do {
+            // Enhancement: Left/Right (and wheel down/up) press the '<'/'>'
+            // buttons, translated into their native hotkeys so they behave
+            // like mouse clicks.
+            if (enhanced) {
+                int32_t key = key::Read_Key();
+                if (key == 0x4BE0) { // Left
+                    key::Push_Key_Code((uint32_t)(uint8_t)ESTRINGS::E_Strings(137 /* 0x89 */)[0], g_last_scan_code);
+                } else if (key == 0x4DE0) { // Right
+                    key::Push_Key_Code((uint32_t)(uint8_t)ESTRINGS::E_Strings(11 /* 0xb */)[0], g_last_scan_code);
+                } else if (key != 0) {
+                    key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+                }
+
+                int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
+                if (wheel_steps != 0) {
+                    uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
+                    if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
+                        last_wheel_ms = wheel_now_ms;
+                        key::Push_Key_Code(
+                            (uint32_t)(uint8_t)ESTRINGS::E_Strings((wheel_steps > 0) ? 11 /* '>' */ : 137 /* '<' */)[0],
+                            g_last_scan_code);
+                    }
+                }
+            }
+
             input = fields::Get_Input();
             scanned_field = fields::Scan_Input();
             Draw_Slider_Popup();
