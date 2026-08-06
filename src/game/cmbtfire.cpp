@@ -498,6 +498,9 @@ namespace CMBTFIRE {
                 if (damage_diff > 0) {
                     damage_done += ((rand_val - 40) * (damage_diff + 1)) / 60;
                 }
+                if (damage_done > weapon_damage) {
+                    damage_done = weapon_damage;
+                }
 
                 if (target_is_missile == 0) {
                     struct_damage = 0;
