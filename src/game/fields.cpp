@@ -1623,12 +1623,54 @@ namespace fields {
             }
         }
 
+        const bool enhanced_keys = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        int16_t prior_scan_idx = 0;
+
         int16_t input;
         bool exit_flag;
         do {
             platform::Check_Exit_();
             timer::Mark_Time_();
-            input = Get_Input_();
+
+            // Enhancement: Up/Down move the highlighted row through the
+            // selectable entries (wrapping), Enter picks it like a click.
+            int16_t synth_input = 0;
+            if (enhanced_keys) {
+                int32_t nav_key = key::Read_Key_();
+                if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+                    int16_t dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                    int16_t sel_fields[64];
+                    int16_t sel_count = 0;
+                    int16_t cur_pos = -1;
+                    for (int16_t i = 1; i <= index && sel_count < 64; ++i) {
+                        s_field_string_list* row = Field_Data_String_List_(&_fields[i]);
+                        if (row->is_selectable != 0) {
+                            if (row->help_start == *selected_index) {
+                                cur_pos = sel_count;
+                            }
+                            sel_fields[sel_count++] = i;
+                        }
+                    }
+                    if (sel_count > 0) {
+                        int16_t next = (cur_pos < 0)
+                                           ? ((dir > 0) ? (int16_t)0 : (int16_t)(sel_count - 1))
+                                           : (int16_t)((cur_pos + sel_count + dir) % sel_count);
+                        *selected_index = static_cast<int8_t>(Field_Data_String_List_(&_fields[sel_fields[next]])->help_start);
+                    }
+                } else if (nav_key == 0x1C0D) { // Enter
+                    for (int16_t i = 1; i <= index; ++i) {
+                        s_field_string_list* row = Field_Data_String_List_(&_fields[i]);
+                        if (row->is_selectable != 0 && row->help_start == *selected_index) {
+                            synth_input = i;
+                            break;
+                        }
+                    }
+                } else if (nav_key != 0) {
+                    key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+                }
+            }
+
+            input = (synth_input != 0) ? synth_input : Get_Input_();
 
             exit_flag = false;
             if (input != 0) {
@@ -1655,7 +1697,15 @@ namespace fields {
             if (_list_field_scan_flag != 0) {
                 int16_t scan_idx = Scan_Input_();
                 if (scan_idx > 0) {
-                    *selected_index = static_cast<int8_t>(Field_Data_String_List_(&_fields[scan_idx])->help_start);
+                    // Enhancement: hover only takes the highlight when the
+                    // pointer moves onto a different row, so keyboard
+                    // navigation wins until then.
+                    if (!enhanced_keys || scan_idx != prior_scan_idx) {
+                        *selected_index = static_cast<int8_t>(Field_Data_String_List_(&_fields[scan_idx])->help_start);
+                    }
+                }
+                if (enhanced_keys) {
+                    prior_scan_idx = scan_idx;
                 }
             }
 

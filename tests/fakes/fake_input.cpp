@@ -16,6 +16,11 @@ namespace key {
         return test::fakes::g_read_key_value;
     }
 
+    void Push_Key_Code_(uint32_t key_code, uint32_t scan_code) {
+        (void)key_code;
+        (void)scan_code;
+    }
+
     int32_t Wait_For_Key_() {
         return test::fakes::g_read_key_value;
     }
