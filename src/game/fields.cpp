@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "enhanced_ux.h"
 
 namespace fields {
     namespace {
@@ -1051,6 +1052,16 @@ namespace fields {
                     mouse_wheel_list_selection_held = 0;
                 }
                 if (scanned_field == 0) {
+                    return 0;
+                }
+
+                // Enhancement: Enter no longer activates the field under the
+                // mouse pointer, so hovering plus Enter cannot click things —
+                // keyboard and mouse input stay separate. Full-screen fields
+                // keep responding, so modal "press any key" boxes still close.
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && scanned_field > 0 &&
+                    (fields[scanned_field].x > 0 || fields[scanned_field].y > 0 ||
+                     fields[scanned_field].x_end < 639 || fields[scanned_field].y_end < 479)) {
                     return 0;
                 }
 
