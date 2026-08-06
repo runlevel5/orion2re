@@ -1,6 +1,10 @@
 #include "pch.h"
+#include "enhanced_ux.h"
 
 namespace {
+    // Enhancement: last hovered list field, so a stationary pointer does not
+    // steal the selection from keyboard navigation.
+    int16_t _g_prior_choice = 0;
     int16_t _turn_sum_list_y[16] = {
         0, 10, 20, 30, 40, 50, 60, 70,
         80, 90, 100, 110, 120, 130, 140, 0,
@@ -72,7 +76,21 @@ namespace TURNSUM {
 
         if (input_field >= INFO::_g_first_list_field && input_field <= INFO::_g_last_list_field)
         {
-            LIST::Set_Selected_List_Entry_(&_g_turn_sum_header, input_field);
+            // Enhancement: hover only takes the selection when the pointer
+            // actually moves onto a new entry, so keyboard navigation wins
+            // until then.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0)
+            {
+                if (_g_prior_choice != input_field)
+                {
+                    _g_prior_choice = input_field;
+                    LIST::Set_Selected_List_Entry_(&_g_turn_sum_header, input_field);
+                }
+            }
+            else
+            {
+                LIST::Set_Selected_List_Entry_(&_g_turn_sum_header, input_field);
+            }
         }
 
         _g_selected_msg_p = LIST::Get_Selected_List_Entry_(&_g_turn_sum_header);
@@ -125,6 +143,9 @@ namespace TURNSUM {
         s_animation_header* ok_button_image = (s_animation_header*)(
             farload::Far_Reload_Next_("turnsum.lbx", 3, MOX::_screen_seg));
 
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        int16_t kbd_page_flip = 0;
+
         while (true)
         {
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
@@ -156,6 +177,21 @@ namespace TURNSUM {
                 LIST::Display_List_Page_(&_g_turn_sum_header);
                 LIST::Set_List_Up_Down_Field_Drawing_(&_g_turn_sum_header, field_btn_up, field_btn_down);
 
+                _g_prior_choice = 0; // fresh hover-guard state for this page
+
+                // Enhancement: land a keyboard page flip on the page's first
+                // or last message.
+                if (kbd_page_flip != 0)
+                {
+                    LIST::Set_Selected_List_Entry_(&_g_turn_sum_header, INFO::_g_first_list_field);
+                    if (kbd_page_flip == 2)
+                    {
+                        LIST::Move_List_Selection_(&_g_turn_sum_header, -1, 1);
+                    }
+                    _g_selected_msg_p = LIST::Get_Selected_List_Entry_(&_g_turn_sum_header);
+                    kbd_page_flip = 0;
+                }
+
                 video::Copy_Off_To_Back_();
                 palette::Clear_Palette_Changes_(0, 0xFF);
                 RUSS::Mox_Sync_Update_();
@@ -165,7 +201,46 @@ namespace TURNSUM {
 
                 while (true)
                 {
-                    int16_t input_field = fields::Get_Input_();
+                    // Enhancement: Up/Down move through the messages (flipping
+                    // pages at the edges), Enter opens the selected one like a
+                    // click on it.
+                    int16_t input_field = 0;
+                    if (enhanced)
+                    {
+                        int32_t nav_key = key::Read_Key_();
+                        if (nav_key == 0x48E0 || nav_key == 0x50E0) // Up/Down
+                        {
+                            int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                            if (LIST::Selection_At_Page_Edge_(&_g_turn_sum_header, nav_dir, 1))
+                            {
+                                int8_t page_flipped = (nav_dir > 0)
+                                                          ? LIST::Next_List_Page_(&_g_turn_sum_header)
+                                                          : LIST::Previous_List_Page_(&_g_turn_sum_header);
+                                if (page_flipped != 0)
+                                {
+                                    kbd_page_flip = (nav_dir > 0) ? (int16_t)1 : (int16_t)2;
+                                    break;
+                                }
+                            }
+                            _g_selected_msg_p = LIST::Move_List_Selection_(&_g_turn_sum_header, nav_dir, 1);
+                        }
+                        else if (nav_key == 0x1C0D) // Enter
+                        {
+                            if (_g_selected_msg_p != nullptr)
+                            {
+                                input_field = INFO::_g_first_list_field;
+                            }
+                        }
+                        else if (nav_key != 0)
+                        {
+                            key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+                        }
+                    }
+
+                    if (input_field == 0)
+                    {
+                        input_field = fields::Get_Input_();
+                    }
 
                     if (MOX::_FULL_DRAW_SCREEN_FLAG != 0)
                     {

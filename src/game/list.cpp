@@ -222,6 +222,34 @@ namespace LIST {
         return Get_Selected_List_Entry_(state);
     }
 
+    // Enhancement helper: reports whether the selection sits on the page's
+    // first (direction < 0) or last (direction > 0) visible line. With
+    // per_item set, only the item position counts, not the line within it.
+    uint8_t __cdecl Selection_At_Page_Edge_(s_list_state* state, int16_t direction, uint8_t per_item) {
+        s_list_item* item = state->selected_item;
+        s_list_item* end = &state->items[(uint8_t)state->num_items];
+        s_list_item* first_item = item;
+        s_list_item* last_item = item;
+        while (item < end) {
+            last_item = item;
+            if (item + 1 >= end || item[1].stop_flag != 0) {
+                break;
+            }
+            ++item;
+        }
+        s_list_item* sel = Get_Selected_List_Entry_(state);
+        if (sel == nullptr) {
+            return 0;
+        }
+        if (direction > 0) {
+            return (sel == last_item &&
+                    (per_item != 0 ||
+                     sel->current_app_index == (uint8_t)(sel->app_count - 1))) ? 1 : 0;
+        }
+        return (sel == first_item &&
+                (per_item != 0 || sel->current_app_index == 0)) ? 1 : 0;
+    }
+
     s_list_item* __cdecl Get_Selected_List_Entry_(s_list_state* state) {
         s_list_item* item = state->selected_item;
         s_list_item* end = &state->items[(uint8_t)state->num_items];

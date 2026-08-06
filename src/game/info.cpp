@@ -790,34 +790,6 @@ namespace INFO {
         fonts::Print_Centered_(105, 196, msg_stat);
     }
 
-    // Enhancement helper: reports whether the selection sits on the page's
-    // first (direction < 0) or last (direction > 0) visible line. With
-    // per_item set, only the item position counts, not the line within it.
-    static uint8_t Selection_At_Page_Edge_(s_list_state* state, int16_t direction, uint8_t per_item) {
-        s_list_item* item = state->selected_item;
-        s_list_item* end = &state->items[(uint8_t)state->num_items];
-        s_list_item* first_item = item;
-        s_list_item* last_item = item;
-        while (item < end) {
-            last_item = item;
-            if (item + 1 >= end || item[1].stop_flag != 0) {
-                break;
-            }
-            ++item;
-        }
-        s_list_item* sel = LIST::Get_Selected_List_Entry_(state);
-        if (sel == nullptr) {
-            return 0;
-        }
-        if (direction > 0) {
-            return (sel == last_item &&
-                    (per_item != 0 ||
-                     sel->current_app_index == (uint8_t)(sel->app_count - 1))) ? 1 : 0;
-        }
-        return (sel == first_item &&
-                (per_item != 0 || sel->current_app_index == 0)) ? 1 : 0;
-    }
-
     int16_t __cdecl _Tech_Review_Subscreen_(s_animation_header** anims, int16_t exit_threshold, int16_t player_idx) {
         s_list_state list_headers[4];
         char billtext[40];
@@ -921,7 +893,7 @@ namespace INFO {
                     int32_t nav_key = key::Read_Key_();
                     if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
                         int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
-                        if (Selection_At_Page_Edge_(_g_header_p, nav_dir, 0)) {
+                        if (LIST::Selection_At_Page_Edge_(_g_header_p, nav_dir, 0)) {
                             int8_t page_flipped = (nav_dir > 0)
                                                       ? LIST::Next_List_Page_(_g_header_p)
                                                       : LIST::Previous_List_Page_(_g_header_p);
@@ -1188,7 +1160,7 @@ namespace INFO {
                     int32_t nav_key = key::Read_Key_();
                     if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
                         int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
-                        if (Selection_At_Page_Edge_(&INFO::_g_category_header, nav_dir, 0)) {
+                        if (LIST::Selection_At_Page_Edge_(&INFO::_g_category_header, nav_dir, 0)) {
                             int8_t page_flipped = (nav_dir > 0)
                                                       ? LIST::Next_List_Page_(&INFO::_g_category_header)
                                                       : LIST::Previous_List_Page_(&INFO::_g_category_header);
@@ -2375,7 +2347,7 @@ namespace INFO {
                     int32_t nav_key = key::Read_Key_();
                     if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
                         int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
-                        if (Selection_At_Page_Edge_(&_g_turn_header, nav_dir, 1)) {
+                        if (LIST::Selection_At_Page_Edge_(&_g_turn_header, nav_dir, 1)) {
                             int8_t page_flipped = (nav_dir > 0)
                                                       ? LIST::Next_List_Page_(&_g_turn_header)
                                                       : LIST::Previous_List_Page_(&_g_turn_header);
