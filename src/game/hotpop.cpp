@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "enhanced_ux.h"
 
 namespace HOTPOP {
     int16_t _hotseat_human_players;
@@ -57,13 +58,16 @@ namespace HOTPOP {
         anim_h = animate::Get_Height_(HOTPOP::_hot_pop_background_seg);
         base_y = (480 - anim_h) / 2;
 
+        // Enhancement: hotkeys for Add Human Player (A) and Begin Game (B).
+        const bool enhanced_hotkeys = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+
         if (HOTPOP::_hotseat_human_players < MAX_PLAYERS) {
-            *out_join_button_field = fields::Add_Button_Field_(base_x + 125, base_y + 99, "", _grid_background[1], "", 40);
+            *out_join_button_field = fields::Add_Button_Field_(base_x + 125, base_y + 99, "", _grid_background[1], enhanced_hotkeys ? "A" : "", 40);
         } else {
             *out_join_button_field = -1000;
         }
 
-        *out_accept_button_field = fields::Add_Button_Field_(base_x + 125, base_y + 136, "", _grid_background[2], "", 40);
+        *out_accept_button_field = fields::Add_Button_Field_(base_x + 125, base_y + 136, "", _grid_background[2], enhanced_hotkeys ? "B" : "", 40);
 
         /* "\x1b" is a non-printing fmtpara ESC control byte reused here as a field-label sentinel. */
         *out_cancel_button_field = fields::Add_Button_Field_(base_x + 140, base_y + 200, "", _grid_background[3], "\x1b", 40);

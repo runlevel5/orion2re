@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "enhanced_ux.h"
 
 namespace {
     constexpr int kPlayerRemapPaletteStart = 144;
@@ -1467,7 +1468,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             s__00551100,
             MOX::_mp_screen->anim_btn_cancel,
             s__00551120,
-            41 /* 0x29 */
+            // Enhancement: vanilla passes 41 here, leaving Cancel silent;
+            // use the standard button click like other Cancel buttons.
+            (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? 0x28 : 41 /* 0x29 */
         );
         MOX::_mp_screen->field_id_cancel = cancel_btn_id;
     }

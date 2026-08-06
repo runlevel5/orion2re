@@ -33,6 +33,9 @@ char* _opp_button_strings[MAX_PLAYERS - 1];
 
 namespace {
 
+// Enhancement: net-game-name input field id, for the 'R' rename hotkey.
+int16_t _g_net_name_field_id = -1000;
+
 bool Show_Net_Game_Name_() {
     return MOX::_game_type == 2 || (MOX::_game_type == 3 && NETMOX::_net.mode == 1);
 }
@@ -118,7 +121,11 @@ int16_t __cdecl Newgame_Screen_(void) {
         // buttons from fields::_down_mouse_button.
         if (enhanced) {
             int32_t key = key::Read_Key_();
-            if (key == 0x1C0D) { // Enter
+            if (key == 0x1C0D && fields::_input_field_active != 0) {
+                // While the net-game-name edit is active, Enter commits the
+                // edit instead of pressing Accept.
+                key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+            } else if (key == 0x1C0D) { // Enter
                 sound::Play_Sound_(0x28);
                 fields::_down_mouse_button = NEWGAME::_fields[8];
                 fonts::Set_Font_Style_(3, &NEWGAME::_color_ken);
@@ -133,6 +140,17 @@ int16_t __cdecl Newgame_Screen_(void) {
                 timer::Mark_Time_();
                 timer::Release_Time_(1);
                 input = NEWGAME::_fields[8];
+            } else if (key > 0 && ((key & 0xFF) == 'r' || (key & 0xFF) == 'R') &&
+                       fields::_input_field_active == 0 &&
+                       _g_net_name_field_id > 0) {
+                // 'R' starts editing the net game name, like clicking it.
+                fields::_input_field_active = 1;
+                fields::_cursor_position = 0;
+                fields::_cursor_on = 0;
+                fields::_active_input_field_number = NEWGAME::_g_net_name_field_id;
+                strlcpy(fields::_continuous_string, NETMOX::_net.cur_game_name,
+                        sizeof(fields::_continuous_string));
+                fields::_active_input_field_first = 1;
             } else if (key != 0) {
                 key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
             }
@@ -361,10 +379,11 @@ void __cdecl Update_Fields_() {
     fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x14A, ESTRINGS::E_Strings_(0x0C), _anims[2], &_xenon_attacks_button_variable, enhanced ? "8" : ESTRINGS::E_Strings_(0x0C), 0x29);
     fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x103, ESTRINGS::E_Strings_(0x0C), _anims[1], (int16_t*)&_combat_button_variable, enhanced ? "6" : ESTRINGS::E_Strings_(0x0C), 0x29);
 
+    _g_net_name_field_id = -1000;
     if (Show_Net_Game_Name_()) {
         Ensure_Settings_Net_Game_Name_();
         strlcpy(NETMOX::_net.cur_game_name, MOX::_settings.net_game_name, sizeof(NETMOX::_net.cur_game_name));
-        fields::Add_Continuous_String_Input_Field_(gx + 0xE1, gy + 0x18A, 0xA8, 0x12, NETMOX::_net.cur_game_name, 8, 0, 0, 0, 0);
+        _g_net_name_field_id = fields::Add_Continuous_String_Input_Field_(gx + 0xE1, gy + 0x18A, 0xA8, 0x12, NETMOX::_net.cur_game_name, 8, 0, 0, 0, 0);
     }
 
     // Accept and Cancel buttons
