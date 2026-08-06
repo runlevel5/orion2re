@@ -820,6 +820,10 @@ namespace platform {
         return g_exit_message;
     }
 
+    int16_t __cdecl Consume_Mouse_Wheel_Steps_() {
+        return 0;
+    }
+
     int __cdecl Exit_Status() {
         return g_exit_status;
     }
