@@ -801,8 +801,9 @@ namespace INFO {
     }
 
     // Enhancement helper: reports whether the selection sits on the page's
-    // first (direction < 0) or last (direction > 0) visible line.
-    static uint8_t Selection_At_Page_Edge_(s_list_state* state, int16_t direction) {
+    // first (direction < 0) or last (direction > 0) visible line. With
+    // per_item set, only the item position counts, not the line within it.
+    static uint8_t Selection_At_Page_Edge_(s_list_state* state, int16_t direction, uint8_t per_item) {
         s_list_item* item = state->selected_item;
         s_list_item* end = &state->items[(uint8_t)state->num_items];
         s_list_item* first_item = item;
@@ -820,9 +821,11 @@ namespace INFO {
         }
         if (direction > 0) {
             return (sel == last_item &&
-                    sel->current_app_index == (uint8_t)(sel->app_count - 1)) ? 1 : 0;
+                    (per_item != 0 ||
+                     sel->current_app_index == (uint8_t)(sel->app_count - 1))) ? 1 : 0;
         }
-        return (sel == first_item && sel->current_app_index == 0) ? 1 : 0;
+        return (sel == first_item &&
+                (per_item != 0 || sel->current_app_index == 0)) ? 1 : 0;
     }
 
     int16_t __cdecl _Tech_Review_Subscreen(s_animation_header** anims, int16_t exit_threshold, int16_t player_idx) {
@@ -924,7 +927,7 @@ namespace INFO {
                     int32_t nav_key = key::Read_Key();
                     if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
                         int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
-                        if (Selection_At_Page_Edge_(g_header_p, nav_dir)) {
+                        if (Selection_At_Page_Edge_(g_header_p, nav_dir, 0)) {
                             int8_t page_flipped = (nav_dir > 0)
                                                       ? LIST::Next_List_Page(g_header_p)
                                                       : LIST::Previous_List_Page(g_header_p);
@@ -1196,7 +1199,7 @@ namespace INFO {
                     int32_t nav_key = key::Read_Key();
                     if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
                         int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
-                        if (Selection_At_Page_Edge_(&INFO::g_category_header, nav_dir)) {
+                        if (Selection_At_Page_Edge_(&INFO::g_category_header, nav_dir, 0)) {
                             int8_t page_flipped = (nav_dir > 0)
                                                       ? LIST::Next_List_Page(&INFO::g_category_header)
                                                       : LIST::Previous_List_Page(&INFO::g_category_header);
@@ -1292,6 +1295,9 @@ namespace INFO {
             INFO::Set_Plyr_Hist_Btns(player_hist_buttons);
         }
 
+        // Enhancement: hotkeys toggle the graph categories (Populations=P,
+        // Buildings=B, Fleet=F, Tech=T).
+        static const char* const graph_hotkeys[4] = { "P", "B", "F", "T" };
         for (int i = 0; i < 4; ++i) {
             fields::Add_Radio_Button_Field(
                 INFO::graph_button_x[i],
@@ -1299,9 +1305,8 @@ namespace INFO {
                 "",
                 lbx_images[i + 8],
                 &player_hist_buttons[i],
-                "",
-                40 /* 0x28 */
-            );
+                ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? graph_hotkeys[i] : "",
+                40 /* 0x28 */);
         }
 
         fields::Assign_Auto_Function(INFO::Draw_History_Subscreen, 2);
@@ -1825,7 +1830,10 @@ namespace INFO {
         }
 
         if (MOX::active_count > 4) {
-            fields::Add_Button_Field(385, 427, MOX::s__00551100, anims[20], MOX::s__00551100, 40);
+            // Enhancement: Tab presses the More button.
+            fields::Add_Button_Field(
+                385, 427, MOX::s__00551100, anims[20],
+                ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? "\t" : MOX::s__00551100, 40);
         }
 
         fields::Assign_Auto_Function(INFO::Draw_Race_Stats_Subscreen, 2);
@@ -2295,6 +2303,9 @@ namespace INFO {
         int16_t msg_count = MSG_::N_Msgs_For_Player(MOX::PLAYER_NUM);
         int16_t up_button;
         int16_t down_button = 0;
+        // Enhancement: pending keyboard page flip (1 = down, land on the
+        // first message; 2 = up, land on the last message).
+        int16_t kbd_page_flip = 0;
 
         if (msg_count > 0) {
             up_button = fields::Add_Button_Field(0x250, 0x54, "", anim_data[0xe], "\x1B", '(');
@@ -2349,18 +2360,43 @@ namespace INFO {
             LIST::Set_List_Up_Down_Field_Drawing(&g_turn_header, up_button, down_button);
             fields::Assign_Auto_Function(Draw_Turn_Summary_Subscreen, 2);
             g_prior_choice = 0; // fresh hover-guard state for this page
+
+            // Enhancement: land a keyboard page flip on the page's first or
+            // last message.
+            if (kbd_page_flip != 0) {
+                LIST::Set_Selected_List_Entry(&g_turn_header, g_first_list_field);
+                if (kbd_page_flip == 2) {
+                    LIST::Move_List_Selection_(&g_turn_header, -1, 1);
+                }
+                g_selected_msg_p = LIST::Get_Selected_List_Entry(&g_turn_header);
+                kbd_page_flip = 0;
+            }
+
             video::Copy_Off_To_Back();
             Introduce_Subscreen();
 
             bool refresh_outer = false;
 
             while (true) {
-                // Enhancement: Up/Down move through the turn's messages.
+                // Enhancement: Up/Down move through the turn's messages; past
+                // the page's last (or first) message they flip to the next
+                // (or previous) page.
                 if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
                     int32_t nav_key = key::Read_Key();
                     if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+                        int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                        if (Selection_At_Page_Edge_(&g_turn_header, nav_dir, 1)) {
+                            int8_t page_flipped = (nav_dir > 0)
+                                                      ? LIST::Next_List_Page(&g_turn_header)
+                                                      : LIST::Previous_List_Page(&g_turn_header);
+                            if (page_flipped != 0) {
+                                kbd_page_flip = (nav_dir > 0) ? (int16_t)1 : (int16_t)2;
+                                refresh_outer = true;
+                                break;
+                            }
+                        }
                         g_selected_msg_p = LIST::Move_List_Selection_(
-                            &g_turn_header, (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1, 1);
+                            &g_turn_header, nav_dir, 1);
                     } else if (nav_key != 0) {
                         key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
                     }
