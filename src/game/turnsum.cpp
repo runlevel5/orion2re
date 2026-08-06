@@ -1,6 +1,10 @@
 #include "pch.h"
+#include "enhanced_ux.h"
 
 namespace {
+    // Enhancement: last hovered list field, so a stationary pointer does not
+    // steal the selection from keyboard navigation.
+    int16_t g_prior_choice = 0;
     int16_t turn_sum_list_y[16] = {
         0,
         10,
@@ -95,8 +99,23 @@ namespace TURNSUM {
 
         int16_t input_field = fields::Scan_Input();
 
-        if (input_field >= INFO::g_first_list_field && input_field <= INFO::g_last_list_field) {
-            LIST::Set_Selected_List_Entry(&g_turn_sum_header, input_field);
+        if (input_field >= INFO::g_first_list_field && input_field <= INFO::g_last_list_field)
+        {
+            // Enhancement: hover only takes the selection when the pointer
+            // actually moves onto a new entry, so keyboard navigation wins
+            // until then.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0)
+            {
+                if (g_prior_choice != input_field)
+                {
+                    g_prior_choice = input_field;
+                    LIST::Set_Selected_List_Entry(&g_turn_sum_header, input_field);
+                }
+            }
+            else
+            {
+                LIST::Set_Selected_List_Entry(&g_turn_sum_header, input_field);
+            }
         }
 
         g_selected_msg_p = LIST::Get_Selected_List_Entry(&g_turn_sum_header);
@@ -134,12 +153,20 @@ namespace TURNSUM {
         fields::Clear_Fields();
         video::Set_Refresh_Stencil();
 
-        s_animation_header* popup_background_anim = (s_animation_header*)(farload::Far_Reload("turnsum.lbx", 0, MOX::screen_seg));
-        s_animation_header* scroll_up_button_image = (s_animation_header*)(farload::Far_Reload_Next("turnsum.lbx", 1, MOX::screen_seg));
-        s_animation_header* scroll_down_button_image = (s_animation_header*)(farload::Far_Reload_Next("turnsum.lbx", 2, MOX::screen_seg));
-        s_animation_header* ok_button_image = (s_animation_header*)(farload::Far_Reload_Next("turnsum.lbx", 3, MOX::screen_seg));
+        s_animation_header* popup_background_anim = (s_animation_header*)(
+            farload::Far_Reload("turnsum.lbx", 0, MOX::screen_seg));
+        s_animation_header* scroll_up_button_image = (s_animation_header*)(
+            farload::Far_Reload_Next("turnsum.lbx", 1, MOX::screen_seg));
+        s_animation_header* scroll_down_button_image = (s_animation_header*)(
+            farload::Far_Reload_Next("turnsum.lbx", 2, MOX::screen_seg));
+        s_animation_header* ok_button_image = (s_animation_header*)(
+            farload::Far_Reload_Next("turnsum.lbx", 3, MOX::screen_seg));
 
-        while (true) {
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        int16_t kbd_page_flip = 0;
+
+        while (true)
+        {
             MOX::FULL_DRAW_SCREEN_FLAG = 0;
             fields::Clear_Fields();
             fields::Assign_Auto_Function(TURNSUM::Draw_Turn_Summary_Popup, 2);
@@ -172,6 +199,21 @@ namespace TURNSUM {
                 LIST::Display_List_Page(&g_turn_sum_header);
                 LIST::Set_List_Up_Down_Field_Drawing(&g_turn_sum_header, field_btn_up, field_btn_down);
 
+                g_prior_choice = 0; // fresh hover-guard state for this page
+
+                // Enhancement: land a keyboard page flip on the page's first
+                // or last message.
+                if (kbd_page_flip != 0)
+                {
+                    LIST::Set_Selected_List_Entry(&g_turn_sum_header, INFO::g_first_list_field);
+                    if (kbd_page_flip == 2)
+                    {
+                        LIST::Move_List_Selection_(&g_turn_sum_header, -1, 1);
+                    }
+                    g_selected_msg_p = LIST::Get_Selected_List_Entry(&g_turn_sum_header);
+                    kbd_page_flip = 0;
+                }
+
                 video::Copy_Off_To_Back();
                 palette::Clear_Palette_Changes(0, 0xFF);
                 RUSS::Mox_Sync_Update();
@@ -179,8 +221,48 @@ namespace TURNSUM {
 
                 bool full_draw_requested = false;
 
-                while (true) {
-                    int16_t input_field = fields::Get_Input();
+                while (true)
+                {
+                    // Enhancement: Up/Down move through the messages (flipping
+                    // pages at the edges), Enter opens the selected one like a
+                    // click on it.
+                    int16_t input_field = 0;
+                    if (enhanced)
+                    {
+                        int32_t nav_key = key::Read_Key();
+                        if (nav_key == 0x48E0 || nav_key == 0x50E0) // Up/Down
+                        {
+                            int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                            if (LIST::Selection_At_Page_Edge_(&g_turn_sum_header, nav_dir, 1))
+                            {
+                                int8_t page_flipped = (nav_dir > 0)
+                                                          ? LIST::Next_List_Page(&g_turn_sum_header)
+                                                          : LIST::Previous_List_Page(&g_turn_sum_header);
+                                if (page_flipped != 0)
+                                {
+                                    kbd_page_flip = (nav_dir > 0) ? (int16_t)1 : (int16_t)2;
+                                    break;
+                                }
+                            }
+                            g_selected_msg_p = LIST::Move_List_Selection_(&g_turn_sum_header, nav_dir, 1);
+                        }
+                        else if (nav_key == 0x1C0D) // Enter
+                        {
+                            if (g_selected_msg_p != nullptr)
+                            {
+                                input_field = INFO::g_first_list_field;
+                            }
+                        }
+                        else if (nav_key != 0)
+                        {
+                            key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
+                        }
+                    }
+
+                    if (input_field == 0)
+                    {
+                        input_field = fields::Get_Input();
+                    }
 
                     if (MOX::FULL_DRAW_SCREEN_FLAG != 0) {
                         full_draw_requested = true;

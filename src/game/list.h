@@ -118,6 +118,13 @@ namespace LIST {
     s_list_item* __cdecl Move_List_Selection_(s_list_state* state, int16_t direction, uint8_t per_item);
 
     /**
+     * Enhancement: reports whether the selection sits on the page's first
+     * (direction < 0) or last (direction > 0) visible line. With per_item
+     * set, only the item position counts, not the line within it.
+     */
+    uint8_t __cdecl Selection_At_Page_Edge_(s_list_state* state, int16_t direction, uint8_t per_item);
+
+    /**
      * Computes item positions and page boundaries for the list.
      * @param state List layout state and item array.
      */
