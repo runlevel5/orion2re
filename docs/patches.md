@@ -100,7 +100,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1548` - `clip fighter damage`: fixed in `CMBTFIRE::Fire_Fighter_Beam_()` by capping weighted fighter-beam rolls at the adjusted weapon maximum; this replaces the 1.50 configurable call-site wrapper with a direct source-level damage invariant.
 - [x] `asm.pl:1577` - `bombardment hits fix`: fixed in `CMBTFIRE::Apply_Damage_To_Planet_()` by processing accumulated defense and colony damage when it exactly reaches the relevant hit-point threshold; this directly expresses the two 1.50 conditional-branch corrections in source.
 - [x] `asm.pl:1654` - `stealth`: implemented in `SHIPSTAK::Remove_Non_Detected_Ships_()` with configurable scanner, base, and stealth bonuses plus the `none`/`race`/`race_tech` traveling-ship size-penalty policy; this replaces the 1.50 binary wrappers with direct source-level visibility calculation while preserving the selected topic's defaults.
-- [ ] `asm.pl:1964` - `mapedge retreat crash`
+- [x] `asm.pl:1964` - `mapedge retreat crash`: already fixed in `draw::Color_Stream_Copy_()` by processing pixels only while the signed index is less than `pixel_count`, so zero or negative clipped widths return without accessing either buffer; this directly expresses the 1.50 `JLE` loop guard in source.
 - [ ] `asm.pl:2160` - `diplomatic event`
 - [ ] `asm.pl:2219` - `relax end of turn`
 - [ ] `asm.pl:2261` - `pop limit bug`
