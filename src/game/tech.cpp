@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "enhanced_ux.h"
+
 namespace {
     /** Draws one application name inside the grouped technology list popup. */
     void __cdecl Draw_Tech_List_App_(int16_t x, int16_t y, uint8_t tech_app_id) {
@@ -12,6 +14,11 @@ namespace {
 }
 
 namespace TECH {
+    // Enhancement: pointer position recorded at the last keyboard navigation
+    // on the research screen. While the mouse has not moved from it, a
+    // stationary hover does not steal the keyboard selection.
+    static int16_t _g_kbd_nav_mouse_x = -1;
+    static int16_t _g_kbd_nav_mouse_y = -1;
     char _hyper_field_name_buffer[64];
 
     uint8_t _saved_hyper_advanced_tech[8];
@@ -244,6 +251,22 @@ namespace TECH {
 
         _g_entries_p = entries;
 
+        // Enhancement: start with the first tech of the first research box
+        // highlighted so keyboard navigation has a visible origin. Recording
+        // the pointer keeps a stationary hover from stealing it immediately.
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        if (enhanced && Get_Selected_Entry_(entries) == nullptr) {
+            for (i = 0; i < 8; ++i) {
+                if (entries[i].tech_field_id != 0 && entries[i].visible_app_count > 0) {
+                    entries[i].current_app_index = 1;
+                    entries[i].selected_app_index = 0;
+                    break;
+                }
+            }
+            _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X_();
+            _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y_();
+        }
+
         player_race = MOX::_player[MOX::_PLAYER_NUM].race;
         snprintf(science_race_lbx_name, sizeof(science_race_lbx_name), "SR_R%x_SC.LBX", player_race);
 
@@ -316,7 +339,64 @@ namespace TECH {
                     JIM::Play_Streaming_Music_(0x75, -2, 1);
                 }
 
+                // Enhancement: keyboard navigation — Tab cycles the research
+                // boxes, Up/Down move within a box, Enter picks the
+                // highlighted tech, and 'i' shows its description.
+                int16_t synth_commit = 0;
+                if (enhanced) {
+                    int32_t nav_key = key::Read_Key_();
+                    if (nav_key != 0) {
+                        int16_t nav_char = (int16_t)(nav_key & 0xFF);
+                        s_list_item_research* sel = Get_Selected_Entry_(entries);
+                        if (nav_key == 0x0F09) { // Tab
+                            int16_t start_idx = (sel != nullptr) ? (int16_t)(sel - entries) : (int16_t)-1;
+                            for (int16_t off = 1; off <= 8; ++off) {
+                                int16_t idx = (int16_t)((start_idx + off + 8) % 8);
+                                if (entries[idx].tech_field_id != 0 && entries[idx].visible_app_count > 0) {
+                                    for (int16_t k = 0; k < 8; ++k) {
+                                        entries[k].current_app_index = 0;
+                                    }
+                                    entries[idx].current_app_index = 1;
+                                    entries[idx].selected_app_index = 0;
+                                    break;
+                                }
+                            }
+                            _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X_();
+                            _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y_();
+                        } else if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+                            if (sel != nullptr && sel->visible_app_count > 0) {
+                                int16_t dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                                sel->selected_app_index = (int16_t)(
+                                    (sel->selected_app_index + sel->visible_app_count + dir) %
+                                    sel->visible_app_count);
+                            }
+                            _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X_();
+                            _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y_();
+                        } else if (nav_key == 0x1C0D) { // Enter
+                            if (sel != nullptr && sel->app_ids[sel->selected_app_index] != 0) {
+                                synth_commit = _g_first_tech_field;
+                            }
+                        } else if (nav_char == 'i' || nav_char == 'I') { // info
+                            if (sel != nullptr) {
+                                int16_t info_app_id = sel->app_ids[sel->selected_app_index];
+                                if (info_app_id != 0) {
+                                    _g_selected_entry_p = sel;
+                                    Display_Selected_Entry_Text_(sel);
+                                    Draw_Application_Description_(0x119, info_app_id);
+                                    redraw = true;
+                                    break;
+                                }
+                            }
+                        } else {
+                            key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+                        }
+                    }
+                }
+
                 input_val = fields::Get_Input_();
+                if (synth_commit != 0 && input_val <= 0) {
+                    input_val = synth_commit;
+                }
 
                 if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
                     redraw = true;
@@ -468,6 +548,14 @@ namespace TECH {
 
     void __cdecl Draw_Tech_Select_() {
         int16_t input_field = fields::Scan_Input_();
+
+        // Enhancement: after a keyboard navigation, a stationary hover must
+        // not steal the selection back; the mouse regains it once it moves.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+            (int16_t)mouse::Pointer_X_() == _g_kbd_nav_mouse_x &&
+            (int16_t)mouse::Pointer_Y_() == _g_kbd_nav_mouse_y) {
+            input_field = 0;
+        }
 
         if (input_field >= _g_first_tech_field && input_field <= _g_last_tech_field) {
             int32_t index = input_field - _g_first_tech_field;
