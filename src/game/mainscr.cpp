@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 #include "config/config_loader.h"
 #include "config/config_snapshot.h"
 #include "game/build_queue.h"

@@ -3,8 +3,6 @@
 
 #include "config/mod_manager.h"
 
-#include "enhanced_ux.h"
-
 namespace MAINMENU {
     s_main_menu* mainmenu;
     s_animation_header* main_menu_background;

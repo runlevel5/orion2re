@@ -2,7 +2,6 @@
 
 #include "config/config_decode.h"
 #include "newgame_options.h"
-#include "enhanced_ux.h"
 namespace NEWGAME {
 
     int16_t g_x = 15;
@@ -89,7 +88,7 @@ namespace NEWGAME {
     uint32_t last_wheel_ms = 0;
     constexpr uint32_t WHEEL_STEP_MS = 120;
     if (enhanced) {
-        platform::Consume_Mouse_Wheel_Steps_(); // discard pre-screen movement
+        platform::Discard_Input_Observations_();
     }
 
         while (!exit_screen) {

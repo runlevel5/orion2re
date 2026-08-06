@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "enhanced_ux.h"
 
 namespace {
     // Enhancement: last hovered list field, so a stationary pointer does not

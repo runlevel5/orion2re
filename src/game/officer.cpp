@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "enhanced_ux.h"
 #include "officer_roster.h"
 #include "string_overrides.h"
 
@@ -963,8 +962,7 @@ namespace OFFICER {
         uint8_t kbd_name_wins = 0;
         int16_t prev_hover_icon = -1;
         if (enhanced) {
-            platform::Consume_Mouse_Wheel_Steps_(); // discard pre-screen movement
-            platform::Consume_Mouse_Wheel_Steps_X_();
+            platform::Discard_Input_Observations_();
         }
 
         do {

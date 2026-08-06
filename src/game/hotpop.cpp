@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "enhanced_ux.h"
-
 namespace HOTPOP {
     int16_t hotseat_human_players;
     s_animation_header* hot_pop_background_seg;

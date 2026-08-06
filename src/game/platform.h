@@ -85,6 +85,9 @@ namespace platform {
     bool Create_Video_Buffers(int16_t video_mode);
     void __cdecl Service_Pending_Window_Events();
     void __cdecl Pump_Game_Input_Queue();
+    // Discards all pending input observations (wheel steps, middle clicks,
+    // observed left clicks); called when a screen or popup opens.
+    void __cdecl Discard_Input_Observations_();
     // Returns and consumes whole accumulated mouse-wheel steps (positive = up).
     int16_t __cdecl Consume_Mouse_Wheel_Steps_();
     // Returns and consumes whole accumulated horizontal mouse-wheel steps

@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 #include "game/config_refresh.h"
 
 namespace MAINSCR {

@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "enhanced_ux.h"
-
 namespace fields {
     namespace {
         s_field g_fields_storage[MAX_FIELDS_COUNT];

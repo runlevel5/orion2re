@@ -3,8 +3,6 @@
 #include "fields.h"
 #include "raceopt.h"
 
-#include "enhanced_ux.h"
-
 namespace RACESEL {
 
     static constexpr char LAST_RACE_FILENAME[] = "ORION2RE.RAC";

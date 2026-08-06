@@ -370,6 +370,7 @@ orion2re_add_unit_test(test_lua_mod_runtime
         src/game/vfs_lbx.cpp
         src/game/vfs_path.cpp
         src/game/vfs_zip.cpp
+        src/game/settings.cpp
     FAKE_SOURCES
         tests/fakes/fake_lua_game_state.cpp
         tests/fakes/fake_lua_network_config.cpp
@@ -418,6 +419,7 @@ orion2re_add_unit_test(test_config_decode
         src/game/newtech_config.cpp
         src/game/raceopt_config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
         src/game/spy_config_validation.cpp
         src/game/spy_bonus.cpp
         src/game/techdata.cpp
@@ -457,6 +459,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/game/mapgen_config.cpp
         src/game/raceopt_config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
         src/game/spy_config_validation.cpp
         src/game/spy_bonus.cpp
         src/game/techdata.cpp
@@ -542,6 +545,7 @@ orion2re_add_unit_test(test_config_loader
         src/game/mapgen_config.cpp
         src/game/raceopt_config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
         src/game/spy_config_validation.cpp
         src/game/spy_bonus.cpp
         src/game/techdata.cpp
@@ -1473,6 +1477,7 @@ orion2re_add_unit_test(test_fields
     PRODUCTION_SOURCES
         src/game/exitm.cpp
         src/game/fields.cpp
+        src/game/settings.cpp
         src/game/mouse_wheel.cpp
     FAKE_SOURCES
         tests/fakes/fake_animate.cpp
