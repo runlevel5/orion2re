@@ -287,6 +287,7 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
     )
 
     set_source_files_properties(${ORION2RE_CONFIG_GENERATED_FILES} PROPERTIES
+        GENERATED TRUE
         OBJECT_DEPENDS "${ORION2RE_CONFIG_GENERATED_STAMP}"
     )
 
@@ -315,6 +316,12 @@ if(ORION2RE_BUILD_CONFIG_TOOL)
     install(FILES "${ORION2RE_CONFIG_DOCUMENTATION}"
         DESTINATION "docs"
     )
+elseif((ORION2RE_BUILD_GAME OR ORION2RE_BUILD_TESTS) AND
+       NOT EXISTS "${ORION2RE_CONFIG_GENERATED_DIR}/config.cpp")
+    message(FATAL_ERROR
+        "Building the game or tests requires generated configuration bindings. "
+        "Enable ORION2RE_BUILD_CONFIG_TOOL and use a native build to generate them."
+    )
 endif()
 target_include_directories(orion2re_lz4 PUBLIC
     "${ORION2RE_VENDORED_LZ4_DIR}/lib"
@@ -328,6 +335,9 @@ if(ORION2RE_BUILD_GAME)
     file(GLOB_RECURSE ORION2RE_HEADERS CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
     )
+
+    list(REMOVE_ITEM ORION2RE_SOURCES ${ORION2RE_CONFIG_GENERATED_FILES})
+    list(APPEND ORION2RE_SOURCES ${ORION2RE_CONFIG_GENERATED_FILES})
 endif()
 
 set(ORION2RE_SUPPORTED_MOD_ARCHIVES)
