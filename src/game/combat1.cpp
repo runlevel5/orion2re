@@ -1196,6 +1196,57 @@ namespace COMBAT1 {
         return 1;
     }
 
+    static bool Should_End_Combat_() {
+        int16_t side_counts[2] = {};
+
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            const s_combat_data* unit = &MOX::_combat_data[i];
+            if (unit->unit_status != 5 && unit->is_captured == 0) {
+                side_counts[unit->owner == MOX::_combat_attacker_player]++;
+            }
+        }
+
+        const bool attacker_is_human =
+            MOX::_combat_attacker_player >= 0 &&
+            MOX::_combat_attacker_player < MAX_PLAYERS &&
+            MOX::_combat_attacker_player < MOX::_NUM_PLAYERS &&
+            MOX::_player[MOX::_combat_attacker_player].objectives == PLAYER_OBJECTIVE_HUMAN;
+
+        if (MOX::_cmbt_colony_id != -1 &&
+            CMBTFIRE::Does_Combat_Planet_Have_Defenses_() == 0 &&
+            (!attacker_is_human || MOX::_auto_combat_flag[0] == 1) &&
+            side_counts[0] > 0) {
+            side_counts[0]--;
+        }
+
+        if (side_counts[0] > 0 && side_counts[1] > 0) {
+            return false;
+        }
+
+        const int16_t surviving_player =
+            side_counts[0] == 0
+                ? MOX::_combat_attacker_player
+                : MOX::_combat_defender_player;
+
+        if (surviving_player < 0 ||
+            surviving_player >= MAX_PLAYERS ||
+            surviving_player >= MOX::_NUM_PLAYERS ||
+            MOX::_player[surviving_player].objectives != PLAYER_OBJECTIVE_HUMAN) {
+            return true;
+        }
+
+        for (int16_t i = 0; i < 300; ++i) {
+            const s_missile* missile = &MOX::_missile[i];
+            if (missile->type > 0 &&
+                missile->quantity != 0 &&
+                missile->owner != surviving_player) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     int16_t __cdecl Check_For_Winner_() {
         int16_t attacker_count = 0;
         int16_t defender_count = 0;
@@ -1256,7 +1307,7 @@ namespace COMBAT1 {
         int16_t saved_cur_ptr = MOX::_cur_ptr;
         int16_t planet_has_defenses = 0;
 
-        if (COMBAT1::Check_For_Winner_() != 0) {
+        if (Should_End_Combat_()) {
             return 1;
         }
 

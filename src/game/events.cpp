@@ -336,12 +336,12 @@ namespace EVENTS {
                 }
 
                 case 4:
-                    diplomac::Change_Relations_(-100, _event_data[i].player_idx, _event_data[i].target_id, 0, 0, 0);
+                    diplomac::Change_Relations_(-100, _event_data[i].target_id, _event_data[i].player_idx, 0, 0, 0);
                     _event_data[i].status = 5;
                     break;
 
                 case 5:
-                    diplomac::Change_Relations_(100, _event_data[i].player_idx, _event_data[i].target_id, 0, 0, 0);
+                    diplomac::Change_Relations_(100, _event_data[i].target_id, _event_data[i].player_idx, 0, 0, 0);
                     _event_data[i].status = 5;
                     break;
 

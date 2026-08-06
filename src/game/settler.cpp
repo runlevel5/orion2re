@@ -1,6 +1,18 @@
 #include "pch.h"
 
 namespace SETTLER {
+    static void Count_Pop_(
+            s_colony* colony,
+            int32_t race_idx,
+            int32_t* pop_limits,
+            int32_t* pop_counts) {
+        if (pop_limits[race_idx] == 0) {
+            pop_limits[race_idx] =
+                    COLCALC::Colony_Race_Pop_Limit_(colony, (int16_t)race_idx);
+        }
+        pop_counts[race_idx]++;
+    }
+
     int8_t __cdecl Add_Settler_To_Colony_(value_type settler_data, s_colony* colony) {
         bool is_full = false;
         int16_t race_idx = (int16_t)Get_Race(settler_data);
@@ -51,36 +63,61 @@ namespace SETTLER {
     }
 
     bool __cdecl Room_For_Another_(s_colony* colony, int16_t race_idx, int8_t include_freighters) {
-        int32_t pop_limit = (int32_t)COLCALC::Colony_Race_Pop_Limit_(colony, race_idx);
-        int32_t matching_pop_count = 0;
+        int32_t pop_limits[10] = {};
+        int32_t pop_counts[10] = {};
 
         for (int32_t i = 0; i < (uint8_t)colony->n_pops; ++i) {
-            int16_t current_pop_race = (int16_t)POP::Get_Race(colony->pop[i]);
-            if (COLCALC::Colony_Race_Pop_Limit_(colony, current_pop_race) <= pop_limit) {
-                matching_pop_count++;
-            }
+            Count_Pop_(colony, (int32_t)POP::Get_Race(colony->pop[i]), pop_limits, pop_counts);
         }
 
         if (include_freighters != 0) {
             s_player* player = &MOX::_player[(int)colony->owner];
-            int16_t colony_idx = (int16_t)(colony - MOX::_colony);
 
             if (player->settlers_freighted > 0) {
                 for (int32_t i = 0; i < (int32_t)player->settlers_freighted; ++i) {
-                    s_settler_info& settler = player->settlers[i];
-                    const value_type settler_data = settler.val;
-                    int16_t dest_planet = Get_Dest_Planet(settler_data);
-
-                    if (MOX::_planet[dest_planet].colony_index == colony_idx) {
-                        if (COLCALC::Colony_Race_Pop_Limit_(colony, (int16_t)Get_Race(settler_data)) <= pop_limit) {
-                            matching_pop_count++;
-                        }
+                    value_type settler_data = player->settlers[i].val;
+                    if (Get_Dest_Planet(settler_data) == colony->planet) {
+                        Count_Pop_(
+                                colony,
+                                (int32_t)Get_Race(settler_data),
+                                pop_limits,
+                                pop_counts);
                     }
                 }
             }
         }
 
-        return matching_pop_count < pop_limit;
+        if (pop_limits[race_idx] == 0) {
+            pop_limits[race_idx] = COLCALC::Colony_Race_Pop_Limit_(colony, race_idx);
+        }
+
+        int32_t total_pop_count = 0;
+        for (int32_t counted_race = 0; counted_race < 10; ++counted_race) {
+            total_pop_count += pop_counts[counted_race];
+        }
+        if (total_pop_count >= 42) {
+            return false;
+        }
+
+        for (int32_t limiting_race = 0; limiting_race < 10; ++limiting_race) {
+            if (pop_limits[limiting_race] < pop_limits[race_idx]) {
+                continue;
+            }
+
+            int32_t constrained_pop_count = 0;
+            for (int32_t counted_race = 0; counted_race < 10; ++counted_race) {
+                if (pop_counts[counted_race] > 0 &&
+                    pop_limits[counted_race] <= pop_limits[limiting_race]) {
+                    constrained_pop_count += pop_counts[counted_race];
+                }
+            }
+
+            if (pop_limits[limiting_race] <= constrained_pop_count) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     void __cdecl Move_Settlers_() {

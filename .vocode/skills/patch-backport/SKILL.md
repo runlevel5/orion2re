@@ -163,6 +163,9 @@ Never silently analyze a near match. Document any version-related differences, a
 
 Explain:
 
+- in plain language, what the actual bug is, including its trigger and observable incorrect result
+- what the patch fixes and why the patched behavior resolves that bug
+- if the topic is not a bug fix, state that explicitly and explain the behavior or feature change instead
 - the original behavior and defect
 - the exact trigger or violated invariant
 - what each 1.50 edit changes
@@ -176,6 +179,8 @@ Distinguish facts proven by assembly from interpretations inferred from comments
 ### 5. Analyze the restored source tree
 
 Locate the semantic equivalent of the original functions and data in the current project.
+
+Before designing or proposing source changes, read the repository's style documentation under `docs/`, including `docs/styleguide.md` when present. Treat those conventions as implementation requirements for source, tests, generated-code handling, naming, visibility, and organization.
 
 Follow repository read policy:
 
@@ -204,12 +209,13 @@ Do not change any project file yet, including `docs/patches.md`.
 Present the user with:
 
 1. A concise analysis summary.
-2. The verified original and patched behavior.
-3. Migration status in the restored source.
-4. A file-by-file implementation plan.
-5. Focused suggested diffs for every proposed source, test, and documentation edit.
-6. When configuration variables will be added, the repository-defined CMake command or target that will regenerate the C++ parser, plus the expected generated outputs.
-7. Assumptions, compatibility effects, and validation commands.
+2. A plain-language statement of the actual bug and what the patch fixes, including the trigger and incorrect result. If the topic is not a bug fix, identify it as a behavior or feature change and explain that change instead.
+3. The verified original and patched behavior.
+4. Migration status in the restored source.
+5. A file-by-file implementation plan.
+6. Focused suggested diffs for every proposed source, test, and documentation edit.
+7. When configuration variables will be added, the repository-defined CMake command or target that will regenerate the C++ parser, plus the expected generated outputs.
+8. Assumptions, compatibility effects, and validation commands.
 
 Before the suggested diffs, include two short implementation paragraphs:
 
@@ -273,6 +279,7 @@ Before finishing:
 
 Report:
 
+- the actual bug and what the patch fixes, or the behavior or feature change when the topic is not a bug fix
 - the restored semantic fix
 - static checks run and the Visual Studio build/test result, or clearly state that user validation is pending
 - catalog status update
