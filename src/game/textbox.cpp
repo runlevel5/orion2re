@@ -21,6 +21,7 @@ namespace TEXTBOX {
     static s_animation_header* _g_close_anim = nullptr;
     static int16_t _g_close_x;
     static int16_t _g_close_y;
+    static int16_t _g_close_field = 0;
     static uint8_t _g_close_animated;
 
     void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name, size_t help_lbx_name_size) {
@@ -185,7 +186,34 @@ namespace TEXTBOX {
                     key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
                 }
             }
-        } while (fields::Get_Input_() == 0);
+
+            int16_t input = fields::Get_Input_();
+            if (input == 0) {
+                continue;
+            }
+
+            // Enhancement: a click on the close button shows it pressed and
+            // released, like the Esc/Enter path (the field's own 0x28 click
+            // sound has already played).
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                _g_close_anim != nullptr && _g_close_field > 0 &&
+                input == _g_close_field) {
+                video::Set_Page_Off_();
+                animate::Set_Animation_Frame_(_g_close_anim, 1);
+                animate::Remap_Draw_(_g_close_x, _g_close_y, _g_close_anim);
+                RUSS::Mox_Sync_Update_();
+                timer::Mark_Time_();
+                timer::Release_Time_(2);
+                video::Set_Page_Off_();
+                animate::Set_Animation_Frame_(_g_close_anim, 0);
+                animate::Remap_Draw_(_g_close_x, _g_close_y, _g_close_anim);
+                RUSS::Mox_Sync_Update_();
+                timer::Mark_Time_();
+                timer::Release_Time_(1);
+                _g_close_animated = 1;
+            }
+            return;
+        } while (true);
     }
 
     void __cdecl Text_Box_Cleanup_() {
@@ -287,7 +315,7 @@ namespace TEXTBOX {
         if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
             int16_t close_x = x + 158;
             int16_t close_y = _bottom_y - 27;
-            fields::Add_Hidden_Field_(
+            _g_close_field = fields::Add_Hidden_Field_(
                 close_x, close_y,
                 close_x + (int16_t)animate::Get_Width_(anim),
                 close_y + (int16_t)animate::Get_Height_(anim),
@@ -302,6 +330,7 @@ namespace TEXTBOX {
         _g_close_y = _bottom_y - 27;
         Text_Box_Get_Input_(input_ticks);
         _g_close_anim = nullptr;
+        _g_close_field = 0;
 
         if (_g_close_animated == 0) {
             animate::Set_Animation_Frame_(anim, 1);
@@ -537,7 +566,7 @@ namespace TEXTBOX {
         if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
             int16_t close_x = box_x + 158;
             int16_t close_y = _bottom_y - 27;
-            fields::Add_Hidden_Field_(
+            _g_close_field = fields::Add_Hidden_Field_(
                 close_x, close_y,
                 close_x + (int16_t)animate::Get_Width_(textbox_lbx_ptr),
                 close_y + (int16_t)animate::Get_Height_(textbox_lbx_ptr),
@@ -552,6 +581,7 @@ namespace TEXTBOX {
         _g_close_y = _bottom_y - 27;
         Text_Box_Get_Input_(0);
         _g_close_anim = nullptr;
+        _g_close_field = 0;
 
         if (_g_close_animated == 0) {
             animate::Set_Animation_Frame_(textbox_lbx_ptr, 1);

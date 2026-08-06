@@ -853,6 +853,59 @@ namespace OFFICER {
             (int16_t)(((((next_idx ^ sign) - sign) & 7) ^ sign) - sign);
     }
 
+    // Enhancement: shows one dialog listing all of the selected leader's
+    // skills (name and description, up to 5), reusing the single-skill
+    // dialog's strings and text box. slot is the leader's on-screen slot.
+    static void Show_Leader_Skills_Dialog_(int16_t slot, int16_t leader_idx) {
+        char body[1800];
+        char name_buf[80];
+        char desc_buf[256];
+        body[0] = '\0';
+
+        for (int16_t i = 0; i < 5; ++i) {
+            if (_officer_skill_help[slot].skill_help_x[i] == -1000) {
+                continue;
+            }
+            int16_t skill_id = _officer_skill_help[slot].skill_id[i];
+
+            int16_t skill_value;
+            if (skill_id == 28) {
+                skill_value = 10;
+            } else if (skill_id == 29) {
+                skill_value = 15;
+            } else {
+                skill_value = (int16_t)Officer_Skill_Bonus_((uint32_t)MOX::_PLAYER_NUM, leader_idx, skill_id);
+            }
+
+            strlcpy(name_buf, _officer_skill_name_string[skill_id / 2], sizeof(name_buf));
+            MISC::Replace_Char_(name_buf, '_', ' ');
+            // "NAVIGATOR SKILL" reads better as just "NAVIGATOR" here.
+            size_t name_len = strlen(name_buf);
+            if (name_len > 6 && strcmp(name_buf + name_len - 6, " SKILL") == 0) {
+                name_buf[name_len - 6] = '\0';
+            }
+
+            // The description embeds the leader's name; format with an empty
+            // name and trim the leftover separator instead.
+            snprintf(desc_buf, sizeof(desc_buf), _officer_skill_description_string[skill_id / 2], "", (int)skill_value);
+            const char* desc = desc_buf;
+            while (*desc == ',' || *desc == ' ') {
+                ++desc;
+            }
+
+            if (body[0] != '\0') {
+                strlcat(body, "\n", sizeof(body));
+            }
+            strlcat(body, name_buf, sizeof(body));
+            strlcat(body, ": ", sizeof(body));
+            strlcat(body, desc, sizeof(body));
+        }
+
+        if (body[0] != '\0') {
+            Text_Box_With_Refresh_("SKILLS", body);
+        }
+    }
+
     void Officers_Screen_() {
         uint16_t saved_map_scale = (uint16_t)MOX::_cur_map_scale;
         int8_t needs_help_reset = 0;
@@ -980,6 +1033,14 @@ namespace OFFICER {
                     if (big_icons_scanned[slot] > 0) {
                         synth_input = big_icons_scanned[slot];
                     }
+                } else if (_officer_button_mode == -1 && key > 0 &&
+                           (key & 0xFF) >= '1' && (key & 0xFF) <= '4') {
+                    // Digits 1-4 select (highlight) the corresponding leader.
+                    int16_t slot = (int16_t)((key & 0xFF) - '1');
+                    if (slot < MOX::_n_fltscrn_officers && MOX::_officer_id_list[slot] > -1) {
+                        MOX::_officer_selected = (int8_t)MOX::_officer_id_list[slot];
+                        MOX::_draw_officer_to_back = 1;
+                    }
                 } else if (key > 0 && ((key & 0xFF) == 'c' || (key & 0xFF) == 'C') &&
                            _officer_button_mode == 0) {
                     key::Push_Key_Code_((uint32_t)'X', g_last_scan_code);
@@ -1004,6 +1065,20 @@ namespace OFFICER {
                         if (MOX::_officer_id_list[next] > -1) {
                             MOX::_officer_selected = (int8_t)MOX::_officer_id_list[next];
                             MOX::_draw_officer_to_back = 1;
+                        }
+                    }
+                } else if (key > 0 && ((key & 0xFF) == 'i' || (key & 0xFF) == 'I') &&
+                           _officer_button_mode == -1 &&
+                           (MOX::_officer_scanned > -1 || MOX::_officer_selected > -1)) {
+                    // 'i' shows all skills of the hovered leader, or of the
+                    // selected one when the pointer is not on a row.
+                    int16_t info_leader = (MOX::_officer_scanned > -1)
+                                              ? (int16_t)MOX::_officer_scanned
+                                              : (int16_t)MOX::_officer_selected;
+                    for (int16_t slot = 0; slot < 4; ++slot) {
+                        if (MOX::_officer_id_list[slot] == info_leader) {
+                            Show_Leader_Skills_Dialog_(slot, info_leader);
+                            break;
                         }
                     }
                 } else if (key == 0x1C0D && _officer_button_mode == -1 &&
