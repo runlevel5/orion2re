@@ -93,7 +93,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1281` - `tolerant races maintenance bug`: fixed in `COLCALC::Compute_Potential_Colony_Info_()` by always reporting the planet climate's maintenance modifier, including for Tolerant races; this directly expresses the 1.50 removal of the trait-based popup skip.
 - [x] `asm.pl:1290` - `telepath skill level is 1 too low bug`: fixed in `spy::Compute_Spy_Bonuses_()` by converting the zero-based officer level to the leader's actual level before applying regular and improved Telepath multipliers; this directly expresses the two 1.50 instruction-level increments in source.
 - [x] `asm.pl:1306` - `ordinary assasin skill works`: fixed in `spy::Resolve_Assassins_()` by testing the ordinary Assassin skill in the fallback branch and applying its `(level + 1) * 2` assassination chance; this directly expresses the 1.50 one-byte skill-mask correction in source.
-- [ ] `asm.pl:1315` - `navigator skill display bug`
+- [x] `asm.pl:1315` - `navigator skill display bug`: fixed in `MOX::_skill_data` by making the Navigator and Navigator* display parameters use the same four-level and three-level bonus intervals as strategic movement; this directly expresses the two 1.50 data-record corrections in source.
 - [ ] `asm.pl:1368` - `AI fighters size`
 - [ ] `asm.pl:1377` - `filter boarding for stasis, bhg`
 - [ ] `asm.pl:1492` - `tech field desync`
