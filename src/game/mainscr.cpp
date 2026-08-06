@@ -1404,7 +1404,10 @@ namespace MAINSCR {
         _treasury_window_field = fields::Add_Hidden_Field_(
             545, 49, 613, 119,
             ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? "X" : "", 0x29);
-        _command_points_window_field = fields::Add_Hidden_Field_(545, 122, 613, 192, "", 0x29);
+        // Enhancement: 'S' opens the command summary like a click.
+        _command_points_window_field = fields::Add_Hidden_Field_(
+            545, 122, 613, 192,
+            ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? "S" : "", 0x29);
         _food_window_field = fields::Add_Hidden_Field_(545, 197, 613, 267, "", 0x29);
         _freighters_window_field = fields::Add_Hidden_Field_(545, 270, 613, 340, "", 0x29);
         _research_window_field = fields::Add_Hidden_Field_(545, 344, 613, 415, "", 0x29);

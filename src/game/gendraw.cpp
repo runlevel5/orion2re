@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "enhanced_ux.h"
+
 namespace GENDRAW {
     s_colors _message_text_colors = {{0xA0, 0xA3, 0xA3, 0xA5, 0xAB, 0xAB, 0xAB, 0xAB}};
     uint8_t _warning_box;
@@ -169,8 +171,13 @@ namespace GENDRAW {
             }
         }
 
-        _first_field = fields::Add_Hidden_Field_(0xeb, 0x12e, 0x11e, 0x143, "Y", 0x29);
-        int16_t second_field = fields::Add_Hidden_Field_(0x159, 0x12e, 0x18c, 0x143, "N", 0x29);
+        // Enhancement: the Yes/No buttons play the button click sound for
+        // consistency with the other buttons.
+        int8_t confirm_sound = (ENHANCED_UX::enhanced_ux_settings.enabled != 0)
+                                   ? (int8_t)0x28
+                                   : (int8_t)0x29;
+        _first_field = fields::Add_Hidden_Field_(0xeb, 0x12e, 0x11e, 0x143, "Y", confirm_sound);
+        int16_t second_field = fields::Add_Hidden_Field_(0x159, 0x12e, 0x18c, 0x143, "N", confirm_sound);
 
         for (int i = 0; i < 3; ++i) {
             _image_seg[i] = (s_animation_header*)buffer::Buffer_Reload_("confirm.lbx", i, (uint8_t*)MOX::_global_cache_seg);
@@ -204,11 +211,45 @@ namespace GENDRAW {
         int16_t input;
         do {
             timer::Mark_Time_();
-            input = fields::Get_Input_();
-            if (input == 0) {
-                RUSS::Mox_Sync_Update_();
+            input = 0;
+
+            // Enhancement: the Y/N hotkeys show their button pressed, then
+            // released, as a mouse hold would — Draw_Confirm_Box_ renders the
+            // pressed frame from fields::_auto_input_variable.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                int32_t key = key::Read_Key_();
+                if (key != 0) {
+                    int16_t key_char = (int16_t)(key & 0xFF);
+                    if (key_char > '`' && key_char < '{') {
+                        key_char -= 0x20;
+                    }
+                    if (key_char == 'Y' || key_char == 'N') {
+                        input = (key_char == 'Y') ? _first_field : second_field;
+                        sound::Play_Sound_(0x28);
+                        fields::_auto_input_variable = input;
+                        video::Set_Page_Off_();
+                        Draw_Confirm_Box_();
+                        RUSS::Mox_Sync_Update_();
+                        timer::Release_Time_(2);
+                        fields::_auto_input_variable = 0;
+                        video::Set_Page_Off_();
+                        Draw_Confirm_Box_();
+                        RUSS::Mox_Sync_Update_();
+                        timer::Mark_Time_();
+                        timer::Release_Time_(1);
+                    } else {
+                        key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                    }
+                }
             }
-            timer::Release_Time_(2);
+
+            if (input == 0) {
+                input = fields::Get_Input_();
+                if (input == 0) {
+                    RUSS::Mox_Sync_Update_();
+                }
+                timer::Release_Time_(2);
+            }
         } while (input != _first_field && input != second_field);
 
         Message_Box_Cleanup_();

@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "enhanced_ux.h"
+
 namespace TEXTBOX {
     int16_t _bottom_y;
     uint8_t* _textbox_seg;
@@ -13,6 +15,13 @@ namespace TEXTBOX {
     MOX2::action_func_t _textbox_af;
     uint16_t _old_help_list_active;
     int32_t _base_colors[3] = {160, 192, 224};
+
+    // Enhancement: the current box's close button, so the shared input wait
+    // can animate it for the Esc/Enter shortcuts.
+    static s_animation_header* _g_close_anim = nullptr;
+    static int16_t _g_close_x;
+    static int16_t _g_close_y;
+    static uint8_t _g_close_animated;
 
     void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name, size_t help_lbx_name_size) {
         const char* selected_name;
@@ -125,6 +134,8 @@ namespace TEXTBOX {
     }
 
     void __cdecl Text_Box_Get_Input_(int16_t ticks) {
+        _g_close_animated = 0;
+
         if (ticks != 0) {
             fields::Timed_Wait_For_Input_((int32_t)ticks);
             fields::Clear_Mouse_Buffer_();
@@ -146,6 +157,34 @@ namespace TEXTBOX {
             timer::Mark_Time_();
             RUSS::Mox_Sync_Update_();
             timer::Release_Time_(1);
+
+            // Enhancement: Esc and Enter press the close button — click
+            // sound plus pressed/released animation — instead of closing
+            // with the plain field sound.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                _g_close_anim != nullptr) {
+                int32_t key = key::Read_Key_();
+                if (key == 0x011B || key == 0x1C0D) { // Esc or Enter
+                    sound::Play_Sound_(0x28);
+                    video::Set_Page_Off_();
+                    animate::Set_Animation_Frame_(_g_close_anim, 1);
+                    animate::Remap_Draw_(_g_close_x, _g_close_y, _g_close_anim);
+                    RUSS::Mox_Sync_Update_();
+                    timer::Mark_Time_();
+                    timer::Release_Time_(2);
+                    video::Set_Page_Off_();
+                    animate::Set_Animation_Frame_(_g_close_anim, 0);
+                    animate::Remap_Draw_(_g_close_x, _g_close_y, _g_close_anim);
+                    RUSS::Mox_Sync_Update_();
+                    timer::Mark_Time_();
+                    timer::Release_Time_(1);
+                    _g_close_animated = 1;
+                    return;
+                }
+                if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+            }
         } while (fields::Get_Input_() == 0);
     }
 
@@ -242,13 +281,32 @@ namespace TEXTBOX {
 
         video::Copy_Off_To_Back_();
 
+        // Enhancement: the close button plays the button click sound. Added
+        // before the full-screen field so its rectangle wins the hit test;
+        // clicks elsewhere keep the plain field sound.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            int16_t close_x = x + 158;
+            int16_t close_y = _bottom_y - 27;
+            fields::Add_Hidden_Field_(
+                close_x, close_y,
+                close_x + (int16_t)animate::Get_Width_(anim),
+                close_y + (int16_t)animate::Get_Height_(anim),
+                "", 0x28);
+        }
+
         /* "\x1B" is fmtpara's color-attribute control byte; used here as a non-printing field label. */
         fields::Add_Hidden_Field_(0, 0, 639, 479, "\x1B", 41);
 
+        _g_close_anim = anim;
+        _g_close_x = x + 158;
+        _g_close_y = _bottom_y - 27;
         Text_Box_Get_Input_(input_ticks);
+        _g_close_anim = nullptr;
 
-        animate::Set_Animation_Frame_(anim, 1);
-        animate::Remap_Draw_(x + 158, _bottom_y - 27, anim);
+        if (_g_close_animated == 0) {
+            animate::Set_Animation_Frame_(anim, 1);
+            animate::Remap_Draw_(x + 158, _bottom_y - 27, anim);
+        }
 
         Text_Box_Cleanup_();
 
@@ -473,16 +531,36 @@ namespace TEXTBOX {
         }
 
         video::Copy_Off_To_Back_();
+
+        // Enhancement: the close button plays the button click sound (see
+        // Do_Text_Box_).
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            int16_t close_x = box_x + 158;
+            int16_t close_y = _bottom_y - 27;
+            fields::Add_Hidden_Field_(
+                close_x, close_y,
+                close_x + (int16_t)animate::Get_Width_(textbox_lbx_ptr),
+                close_y + (int16_t)animate::Get_Height_(textbox_lbx_ptr),
+                "", 0x28);
+        }
+
         /* "\x1B" is fmtpara's color-attribute control byte; used here as a non-printing field label. */
         fields::Add_Hidden_Field_(0, 0, 639, 479, "\x1B", 41);
-        Text_Box_Get_Input_(0);
 
-        animate::Set_Animation_Frame_(textbox_lbx_ptr, 1);
-        animate::Remap_Draw_(
-            box_x + 158,
-            _bottom_y - 27,
-            textbox_lbx_ptr
-        );
+        _g_close_anim = textbox_lbx_ptr;
+        _g_close_x = box_x + 158;
+        _g_close_y = _bottom_y - 27;
+        Text_Box_Get_Input_(0);
+        _g_close_anim = nullptr;
+
+        if (_g_close_animated == 0) {
+            animate::Set_Animation_Frame_(textbox_lbx_ptr, 1);
+            animate::Remap_Draw_(
+                box_x + 158,
+                _bottom_y - 27,
+                textbox_lbx_ptr
+            );
+        }
 
         Text_Box_Cleanup_();
         MOX::_FULL_DRAW_SCREEN_FLAG = 1;
