@@ -809,6 +809,10 @@ namespace platform {
         return g_exit_message;
     }
 
+    int16_t __cdecl Consume_Mouse_Wheel_Steps_() {
+        return 0;
+    }
+
     void __cdecl Check_Exit_() {
         if (g_exit_requested) {
             throw process_exit_requested{};
