@@ -71,6 +71,20 @@ namespace platform {
 	// returns 0 when none are pending.
 	uint8_t __cdecl Consume_Left_Click_(int16_t* x, int16_t* y, uint32_t* ticks);
 
+	// Synthetic key codes for audio hotkeys (same 0xFFFFxx00 form as the
+	// F11/F12 codes), delivered through the regular key buffer. The media
+	// keys and the Ctrl/Alt + -/=/0 combinations map here; plain -/=/0 stay
+	// ordinary printable keys.
+	constexpr int32_t KEY_CODE_MUTE = (int32_t)0xFFFF9000;
+	constexpr int32_t KEY_CODE_VOLUME_UP = (int32_t)0xFFFF9100;
+	constexpr int32_t KEY_CODE_VOLUME_DOWN = (int32_t)0xFFFF9200;
+	constexpr int32_t KEY_CODE_MUSIC_MUTE = (int32_t)0xFFFF9300;
+	constexpr int32_t KEY_CODE_MUSIC_VOLUME_UP = (int32_t)0xFFFF9400;
+	constexpr int32_t KEY_CODE_MUSIC_VOLUME_DOWN = (int32_t)0xFFFF9500;
+	constexpr int32_t KEY_CODE_SFX_MUTE = (int32_t)0xFFFF9600;
+	constexpr int32_t KEY_CODE_SFX_VOLUME_UP = (int32_t)0xFFFF9700;
+	constexpr int32_t KEY_CODE_SFX_VOLUME_DOWN = (int32_t)0xFFFF9800;
+
 	constexpr uint8_t ARROW_KEY_UP = 1;
 	constexpr uint8_t ARROW_KEY_DOWN = 2;
 	constexpr uint8_t ARROW_KEY_LEFT = 4;

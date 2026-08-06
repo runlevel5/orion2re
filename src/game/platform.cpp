@@ -405,6 +405,9 @@ namespace platform {
 			case SDLK_F10: *translated_key_code = 0x4400; return true;
 			case SDLK_F11: *translated_key_code = 0xFFFF8500; return true;
 			case SDLK_F12: *translated_key_code = 0xFFFF8600; return true;
+			case SDLK_MUTE: *translated_key_code = (uint32_t)KEY_CODE_MUTE; return true;
+			case SDLK_VOLUMEUP: *translated_key_code = (uint32_t)KEY_CODE_VOLUME_UP; return true;
+			case SDLK_VOLUMEDOWN: *translated_key_code = (uint32_t)KEY_CODE_VOLUME_DOWN; return true;
 			default:
 				return false;
 			}
@@ -515,10 +518,46 @@ namespace platform {
 			}
 
 			if ((key_event.mod & SDL_KMOD_ALT) != 0) {
+				// Audio hotkeys: Alt + -/=/0 or the media keys control the
+				// Sound FX volume.
+				if (key_event.key == SDLK_MINUS || key_event.key == SDLK_KP_MINUS ||
+					key_event.key == SDLK_VOLUMEDOWN) {
+					Enqueue_Key_Input_Event_((uint32_t)KEY_CODE_SFX_VOLUME_DOWN, scan_code);
+					return;
+				}
+				if (key_event.key == SDLK_EQUALS || key_event.key == SDLK_KP_PLUS ||
+					key_event.key == SDLK_VOLUMEUP) {
+					Enqueue_Key_Input_Event_((uint32_t)KEY_CODE_SFX_VOLUME_UP, scan_code);
+					return;
+				}
+				if (key_event.key == SDLK_0 || key_event.key == SDLK_MUTE) {
+					Enqueue_Key_Input_Event_((uint32_t)KEY_CODE_SFX_MUTE, scan_code);
+					return;
+				}
 				if (Translate_Alt_Key_(key_event.key, &translated_key_code)) {
 					Enqueue_Key_Input_Event_(translated_key_code, scan_code);
 				}
 				return;
+			}
+
+			if ((key_event.mod & SDL_KMOD_CTRL) != 0) {
+				// Audio hotkeys: Ctrl + -/=/0 or the media keys control the
+				// Music volume. Other Ctrl combinations keep their existing
+				// translation.
+				if (key_event.key == SDLK_MINUS || key_event.key == SDLK_KP_MINUS ||
+					key_event.key == SDLK_VOLUMEDOWN) {
+					Enqueue_Key_Input_Event_((uint32_t)KEY_CODE_MUSIC_VOLUME_DOWN, scan_code);
+					return;
+				}
+				if (key_event.key == SDLK_EQUALS || key_event.key == SDLK_KP_PLUS ||
+					key_event.key == SDLK_VOLUMEUP) {
+					Enqueue_Key_Input_Event_((uint32_t)KEY_CODE_MUSIC_VOLUME_UP, scan_code);
+					return;
+				}
+				if (key_event.key == SDLK_0 || key_event.key == SDLK_MUTE) {
+					Enqueue_Key_Input_Event_((uint32_t)KEY_CODE_MUSIC_MUTE, scan_code);
+					return;
+				}
 			}
 
 			if (Translate_Non_Character_Key_(key_event.key, &translated_key_code)) {

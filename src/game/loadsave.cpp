@@ -26,6 +26,13 @@ namespace LOADSAVE {
     // slot, which the rest of the game must never see as the active slot.
     static int8_t _enhanced_load_selection = -1;
 
+    // Enhancement: mute state for the audio hotkeys in the Game panel, per
+    // channel. The pre-mute slider levels are restored on unmute.
+    static uint8_t _music_muted = 0;
+    static uint8_t _sfx_muted = 0;
+    static int16_t _premute_music_level = 0;
+    static int16_t _premute_sfx_level = 0;
+
     /**
      * @address 00511020
      */
@@ -1609,8 +1616,119 @@ namespace LOADSAVE {
         fields::Assign_Auto_Function_(LOADSAVE::_Draw_Main_Game_Popup_, 1);
         EVANHELP::Set_Main_Game_Screen_Help_List_();
 
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        constexpr int16_t VOLUME_KEY_STEP = 16; // sliders range 0..0x9C
+
         while (true) {
             timer::Mark_Time_();
+
+            // Enhancement: audio hotkeys while the Game panel is open.
+            // Plain -/+/0 (and the keyboard media keys, where the OS lets
+            // them through) drive both sliders; Ctrl + -/=/0 the Music one;
+            // Alt + -/=/0 the Sound FX one. 0 toggles mute, remembering the
+            // levels; volume keys leave mute by restoring them first.
+            if (enhanced) {
+                int32_t key = key::Read_Key_();
+                bool for_music = false;
+                bool for_sfx = false;
+                int16_t volume_action = 0; // -1 down, 1 up, 2 mute toggle
+
+                if (key == platform::KEY_CODE_MUTE) {
+                    for_music = for_sfx = true;
+                    volume_action = 2;
+                } else if (key == platform::KEY_CODE_VOLUME_UP) {
+                    for_music = for_sfx = true;
+                    volume_action = 1;
+                } else if (key == platform::KEY_CODE_VOLUME_DOWN) {
+                    for_music = for_sfx = true;
+                    volume_action = -1;
+                } else if (key == platform::KEY_CODE_MUSIC_MUTE) {
+                    for_music = true;
+                    volume_action = 2;
+                } else if (key == platform::KEY_CODE_MUSIC_VOLUME_UP) {
+                    for_music = true;
+                    volume_action = 1;
+                } else if (key == platform::KEY_CODE_MUSIC_VOLUME_DOWN) {
+                    for_music = true;
+                    volume_action = -1;
+                } else if (key == platform::KEY_CODE_SFX_MUTE) {
+                    for_sfx = true;
+                    volume_action = 2;
+                } else if (key == platform::KEY_CODE_SFX_VOLUME_UP) {
+                    for_sfx = true;
+                    volume_action = 1;
+                } else if (key == platform::KEY_CODE_SFX_VOLUME_DOWN) {
+                    for_sfx = true;
+                    volume_action = -1;
+                } else if (key > 0) {
+                    int16_t character = (int16_t)(key & 0xFF);
+                    if (character == '0') {
+                        for_music = for_sfx = true;
+                        volume_action = 2;
+                    } else if (character == '+') {
+                        for_music = for_sfx = true;
+                        volume_action = 1;
+                    } else if (character == '-') {
+                        for_music = for_sfx = true;
+                        volume_action = -1;
+                    }
+                }
+
+                if (volume_action == 0) {
+                    if (key != 0) {
+                        key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                    }
+                } else if (volume_action == 2) {
+                    // Toggle: unmute only when every targeted channel is
+                    // already muted, otherwise mute the audible ones.
+                    bool all_targets_muted = (!for_music || _music_muted != 0) &&
+                                             (!for_sfx || _sfx_muted != 0);
+                    if (for_music) {
+                        if (all_targets_muted) {
+                            _game_popup_fields->music_level = _premute_music_level;
+                            _music_muted = 0;
+                        } else if (_music_muted == 0) {
+                            _premute_music_level = _game_popup_fields->music_level;
+                            _game_popup_fields->music_level = 0;
+                            _music_muted = 1;
+                        }
+                        Set_Music_For_Game_Popup_();
+                    }
+                    if (for_sfx) {
+                        if (all_targets_muted) {
+                            _game_popup_fields->sound_fx_level = _premute_sfx_level;
+                            _sfx_muted = 0;
+                        } else if (_sfx_muted == 0) {
+                            _premute_sfx_level = _game_popup_fields->sound_fx_level;
+                            _game_popup_fields->sound_fx_level = 0;
+                            _sfx_muted = 1;
+                        }
+                        Set_Sound_For_Game_Popup_(_sfx_muted != 0 ? 0 : 1);
+                    }
+                } else {
+                    int16_t step = (volume_action > 0) ? VOLUME_KEY_STEP
+                                                       : (int16_t)-VOLUME_KEY_STEP;
+                    if (for_music) {
+                        if (_music_muted != 0) {
+                            _game_popup_fields->music_level = _premute_music_level;
+                            _music_muted = 0;
+                        }
+                        int16_t music = (int16_t)(_game_popup_fields->music_level + step);
+                        _game_popup_fields->music_level = (music < 0) ? 0 : (music > 0x9C) ? 0x9C : music;
+                        Set_Music_For_Game_Popup_();
+                    }
+                    if (for_sfx) {
+                        if (_sfx_muted != 0) {
+                            _game_popup_fields->sound_fx_level = _premute_sfx_level;
+                            _sfx_muted = 0;
+                        }
+                        int16_t sfx = (int16_t)(_game_popup_fields->sound_fx_level + step);
+                        _game_popup_fields->sound_fx_level = (sfx < 0) ? 0 : (sfx > 0x9C) ? 0x9C : sfx;
+                        Set_Sound_For_Game_Popup_(1);
+                    }
+                }
+            }
+
             int16_t input = fields::Get_Input_();
 
             if (input == _game_popup_fields->btn_main_close_id) {
@@ -1683,8 +1801,14 @@ namespace LOADSAVE {
                     *out_finished = 1;
                 }
             } else if (input == _music_level_field) {
+                if (enhanced) {
+                    _music_muted = 0; // a manual slider change ends the mute
+                }
                 Set_Music_For_Game_Popup_();
             } else if (input == _sfx_level_field) {
+                if (enhanced) {
+                    _sfx_muted = 0;
+                }
                 Set_Sound_For_Game_Popup_(1);
             }
 
