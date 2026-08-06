@@ -1053,10 +1053,8 @@ namespace fields {
                     return 0;
                 }
 
-                // Enhancement: Enter no longer activates the field under the
-                // mouse pointer, so hovering plus Enter cannot click things —
-                // keyboard and mouse input stay separate. Full-screen fields
-                // keep responding, so modal "press any key" boxes still close.
+                // Enhancement: Enter does not activate the hovered field;
+                // full-screen fields (modal boxes) keep responding.
                 if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && scanned_field > 0 &&
                     (fields[scanned_field].x > 0 || fields[scanned_field].y > 0 ||
                      fields[scanned_field].x_end < 639 || fields[scanned_field].y_end < 479)) {
@@ -2143,6 +2141,17 @@ namespace fields {
         }
 
         graphics::Set_Window(x1, y1, x2, y2);
+    }
+
+    // Enhancement: puts a continuous string input field into editing mode
+    // with the given initial text, as clicking it would.
+    void __cdecl Begin_Continuous_Input_(int16_t field_id, const char* text) {
+        input_field_active = 1;
+        cursor_position = 0;
+        cursor_on = 0;
+        active_input_field_number = field_id;
+        strlcpy(continuous_string, text, sizeof(continuous_string));
+        active_input_field_first = 1;
     }
 
     void __cdecl Push_Field_Down(int16_t field_idx, int16_t x, int16_t y) {

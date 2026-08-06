@@ -357,12 +357,8 @@ namespace LOADSAVE {
     // Enhancement helper: puts the save popup into name-editing mode for a
     // slot, exactly as clicking the slot's date line does.
     static void Begin_Save_Slot_Edit_(int16_t slot) {
-        fields::input_field_active = 1;
-        fields::cursor_position = 0;
-        fields::cursor_on = 0;
-        fields::active_input_field_number = game_popup_fields->saved_game_fields[slot];
-        strlcpy(fields::continuous_string, MOX::save_game_description[slot].description, sizeof(fields::continuous_string));
-        fields::active_input_field_first = 1;
+        fields::Begin_Continuous_Input_(game_popup_fields->saved_game_fields[slot],
+                                        MOX::save_game_description[slot].description);
     }
 
     constexpr uint32_t DOUBLE_CLICK_MS = 500;

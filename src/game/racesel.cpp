@@ -164,6 +164,65 @@ namespace RACESEL {
         last_race_seg = (s_animation_header*)farload::Far_Reload_Next("patch13.lbx", 1, MOX::screen_seg);
     }
 
+    // Enhancement: keyboard selection state over the 7x2 race grid — last input
+    // wins between arrow keys and mouse hover.
+    struct s_race_grid_nav {
+        int16_t kbd_race = -1;
+        bool kbd_active = false;
+        int16_t prev_ptr_x = 0;
+        int16_t prev_ptr_y = 0;
+    };
+
+    // Enhancement helper: Up/Down move within a column, Left/Right toggle the
+    // column. Returns the highlighted race's field for Enter, else 0; other keys
+    // go back to the fields system.
+    static int16_t Read_Race_Grid_Keys_(s_race_grid_nav* nav, const int16_t* field_ids) {
+        int32_t nav_key = key::Read_Key();
+        if (nav_key == 0x1C0D) { // Enter picks the highlighted race
+            int16_t pick = nav->kbd_active ? nav->kbd_race : displayed_race;
+            if (pick >= 0 && pick <= 13) {
+                return field_ids[pick];
+            }
+        } else if (nav_key == 0x48E0 || nav_key == 0x50E0 ||
+                   nav_key == 0x4BE0 || nav_key == 0x4DE0) {
+            int16_t base = nav->kbd_active ? nav->kbd_race : displayed_race;
+            if (base < 0 || base > 13) {
+                base = 0;
+            }
+            int16_t grid_row = (int16_t)(base % 7);
+            int16_t grid_col = (int16_t)(base / 7);
+            if (nav_key == 0x48E0) { // Up
+                grid_row = (int16_t)((grid_row + 6) % 7);
+            } else if (nav_key == 0x50E0) { // Down
+                grid_row = (int16_t)((grid_row + 1) % 7);
+            } else { // Left/Right toggle the column
+                grid_col = (int16_t)(1 - grid_col);
+            }
+            nav->kbd_race = (int16_t)(grid_col * 7 + grid_row);
+            nav->kbd_active = true;
+        } else if (nav_key != 0) {
+            key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
+        }
+        return 0;
+    }
+
+    // Enhancement helper: the mouse takes the selection over when it moves onto
+    // a race; otherwise the keyboard highlight drives the displayed race.
+    static void Apply_Race_Grid_Selection_(s_race_grid_nav* nav, int16_t scan_idx, const int16_t* field_ids) {
+        int16_t ptr_x = (int16_t)mouse::Pointer_X();
+        int16_t ptr_y = (int16_t)mouse::Pointer_Y();
+        bool mouse_moved = (ptr_x != nav->prev_ptr_x || ptr_y != nav->prev_ptr_y);
+        nav->prev_ptr_x = ptr_x;
+        nav->prev_ptr_y = ptr_y;
+        int16_t hover_race = (int16_t)(scan_idx - field_ids[0]);
+        if (mouse_moved && hover_race >= 0 && hover_race <= 13) {
+            nav->kbd_active = false;
+        }
+        if (nav->kbd_active) {
+            displayed_race = nav->kbd_race;
+        }
+    }
+
     int16_t Race_Selection_Screen(s_player* plr) {
         int16_t field_ids[14];
         int16_t hotkey_field;
@@ -212,44 +271,17 @@ namespace RACESEL {
         RUSS::Mox_Sync_Update();
         ERIC::Fast_Fade_In();
 
-    // Enhancement: keyboard selection over the 7x2 race grid — Up/Down move
-    // within a column, Left/Right jump between the columns. Last input wins:
-    // arrow keys drive the displayed race until the mouse moves onto one.
+    // Enhancement: keyboard selection over the 7x2 race grid, last input
+    // wins between arrow keys and mouse hover.
     const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
-    int16_t kbd_race = -1;
-    bool kbd_active = false;
-    int16_t prev_ptr_x = (int16_t)mouse::Pointer_X();
-    int16_t prev_ptr_y = (int16_t)mouse::Pointer_Y();
+    s_race_grid_nav grid_nav;
+    grid_nav.prev_ptr_x = (int16_t)mouse::Pointer_X();
+    grid_nav.prev_ptr_y = (int16_t)mouse::Pointer_Y();
 
         while (true) {
         int16_t synth_input = 0;
         if (enhanced) {
-            int32_t nav_key = key::Read_Key();
-            if (nav_key == 0x1C0D) { // Enter picks the highlighted race
-                int16_t pick = kbd_active ? kbd_race : displayed_race;
-                if (pick >= 0 && pick <= 13) {
-                    synth_input = field_ids[pick];
-                }
-            } else if (nav_key == 0x48E0 || nav_key == 0x50E0 ||
-                nav_key == 0x4BE0 || nav_key == 0x4DE0) {
-                int16_t base = kbd_active ? kbd_race : displayed_race;
-                if (base < 0 || base > 13) {
-                    base = 0;
-                }
-                int16_t grid_row = (int16_t)(base % 7);
-                int16_t grid_col = (int16_t)(base / 7);
-                if (nav_key == 0x48E0) { // Up
-                    grid_row = (int16_t)((grid_row + 6) % 7);
-                } else if (nav_key == 0x50E0) { // Down
-                    grid_row = (int16_t)((grid_row + 1) % 7);
-                } else { // Left/Right toggle the column
-                    grid_col = (int16_t)(1 - grid_col);
-                }
-                kbd_race = (int16_t)(grid_col * 7 + grid_row);
-                kbd_active = true;
-            } else if (nav_key != 0) {
-                key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
-            }
+            synth_input = Read_Race_Grid_Keys_(&grid_nav, field_ids);
         }
 
             int16_t input_field = fields::Get_Input();
@@ -263,18 +295,7 @@ namespace RACESEL {
             }
 
         if (enhanced) {
-            int16_t ptr_x = (int16_t)mouse::Pointer_X();
-            int16_t ptr_y = (int16_t)mouse::Pointer_Y();
-            bool mouse_moved = (ptr_x != prev_ptr_x || ptr_y != prev_ptr_y);
-            prev_ptr_x = ptr_x;
-            prev_ptr_y = ptr_y;
-            int16_t hover_race = (int16_t)(scan_idx - field_ids[0]);
-            if (mouse_moved && hover_race >= 0 && hover_race <= 13) {
-                kbd_active = false; // the mouse takes the selection over
-            }
-            if (kbd_active) {
-                displayed_race = kbd_race;
-            }
+            Apply_Race_Grid_Selection_(&grid_nav, scan_idx, field_ids);
         }
         
             for (int i = STOCK_RACE_ALKARI; i < STOCK_RACE_COUNT; ++i) {
@@ -614,6 +635,75 @@ namespace RACESEL {
         return cur_field;
     }
 
+    // Enhancement: keyboard selection state for the Custom Race option lines —
+    // last input wins between arrow keys and mouse hover.
+    struct s_raceopt_nav {
+        int16_t sel_option_field = -1;
+        int16_t prev_ptr_x = 0;
+        int16_t prev_ptr_y = 0;
+    };
+
+    // Enhancement helper: arrows move the option selection spatially, Space
+    // toggles it, Backspace presses Clear (animated), 'R' starts renaming the
+    // race; other keys go back to the fields system. Moving the mouse onto a
+    // line takes the selection over. Returns the field to activate, or 0.
+    static int16_t Read_Raceopt_Keys_(s_raceopt_nav* nav) {
+        int16_t synth_input = 0;
+        int32_t nav_key = key::Read_Key();
+        if (nav_key == 0x48E0 || nav_key == 0x50E0 ||
+            nav_key == 0x4BE0 || nav_key == 0x4DE0) {
+            int16_t dir_x = (nav_key == 0x4BE0) ? (int16_t)-1
+                          : (nav_key == 0x4DE0) ? (int16_t)1 : (int16_t)0;
+            int16_t dir_y = (nav_key == 0x48E0) ? (int16_t)-1
+                          : (nav_key == 0x50E0) ? (int16_t)1 : (int16_t)0;
+            int16_t next_field = Raceopt_Nav_(nav->sel_option_field, dir_x, dir_y);
+            if (next_field != nav->sel_option_field) {
+                nav->sel_option_field = next_field;
+                MOX::FULL_DRAW_SCREEN_FLAG = 1; // erase the old pulse text
+            }
+        } else if (nav_key > 0 && (nav_key & 0xFF) == 0x20) { // Space toggles
+            if (nav->sel_option_field > 0) {
+                synth_input = nav->sel_option_field;
+            }
+        } else if (nav_key == 0x0E08) { // Backspace presses the Clear button
+            sound::Play_Sound(0x28);
+            fields::down_mouse_button = raceopt::defalt;
+            video::Set_Page_Off();
+            raceopt::Draw_Racial_Option_Screen();
+            RUSS::Mox_Sync_Update();
+            timer::Mark_Time();
+            timer::Release_Time(2);
+            fields::down_mouse_button = -1;
+            video::Set_Page_Off();
+            raceopt::Draw_Racial_Option_Screen();
+            RUSS::Mox_Sync_Update();
+            timer::Mark_Time();
+            timer::Release_Time(1);
+            synth_input = raceopt::defalt;
+        } else if (nav_key > 0 &&
+                   ((nav_key & 0xFF) == 'r' || (nav_key & 0xFF) == 'R')) {
+            // 'R' starts renaming the race, like clicking the name label.
+            fields::Begin_Continuous_Input_(raceopt::name_button, raceopt::cur_race_name);
+        } else if (nav_key != 0) {
+            key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
+        }
+
+        // The mouse takes the selection over when it moves onto a line.
+        int16_t ptr_x = (int16_t)mouse::Pointer_X();
+        int16_t ptr_y = (int16_t)mouse::Pointer_Y();
+        if (ptr_x != nav->prev_ptr_x || ptr_y != nav->prev_ptr_y) {
+            nav->prev_ptr_x = ptr_x;
+            nav->prev_ptr_y = ptr_y;
+            int16_t hover_field = fields::Scan_Input();
+            if (hover_field != nav->sel_option_field &&
+                Raceopt_Is_Option_Field_(hover_field)) {
+                nav->sel_option_field = hover_field;
+                MOX::FULL_DRAW_SCREEN_FLAG = 1; // erase the old pulse text
+            }
+        }
+        return synth_input;
+    }
+
     int16_t __cdecl Racial_Option_Screen(s_player* player) {
         int16_t finished;
         int16_t input_id;
@@ -655,14 +745,12 @@ namespace RACESEL {
         raceopt::Draw_Racial_Option_Screen();
         RUSS::Mox_Sync_Update();
 
-        // Enhancement: keyboard selection over the option lines — arrows move
-        // spatially, Space toggles the selected option, and the selected line's
-        // text pulsates via a palette-cycled color. Last input wins between
-        // keyboard and mouse hover.
+        // Enhancement: keyboard selection over the option lines; the selected
+        // line's text pulsates via a palette-cycled color.
         const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
-        int16_t sel_option_field = -1;
-        int16_t prev_ptr_x = (int16_t)mouse::Pointer_X();
-        int16_t prev_ptr_y = (int16_t)mouse::Pointer_Y();
+        s_raceopt_nav opt_nav;
+        opt_nav.prev_ptr_x = (int16_t)mouse::Pointer_X();
+        opt_nav.prev_ptr_y = (int16_t)mouse::Pointer_Y();
         uint32_t last_pulse_ms = 0;
 
         while (true) {
@@ -671,64 +759,7 @@ namespace RACESEL {
 
             int16_t synth_input = 0;
             if (enhanced && fields::input_field_active == 0) {
-                int32_t nav_key = key::Read_Key();
-                if (nav_key == 0x48E0 || nav_key == 0x50E0 ||
-                    nav_key == 0x4BE0 || nav_key == 0x4DE0) {
-                    int16_t dir_x = (nav_key == 0x4BE0) ? (int16_t)-1
-                                  : (nav_key == 0x4DE0) ? (int16_t)1 : (int16_t)0;
-                    int16_t dir_y = (nav_key == 0x48E0) ? (int16_t)-1
-                                  : (nav_key == 0x50E0) ? (int16_t)1 : (int16_t)0;
-                    int16_t next_field = Raceopt_Nav_(sel_option_field, dir_x, dir_y);
-                    if (next_field != sel_option_field) {
-                        sel_option_field = next_field;
-                        MOX::FULL_DRAW_SCREEN_FLAG = 1; // erase the old pulse text
-                    }
-                } else if (nav_key > 0 && (nav_key & 0xFF) == 0x20) { // Space toggles
-                    if (sel_option_field > 0) {
-                        synth_input = sel_option_field;
-                    }
-                } else if (nav_key == 0x0E08) { // Backspace presses the Clear button
-                    sound::Play_Sound(0x28);
-                    fields::down_mouse_button = raceopt::defalt;
-                    video::Set_Page_Off();
-                    raceopt::Draw_Racial_Option_Screen();
-                    RUSS::Mox_Sync_Update();
-                    timer::Mark_Time();
-                    timer::Release_Time(2);
-                    fields::down_mouse_button = -1;
-                    video::Set_Page_Off();
-                    raceopt::Draw_Racial_Option_Screen();
-                    RUSS::Mox_Sync_Update();
-                    timer::Mark_Time();
-                    timer::Release_Time(1);
-                    synth_input = raceopt::defalt;
-                } else if (nav_key > 0 &&
-                           ((nav_key & 0xFF) == 'r' || (nav_key & 0xFF) == 'R')) {
-                    // 'R' starts renaming the race, like clicking the name label.
-                    fields::input_field_active = 1;
-                    fields::cursor_position = 0;
-                    fields::cursor_on = 0;
-                    fields::active_input_field_number = raceopt::name_button;
-                    strlcpy(fields::continuous_string, raceopt::cur_race_name,
-                            sizeof(fields::continuous_string));
-                    fields::active_input_field_first = 1;
-                } else if (nav_key != 0) {
-                    key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
-                }
-
-                // The mouse takes the selection over when it moves onto a line.
-                int16_t ptr_x = (int16_t)mouse::Pointer_X();
-                int16_t ptr_y = (int16_t)mouse::Pointer_Y();
-                if (ptr_x != prev_ptr_x || ptr_y != prev_ptr_y) {
-                    prev_ptr_x = ptr_x;
-                    prev_ptr_y = ptr_y;
-                    int16_t hover_field = fields::Scan_Input();
-                    if (hover_field != sel_option_field &&
-                        Raceopt_Is_Option_Field_(hover_field)) {
-                        sel_option_field = hover_field;
-                        MOX::FULL_DRAW_SCREEN_FLAG = 1; // erase the old pulse text
-                    }
-                }
+                synth_input = Read_Raceopt_Keys_(&opt_nav);
             }
 
             input_id = (synth_input != 0) ? synth_input : fields::Get_Input();
@@ -963,9 +994,9 @@ namespace RACESEL {
             // Enhancement: draw the selected option's text in the palette-cycled
             // color so it pulsates (the cycling animates the pixels without
             // needing redraws).
-            if (enhanced && sel_option_field > 0) {
+            if (enhanced && opt_nav.sel_option_field > 0) {
                 int16_t pulse_x, pulse_y;
-                const char* pulse_text = Raceopt_Field_Text_(sel_option_field, &pulse_x, &pulse_y);
+                const char* pulse_text = Raceopt_Field_Text_(opt_nav.sel_option_field, &pulse_x, &pulse_y);
                 if (pulse_text != nullptr) {
                     s_colors pulse_colors;
                     for (int i = 0; i < 8; ++i) {
