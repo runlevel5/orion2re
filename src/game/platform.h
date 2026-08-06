@@ -66,6 +66,11 @@ namespace platform {
 	// Returns and consumes the number of middle-button clicks since last call.
 	int16_t __cdecl Consume_Middle_Clicks_();
 
+	// Observes (without consuming from the input queue) left-button presses:
+	// pops the oldest observed press with its position and press timestamp;
+	// returns 0 when none are pending.
+	uint8_t __cdecl Consume_Left_Click_(int16_t* x, int16_t* y, uint32_t* ticks);
+
 	constexpr uint8_t ARROW_KEY_UP = 1;
 	constexpr uint8_t ARROW_KEY_DOWN = 2;
 	constexpr uint8_t ARROW_KEY_LEFT = 4;

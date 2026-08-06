@@ -67,6 +67,15 @@ namespace platform {
 		SDL_AtomicInt g_mouse_wheel_accum; // hundredths of a wheel step
 		SDL_AtomicInt g_middle_click_count;
 		SDL_AtomicInt g_arrow_keys_held; // ARROW_KEY_* bits, tracked across key down/up
+		struct s_observed_click {
+			int16_t x;
+			int16_t y;
+			uint32_t ticks;
+		};
+		constexpr uint16_t k_observed_click_capacity = 16;
+		s_observed_click g_observed_clicks[k_observed_click_capacity];
+		uint16_t g_observed_click_read;
+		uint16_t g_observed_click_write;
 		e_present_scaler g_present_scaler = PRESENT_SCALER_PIXELART;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
@@ -1184,6 +1193,18 @@ namespace platform {
                 int16_t mouse_y = 0;
                 Map_Window_Point_To_Game_Point_(event.button.x, event.button.y, &mouse_x, &mouse_y);
 
+                if (event.button.button == SDL_BUTTON_LEFT && event.button.down &&
+                    g_input_queue_mutex != nullptr) {
+                    SDL_LockMutex(g_input_queue_mutex);
+                    const uint16_t next_write = (uint16_t)((g_observed_click_write + 1) % k_observed_click_capacity);
+                    if (next_write == g_observed_click_read) {
+                        g_observed_click_read = (uint16_t)((g_observed_click_read + 1) % k_observed_click_capacity);
+                    }
+                    g_observed_clicks[g_observed_click_write] = { mouse_x, mouse_y, (uint32_t)SDL_GetTicks() };
+                    g_observed_click_write = next_write;
+                    SDL_UnlockMutex(g_input_queue_mutex);
+                }
+
                 Set_Present_Mouse_Position_(mouse_x, mouse_y);
                 Enqueue_Mouse_Input_Event_(mouse_x, mouse_y, mouse_buttons);
                 continue;
@@ -1523,6 +1544,30 @@ namespace platform {
 
     uint8_t __cdecl Arrow_Keys_Held_() {
         return (uint8_t)SDL_GetAtomicInt(&g_arrow_keys_held);
+    }
+
+    uint8_t __cdecl Consume_Left_Click_(int16_t* x, int16_t* y, uint32_t* ticks) {
+        if (g_input_queue_mutex == nullptr) {
+            return 0;
+        }
+        uint8_t has_click = 0;
+        SDL_LockMutex(g_input_queue_mutex);
+        if (g_observed_click_read != g_observed_click_write) {
+            const s_observed_click& click = g_observed_clicks[g_observed_click_read];
+            if (x != nullptr) {
+                *x = click.x;
+            }
+            if (y != nullptr) {
+                *y = click.y;
+            }
+            if (ticks != nullptr) {
+                *ticks = click.ticks;
+            }
+            g_observed_click_read = (uint16_t)((g_observed_click_read + 1) % k_observed_click_capacity);
+            has_click = 1;
+        }
+        SDL_UnlockMutex(g_input_queue_mutex);
+        return has_click;
     }
 
     void __cdecl Update_Cursor_Image_() {

@@ -249,9 +249,10 @@ namespace LOADSAVE {
             *out_y = animate::Get_Height_(main_pic);
 
             Check_For_Saved_Games_(_game_popup_fields->slot_status);
-            s_colors colors_style, colors_special;
-            Get_Game_Popup_Colors_(2, &colors_style, &colors_special);
-            fonts::Set_Font_Special_Colors_(&colors_special);
+            // Persistent storage: the input fields keep a pointer to these
+            // colors past this function's lifetime.
+            Get_Game_Popup_Colors_(2, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
+            fonts::Set_Font_Special_Colors_(&_game_popup_fields->color_active);
 
             for (int16_t i = 0; i < 10; ++i) {
                 // Loadable slots only: the draw code matches empty-slot
@@ -278,7 +279,7 @@ namespace LOADSAVE {
                 _game_popup_fields->btn_popup_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x151, "", _game_anims->pictures[0xc], "L", '(');
             } else {
                 for (int16_t i = 0; i < 10; ++i) {
-                    fonts::Set_Font_Style_(2, &colors_style);
+                    fonts::Set_Font_Style_(2, &_game_popup_fields->color_normal);
                     if (_game_popup_fields->slot_status[i] == 2) {
                         memcpy(MOX::_save_game_description[i].description, "* INVALID *", sizeof("* INVALID *"));
                     }
@@ -321,16 +322,16 @@ namespace LOADSAVE {
         }
     }
 
-    // Enhancement helper: plays the LOAD button sound and shows the button
-    // pressed, then released, as a mouse click on it would, before a load
-    // triggered by Enter or a double click. Every page toggle repaints the
-    // buttons from _down_mouse_button (fields::Draw_Visible_Fields_), so the
-    // pressed state must be expressed through that variable rather than by
-    // drawing the pressed frame directly.
-    static void Animate_Load_Button_Press_() {
+    // Enhancement helper: plays the button sound and shows the given popup
+    // button pressed, then released, as a mouse click on it would, before an
+    // action triggered by Enter or a double click. Every page toggle repaints
+    // the buttons from _down_mouse_button (fields::Draw_Visible_Fields_), so
+    // the pressed state must be expressed through that variable rather than
+    // by drawing the pressed frame directly.
+    static void Animate_Popup_Button_Press_(int16_t button_field_id) {
         sound::Play_Sound_('(');
 
-        fields::_down_mouse_button = _game_popup_fields->btn_popup_load_id;
+        fields::_down_mouse_button = button_field_id;
         video::Set_Page_Off_();
         fields::Invoke_Auto_Function_();
         RUSS::Mox_Sync_Update_();
@@ -343,6 +344,47 @@ namespace LOADSAVE {
         RUSS::Mox_Sync_Update_();
         timer::Mark_Time_();
         timer::Release_Time_(1);
+    }
+
+    // Enhancement helper: recolors the save popup's name fields so the
+    // selected row is highlighted (empty rows have no embedded color codes,
+    // so the field color is their only highlight).
+    static void Highlight_Save_Popup_Row_(int16_t slot) {
+        for (int16_t i = 0; i < 10; ++i) {
+            fields::_fields[_game_popup_fields->saved_game_fields[i]].font_color =
+                (i == slot) ? &_game_popup_fields->color_active
+                            : &_game_popup_fields->color_normal;
+        }
+    }
+
+    static void Select_Save_Popup_Slot_(int16_t slot) {
+        Select_Save_Slot_(slot);
+        Highlight_Save_Popup_Row_(slot);
+    }
+
+    // Enhancement helper: maps a screen position to a save popup row (both
+    // the name line and the date line count), or -1.
+    static int16_t Save_Popup_Row_At_(int16_t x, int16_t y) {
+        if (x < MOX::_popup_base_x + 0x1a || x > MOX::_popup_base_x + 0xf4) {
+            return -1;
+        }
+        int16_t rel_y = y - (MOX::_popup_base_y + 0x18);
+        if (rel_y < 0) {
+            return -1;
+        }
+        int16_t row = rel_y / 0x1f;
+        return (row <= 9) ? row : -1;
+    }
+
+    // Enhancement helper: puts the save popup into name-editing mode for a
+    // slot, exactly as clicking the slot's date line does.
+    static void Begin_Save_Slot_Edit_(int16_t slot) {
+        fields::_input_field_active = 1;
+        fields::_cursor_position = 0;
+        fields::_cursor_on = 0;
+        fields::_active_input_field_number = _game_popup_fields->saved_game_fields[slot];
+        strlcpy(fields::_continuous_string, MOX::_save_game_description[slot].description, sizeof(fields::_continuous_string));
+        fields::_active_input_field_first = 1;
     }
 
     /**
@@ -451,7 +493,7 @@ namespace LOADSAVE {
             int16_t input_id = fields::Get_Input_();
             if (key_load) {
                 input_id = _game_popup_fields->btn_popup_load_id;
-                Animate_Load_Button_Press_();
+                Animate_Popup_Button_Press_(_game_popup_fields->btn_popup_load_id);
             }
             int16_t selected_slot = -1;
 
@@ -473,7 +515,7 @@ namespace LOADSAVE {
                 last_click_ms = now_ms;
 
                 if (is_double_click) {
-                    Animate_Load_Button_Press_();
+                    Animate_Popup_Button_Press_(_game_popup_fields->btn_popup_load_id);
                 } else {
                     if (selected_slot != MOX::_settings.active_save_slot) {
                         Select_Save_Slot_(selected_slot);
@@ -632,6 +674,17 @@ namespace LOADSAVE {
         bool saved_successfully = false;
         int16_t active_slot_idx = -1;
 
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        int8_t entry_active_slot = MOX::_settings.active_save_slot;
+        int16_t last_row_clicked = -1;
+        int16_t last_click_x = -1000;
+        int16_t last_click_y = -1000;
+        uint32_t last_row_click_ms = 0;
+        uint32_t last_wheel_ms = 0;
+        constexpr uint32_t DOUBLE_CLICK_MS = 500;
+        constexpr int16_t DOUBLE_CLICK_RADIUS = 4;
+        constexpr uint32_t WHEEL_STEP_MS = 120;
+
         strlcpy(_empty_save_slot_message, HAROLD::H_Message_(0x184), sizeof(_empty_save_slot_message));
 
         Load_Month_Names_();
@@ -644,37 +697,180 @@ namespace LOADSAVE {
         Add_Game_Popup_Fields_(&popup_accept_field, &popup_cancel_field);
         MOX::_global_var = 0;
 
+        // Enhancement: restore the remembered selection (falling back to the
+        // active slot, then the top row) and discard stale input events.
+        if (enhanced) {
+            int16_t initial_slot = _enhanced_load_selection;
+            if (initial_slot < 0 || initial_slot > 9) {
+                initial_slot = MOX::_settings.active_save_slot;
+            }
+            if (initial_slot < 0 || initial_slot > 9) {
+                initial_slot = 0;
+            }
+            Select_Save_Popup_Slot_(initial_slot);
+            active_slot_idx = initial_slot;
+            platform::Consume_Mouse_Wheel_Steps_();
+            platform::Consume_Middle_Clicks_();
+            while (platform::Consume_Left_Click_(nullptr, nullptr, nullptr)) {
+            }
+
+            // Committing a name into an empty slot redraws one frame before
+            // the post-save stardate refresh runs; blank the "missing file"
+            // markers so that frame's second line shows nothing instead of
+            // "* INVALID *". (Corrupt slots keep their marker.)
+            for (int16_t i = 0; i < 10; ++i) {
+                if (_game_popup_fields->slot_status[i] == 1) {
+                    MOX::_save_game_stardates[i * 25] = '\0';
+                }
+            }
+        }
+
         do {
             timer::Mark_Time_();
             bool copy_saved_field_text = false;
             bool trigger_save = false;
+
+            // Enhancement: keyboard/wheel selection and edit-mode entry while
+            // no name is being edited. Consume the observation counters every
+            // frame so events during editing do not fire afterwards.
+            int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
+            int16_t middle_clicks = platform::Consume_Middle_Clicks_();
+            if (enhanced && fields::_input_field_active == 0) {
+                int16_t nav = 0;
+                bool begin_edit = false;
+                int32_t key = key::Read_Key_();
+                if (key == 0x48E0) { // Up arrow
+                    nav = -1;
+                } else if (key == 0x50E0) { // Down arrow
+                    nav = 1;
+                } else if (key == 0x1C0D) { // Enter
+                    begin_edit = true;
+                } else if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+                if (wheel_steps != 0 && nav == 0) {
+                    uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
+                    if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
+                        last_wheel_ms = wheel_now_ms;
+                        nav = (wheel_steps > 0) ? -1 : 1;
+                    }
+                }
+                if (middle_clicks != 0) {
+                    begin_edit = true;
+                }
+                if (nav != 0) {
+                    int16_t nav_slot = active_slot_idx;
+                    if (nav_slot < 0 || nav_slot > 9) {
+                        nav_slot = (nav > 0) ? 0 : 9;
+                    } else {
+                        nav_slot = static_cast<int16_t>((nav_slot + 10 + nav) % 10);
+                    }
+                    Select_Save_Popup_Slot_(nav_slot);
+                    active_slot_idx = nav_slot;
+                    sound::Play_Sound_(')');
+                }
+                if (begin_edit && active_slot_idx >= 0 && active_slot_idx < 10) {
+                    Begin_Save_Slot_Edit_(active_slot_idx);
+                    sound::Play_Sound_(')');
+                }
+            }
+
+            // Enhancement: a double click on a row overwrites that slot
+            // directly, bypassing name editing. Detected from observed left
+            // clicks so it also works while the first click started editing.
+            int16_t double_click_slot = -1;
+            {
+                int16_t click_x, click_y;
+                uint32_t click_ticks;
+                while (platform::Consume_Left_Click_(&click_x, &click_y, &click_ticks)) {
+                    if (!enhanced) {
+                        continue;
+                    }
+                    int16_t clicked_row = Save_Popup_Row_At_(click_x, click_y);
+                    // Both clicks must land in (nearly) the same spot within
+                    // the double-click window, judged by their true press
+                    // timestamps: distinct single clicks inside one row (the
+                    // date line, then the name to place the cursor) are
+                    // normal edit interactions, not a double click.
+                    bool near_last_click =
+                        (int16_t)abs(click_x - last_click_x) <= DOUBLE_CLICK_RADIUS &&
+                        (int16_t)abs(click_y - last_click_y) <= DOUBLE_CLICK_RADIUS;
+                    if (clicked_row >= 0 && clicked_row == last_row_clicked &&
+                        near_last_click &&
+                        click_ticks - last_row_click_ms <= DOUBLE_CLICK_MS) {
+                        double_click_slot = clicked_row;
+                        last_row_clicked = -1; // the pair is consumed
+                    } else {
+                        last_row_clicked = clicked_row;
+                    }
+                    last_row_click_ms = click_ticks;
+                    last_click_x = click_x;
+                    last_click_y = click_y;
+                }
+            }
+
             int16_t input_id = fields::Get_Input_();
+
+            if (double_click_slot != -1) {
+                if (fields::_input_field_active != 0) {
+                    fields::_input_field_active = 0;
+                    fields::_active_input_field_number = -1;
+                }
+                Select_Save_Popup_Slot_(double_click_slot);
+                active_slot_idx = double_click_slot;
+                trigger_save = true;
+                input_id = 0; // the double click supersedes this frame's field input
+                Animate_Popup_Button_Press_(_game_popup_fields->btn_popup_save_id);
+            }
+
+            // Enhancement: keep the selection in sync when clicking a name
+            // field starts editing it directly.
+            if (enhanced && fields::_input_field_active != 0) {
+                for (int16_t i = 0; i < 10; ++i) {
+                    if (fields::_active_input_field_number == _game_popup_fields->saved_game_fields[i]) {
+                        if (active_slot_idx != i) {
+                            Select_Save_Popup_Slot_(i);
+                            active_slot_idx = i;
+                        }
+                        break;
+                    }
+                }
+            }
 
             if (input_id != 0) {
                 for (int16_t i = 0; i < 10; ++i) {
                     if (input_id == _game_popup_fields->saved_game_fields[i]) {
-                        if (active_slot_idx == i) {
+                        // A click on the name field returns its id while ALSO
+                        // starting edit mode (_input_field_active stays set);
+                        // only an Enter commit ends editing before returning.
+                        // Enhanced mode saves only on the commit — a click on
+                        // the already-selected row must edit, not save.
+                        if (active_slot_idx == i &&
+                            (!enhanced || fields::_input_field_active == 0)) {
                             copy_saved_field_text = true;
                             trigger_save = true;
+                            if (enhanced) {
+                                // Enter committed the name; show the SAVE
+                                // button pressed and released like a click.
+                                Animate_Popup_Button_Press_(_game_popup_fields->btn_popup_save_id);
+                            }
                         }
                         active_slot_idx = i;
                         break;
                     }
 
                     if (input_id == _game_popup_fields->save_slot_fields[i]) {
-                        if (active_slot_idx == i) {
+                        // Enhancement: a single click always starts name
+                        // editing; overwriting takes a double click.
+                        if (!enhanced && active_slot_idx == i) {
                             trigger_save = true;
                             _draw_down = 2;
                             break;
                         }
-                        fields::_input_field_active = 1;
-                        fields::_cursor_position = 0;
-                        fields::_cursor_on = 0;
-                        fields::_active_input_field_number = _game_popup_fields->saved_game_fields[i];
-
-                        strlcpy(fields::_continuous_string, MOX::_save_game_description[i].description, sizeof(fields::_continuous_string));
-
-                        fields::_active_input_field_first = 1;
+                        Begin_Save_Slot_Edit_(i);
+                        if (enhanced) {
+                            Select_Save_Popup_Slot_(i);
+                        }
                         active_slot_idx = i;
                         break;
                     }
@@ -711,9 +907,21 @@ namespace LOADSAVE {
                     strlcpy(MOX::_save_game_description[active_slot_idx].description, fields::_continuous_string, sizeof(MOX::_save_game_description[active_slot_idx].description));
                 }
 
+                if (enhanced) {
+                    // The selection highlight embeds color codes into the
+                    // description; never write those into the save file.
+                    Remove_Embedded_Special_Codes_(MOX::_save_game_description[active_slot_idx].description);
+                }
                 FILEDEF::Save_Game_(active_slot_idx);
                 Save_Session_Related_Settings_();
                 saved_successfully = true;
+                if (enhanced) {
+                    // Refresh the per-slot stardates before regenerating the
+                    // strings: a first save into an empty slot otherwise keeps
+                    // its stale "missing file" marker and the slot's second
+                    // line shows "* INVALID *".
+                    FILEDEF::Get_Saved_Game_Descriptions_(_game_popup_fields->slot_occupied_flags);
+                }
                 Get_Save_Game_Date_Strings_(MOX::_save_game_dates);
                 Get_Star_Date_Strings_(_game_popup_fields->slot_occupied_flags, MOX::_save_game_stardates);
                 exit_popup = 1;
@@ -727,8 +935,13 @@ namespace LOADSAVE {
                 int32_t abs_input = abs((int32_t)input_id);
                 if (_game_popup_fields->saved_game_fields[0] <= abs_input &&
                     abs_input <= _game_popup_fields->saved_game_fields[9]) {
-                    MOX::_screen_data = 0;
-                    exit_popup = 1;
+                    // Enhancement: Esc while editing a name only cancels the
+                    // edit (the fields system already restored the text);
+                    // the dialog stays open.
+                    if (!enhanced) {
+                        MOX::_screen_data = 0;
+                        exit_popup = 1;
+                    }
                 }
             } else if (input_id == _game_popup_fields->screen_cancel_field_id) {
                 exit_popup = 1;
@@ -742,6 +955,17 @@ namespace LOADSAVE {
                 timer::Release_Time_(1);
             }
         } while (exit_popup == 0);
+
+        // Enhancement: never leave a selection on an empty slot as the game's
+        // active save slot (quick save/load assume it is occupied). The
+        // selection itself is remembered in _enhanced_load_selection.
+        if (enhanced && !saved_successfully) {
+            int8_t active = MOX::_settings.active_save_slot;
+            if (active < 0 || active > 9 ||
+                _game_popup_fields->slot_status[active] != 0) {
+                MOX::_settings.active_save_slot = entry_active_slot;
+            }
+        }
 
         for (int i = 0; i < 10; ++i) {
             Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
