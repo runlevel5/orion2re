@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "enhanced_ux.h"
+
 #include "config/config_loader.h"
 #include "config/config_snapshot.h"
 #include "game/build_queue.h"
@@ -1437,7 +1439,10 @@ namespace MAINSCR {
         races_button = fields::Add_Irregular_Button_Field(386, 435, 453, 471, "", MOX::main_races_button_seg, 306, 425, "R", 0x28);
         info_button = fields::Add_Irregular_Button_Field(462, 435, 526, 471, "", MOX::main_info_button_seg, 306, 425, "I", 0x28);
 
-        treasury_window_field = fields::Add_Hidden_Field(545, 49, 613, 119, "", 0x29);
+        // Enhancement: 'X' opens the treasury/tax-rate popup like a click.
+        treasury_window_field = fields::Add_Hidden_Field(
+            545, 49, 613, 119,
+            ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? "X" : "", 0x29);
         command_points_window_field = fields::Add_Hidden_Field(545, 122, 613, 192, "", 0x29);
         food_window_field = fields::Add_Hidden_Field(545, 197, 613, 267, "", 0x29);
         freighters_window_field = fields::Add_Hidden_Field(545, 270, 613, 340, "", 0x29);
@@ -2408,8 +2413,42 @@ namespace MAINSCR {
         RUSS::Mox_Sync_Update();
         video::Set_Refresh_Differential();
 
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+
         do {
-            input_val = fields::Get_Input();
+            // Enhancement (not in the original game): Enter accepts, like the
+            // Escape hotkey — it yields the Accept button's field id (with
+            // its click sound) — and Tab cycles through the tax rate options.
+            // Any other key goes back into the buffer for normal handling.
+            input_val = 0;
+            if (enhanced) {
+                int32_t key = key::Read_Key();
+                if (key == 0x1C0D) { // Enter
+                    // Show the Accept button pressed, then released, as a
+                    // click would: the page toggle repaints buttons from
+                    // fields::down_mouse_button.
+                    sound::Play_Sound(0x28);
+                    fields::down_mouse_button = MAINPUPS::mp_fields[25];
+                    RUSS::Mox_Sync_Update();
+                    timer::Mark_Time();
+                    timer::Release_Time(2);
+                    fields::down_mouse_button = -1;
+                    RUSS::Mox_Sync_Update();
+                    timer::Mark_Time();
+                    timer::Release_Time(1);
+                    input_val = MAINPUPS::mp_fields[25];
+                } else if (key == 0x0F09) { // Tab
+                    sound::Play_Sound(0x29);
+                    int16_t next_step = (int16_t)(((MAINPUPS::g_temp_tax_rate / 10) + 1) % 6);
+                    MAINPUPS::g_temp_tax_rate = (int16_t)(next_step * 10);
+                    input_val = MAINPUPS::mp_fields[19 + next_step];
+                } else if (key != 0) {
+                    key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+                }
+            }
+            if (input_val == 0) {
+                input_val = fields::Get_Input();
+            }
             scan_val = fields::Scan_Input();
             MAINPUPS::Evaluate_Tax_Rate_Input(&input_val, &scan_val, &exit_flag);
             MAINPUPS::Draw_Tax_Rate_Popup();
