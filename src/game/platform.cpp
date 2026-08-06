@@ -71,6 +71,7 @@ namespace platform {
         SDL_AtomicInt g_game_thread_exited;
         SDL_AtomicInt g_mouse_wheel_accum; // hundredths of a wheel step
         SDL_AtomicInt g_middle_click_count;
+        SDL_AtomicInt g_arrow_keys_held; // ARROW_KEY_* bits, tracked across key down/up
         SDL_AtomicInt g_requested_present_scaler;
         SDL_AtomicInt g_requested_vsync_enabled;
         e_present_scaler g_applied_present_scaler = (e_present_scaler)UINT8_MAX;
@@ -1335,6 +1336,7 @@ namespace platform {
                 g_window_focus_state = 0;
                 g_sdl_mouse_buttons = 0;
                 g_game_mouse_buttons = 0;
+                SDL_SetAtomicInt(&g_arrow_keys_held, 0);
                 Enqueue_Mouse_Input_Event(g_mouse_x, g_mouse_y, 0);
                 debug_overlay::Handle_Focus(false);
                 continue;
@@ -1346,6 +1348,22 @@ namespace platform {
                 Request_Present_Refresh();
                 Sync_Mouse_State_From_SDL();
                 continue;
+            }
+
+            if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) {
+                uint8_t arrow_bit = 0;
+                switch (event.key.key) {
+                case SDLK_UP: arrow_bit = ARROW_KEY_UP; break;
+                case SDLK_DOWN: arrow_bit = ARROW_KEY_DOWN; break;
+                case SDLK_LEFT: arrow_bit = ARROW_KEY_LEFT; break;
+                case SDLK_RIGHT: arrow_bit = ARROW_KEY_RIGHT; break;
+                default: break;
+                }
+                if (arrow_bit != 0) {
+                    int32_t held = SDL_GetAtomicInt(&g_arrow_keys_held);
+                    held = event.key.down ? (held | arrow_bit) : (held & ~arrow_bit);
+                    SDL_SetAtomicInt(&g_arrow_keys_held, held);
+                }
             }
 
             if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) {
@@ -1807,6 +1825,10 @@ namespace platform {
             SDL_AddAtomicInt(&g_middle_click_count, -clicks);
         }
         return (int16_t)clicks;
+    }
+
+    uint8_t __cdecl Arrow_Keys_Held_() {
+        return (uint8_t)SDL_GetAtomicInt(&g_arrow_keys_held);
     }
 
     void __cdecl Update_Cursor_Image() {

@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "enhanced_ux.h"
+
 #include "game/config_refresh.h"
 
 namespace MAINSCR {
@@ -151,6 +153,35 @@ namespace MAINSCR {
 
             fleet_ship_selection_status = -1;
             timer::Mark_Time();
+
+            // Enhancement (not in the original game): keyboard control of the
+            // zoom selection box. The box follows the mouse pointer, so held
+            // arrow keys move the pointer itself; Esc cancels the zoom the
+            // same way a right click does.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled && MOX::zoom_in == 1) {
+                constexpr int16_t ZOOM_KEY_STEP = 8;
+                uint8_t arrows = platform::Arrow_Keys_Held_();
+                if (arrows != 0) {
+                    int16_t ptr_x = (int16_t)mouse::Pointer_X();
+                    int16_t ptr_y = (int16_t)mouse::Pointer_Y();
+                    if (arrows & platform::ARROW_KEY_UP) ptr_y -= ZOOM_KEY_STEP;
+                    if (arrows & platform::ARROW_KEY_DOWN) ptr_y += ZOOM_KEY_STEP;
+                    if (arrows & platform::ARROW_KEY_LEFT) ptr_x -= ZOOM_KEY_STEP;
+                    if (arrows & platform::ARROW_KEY_RIGHT) ptr_x += ZOOM_KEY_STEP;
+                    // Keep the pointer inside the galaxy-map viewport.
+                    if (ptr_x < 22) ptr_x = 22;
+                    if (ptr_x > 526) ptr_x = 526;
+                    if (ptr_y < 22) ptr_y = 22;
+                    if (ptr_y > 420) ptr_y = 420;
+                    platform::Force_Cursor_Pos(ptr_x, ptr_y);
+                }
+                int32_t zoom_key = key::Read_Key();
+                if (zoom_key == 0x011B) { // Esc
+                    MAINSCR::Exit_Zooming_Mode(&boxes_saved_flag);
+                } else if (zoom_key != 0) {
+                    key::Push_Key_Code((uint32_t)zoom_key, g_last_scan_code);
+                }
+            }
 
             int16_t input = fields::Get_Input();
             if (input < 0) {
