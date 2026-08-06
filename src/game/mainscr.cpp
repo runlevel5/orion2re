@@ -1400,17 +1400,20 @@ namespace MAINSCR {
         _races_button = fields::Add_Irregular_Button_Field_(386, 435, 453, 471, "", MOX::_main_races_button_seg, 306, 425, "R", 0x28);
         _info_button = fields::Add_Irregular_Button_Field_(462, 435, 526, 471, "", MOX::_main_info_button_seg, 306, 425, "I", 0x28);
 
-        // Enhancement: 'X' opens the treasury/tax-rate popup like a click.
+        // Enhancement: digits 1-5 open the five status windows on the right
+        // edge (treasury, command points, food, freighters, research) like a
+        // click on them.
+        const bool enhanced_windows = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
         _treasury_window_field = fields::Add_Hidden_Field_(
-            545, 49, 613, 119,
-            ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? "X" : "", 0x29);
-        // Enhancement: 'S' opens the command summary like a click.
+            545, 49, 613, 119, enhanced_windows ? "1" : "", 0x29);
         _command_points_window_field = fields::Add_Hidden_Field_(
-            545, 122, 613, 192,
-            ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? "S" : "", 0x29);
-        _food_window_field = fields::Add_Hidden_Field_(545, 197, 613, 267, "", 0x29);
-        _freighters_window_field = fields::Add_Hidden_Field_(545, 270, 613, 340, "", 0x29);
-        _research_window_field = fields::Add_Hidden_Field_(545, 344, 613, 415, "", 0x29);
+            545, 122, 613, 192, enhanced_windows ? "2" : "", 0x29);
+        _food_window_field = fields::Add_Hidden_Field_(
+            545, 197, 613, 267, enhanced_windows ? "3" : "", 0x29);
+        _freighters_window_field = fields::Add_Hidden_Field_(
+            545, 270, 613, 340, enhanced_windows ? "4" : "", 0x29);
+        _research_window_field = fields::Add_Hidden_Field_(
+            545, 344, 613, 415, enhanced_windows ? "5" : "", 0x29);
 
         Add_Moveable_Box_Fields_();
 
