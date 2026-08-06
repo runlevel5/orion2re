@@ -943,7 +943,7 @@ namespace CMBTFIRE {
                     defense_hits *= 2;
                 }
                 MOX::_combat_data->structure_damage += defense_hits;
-                if (MOX::_combat_data->structure_damage > armor_threshold) {
+                if (MOX::_combat_data->structure_damage >= armor_threshold) {
                     int16_t hits = MOX::_combat_data->structure_damage / armor_threshold;
                     *damage = hits;
                     CMBTFIRE::Destroy_Colony_Defense_(hits);
@@ -964,7 +964,7 @@ namespace CMBTFIRE {
                         MOX::_combat_data->structure_max += colony_hits;
                     }
 
-                    if (MOX::_combat_data->structure_max > 100) {
+                    if (MOX::_combat_data->structure_max >= 100) {
                         bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                         bomb_stats.colony_idx = MOX::_cmbt_colony_id;
                         bomb_stats.is_planetary_hit = 1;

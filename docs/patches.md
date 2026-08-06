@@ -98,7 +98,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1377` - `filter boarding for stasis, bhg`: fixed in `BOARDING::Filter_Boarding_()` and applied to manual and AI boarding by always rejecting targets in stasis and, when `combat board_in_black_hole` is disabled, rejecting BHG-trapped attackers and targets; this replaces the 1.50 register-preserving call-site wrappers with a shared source-level invariant while retaining the classic-enabled default.
 - [x] `asm.pl:1492` - `tech field desync`: fixed in `NETMOX::Send_Pick_Target_Info_()`, `NETMOX::Decode_Pick_Target_Info_()`, `NETMOX::Send_You_Are_Target_Info_()`, and `NETMOX::Decode_You_Are_Target_Info_()` by synchronizing technology-field state together with technology applications before tactical combat; this expresses the 1.50 expanded player-data copy range through named source fields.
 - [x] `asm.pl:1548` - `clip fighter damage`: fixed in `CMBTFIRE::Fire_Fighter_Beam_()` by capping weighted fighter-beam rolls at the adjusted weapon maximum; this replaces the 1.50 configurable call-site wrapper with a direct source-level damage invariant.
-- [ ] `asm.pl:1577` - `bombardment hits fix`
+- [x] `asm.pl:1577` - `bombardment hits fix`: fixed in `CMBTFIRE::Apply_Damage_To_Planet_()` by processing accumulated defense and colony damage when it exactly reaches the relevant hit-point threshold; this directly expresses the two 1.50 conditional-branch corrections in source.
 - [ ] `asm.pl:1654` - `stealth`
 - [ ] `asm.pl:1964` - `mapedge retreat crash`
 - [ ] `asm.pl:2160` - `diplomatic event`
