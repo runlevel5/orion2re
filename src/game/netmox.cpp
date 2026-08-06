@@ -1773,9 +1773,10 @@ namespace NETMOX {
             reader.Require_(k_star_player_presence_payload_bytes);
             COMBFIND::Decode_Star_Player_Presence_(&reader, -1);
 
-            // 3. Read Player Tech Applications
+            // 3. Read Player Technology State
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                    reader.Read_Bytes_(MOX::_player[i].tech_fields, sizeof(MOX::_player[i].tech_fields));
                     reader.Read_Bytes_(MOX::_player[i].tech_applications, sizeof(MOX::_player[i].tech_applications));
                 }
             }
@@ -1888,12 +1889,14 @@ namespace NETMOX {
             reader.Require_(k_star_player_presence_payload_bytes);
             COMBFIND::Decode_Star_Player_Presence_(&reader, -1);
 
-            // 2. Read Player Tech Applications
+            // 2. Read Player Technology State
             if (attacker_id < MAX_PLAYERS) {
+                reader.Read_Bytes_(MOX::_player[attacker_id].tech_fields, sizeof(MOX::_player[attacker_id].tech_fields));
                 reader.Read_Bytes_(MOX::_player[attacker_id].tech_applications, sizeof(MOX::_player[attacker_id].tech_applications));
             }
 
             if (MOX::_PLAYER_NUM < MAX_PLAYERS) {
+                reader.Read_Bytes_(MOX::_player[MOX::_PLAYER_NUM].tech_fields, sizeof(MOX::_player[MOX::_PLAYER_NUM].tech_fields));
                 reader.Read_Bytes_(MOX::_player[MOX::_PLAYER_NUM].tech_applications, sizeof(MOX::_player[MOX::_PLAYER_NUM].tech_applications));
             }
 
@@ -2256,10 +2259,12 @@ namespace NETMOX {
             RUSS::Mox_Update_();
 
             if (other_player_idx < MAX_PLAYERS) {
+                writer.Write_Bytes_(MOX::_player[other_player_idx].tech_fields, sizeof(MOX::_player[other_player_idx].tech_fields));
                 writer.Write_Bytes_(MOX::_player[other_player_idx].tech_applications, sizeof(MOX::_player[other_player_idx].tech_applications));
             }
 
             if (target_player_idx < MAX_PLAYERS) {
+                writer.Write_Bytes_(MOX::_player[target_player_idx].tech_fields, sizeof(MOX::_player[target_player_idx].tech_fields));
                 writer.Write_Bytes_(MOX::_player[target_player_idx].tech_applications, sizeof(MOX::_player[target_player_idx].tech_applications));
             }
 
@@ -2338,6 +2343,7 @@ namespace NETMOX {
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                    writer.Write_Bytes_(MOX::_player[i].tech_fields, sizeof(MOX::_player[i].tech_fields));
                     writer.Write_Bytes_(MOX::_player[i].tech_applications, sizeof(MOX::_player[i].tech_applications));
                 }
             }

@@ -336,7 +336,7 @@ DOCTEST_TEST_CASE("large combat payload allocations stay within the shared limit
         sizeof(NETMOX::s_packet_0x12) +
         MAX_PLAYERS * sizeof(s_combfind_star_has_player) +
         sizeof(uint8_t) +
-        2 * sizeof(MOX::_player[0].tech_applications) +
+        2 * (sizeof(MOX::_player[0].tech_fields) + sizeof(MOX::_player[0].tech_applications)) +
         MAX_LEADERS * (sizeof(int16_t) + sizeof(s_leader_data)) +
         sizeof(int16_t) +
         2 * sizeof(uint8_t) +
@@ -350,7 +350,7 @@ DOCTEST_TEST_CASE("large combat payload allocations stay within the shared limit
         sizeof(s_combfind_target) +
         MAX_PLAYERS * sizeof(s_combfind_star_has_player) +
         sizeof(uint8_t) +
-        MAX_PLAYERS * sizeof(MOX::_player[0].tech_applications) +
+        MAX_PLAYERS * (sizeof(MOX::_player[0].tech_fields) + sizeof(MOX::_player[0].tech_applications)) +
         MAX_LEADERS * (sizeof(int16_t) + sizeof(s_leader_data)) +
         sizeof(int16_t) +
         MAX_PLAYERS * sizeof(uint8_t) +
