@@ -3,6 +3,8 @@
 
 #include "config/mod_manager.h"
 
+#include "enhanced_ux.h"
+
 namespace MAINMENU {
     s_main_menu* mainmenu;
     s_animation_header* main_menu_background;
@@ -23,6 +25,9 @@ namespace MAINMENU {
     int16_t fade_out_count;
     char (*credits)[2][127];
     uint8_t credits_column_one;
+    // Enhancement: frame phase for the smooth credit scroll (1px on two of
+    // every three fast frames).
+    static uint8_t _credit_step_phase = 0;
     int16_t credits_field = -1000;
 
     namespace {
@@ -133,13 +138,18 @@ namespace MAINMENU {
 
         fields::Clear_Fields();
 
-        int16_t button_fields[6];
+        int16_t button_fields[7];
         button_fields[0] = fields::Add_Hidden_Field(10, 20, 25, 35, "C", ')');
         button_fields[1] = fields::Add_Hidden_Field(20, 30, 35, 45, "S", ')');
         button_fields[2] = fields::Add_Hidden_Field(30, 40, 45, 55, "L", ')');
         button_fields[3] = fields::Add_Hidden_Field(40, 50, 55, 65, "M", ')');
         button_fields[4] = fields::Add_Hidden_Field(50, 60, 65, 75, "H", ')');
         button_fields[5] = fields::Add_Hidden_Field(60, 70, 75, 85, "Q", ')');
+        // Enhancement: 'N' skips the menu video straight into New Game, like
+        // the other menu hotkeys do for their entries.
+        button_fields[6] = (ENHANCED_UX::enhanced_ux_settings.enabled != 0)
+                               ? fields::Add_Hidden_Field(70, 80, 85, 95, "N", ')')
+                               : (int16_t)-1000;
 
         /* fmtpara: "\x1b" begins an inline color-attribute command; it is preserved here as the original non-printing field token. */
         int16_t hotkey_field = fields::Add_Hot_Key("\x1b");
@@ -166,9 +176,9 @@ namespace MAINMENU {
             } else if (current_frame == total_frames) {
                 finished = true;
             } else {
-                for (int32_t i = 0; i < 6; ++i) {
-                    if (input == button_fields[i]) {
-                        static const uint16_t mapping[] = {0x43, 0x53, 0x4C, 0x4D, 0x48, 0x51}; // C, S, L, M, H, Q
+                for (int32_t i = 0; i < 7; ++i) {
+                    if (input == button_fields[i] && button_fields[i] > 0) {
+                        static const uint16_t mapping[] = { 0x43, 0x53, 0x4C, 0x4D, 0x48, 0x51, 0x4E }; // C, S, L, M, H, Q, N
                         result_code = mapping[i];
                         finished = true;
                         input_detected = true;
@@ -569,7 +579,18 @@ namespace MAINMENU {
         s_colors active_palette;
 
         if (MAINMENU::delay_count <= 0) {
-            MAINMENU::credit_y_slot.y -= 2;
+            // Enhancement: with the menu loop ticking three times faster
+            // while the credits roll, scroll 1px on two of every three frames
+            // — the same net speed as the stock 2px per slow frame, but three
+            // times the temporal resolution.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                MAINMENU::_credit_step_phase = (uint8_t)((MAINMENU::_credit_step_phase + 1) % 3);
+                if (MAINMENU::_credit_step_phase != 0) {
+                    MAINMENU::credit_y_slot.y -= 1;
+                }
+            } else {
+                MAINMENU::credit_y_slot.y -= 2;
+            }
             MAINMENU::credit_count = 0x1A6 /* 422 */ - MAINMENU::credit_y_slot.y;
 
             int16_t fade_in_line_idx = -1;
@@ -617,7 +638,10 @@ namespace MAINMENU {
         if (abs(MAINMENU::credit_y_slot.y - 179) > MAINMENU::max_credits * 14) {
             MAINMENU::credit_x = 0x42 /* 66 */;
             MAINMENU::credit_y_slot.dword = 0x1A6 /* 422 */;
-            MAINMENU::delay_count = 10;
+            // The pause between rolls is counted in frames; scale it to the
+            // faster enhanced frame rate so it lasts as long as stock.
+            MAINMENU::delay_count =
+                (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? 30 : 10;
         }
     }
 
@@ -777,7 +801,14 @@ namespace MAINMENU {
                 RUSS::Mox_Sync_Update();
             }
 
-            timer::Release_Time(3);
+            // Enhancement: while the credits roll, tick at 55ms instead of
+            // 165ms so the scroll animates smoothly (Draw_Credits scales the
+            // per-frame step to keep the same net speed).
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && credit_num != 0) {
+                timer::Release_Time(1);
+            } else {
+                timer::Release_Time(3);
+            }
 
             if (screen_exit) {
                 MAINSCR2::main_screen_fade_in_flag = 1;
