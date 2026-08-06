@@ -1064,7 +1064,7 @@ namespace aidesign {
         finalize_count:
             *weapon_slot_idx = *weapon_slot_idx + 1;
 
-            int fighter_unit_space = DESIGN::Weapon_Space_(player_idx, WEAPON_INTERCEPTOR, 1, WEAPON_FIRING_ARC_360, 1, 0);
+            int fighter_unit_space = DESIGN::Weapon_Space_(player_idx, weapon_type, 1, WEAPON_FIRING_ARC_360, 1, 0);
             total_space_used = (int16_t)((int16_t)fighter_unit_space * total_fighters);
         }
 
