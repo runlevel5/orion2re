@@ -800,6 +800,31 @@ namespace INFO {
         fonts::Print_Centered(105, 196, msg_stat);
     }
 
+    // Enhancement helper: reports whether the selection sits on the page's
+    // first (direction < 0) or last (direction > 0) visible line.
+    static uint8_t Selection_At_Page_Edge_(s_list_state* state, int16_t direction) {
+        s_list_item* item = state->selected_item;
+        s_list_item* end = &state->items[(uint8_t)state->num_items];
+        s_list_item* first_item = item;
+        s_list_item* last_item = item;
+        while (item < end) {
+            last_item = item;
+            if (item + 1 >= end || item[1].stop_flag != 0) {
+                break;
+            }
+            ++item;
+        }
+        s_list_item* sel = LIST::Get_Selected_List_Entry(state);
+        if (sel == nullptr) {
+            return 0;
+        }
+        if (direction > 0) {
+            return (sel == last_item &&
+                    sel->current_app_index == (uint8_t)(sel->app_count - 1)) ? 1 : 0;
+        }
+        return (sel == first_item && sel->current_app_index == 0) ? 1 : 0;
+    }
+
     int16_t __cdecl _Tech_Review_Subscreen(s_animation_header** anims, int16_t exit_threshold, int16_t player_idx) {
         s_list_state list_headers[4];
         char billtext[40];
@@ -853,6 +878,7 @@ namespace INFO {
 
         bool list_changed = false;
         bool refresh_list_content = true;
+        bool select_page_end = false; // enhancement: land on the last line after a keyboard page-up
 
         while (true) {
             if (refresh_list_content) {
@@ -872,6 +898,11 @@ namespace INFO {
 
             if (list_changed) {
                 LIST::Set_Selected_List_Entry(g_header_p, g_first_list_field);
+                if (select_page_end) {
+                    // Moving up from the page's first line wraps to its last.
+                    LIST::Move_List_Selection_(g_header_p, -1, 0);
+                    select_page_end = false;
+                }
             }
 
             LIST::Set_List_Up_Down_Field_Drawing(g_header_p, field_up, field_down);
@@ -884,6 +915,41 @@ namespace INFO {
             bool inner_break = false;
             while (!inner_break) {
                 timer::Mark_Time();
+
+                // Enhancement: Up/Down move the tech review selection; past
+                // the page's last (or first) line they flip to the next (or
+                // previous) page. Runs before the rebuild block below so the
+                // description panel and tech image refresh in the same frame.
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                    int32_t nav_key = key::Read_Key();
+                    if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+                        int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                        if (Selection_At_Page_Edge_(g_header_p, nav_dir)) {
+                            int8_t page_flipped = (nav_dir > 0)
+                                                      ? LIST::Next_List_Page(g_header_p)
+                                                      : LIST::Previous_List_Page(g_header_p);
+                            if (page_flipped != 0) {
+                                list_changed = true;
+                                refresh_list_content = false;
+                                select_page_end = (nav_dir < 0);
+                                inner_break = true;
+                                continue;
+                            }
+                        }
+                        g_selected_list_p = LIST::Move_List_Selection_(
+                            g_header_p, nav_dir, 0);
+                        g_list_update_needed = 1;
+                    } else if (nav_key == 0x0F09) { // Tab cycles the category
+                        sound::Play_Sound(40);
+                        tech_review_tab_index = (int16_t)((tech_review_tab_index + 1) % 4);
+                        list_changed = false;
+                        refresh_list_content = true;
+                        inner_break = true;
+                        continue;
+                    } else if (nav_key != 0) {
+                        key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
+                    }
+                }
 
                 if (g_list_update_needed != 0 && g_header_p->num_items != 0) {
                     bitmap::Create_Blank_Bitmap(180, 150, g_bitmap1_p);
@@ -1003,7 +1069,13 @@ namespace INFO {
         int16_t field_idx = fields::Scan_Input();
 
         if (field_idx >= g_first_list_field && field_idx <= g_last_list_field) {
-            LIST::Set_Selected_List_Entry(&g_turn_header, field_idx);
+            // Enhancement: a stationary hover must not steal the keyboard
+            // selection; the mouse regains it when it moves to a new entry.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled == 0 ||
+                field_idx != g_prior_choice) {
+                LIST::Set_Selected_List_Entry(&g_turn_header, field_idx);
+                g_prior_choice = field_idx;
+            }
         }
 
         g_selected_msg_p = LIST::Get_Selected_List_Entry(&g_turn_header);
@@ -1069,12 +1141,19 @@ namespace INFO {
         }
 
         LIST::Init_List_Data(&INFO::g_category_header);
-        int16_t close_btn_id = fields::Add_Button_Field(386, 427, "", anims[21], "", '(');
+        // Enhancement: 'B' presses the Back button.
+        int16_t close_btn_id = fields::Add_Button_Field(
+            386, 427, "", anims[21],
+            ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? "B" : "", '(');
         int16_t up_btn_id = fields::Add_Button_Field(398, 96, "", anims[14], "\x1B", '(');
         int16_t down_btn_id = fields::Add_Button_Field(398, 396, "", anims[15], "\x1B", '(');
 
         fields::Assign_Auto_Function(INFO::Draw_Reference_Category_Subscreen, 2);
         INFO::g_reference_screen_type = 0;
+
+        // Enhancement: pending keyboard page flip (1 = down, land on the
+        // first entry; 2 = up, land on the last entry).
+        int16_t kbd_page_flip = 0;
 
         while (true) {
             INFO::Draw_Multiple_Drop_Areas(&INFO::category_drops[1], 2);
@@ -1089,11 +1168,17 @@ namespace INFO {
             LIST::Set_List_Up_Down_Field_Drawing(&INFO::g_category_header, up_btn_id, down_btn_id);
 
             INFO::g_prior_choice = fields::Scan_Input();
-            if (INFO::g_prior_choice < INFO::g_first_list_field || INFO::g_prior_choice > INFO::g_last_list_field) {
+            if (kbd_page_flip != 0 ||
+                INFO::g_prior_choice < INFO::g_first_list_field || INFO::g_prior_choice > INFO::g_last_list_field) {
                 INFO::g_prior_choice = INFO::g_first_list_field;
             }
 
             LIST::Set_Selected_List_Entry(&INFO::g_category_header, INFO::g_prior_choice);
+            if (kbd_page_flip == 2) {
+                // Moving up from the page's first entry wraps to its last.
+                LIST::Move_List_Selection_(&INFO::g_category_header, -1, 0);
+            }
+            kbd_page_flip = 0;
             INFO::g_selected_list_p = LIST::Get_Selected_List_Entry(&INFO::g_category_header);
             INFO::g_list_update_needed = 1;
 
@@ -1101,6 +1186,38 @@ namespace INFO {
 
             while (true) {
                 timer::Mark_Time();
+
+                // Enhancement: Up/Down move the topic selection; past the
+                // page's last (or first) entry they flip to the next (or
+                // previous) page. Runs before the rebuild block so the topic
+                // text refreshes in the same frame.
+                bool kbd_flip_break = false;
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                    int32_t nav_key = key::Read_Key();
+                    if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+                        int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                        if (Selection_At_Page_Edge_(&INFO::g_category_header, nav_dir)) {
+                            int8_t page_flipped = (nav_dir > 0)
+                                                      ? LIST::Next_List_Page(&INFO::g_category_header)
+                                                      : LIST::Previous_List_Page(&INFO::g_category_header);
+                            if (page_flipped != 0) {
+                                kbd_page_flip = (nav_dir > 0) ? (int16_t)1 : (int16_t)2;
+                                kbd_flip_break = true;
+                            }
+                        }
+                        if (!kbd_flip_break) {
+                            INFO::g_selected_list_p = LIST::Move_List_Selection_(
+                                &INFO::g_category_header, nav_dir, 0);
+                            INFO::g_list_update_needed = 1;
+                        }
+                    } else if (nav_key != 0) {
+                        key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
+                    }
+                }
+                if (kbd_flip_break) {
+                    break;
+                }
+
                 if (INFO::g_list_update_needed != 0) {
                     bitmap::Create_Blank_Bitmap(190, 314, INFO::g_bitmap1_p);
                     s_help_record* data = (s_help_record*)farload::Far_Reload_Data(lbx_name, 0, record_buffer, record_offsets[INFO::g_selected_list_p->group_id], 1, sizeof(s_help_record));
@@ -1857,14 +1974,144 @@ namespace INFO {
         fields::Assign_Auto_Function(INFO::Draw_Reference_Main_Subscreen, 2);
         INFO::Introduce_Subscreen();
 
+        // Enhancement: solid highlight for the selected/hovered entry — the
+        // stock high color includes palette index 191, which the page's
+        // palette cycle makes pulsate; 188 is its brightest static neighbor.
+        // The ambient font set here drives both the hover print in the draw
+        // function and the keyboard highlight below.
+        static s_colors solid_high_color = {{178, 188, 183, 185, 187, 188, 188, 188}};
+        s_colors* reference_high_color = (ENHANCED_UX::enhanced_ux_settings.enabled != 0)
+                                             ? &solid_high_color
+                                             : &INFO::info_high_color;
         if (MOX::settings.language == 1 || MOX::settings.language == 2) {
-            fonts::Set_Font_Style(3, &INFO::info_high_color);
+            fonts::Set_Font_Style(3, reference_high_color);
         } else {
-            fonts::Set_Font_Style(4, &INFO::info_high_color);
+            fonts::Set_Font_Style(4, reference_high_color);
+        }
+
+        // Enhancement: single-highlight keyboard/mouse selection — exactly one
+        // entry is highlighted at any time, owned by whichever input acted
+        // last. Up/Down move within a column, Left/Right jump between the
+        // Categories and How To? columns (keyboard picks up from the current
+        // highlight), Enter opens it. Moving the mouse onto an entry takes
+        // the highlight over to hover. All painting happens here, with
+        // released highlights erased in the normal color for two frames so
+        // both flip pages are cleaned.
+        const bool kbd_nav = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        const int16_t ref_font_style =
+            (MOX::settings.language == 1 || MOX::settings.language == 2) ? (int16_t)3 : (int16_t)4;
+        int16_t cur_col = -1; // highlighted entry: 0 = Categories, 1 = How To?
+        int16_t cur_row = 0;
+        int16_t prev_ptr_x = (int16_t)mouse::Pointer_X();
+        int16_t prev_ptr_y = (int16_t)mouse::Pointer_Y();
+        struct s_erase_slot {
+            int16_t col;
+            int16_t row;
+            uint8_t frames;
+        } erase_slots[2] = { { -1, 0, 0 }, { -1, 0, 0 } };
+        if (kbd_nav && category_count > 0) {
+            cur_col = 0;
+            cur_row = 0;
         }
 
         while (true) {
-            input = fields::Get_Input();
+            int16_t synth_input = 0;
+            if (kbd_nav) {
+                // Map the current hover to an entry, if any.
+                int16_t hover_field = fields::Scan_Input();
+                int16_t hover_col = -1;
+                int16_t hover_row = 0;
+                if (hover_field >= INFO::g_first_how_to_field &&
+                    hover_field < (int16_t)(INFO::g_first_how_to_field + (int16_t)record_count)) {
+                    hover_col = 1;
+                    hover_row = (int16_t)(hover_field - INFO::g_first_how_to_field);
+                } else if (hover_field >= INFO::g_first_category_field &&
+                           hover_field < (int16_t)(INFO::g_first_category_field + category_count)) {
+                    hover_col = 0;
+                    hover_row = (int16_t)(hover_field - INFO::g_first_category_field);
+                }
+
+                int16_t new_col = cur_col;
+                int16_t new_row = cur_row;
+
+                // Mouse wins when it moves onto an entry.
+                int16_t ptr_x = (int16_t)mouse::Pointer_X();
+                int16_t ptr_y = (int16_t)mouse::Pointer_Y();
+                bool mouse_moved = (ptr_x != prev_ptr_x || ptr_y != prev_ptr_y);
+                prev_ptr_x = ptr_x;
+                prev_ptr_y = ptr_y;
+                if (mouse_moved && hover_col >= 0) {
+                    new_col = hover_col;
+                    new_row = hover_row;
+                }
+
+                // Keyboard wins when a key is pressed, starting from the
+                // current highlight.
+                int32_t nav_key = key::Read_Key();
+                if (nav_key != 0) {
+                    int16_t col = (new_col >= 0) ? new_col : (int16_t)0;
+                    int16_t row = (new_col >= 0) ? new_row : (int16_t)0;
+                    int16_t col_count = (col == 0) ? category_count : (int16_t)record_count;
+                    if (nav_key == 0x48E0 && col_count > 0) { // Up
+                        new_col = col;
+                        new_row = (int16_t)((row + col_count - 1) % col_count);
+                    } else if (nav_key == 0x50E0 && col_count > 0) { // Down
+                        new_col = col;
+                        new_row = (int16_t)((row + 1) % col_count);
+                    } else if (nav_key == 0x4BE0 || nav_key == 0x4DE0) { // Left/Right
+                        int16_t other_col = (int16_t)(1 - col);
+                        int16_t other_count = (other_col == 0) ? category_count : (int16_t)record_count;
+                        if (other_count > 0) {
+                            new_col = other_col;
+                            new_row = (row < other_count) ? row : (int16_t)(other_count - 1);
+                        }
+                    } else if (nav_key == 0x1C0D) { // Enter opens the highlight
+                        if (new_col >= 0) {
+                            synth_input = (new_col == 0)
+                                              ? (int16_t)(INFO::g_first_category_field + new_row)
+                                              : (int16_t)(INFO::g_first_how_to_field + new_row);
+                        }
+                    } else {
+                        key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
+                    }
+                }
+
+                // Highlight moved: erase the old entry.
+                if ((new_col != cur_col || new_row != cur_row) && cur_col >= 0) {
+                    s_erase_slot* slot = (erase_slots[0].frames == 0) ? &erase_slots[0]
+                                                                      : &erase_slots[1];
+                    slot->col = cur_col;
+                    slot->row = cur_row;
+                    slot->frames = 2;
+                }
+                cur_col = new_col;
+                cur_row = new_row;
+
+                // Per-frame painting: erases first, then the live highlight.
+                for (int slot_ix = 0; slot_ix < 2; ++slot_ix) {
+                    s_erase_slot* slot = &erase_slots[slot_ix];
+                    if (slot->frames > 0 && slot->col >= 0 &&
+                        !(slot->col == cur_col && slot->row == cur_row)) {
+                        fonts::Set_Font_Style(ref_font_style, &INFO::info_normal_color);
+                        if (slot->col == 0) {
+                            fonts::Print(0xdd, (slot->row + 5) * 20, category_strs[slot->row]);
+                        } else {
+                            fonts::Print(0x1a5, (slot->row + 5) * 20, how_to_strs[slot->row]);
+                        }
+                        slot->frames--;
+                    }
+                }
+                if (cur_col >= 0) {
+                    fonts::Set_Font_Style(ref_font_style, reference_high_color);
+                    if (cur_col == 0) {
+                        fonts::Print(0xdd, (cur_row + 5) * 20, category_strs[cur_row]);
+                    } else {
+                        fonts::Print(0x1a5, (cur_row + 5) * 20, how_to_strs[cur_row]);
+                    }
+                }
+            }
+
+            input = (synth_input != 0) ? synth_input : fields::Get_Input();
             if (MOX::FULL_DRAW_SCREEN_FLAG != 0) {
                 return 0;
             }
@@ -1921,7 +2168,10 @@ namespace INFO {
 
         video::Copy_Off_To_Back();
 
-        fields::Add_Button_Field(386, 427, "", anims[21], "", 40);
+        // Enhancement: 'B' presses the Back button.
+        fields::Add_Button_Field(
+            386, 427, "", anims[21],
+            ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? "B" : "", 40);
 
         fields::Assign_Auto_Function(INFO::Draw_Dummy_Turn_Summary_Subscreen, 2);
 
@@ -2012,6 +2262,13 @@ namespace INFO {
     void __cdecl Draw_Reference_Main_Subscreen() {
         int16_t field_idx = fields::Scan_Input();
 
+        // Enhancement: the subscreen loop owns all highlight painting (with
+        // proper erasing); the built-in hover print would leave stale bright
+        // entries behind.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            field_idx = 0;
+        }
+
         if (field_idx >= INFO::g_first_how_to_field) {
             int16_t offset = field_idx - INFO::g_first_how_to_field;
             fonts::Print(0x1a5, (offset + 5) * 20, INFO::g_how_to_str_[offset]);
@@ -2091,12 +2348,24 @@ namespace INFO {
             LIST::Display_List_Page(&g_turn_header);
             LIST::Set_List_Up_Down_Field_Drawing(&g_turn_header, up_button, down_button);
             fields::Assign_Auto_Function(Draw_Turn_Summary_Subscreen, 2);
+            g_prior_choice = 0; // fresh hover-guard state for this page
             video::Copy_Off_To_Back();
             Introduce_Subscreen();
 
             bool refresh_outer = false;
 
             while (true) {
+                // Enhancement: Up/Down move through the turn's messages.
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                    int32_t nav_key = key::Read_Key();
+                    if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+                        g_selected_msg_p = LIST::Move_List_Selection_(
+                            &g_turn_header, (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1, 1);
+                    } else if (nav_key != 0) {
+                        key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
+                    }
+                }
+
                 input_field = fields::Get_Input();
                 if (MOX::FULL_DRAW_SCREEN_FLAG != 0) {
                     return 0;
