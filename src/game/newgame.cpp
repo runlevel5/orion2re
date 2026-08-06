@@ -2,6 +2,7 @@
 
 #include "config/config_decode.h"
 #include "newgame_options.h"
+#include "enhanced_ux.h"
 namespace NEWGAME {
 
     int16_t g_x = 15;
@@ -81,11 +82,60 @@ namespace NEWGAME {
         ERIC::Fast_Fade_In();
         mouse::Set_Mouse_List(&MOX::mouse_list_arrow, 1);
 
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+
         while (!exit_screen) {
-            int16_t input = fields::Get_Input();
+            int16_t input = 0;
+
+            // Enhancement: Enter is reserved for the Accept button — consumed
+            // here so it can no longer activate whatever the mouse hovers — and
+            // shows the button pressed and released. The page toggle repaints
+            // buttons from fields::down_mouse_button.
+            if (enhanced) {
+                int32_t key = key::Read_Key();
+                if (key == 0x1C0D) { // Enter
+                    sound::Play_Sound(0x28);
+                    fields::down_mouse_button = NEWGAME::fields[8];
+                    fonts::Set_Font_Style(3, &NEWGAME::color_ken);
+                    NEWGAME::Draw_Newgame_Screen();
+                    RUSS::Mox_Sync_Update();
+                    timer::Mark_Time();
+                    timer::Release_Time(2);
+                    fields::down_mouse_button = -1;
+                    fonts::Set_Font_Style(3, &NEWGAME::color_ken);
+                    NEWGAME::Draw_Newgame_Screen();
+                    RUSS::Mox_Sync_Update();
+                    timer::Mark_Time();
+                    timer::Release_Time(1);
+                    input = NEWGAME::fields[8];
+                } else if (key != 0) {
+                    key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+                }
+            }
+
+            if (input == 0) {
+                input = fields::Get_Input();
+            }
             FAKEBUTS::Evaluate_Click_Thru_Fields(input);
 
             if (input == NEWGAME::fields[6] || input == NEWGAME::fields[7]) {
+                // Enhancement: the Esc hotkey shows the Cancel button pressed and
+                // released, as a click on it would.
+                if (enhanced && input == NEWGAME::fields[7]) {
+                    sound::Play_Sound(0x28);
+                    fields::down_mouse_button = NEWGAME::fields[6];
+                    fonts::Set_Font_Style(3, &NEWGAME::color_ken);
+                    NEWGAME::Draw_Newgame_Screen();
+                    RUSS::Mox_Sync_Update();
+                    timer::Mark_Time();
+                    timer::Release_Time(2);
+                    fields::down_mouse_button = -1;
+                    fonts::Set_Font_Style(3, &NEWGAME::color_ken);
+                    NEWGAME::Draw_Newgame_Screen();
+                    RUSS::Mox_Sync_Update();
+                    timer::Mark_Time();
+                    timer::Release_Time(1);
+                }
                 MOX::current_screen = MOX::return_screen;
                 exit_screen = true;
             }
@@ -249,30 +299,35 @@ namespace NEWGAME {
         int16_t gx = g_x;
         int16_t gy = g_y;
 
+        // Enhancement: digits activate the setup options (Difficulty=1, Galaxy
+        // Size=2, Galaxy Age=3, Players=4, Tech Level=5, Tactical Combat=6,
+        // Random Event=7, Antares Attack=8).
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+
         // Difficulty
-        int16_t difficulty_hidden_field = fields::Add_Hidden_Field(gx + 0x79, gy + 0x77, gx + 0xBC, gy + 0xB8, common_help_text, 0);
+        int16_t difficulty_hidden_field = fields::Add_Hidden_Field(gx + 0x79, gy + 0x77, gx + 0xBC, gy + 0xB8, enhanced ? "1" : common_help_text, 0);
         fields[0] = FAKEBUTS::Add_Click_Thru_Field(gx + 0x69, gy + 0xCC, gx + 0xCD, gy + 0xE0, diff_button_strings, GAME_DIFFICULTY_COUNT, &diff_button_variable, 0, common_help_text, 0, difficulty_hidden_field);
 
         // Galaxy Size
-        int16_t galaxy_size_hidden_field = fields::Add_Hidden_Field(gx + 0x114, gy + 0x77, gx + 0x157, gy + 0xB8, common_help_text, 0);
+        int16_t galaxy_size_hidden_field = fields::Add_Hidden_Field(gx + 0x114, gy + 0x77, gx + 0x157, gy + 0xB8, enhanced ? "2" : common_help_text, 0);
         fields[1] = FAKEBUTS::Add_Click_Thru_Field(gx + 0x105, gy + 0xCC, gx + 0x169, gy + 0xE0, gal_size_button_strings, NEW_GAME_GALAXY_SIZE_COUNT, &gal_size_button_variable, 0, common_help_text, 0, galaxy_size_hidden_field);
 
         // Galaxy Age
-        int16_t galaxy_age_hidden_field = fields::Add_Hidden_Field(gx + 0x1AF, gy + 0x77, gx + 0x1F2, gy + 0xB8, common_help_text, 0);
+        int16_t galaxy_age_hidden_field = fields::Add_Hidden_Field(gx + 0x1AF, gy + 0x77, gx + 0x1F2, gy + 0xB8, enhanced ? "3" : common_help_text, 0);
         fields[2] = FAKEBUTS::Add_Click_Thru_Field(gx + 0x1A1, gy + 0xCC, gx + 0x205, gy + 0xE0, gal_age_button_strings, GALAXY_AGE_COUNT, &gal_age_button_variable, 0, common_help_text, 0, galaxy_age_hidden_field);
 
         // Opponents
-        int16_t opponents_hidden_field = fields::Add_Hidden_Field(gx + 0x79, gy + 0x103, gx + 0xBC, gy + 0x144, common_help_text, 0);
+        int16_t opponents_hidden_field = fields::Add_Hidden_Field(gx + 0x79, gy + 0x103, gx + 0xBC, gy + 0x144, enhanced ? "4" : common_help_text, 0);
         fields[3] = FAKEBUTS::Add_Click_Thru_Field(gx + 0x69, gy + 0x15D, gx + 0xCD, gy + 0x171, opp_button_strings, MAX_PLAYERS, &opp_button_variable, 0, common_help_text, 0, opponents_hidden_field);
 
         // Starting Civilization Level
-        int16_t civilization_hidden_field = fields::Add_Hidden_Field(gx + 0x114, gy + 0x103, gx + 0x157, gy + 0x144, common_help_text, 0);
+        int16_t civilization_hidden_field = fields::Add_Hidden_Field(gx + 0x114, gy + 0x103, gx + 0x157, gy + 0x144, enhanced ? "5" : common_help_text, 0);
         fields[5] = FAKEBUTS::Add_Click_Thru_Field(gx + 0x105, gy + 0x15D, gx + 0x169, gy + 0x171, civ_button_strings, STARTING_CIVILIZATION_LEVEL_COUNT, &civ_button_variable, 0, common_help_text, 0, civilization_hidden_field);
 
         // Radio Buttons: Random Events, Xenon Attacks, Strategic Combat
-        fields::Add_Radio_Button_Field(gx + 0x17C, gy + 0x127, ESTRINGS::E_Strings(0x0C), anims[0], &random_events_button_variable, ESTRINGS::E_Strings(0x0C), 0x29);
-        fields::Add_Radio_Button_Field(gx + 0x17C, gy + 0x14A, ESTRINGS::E_Strings(0x0C), anims[2], &xenon_attacks_button_variable, ESTRINGS::E_Strings(0x0C), 0x29);
-        fields::Add_Radio_Button_Field(gx + 0x17C, gy + 0x103, ESTRINGS::E_Strings(0x0C), anims[1], (int16_t*)&combat_button_variable, ESTRINGS::E_Strings(0x0C), 0x29);
+        fields::Add_Radio_Button_Field(gx + 0x17C, gy + 0x127, ESTRINGS::E_Strings(0x0C), anims[0], &random_events_button_variable, enhanced ? "7" : ESTRINGS::E_Strings(0x0C), 0x29);
+        fields::Add_Radio_Button_Field(gx + 0x17C, gy + 0x14A, ESTRINGS::E_Strings(0x0C), anims[2], &xenon_attacks_button_variable, enhanced ? "8" : ESTRINGS::E_Strings(0x0C), 0x29);
+        fields::Add_Radio_Button_Field(gx + 0x17C, gy + 0x103, ESTRINGS::E_Strings(0x0C), anims[1], (int16_t*)&combat_button_variable, enhanced ? "6" : ESTRINGS::E_Strings(0x0C), 0x29);
 
         if (Show_Net_Game_Name()) {
             Ensure_Settings_Net_Game_Name();
