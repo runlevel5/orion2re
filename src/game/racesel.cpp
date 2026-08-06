@@ -224,9 +224,15 @@ namespace RACESEL {
     int16_t prev_ptr_y = (int16_t)mouse::Pointer_Y();
 
         while (true) {
+        int16_t synth_input = 0;
         if (enhanced) {
             int32_t nav_key = key::Read_Key();
-            if (nav_key == 0x48E0 || nav_key == 0x50E0 ||
+            if (nav_key == 0x1C0D) { // Enter picks the highlighted race
+                int16_t pick = kbd_active ? kbd_race : displayed_race;
+                if (pick >= 0 && pick <= 13) {
+                    synth_input = field_ids[pick];
+                }
+            } else if (nav_key == 0x48E0 || nav_key == 0x50E0 ||
                 nav_key == 0x4BE0 || nav_key == 0x4DE0) {
                 int16_t base = kbd_active ? kbd_race : displayed_race;
                 if (base < 0 || base > 13) {
@@ -249,6 +255,9 @@ namespace RACESEL {
         }
 
             int16_t input_field = fields::Get_Input();
+        if (synth_input != 0) {
+            input_field = synth_input;
+        }
             int16_t scan_idx = fields::Scan_Input();
             displayed_race = scan_idx - field_ids[0];
             if (displayed_race < 0 || displayed_race > 13) {
