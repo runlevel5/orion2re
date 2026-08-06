@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "enhanced_ux.h"
+
 namespace {
     int16_t _turn_summary_list_y[16] = {
         0, 10, 20, 30, 40, 50, 60, 70,
@@ -560,7 +562,13 @@ namespace INFO {
 
         _g_exit_field = fields::Add_Button_Field_(0x217, 0x1B2, "", info_lbx[2], "\x1B", '(');
 
+        // Enhancement: digits 1-5 switch the info tabs (History Graph=1,
+        // Tech Review=2, Race Stats=3, Turn Summary=4, Reference=5).
+        char tab_hotkey[2] = { '\0', '\0' };
         for (int i = 0; i < 5; ++i) {
+            tab_hotkey[0] = (ENHANCED_UX::enhanced_ux_settings.enabled != 0)
+                                ? (char)('1' + i)
+                                : '\0';
             fields::Add_Multi_Button_Field_(
                 _sub_scr_field[i * 2],
                 _sub_scr_field[i * 2 + 1],
@@ -568,7 +576,7 @@ namespace INFO {
                 info_lbx[3 + i],
                 &current_tab,
                 i,
-                "",
+                tab_hotkey,
                 0x29
             );
         }
