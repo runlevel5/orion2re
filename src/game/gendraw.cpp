@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 namespace GENDRAW {
     s_colors _message_text_colors = {{0xA0, 0xA3, 0xA3, 0xA5, 0xAB, 0xAB, 0xAB, 0xAB}};
     uint8_t _warning_box;

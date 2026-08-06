@@ -91,6 +91,7 @@ orion2re_add_unit_test(test_config_decode
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -104,6 +105,7 @@ orion2re_add_unit_test(test_config_bindings
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -118,6 +120,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -135,6 +138,7 @@ orion2re_add_unit_test(test_config_loader
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
         src/game/compat.cpp
         src/game/vfs.cpp
         src/game/vfs_file.cpp
@@ -333,6 +337,7 @@ orion2re_add_unit_test(test_fields
         tests/unit/test_fields.cpp
     PRODUCTION_SOURCES
         src/game/fields.cpp
+        src/game/settings.cpp
     FAKE_SOURCES
         tests/fakes/fake_animate.cpp
         tests/fakes/fake_exitm.cpp

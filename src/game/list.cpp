@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 namespace LIST {
 
     void __cdecl Set_List_Page_Pointer_(s_list_state* state) {

@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 namespace LOADSAVE {
     char _months[12][6];
 
@@ -21,13 +19,11 @@ namespace LOADSAVE {
     uint8_t _loaded_new_game;
     uint8_t _loaded_debug_save;
 
-    // Enhancement: the Load Game dialog's remembered selection. Kept apart
-    // from MOX::_settings.active_save_slot because it may point at an empty
-    // slot, which the rest of the game must never see as the active slot.
+    // Enhancement: session state — the dialogs' remembered selection (kept
+    // apart from active_save_slot, which must never point at an empty slot)
+    // and the audio hotkeys' mute state with pre-mute slider levels.
     static int8_t _enhanced_load_selection = -1;
 
-    // Enhancement: mute state for the audio hotkeys in the Game panel, per
-    // channel. The pre-mute slider levels are restored on unmute.
     static uint8_t _music_muted = 0;
     static uint8_t _sfx_muted = 0;
     static int16_t _premute_music_level = 0;
@@ -313,9 +309,8 @@ namespace LOADSAVE {
     }
 
     // Enhancement helper: highlights a slot as the pending load target.
-    // Embedded color codes only on loadable slots: the draw code matches
-    // empty-slot descriptions by string comparison, which the codes would
-    // break.
+    // Color codes only on loadable slots: the draw code matches empty-slot
+    // descriptions by string comparison.
     static void Select_Save_Slot_(int16_t slot) {
         _enhanced_load_selection = static_cast<int8_t>(slot);
         MOX::_settings.active_save_slot = static_cast<int8_t>(slot);
@@ -329,12 +324,9 @@ namespace LOADSAVE {
         }
     }
 
-    // Enhancement helper: plays the button sound and shows the given popup
-    // button pressed, then released, as a mouse click on it would, before an
-    // action triggered by Enter or a double click. Every page toggle repaints
-    // the buttons from _down_mouse_button (fields::Draw_Visible_Fields_), so
-    // the pressed state must be expressed through that variable rather than
-    // by drawing the pressed frame directly.
+    // Enhancement helper: shows a popup button pressed and released with its
+    // click sound. Page toggles repaint buttons from _down_mouse_button, so
+    // the pressed state must go through that variable.
     static void Animate_Popup_Button_Press_(int16_t button_field_id) {
         sound::Play_Sound_('(');
 
@@ -394,6 +386,90 @@ namespace LOADSAVE {
         fields::_active_input_field_first = 1;
     }
 
+    constexpr uint32_t DOUBLE_CLICK_MS = 500;
+    constexpr int16_t DOUBLE_CLICK_RADIUS = 4;
+    constexpr uint32_t WHEEL_STEP_MS = 120;
+
+    // Enhancement helper: the slot the load/save dialogs open on.
+    static int16_t Initial_Popup_Selection_() {
+        int16_t slot = _enhanced_load_selection;
+        if (slot < 0 || slot > 9) {
+            slot = MOX::_settings.active_save_slot;
+        }
+        return (slot < 0 || slot > 9) ? (int16_t)0 : slot;
+    }
+
+    // Enhancement helper: steps a dialog slot selection, wrapping at the ends.
+    static int16_t Step_Slot_(int16_t slot, int16_t dir) {
+        if (slot < 0 || slot > 9) {
+            return (dir > 0) ? (int16_t)0 : (int16_t)9;
+        }
+        return (int16_t)((slot + 10 + dir) % 10);
+    }
+
+    // Enhancement helper: reads Up/Down/wheel navigation (wheel paced to one
+    // step per WHEEL_STEP_MS) and Enter/middle-click activation; other keys
+    // go back to the fields system.
+    static int16_t Read_Popup_Nav_Input_(int16_t wheel_steps, int16_t middle_clicks,
+                                         uint32_t* last_wheel_ms, bool* out_activate) {
+        int16_t nav = 0;
+        *out_activate = false;
+        int32_t key = key::Read_Key_();
+        if (key == 0x48E0) { // Up
+            nav = -1;
+        } else if (key == 0x50E0) { // Down
+            nav = 1;
+        } else if (key == 0x1C0D) { // Enter
+            *out_activate = true;
+        } else if (key != 0) {
+            key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+        }
+        if (middle_clicks != 0) {
+            *out_activate = true;
+        }
+        if (wheel_steps != 0 && nav == 0) {
+            uint32_t now_ms = (uint32_t)SDL_GetTicks();
+            if (now_ms - *last_wheel_ms >= WHEEL_STEP_MS) {
+                *last_wheel_ms = now_ms;
+                nav = (wheel_steps > 0) ? (int16_t)-1 : (int16_t)1;
+            }
+        }
+        return nav;
+    }
+
+    struct s_row_click_state {
+        int16_t last_row = -1;
+        int16_t last_x = -1000;
+        int16_t last_y = -1000;
+        uint32_t last_ms = 0;
+    };
+
+    // Enhancement helper: detects a double click on a save row from observed
+    // left clicks — same row, near-same spot, within the double-click window
+    // by true press timestamps (so it also works while the first click
+    // started editing). Returns the row, or -1.
+    static int16_t Detect_Save_Row_Double_Click_(s_row_click_state* st) {
+        int16_t result = -1;
+        int16_t click_x, click_y;
+        uint32_t click_ticks;
+        while (platform::Consume_Left_Click_(&click_x, &click_y, &click_ticks)) {
+            int16_t row = Save_Popup_Row_At_(click_x, click_y);
+            bool near_last = (int16_t)abs(click_x - st->last_x) <= DOUBLE_CLICK_RADIUS &&
+                             (int16_t)abs(click_y - st->last_y) <= DOUBLE_CLICK_RADIUS;
+            if (row >= 0 && row == st->last_row && near_last &&
+                click_ticks - st->last_ms <= DOUBLE_CLICK_MS) {
+                result = row;
+                st->last_row = -1; // the pair is consumed
+            } else {
+                st->last_row = row;
+            }
+            st->last_ms = click_ticks;
+            st->last_x = click_x;
+            st->last_y = click_y;
+        }
+        return result;
+    }
+
     /**
      * @address 0050e910
      */
@@ -419,12 +495,8 @@ namespace LOADSAVE {
         int16_t last_clicked_slot = -1;
         uint32_t last_click_ms = 0;
         uint32_t last_wheel_ms = 0;
-        constexpr uint32_t DOUBLE_CLICK_MS = 500;
-        constexpr uint32_t WHEEL_STEP_MS = 120;
 
-        // Discard wheel movement and middle clicks from before the popup opened.
-        platform::Consume_Mouse_Wheel_Steps_();
-        platform::Consume_Middle_Clicks_();
+        platform::Discard_Input_Observations_();
 
         if (!from_menu) {
             EVANHELP::Set_Load_Game_Screen_Help_List_();
@@ -437,64 +509,26 @@ namespace LOADSAVE {
         Add_Game_Popup_Fields_(&unused1, &unused2);
         MOX::_global_var = 0;
 
-        // Enhancement: restore the remembered selection; fall back to the
-        // game's active slot, then to the top row.
+        // Enhancement: restore the remembered selection.
         if (ENHANCED_UX::enhanced_ux_settings.enabled) {
-            int16_t initial_slot = _enhanced_load_selection;
-            if (initial_slot < 0 || initial_slot > 9) {
-                initial_slot = MOX::_settings.active_save_slot;
-            }
-            if (initial_slot < 0 || initial_slot > 9) {
-                initial_slot = 0;
-            }
-            Select_Save_Slot_(initial_slot);
+            Select_Save_Slot_(Initial_Popup_Selection_());
         }
 
         do {
             timer::Mark_Time_();
 
-            // Enhancement: Up/Down move the selection, Enter presses LOAD.
-            // The fields system swallows these keys, so peek at the keyboard
-            // buffer first and push back anything it should still handle.
-            int16_t key_nav = 0;
+            // Enhancement: Up/Down/wheel move the selection, Enter or a
+            // middle click presses LOAD.
             bool key_load = false;
             if (ENHANCED_UX::enhanced_ux_settings.enabled) {
-                int32_t key = key::Read_Key_();
-                if (key == 0x48E0) { // Up arrow
-                    key_nav = -1;
-                } else if (key == 0x50E0) { // Down arrow
-                    key_nav = 1;
-                } else if (key == 0x1C0D) { // Enter
-                    key_load = true;
-                } else if (key != 0) {
-                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                int16_t key_nav = Read_Popup_Nav_Input_(
+                    platform::Consume_Mouse_Wheel_Steps_(),
+                    platform::Consume_Middle_Clicks_(),
+                    &last_wheel_ms, &key_load);
+                if (key_nav != 0) {
+                    Select_Save_Slot_(Step_Slot_(MOX::_settings.active_save_slot, key_nav));
+                    sound::Play_Sound_(')'); // same sound as clicking a row
                 }
-
-                // Middle click activates LOAD, like Enter.
-                if (platform::Consume_Middle_Clicks_() != 0) {
-                    key_load = true;
-                }
-
-                // Mouse wheel moves the selection too, capped at one slot per
-                // WHEEL_STEP_MS so fast scrolling stays at a readable pace.
-                int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
-                if (wheel_steps != 0 && key_nav == 0) {
-                    uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
-                    if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
-                        last_wheel_ms = wheel_now_ms;
-                        key_nav = (wheel_steps > 0) ? -1 : 1;
-                    }
-                }
-            }
-            if (key_nav != 0) {
-                int16_t nav_slot = MOX::_settings.active_save_slot;
-                if (nav_slot < 0 || nav_slot > 9) {
-                    nav_slot = (key_nav > 0) ? 0 : 9;
-                } else {
-                    nav_slot = static_cast<int16_t>((nav_slot + 10 + key_nav) % 10);
-                }
-                Select_Save_Slot_(nav_slot);
-                sound::Play_Sound_(')'); // same sound as clicking a slot row
             }
 
             int16_t input_id = fields::Get_Input_();
@@ -594,10 +628,8 @@ namespace LOADSAVE {
             }
         } while (exit_loop == 0);
 
-        // Enhancement: the dialog selection may sit on an empty slot; never
-        // leave that as the game's active save slot — quick save/load and the
-        // save dialog assume the active slot is occupied. The selection itself
-        // is remembered in _enhanced_load_selection.
+        // Enhancement: never leave an empty slot as the active save slot
+        // (quick save/load assume it is occupied).
         if (ENHANCED_UX::enhanced_ux_settings.enabled) {
             int8_t active = MOX::_settings.active_save_slot;
             if (active < 0 || active > 9 ||
@@ -683,14 +715,8 @@ namespace LOADSAVE {
 
         const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
         int8_t entry_active_slot = MOX::_settings.active_save_slot;
-        int16_t last_row_clicked = -1;
-        int16_t last_click_x = -1000;
-        int16_t last_click_y = -1000;
-        uint32_t last_row_click_ms = 0;
+        s_row_click_state row_clicks;
         uint32_t last_wheel_ms = 0;
-        constexpr uint32_t DOUBLE_CLICK_MS = 500;
-        constexpr int16_t DOUBLE_CLICK_RADIUS = 4;
-        constexpr uint32_t WHEEL_STEP_MS = 120;
 
         strlcpy(_empty_save_slot_message, HAROLD::H_Message_(0x184), sizeof(_empty_save_slot_message));
 
@@ -704,27 +730,15 @@ namespace LOADSAVE {
         Add_Game_Popup_Fields_(&popup_accept_field, &popup_cancel_field);
         MOX::_global_var = 0;
 
-        // Enhancement: restore the remembered selection (falling back to the
-        // active slot, then the top row) and discard stale input events.
+        // Enhancement: restore the remembered selection and blank the
+        // missing-file stardate markers, which would otherwise flash as
+        // "* INVALID *" for one frame on the first save into an empty slot
+        // (corrupt slots keep their marker).
         if (enhanced) {
-            int16_t initial_slot = _enhanced_load_selection;
-            if (initial_slot < 0 || initial_slot > 9) {
-                initial_slot = MOX::_settings.active_save_slot;
-            }
-            if (initial_slot < 0 || initial_slot > 9) {
-                initial_slot = 0;
-            }
-            Select_Save_Popup_Slot_(initial_slot);
-            active_slot_idx = initial_slot;
-            platform::Consume_Mouse_Wheel_Steps_();
-            platform::Consume_Middle_Clicks_();
-            while (platform::Consume_Left_Click_(nullptr, nullptr, nullptr)) {
-            }
+            active_slot_idx = Initial_Popup_Selection_();
+            Select_Save_Popup_Slot_(active_slot_idx);
+            platform::Discard_Input_Observations_();
 
-            // Committing a name into an empty slot redraws one frame before
-            // the post-save stardate refresh runs; blank the "missing file"
-            // markers so that frame's second line shows nothing instead of
-            // "* INVALID *". (Corrupt slots keep their marker.)
             for (int16_t i = 0; i < 10; ++i) {
                 if (_game_popup_fields->slot_status[i] == 1) {
                     MOX::_save_game_stardates[i * 25] = '\0';
@@ -737,43 +751,20 @@ namespace LOADSAVE {
             bool copy_saved_field_text = false;
             bool trigger_save = false;
 
-            // Enhancement: keyboard/wheel selection and edit-mode entry while
-            // no name is being edited. Consume the observation counters every
-            // frame so events during editing do not fire afterwards.
+            // Enhancement: Up/Down/wheel move the selection, Enter or a
+            // middle click starts editing the name. The observations are
+            // consumed every frame so events during editing do not fire
+            // afterwards, and a double click on a row overwrites that slot
+            // directly, bypassing name editing.
             int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
             int16_t middle_clicks = platform::Consume_Middle_Clicks_();
             if (enhanced && fields::_input_field_active == 0) {
-                int16_t nav = 0;
                 bool begin_edit = false;
-                int32_t key = key::Read_Key_();
-                if (key == 0x48E0) { // Up arrow
-                    nav = -1;
-                } else if (key == 0x50E0) { // Down arrow
-                    nav = 1;
-                } else if (key == 0x1C0D) { // Enter
-                    begin_edit = true;
-                } else if (key != 0) {
-                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
-                }
-                if (wheel_steps != 0 && nav == 0) {
-                    uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
-                    if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
-                        last_wheel_ms = wheel_now_ms;
-                        nav = (wheel_steps > 0) ? -1 : 1;
-                    }
-                }
-                if (middle_clicks != 0) {
-                    begin_edit = true;
-                }
+                int16_t nav = Read_Popup_Nav_Input_(wheel_steps, middle_clicks,
+                                                    &last_wheel_ms, &begin_edit);
                 if (nav != 0) {
-                    int16_t nav_slot = active_slot_idx;
-                    if (nav_slot < 0 || nav_slot > 9) {
-                        nav_slot = (nav > 0) ? 0 : 9;
-                    } else {
-                        nav_slot = static_cast<int16_t>((nav_slot + 10 + nav) % 10);
-                    }
-                    Select_Save_Popup_Slot_(nav_slot);
-                    active_slot_idx = nav_slot;
+                    active_slot_idx = Step_Slot_(active_slot_idx, nav);
+                    Select_Save_Popup_Slot_(active_slot_idx);
                     sound::Play_Sound_(')');
                 }
                 if (begin_edit && active_slot_idx >= 0 && active_slot_idx < 10) {
@@ -781,40 +772,7 @@ namespace LOADSAVE {
                     sound::Play_Sound_(')');
                 }
             }
-
-            // Enhancement: a double click on a row overwrites that slot
-            // directly, bypassing name editing. Detected from observed left
-            // clicks so it also works while the first click started editing.
-            int16_t double_click_slot = -1;
-            {
-                int16_t click_x, click_y;
-                uint32_t click_ticks;
-                while (platform::Consume_Left_Click_(&click_x, &click_y, &click_ticks)) {
-                    if (!enhanced) {
-                        continue;
-                    }
-                    int16_t clicked_row = Save_Popup_Row_At_(click_x, click_y);
-                    // Both clicks must land in (nearly) the same spot within
-                    // the double-click window, judged by their true press
-                    // timestamps: distinct single clicks inside one row (the
-                    // date line, then the name to place the cursor) are
-                    // normal edit interactions, not a double click.
-                    bool near_last_click =
-                        (int16_t)abs(click_x - last_click_x) <= DOUBLE_CLICK_RADIUS &&
-                        (int16_t)abs(click_y - last_click_y) <= DOUBLE_CLICK_RADIUS;
-                    if (clicked_row >= 0 && clicked_row == last_row_clicked &&
-                        near_last_click &&
-                        click_ticks - last_row_click_ms <= DOUBLE_CLICK_MS) {
-                        double_click_slot = clicked_row;
-                        last_row_clicked = -1; // the pair is consumed
-                    } else {
-                        last_row_clicked = clicked_row;
-                    }
-                    last_row_click_ms = click_ticks;
-                    last_click_x = click_x;
-                    last_click_y = click_y;
-                }
-            }
+            int16_t double_click_slot = enhanced ? Detect_Save_Row_Double_Click_(&row_clicks) : -1;
 
             int16_t input_id = fields::Get_Input_();
 
@@ -847,18 +805,14 @@ namespace LOADSAVE {
             if (input_id != 0) {
                 for (int16_t i = 0; i < 10; ++i) {
                     if (input_id == _game_popup_fields->saved_game_fields[i]) {
-                        // A click on the name field returns its id while ALSO
-                        // starting edit mode (_input_field_active stays set);
-                        // only an Enter commit ends editing before returning.
-                        // Enhanced mode saves only on the commit — a click on
-                        // the already-selected row must edit, not save.
+                        // A click returns the field id while also starting
+                        // edit mode; only an Enter commit ends editing first.
+                        // Enhanced mode saves only on the commit.
                         if (active_slot_idx == i &&
                             (!enhanced || fields::_input_field_active == 0)) {
                             copy_saved_field_text = true;
                             trigger_save = true;
                             if (enhanced) {
-                                // Enter committed the name; show the SAVE
-                                // button pressed and released like a click.
                                 Animate_Popup_Button_Press_(_game_popup_fields->btn_popup_save_id);
                             }
                         }
@@ -915,18 +869,15 @@ namespace LOADSAVE {
                 }
 
                 if (enhanced) {
-                    // The selection highlight embeds color codes into the
-                    // description; never write those into the save file.
+                    // Never write highlight color codes into the save file.
                     Remove_Embedded_Special_Codes_(MOX::_save_game_description[active_slot_idx].description);
                 }
                 FILEDEF::Save_Game_(active_slot_idx);
                 Save_Session_Related_Settings_();
                 saved_successfully = true;
                 if (enhanced) {
-                    // Refresh the per-slot stardates before regenerating the
-                    // strings: a first save into an empty slot otherwise keeps
-                    // its stale "missing file" marker and the slot's second
-                    // line shows "* INVALID *".
+                    // Refresh slot stardates so a first save into an empty
+                    // slot loses its stale missing-file marker.
                     FILEDEF::Get_Saved_Game_Descriptions_(_game_popup_fields->slot_occupied_flags);
                 }
                 Get_Save_Game_Date_Strings_(MOX::_save_game_dates);
@@ -942,9 +893,8 @@ namespace LOADSAVE {
                 int32_t abs_input = abs((int32_t)input_id);
                 if (_game_popup_fields->saved_game_fields[0] <= abs_input &&
                     abs_input <= _game_popup_fields->saved_game_fields[9]) {
-                    // Enhancement: Esc while editing a name only cancels the
-                    // edit (the fields system already restored the text);
-                    // the dialog stays open.
+                    // Enhancement: Esc only cancels the name edit; the
+                    // dialog stays open.
                     if (!enhanced) {
                         MOX::_screen_data = 0;
                         exit_popup = 1;
@@ -963,9 +913,8 @@ namespace LOADSAVE {
             }
         } while (exit_popup == 0);
 
-        // Enhancement: never leave a selection on an empty slot as the game's
-        // active save slot (quick save/load assume it is occupied). The
-        // selection itself is remembered in _enhanced_load_selection.
+        // Enhancement: never leave an empty slot as the active save slot
+        // (quick save/load assume it is occupied).
         if (enhanced && !saved_successfully) {
             int8_t active = MOX::_settings.active_save_slot;
             if (active < 0 || active > 9 ||
@@ -1608,6 +1557,113 @@ namespace LOADSAVE {
     /**
      * @address 005110a0
      */
+    // Enhancement helper: audio hotkeys while the Game panel is open. Plain
+    // -/+/0 and the media keys drive both sliders, Ctrl + -/=/0 the Music
+    // one, Alt + -/=/0 the Sound FX one; 0 toggles mute (levels remembered),
+    // volume keys leave mute by restoring them. Other keys go back to the
+    // fields system.
+    static void Handle_Game_Popup_Audio_Keys_() {
+        constexpr int16_t VOLUME_KEY_STEP = 16; // sliders range 0..0x9C
+        int32_t key = key::Read_Key_();
+        bool for_music = false;
+        bool for_sfx = false;
+        int16_t volume_action = 0; // -1 down, 1 up, 2 mute toggle
+
+        if (key == platform::KEY_CODE_MUTE) {
+            for_music = for_sfx = true;
+            volume_action = 2;
+        } else if (key == platform::KEY_CODE_VOLUME_UP) {
+            for_music = for_sfx = true;
+            volume_action = 1;
+        } else if (key == platform::KEY_CODE_VOLUME_DOWN) {
+            for_music = for_sfx = true;
+            volume_action = -1;
+        } else if (key == platform::KEY_CODE_MUSIC_MUTE) {
+            for_music = true;
+            volume_action = 2;
+        } else if (key == platform::KEY_CODE_MUSIC_VOLUME_UP) {
+            for_music = true;
+            volume_action = 1;
+        } else if (key == platform::KEY_CODE_MUSIC_VOLUME_DOWN) {
+            for_music = true;
+            volume_action = -1;
+        } else if (key == platform::KEY_CODE_SFX_MUTE) {
+            for_sfx = true;
+            volume_action = 2;
+        } else if (key == platform::KEY_CODE_SFX_VOLUME_UP) {
+            for_sfx = true;
+            volume_action = 1;
+        } else if (key == platform::KEY_CODE_SFX_VOLUME_DOWN) {
+            for_sfx = true;
+            volume_action = -1;
+        } else if (key > 0) {
+            int16_t character = (int16_t)(key & 0xFF);
+            if (character == '0') {
+                for_music = for_sfx = true;
+                volume_action = 2;
+            } else if (character == '+') {
+                for_music = for_sfx = true;
+                volume_action = 1;
+            } else if (character == '-') {
+                for_music = for_sfx = true;
+                volume_action = -1;
+            }
+        }
+
+        if (volume_action == 0) {
+            if (key != 0) {
+                key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+            }
+        } else if (volume_action == 2) {
+            // Unmute only when every targeted channel is already muted.
+            bool all_targets_muted = (!for_music || _music_muted != 0) &&
+                                     (!for_sfx || _sfx_muted != 0);
+            if (for_music) {
+                if (all_targets_muted) {
+                    _game_popup_fields->music_level = _premute_music_level;
+                    _music_muted = 0;
+                } else if (_music_muted == 0) {
+                    _premute_music_level = _game_popup_fields->music_level;
+                    _game_popup_fields->music_level = 0;
+                    _music_muted = 1;
+                }
+                Set_Music_For_Game_Popup_();
+            }
+            if (for_sfx) {
+                if (all_targets_muted) {
+                    _game_popup_fields->sound_fx_level = _premute_sfx_level;
+                    _sfx_muted = 0;
+                } else if (_sfx_muted == 0) {
+                    _premute_sfx_level = _game_popup_fields->sound_fx_level;
+                    _game_popup_fields->sound_fx_level = 0;
+                    _sfx_muted = 1;
+                }
+                Set_Sound_For_Game_Popup_(_sfx_muted != 0 ? 0 : 1);
+            }
+        } else {
+            int16_t step = (volume_action > 0) ? VOLUME_KEY_STEP
+                                               : (int16_t)-VOLUME_KEY_STEP;
+            if (for_music) {
+                if (_music_muted != 0) {
+                    _game_popup_fields->music_level = _premute_music_level;
+                    _music_muted = 0;
+                }
+                int16_t music = (int16_t)(_game_popup_fields->music_level + step);
+                _game_popup_fields->music_level = (music < 0) ? 0 : (music > 0x9C) ? 0x9C : music;
+                Set_Music_For_Game_Popup_();
+            }
+            if (for_sfx) {
+                if (_sfx_muted != 0) {
+                    _game_popup_fields->sound_fx_level = _premute_sfx_level;
+                    _sfx_muted = 0;
+                }
+                int16_t sfx = (int16_t)(_game_popup_fields->sound_fx_level + step);
+                _game_popup_fields->sound_fx_level = (sfx < 0) ? 0 : (sfx > 0x9C) ? 0x9C : sfx;
+                Set_Sound_For_Game_Popup_(1);
+            }
+        }
+    }
+
     void __cdecl Do_Main_Game_Popup_(int16_t* out_finished) {
         bool closed_with_exit = false;
         bool event_processed = false;
@@ -1617,116 +1673,12 @@ namespace LOADSAVE {
         EVANHELP::Set_Main_Game_Screen_Help_List_();
 
         const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
-        constexpr int16_t VOLUME_KEY_STEP = 16; // sliders range 0..0x9C
 
         while (true) {
             timer::Mark_Time_();
 
-            // Enhancement: audio hotkeys while the Game panel is open.
-            // Plain -/+/0 (and the keyboard media keys, where the OS lets
-            // them through) drive both sliders; Ctrl + -/=/0 the Music one;
-            // Alt + -/=/0 the Sound FX one. 0 toggles mute, remembering the
-            // levels; volume keys leave mute by restoring them first.
             if (enhanced) {
-                int32_t key = key::Read_Key_();
-                bool for_music = false;
-                bool for_sfx = false;
-                int16_t volume_action = 0; // -1 down, 1 up, 2 mute toggle
-
-                if (key == platform::KEY_CODE_MUTE) {
-                    for_music = for_sfx = true;
-                    volume_action = 2;
-                } else if (key == platform::KEY_CODE_VOLUME_UP) {
-                    for_music = for_sfx = true;
-                    volume_action = 1;
-                } else if (key == platform::KEY_CODE_VOLUME_DOWN) {
-                    for_music = for_sfx = true;
-                    volume_action = -1;
-                } else if (key == platform::KEY_CODE_MUSIC_MUTE) {
-                    for_music = true;
-                    volume_action = 2;
-                } else if (key == platform::KEY_CODE_MUSIC_VOLUME_UP) {
-                    for_music = true;
-                    volume_action = 1;
-                } else if (key == platform::KEY_CODE_MUSIC_VOLUME_DOWN) {
-                    for_music = true;
-                    volume_action = -1;
-                } else if (key == platform::KEY_CODE_SFX_MUTE) {
-                    for_sfx = true;
-                    volume_action = 2;
-                } else if (key == platform::KEY_CODE_SFX_VOLUME_UP) {
-                    for_sfx = true;
-                    volume_action = 1;
-                } else if (key == platform::KEY_CODE_SFX_VOLUME_DOWN) {
-                    for_sfx = true;
-                    volume_action = -1;
-                } else if (key > 0) {
-                    int16_t character = (int16_t)(key & 0xFF);
-                    if (character == '0') {
-                        for_music = for_sfx = true;
-                        volume_action = 2;
-                    } else if (character == '+') {
-                        for_music = for_sfx = true;
-                        volume_action = 1;
-                    } else if (character == '-') {
-                        for_music = for_sfx = true;
-                        volume_action = -1;
-                    }
-                }
-
-                if (volume_action == 0) {
-                    if (key != 0) {
-                        key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
-                    }
-                } else if (volume_action == 2) {
-                    // Toggle: unmute only when every targeted channel is
-                    // already muted, otherwise mute the audible ones.
-                    bool all_targets_muted = (!for_music || _music_muted != 0) &&
-                                             (!for_sfx || _sfx_muted != 0);
-                    if (for_music) {
-                        if (all_targets_muted) {
-                            _game_popup_fields->music_level = _premute_music_level;
-                            _music_muted = 0;
-                        } else if (_music_muted == 0) {
-                            _premute_music_level = _game_popup_fields->music_level;
-                            _game_popup_fields->music_level = 0;
-                            _music_muted = 1;
-                        }
-                        Set_Music_For_Game_Popup_();
-                    }
-                    if (for_sfx) {
-                        if (all_targets_muted) {
-                            _game_popup_fields->sound_fx_level = _premute_sfx_level;
-                            _sfx_muted = 0;
-                        } else if (_sfx_muted == 0) {
-                            _premute_sfx_level = _game_popup_fields->sound_fx_level;
-                            _game_popup_fields->sound_fx_level = 0;
-                            _sfx_muted = 1;
-                        }
-                        Set_Sound_For_Game_Popup_(_sfx_muted != 0 ? 0 : 1);
-                    }
-                } else {
-                    int16_t step = (volume_action > 0) ? VOLUME_KEY_STEP
-                                                       : (int16_t)-VOLUME_KEY_STEP;
-                    if (for_music) {
-                        if (_music_muted != 0) {
-                            _game_popup_fields->music_level = _premute_music_level;
-                            _music_muted = 0;
-                        }
-                        int16_t music = (int16_t)(_game_popup_fields->music_level + step);
-                        _game_popup_fields->music_level = (music < 0) ? 0 : (music > 0x9C) ? 0x9C : music;
-                        Set_Music_For_Game_Popup_();
-                    }
-                    if (for_sfx) {
-                        if (_sfx_muted != 0) {
-                            _game_popup_fields->sound_fx_level = _premute_sfx_level;
-                            _sfx_muted = 0;
-                        }
-                        int16_t sfx = (int16_t)(_game_popup_fields->sound_fx_level + step);
-                        _game_popup_fields->sound_fx_level = (sfx < 0) ? 0 : (sfx > 0x9C) ? 0x9C : sfx;
-                        Set_Sound_For_Game_Popup_(1);
-                    }
-                }
+                Handle_Game_Popup_Audio_Keys_();
             }
 
             int16_t input = fields::Get_Input_();

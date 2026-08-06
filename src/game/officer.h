@@ -289,6 +289,12 @@ namespace OFFICER {
 
     void __cdecl Wrapper_For_Officer_Popup_Help_Fields_(int16_t field_x, int16_t officer_idx);
 
+    /**
+     * Enhancement: shows the SKILLS dialog for the leader offered in the
+     * hire popup ('i' hotkey).
+     */
+    void __cdecl Show_Officer_Popup_Skills_Dialog_(int16_t officer_idx);
+
     void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int16_t officer_idx);
 
     void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(

@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 namespace TEXTBOX {
     int16_t _bottom_y;
     uint8_t* _textbox_seg;

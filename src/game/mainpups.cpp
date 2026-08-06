@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "enhanced_ux.h"
-
 namespace MAINPUPS {
     char* _g_msg_ptr;
 
@@ -701,7 +699,7 @@ namespace MAINPUPS {
         uint32_t last_wheel_ms = 0;
         constexpr uint32_t WHEEL_STEP_MS = 120;
         if (enhanced) {
-            platform::Consume_Mouse_Wheel_Steps_(); // discard pre-popup movement
+            platform::Discard_Input_Observations_();
         }
 
         do {
@@ -875,6 +873,16 @@ namespace MAINPUPS {
         bool accepted = false;
 
         do {
+            // Enhancement: 'i' shows all of the offered leader's skills.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                int32_t key = key::Read_Key_();
+                if (key > 0 && ((key & 0xFF) == 'i' || (key & 0xFF) == 'I')) {
+                    OFFICER::Show_Officer_Popup_Skills_Dialog_(_g_officer);
+                } else if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+            }
+
             int16_t input = fields::Get_Input_();
             int16_t scan_input = fields::Scan_Input_();
 

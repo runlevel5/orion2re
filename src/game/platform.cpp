@@ -1588,6 +1588,17 @@ namespace platform {
         return (int16_t)steps;
     }
 
+    void __cdecl Discard_Input_Observations_() {
+        SDL_SetAtomicInt(&g_mouse_wheel_accum, 0);
+        SDL_SetAtomicInt(&g_mouse_wheel_accum_x, 0);
+        SDL_SetAtomicInt(&g_middle_click_count, 0);
+        if (g_input_queue_mutex != nullptr) {
+            SDL_LockMutex(g_input_queue_mutex);
+            g_observed_click_read = g_observed_click_write;
+            SDL_UnlockMutex(g_input_queue_mutex);
+        }
+    }
+
     int16_t __cdecl Consume_Mouse_Wheel_Steps_X_() {
         int32_t accumulated = SDL_GetAtomicInt(&g_mouse_wheel_accum_x);
         int32_t steps = accumulated / 100;

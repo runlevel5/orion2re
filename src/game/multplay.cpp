@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "enhanced_ux.h"
-
 namespace {
     constexpr int kPlayerRemapPaletteStart = 144;
     constexpr uint8_t kMpSetupPopupBackgroundColor = 0x09;

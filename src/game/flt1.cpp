@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 namespace FLT1 {
 
     int16_t _fleet_screen_bad_ship_id;
@@ -579,12 +577,11 @@ namespace FLT1 {
         ERIC::Fast_Fade_In_();
         fields::Enable_Draw_All_Fields_();
 
-        // Enhancement: wheel-scroll pacing state; stale wheel movement from
-        // before the screen opened is discarded.
+        // Enhancement: wheel-scroll pacing state.
         uint32_t last_wheel_ms = 0;
         constexpr uint32_t WHEEL_STEP_MS = 120;
         if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
-            platform::Consume_Mouse_Wheel_Steps_();
+            platform::Discard_Input_Observations_();
         }
 
         do {

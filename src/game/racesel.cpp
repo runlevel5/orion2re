@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "fields.h"
 
-#include "enhanced_ux.h"
-
 namespace RACESEL {
 
 static bool Is_Valid_Last_Race_Base_Race_(uint8_t race_idx) {

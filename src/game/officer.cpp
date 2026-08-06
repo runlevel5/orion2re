@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "enhanced_ux.h"
-
 namespace OFFICER {
     // Legacy galaxy-map UI encoding for race-only fleet labels. The first tagged
     // value represents ship-stack head node 9; subsequent values are contiguous.
@@ -1078,8 +1076,7 @@ namespace OFFICER {
         uint8_t kbd_name_wins = 0;
         int16_t prev_hover_icon = -1;
         if (enhanced) {
-            platform::Consume_Mouse_Wheel_Steps_(); // discard pre-screen movement
-            platform::Consume_Mouse_Wheel_Steps_X_();
+            platform::Discard_Input_Observations_();
         }
 
         do {

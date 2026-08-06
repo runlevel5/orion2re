@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 namespace {
     /** Draws one application name inside the grouped technology list popup. */
     void __cdecl Draw_Tech_List_App_(int16_t x, int16_t y, uint8_t tech_app_id) {

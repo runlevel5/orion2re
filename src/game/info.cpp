@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 namespace {
     int16_t _turn_summary_list_y[16] = {
         0, 10, 20, 30, 40, 50, 60, 70,
@@ -867,8 +865,8 @@ namespace INFO {
 
             if (list_changed) {
                 LIST::Set_Selected_List_Entry_(_g_header_p, _g_first_list_field);
-                if (select_page_end) {
-                    // Moving up from the page's first line wraps to its last.
+                // A keyboard page-up lands on the page's last line.
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && select_page_end) {
                     LIST::Move_List_Selection_(_g_header_p, -1, 0);
                     select_page_end = false;
                 }
@@ -877,7 +875,9 @@ namespace INFO {
             LIST::Set_List_Up_Down_Field_Drawing_(_g_header_p, field_up, field_down);
             _g_selected_list_p = LIST::Get_Selected_List_Entry_(_g_header_p);
             _g_list_update_needed = 1;
-            _g_prior_choice = 0;
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                _g_prior_choice = 0; // fresh hover-guard state
+            }
 
             Introduce_Subscreen_();
 
@@ -2321,10 +2321,12 @@ namespace INFO {
             LIST::Display_List_Page_(&_g_turn_header);
             LIST::Set_List_Up_Down_Field_Drawing_(&_g_turn_header, up_button, down_button);
             fields::Assign_Auto_Function_(Draw_Turn_Summary_Subscreen_, 2);
-            _g_prior_choice = 0; // fresh hover-guard state for this page
 
-            // Enhancement: land a keyboard page flip on the page's first or
-            // last message.
+            // Enhancement: fresh hover-guard state, and a keyboard page flip
+            // lands on the page's first or last message.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                _g_prior_choice = 0;
+            }
             if (kbd_page_flip != 0) {
                 LIST::Set_Selected_List_Entry_(&_g_turn_header, _g_first_list_field);
                 if (kbd_page_flip == 2) {

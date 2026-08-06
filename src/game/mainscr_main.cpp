@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "enhanced_ux.h"
-
 namespace MAINSCR {
     /**
      * Draws the main-screen HUD summaries for stardate, economy, command points, food, freighters, and research.

@@ -1073,7 +1073,7 @@
       examples: ["enhanced_ux enabled = true;"],
       group: "interface",
       type: "enhanced_ux_settings",
-      bind_root: { header: "game/enhanced_ux.h", symbol: "ENHANCED_UX::enhanced_ux_settings" },
+      bind_root: { header: "game/settings.h", symbol: "ENHANCED_UX::enhanced_ux_settings" },
       default: { enabled: false },
     },
 
