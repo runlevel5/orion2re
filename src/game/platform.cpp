@@ -778,9 +778,9 @@ namespace platform {
 			}
 
 			const int32_t dst_x0 =
-				SDL_GetAtomicInt(&g_present_mouse_x) + (int32_t)cursor_state.offset;
+				SDL_GetAtomicInt(&g_present_mouse_x);
 			const int32_t dst_y0 =
-				SDL_GetAtomicInt(&g_present_mouse_y) + (int32_t)cursor_state.offset;
+				SDL_GetAtomicInt(&g_present_mouse_y);
 
 			SDL_Rect dst_rect = {dst_x0, dst_y0, k_cursor_dimension, k_cursor_dimension};
 			(void)SDL_BlitSurface(
