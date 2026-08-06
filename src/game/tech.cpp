@@ -19,6 +19,13 @@ namespace TECH {
     // stationary hover does not steal the keyboard selection.
     static int16_t _g_kbd_nav_mouse_x = -1;
     static int16_t _g_kbd_nav_mouse_y = -1;
+
+    // Enhancement: clean snapshot of the tech list window's content, taken
+    // right after the page is rendered. Restored every frame before the
+    // selection overlay (like the Info > Reference dialog does), so moving
+    // the selection can never leave stale highlight or marker pixels.
+    static s_animation_header* _g_list_restore_bitmap = nullptr;
+    static int16_t _g_list_restore_x = 0;
     char hyper_field_name_buffer[64];
 
     int32_t tech_select_pos[8] = {
@@ -526,8 +533,14 @@ namespace TECH {
     }
 
     void Setup_Entry_Buttons(s_list_item_research* items, s_animation_header** images) {
+        // Enhancement: digits 1-8 activate the research boxes' buttons in
+        // display order (Construction=1 ... Force Fields=8).
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        char hotkey_str[2] = { '\0', '\0' };
+
         for (int i = 0; i < 8; ++i) {
             if (items[i].tech_field_id != 0) {
+                hotkey_str[0] = enhanced ? (char)('1' + i) : '\0';
                 items[i].button_value = 0;
                 items[i].button_field_id = fields::Add_Radio_Button_Field(
                     TECH::tech_button_pos[i * 2] + TECH::g_scrn_x,
@@ -535,7 +548,7 @@ namespace TECH {
                     "",
                     images[i],
                     &items[i].button_value,
-                    "",
+                    hotkey_str,
                     40);
                 items[i].button_image = images[i];
             }
@@ -862,6 +875,43 @@ namespace TECH {
         fields::Enable_Draw_All_Fields();
     }
 
+    // Enhancement helper: moves the tech-list selection one visible line up
+    // or down, treating the current page's items and their application lines
+    // as one flat sequence (wrapping at the ends).
+    static void Tech_List_Move_Selection_(int16_t direction) {
+        s_list_state* state = &g_tech_list_header;
+        int16_t line_field_ids[256];
+        int16_t line_count = 0;
+        int16_t current_line = -1;
+
+        s_list_item* item = state->selected_item;
+        s_list_item* end = &state->items[(uint8_t)state->num_items];
+        while (item < end && line_count < (int16_t)(sizeof(line_field_ids) / sizeof(line_field_ids[0]))) {
+            for (uint8_t i = 0; i < item->app_count; ++i) {
+                if (item->is_selectable != 0 && item->current_app_index == i) {
+                    current_line = line_count;
+                }
+                line_field_ids[line_count++] = (int16_t)(int8_t)item->app_ids[i];
+            }
+            if (item + 1 >= end || item[1].stop_flag != 0) {
+                break;
+            }
+            ++item;
+        }
+
+        if (line_count == 0) {
+            return;
+        }
+
+        int16_t next_line;
+        if (current_line < 0) {
+            next_line = (direction > 0) ? 0 : (int16_t)(line_count - 1);
+        } else {
+            next_line = (int16_t)((current_line + line_count + direction) % line_count);
+        }
+        LIST::Set_Selected_List_Entry(state, line_field_ids[next_line]);
+    }
+
     int16_t __cdecl _Tech_List(s_list_item_research* entry, uint8_t is_change_mode) {
         char msg_buf[80];
         char title_buf[32];
@@ -929,6 +979,15 @@ namespace TECH {
         bitmap::Create_Blank_Bitmap(0x1B5, 0x190, bg_capture);
         bitmap::Screen_Bitmap_Capture(0x54, 0x28, 0x207, 0x1B7, bg_capture);
 
+        // Enhancement: snapshot buffer for the list window's content area.
+        s_animation_header* list_capture = nullptr;
+        _g_list_restore_bitmap = nullptr;
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            uint32_t list_cap_size = bitmap::Get_Bitmap_Size(0x10C, 0x1A3);
+            list_capture = (s_animation_header*)allocate::Allocate_Next_Block(MOX::screen_seg, list_cap_size);
+            bitmap::Create_Blank_Bitmap(0x10C, 0x1A3, list_capture);
+        }
+
         if ((win_x - g_scrn_x) <= 6) {
             if (is_change_mode != 0) {
                 BILLHELP::Tech_Change_List_Left_Help();
@@ -969,6 +1028,15 @@ namespace TECH {
             fonts::Print_Centered(text_x, 0x2F, title_buf);
 
             LIST::Display_List_Page(&g_tech_list_header);
+
+            // Enhancement: snapshot the freshly rendered page for the
+            // per-frame restore under the selection overlay.
+            if (list_capture != nullptr) {
+                bitmap::Screen_Bitmap_Capture(win_x, 0x1F, win_x + 0x10B, 0x1C1, list_capture);
+                _g_list_restore_bitmap = list_capture;
+                _g_list_restore_x = win_x;
+            }
+
             video::Copy_Off_To_Back();
             LIST::Set_List_Up_Down_Field_Drawing(&g_tech_list_header, button_1_id, button_2_id);
 
@@ -978,12 +1046,49 @@ namespace TECH {
             fields::Clear_Fields_Above(clear_field);
             list_bottom_field = LIST::Add_Fields_To_List_Page(&g_tech_list_header);
 
-            hidden_field_1 = fields::Add_Hidden_Field(0, 0, 0x27F, 0x1DF, "\x1B", 0);
+            // Enhancement: the Return button (this field's trigger, by click
+            // or Esc) plays the button click sound.
+            hidden_field_1 = fields::Add_Hidden_Field(
+                0, 0, 0x27F, 0x1DF, "\x1B",
+                ENHANCED_UX::enhanced_ux_settings.enabled != 0 ? (int8_t)0x28 : (int8_t)0);
             fields::Add_Hidden_Field(0, 0, 0x27F, 0x1DF, "", 0);
+
+            // Enhancement: start with the page's first tech highlighted so
+            // keyboard navigation has a visible origin.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                LIST::Get_Selected_List_Entry(&g_tech_list_header) == nullptr) {
+                Tech_List_Move_Selection_(1);
+                _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X();
+                _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y();
+            }
 
             timer::Release_Time(4);
 
             while (true) {
+                // Enhancement: Up/Down move the selection through the list;
+                // Enter opens the highlighted tech's description like a
+                // right click.
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                    int32_t nav_key = key::Read_Key();
+                    if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+                        Tech_List_Move_Selection_((nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1);
+                        _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X();
+                        _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y();
+                    } else if (nav_key == 0x1C0D) { // Enter
+                        g_selected_list_entry_p = LIST::Get_Selected_List_Entry(&g_tech_list_header);
+                        if (g_selected_list_entry_p != nullptr) {
+                            uint8_t info_app_id = g_selected_list_entry_p->tech_app_ids[g_selected_list_entry_p->current_app_index];
+                            if (info_app_id != 0) {
+                                LIST::Display_Selected_List_Text(&g_tech_list_header, g_selected_list_entry_p);
+                                Draw_Application_Description(0x119, info_app_id);
+                                break;
+                            }
+                        }
+                    } else if (nav_key != 0) {
+                        key::Push_Key_Code((uint32_t)nav_key, g_last_scan_code);
+                    }
+                }
+
                 input = fields::Get_Input();
                 if (MOX::FULL_DRAW_SCREEN_FLAG != 0) {
                     break;
@@ -999,6 +1104,22 @@ namespace TECH {
                     if (input == button_1_id) {
                         if (LIST::Previous_List_Page(&g_tech_list_header) != 0) {
                             break;
+                        }
+                        continue;
+                    }
+                    // Enhancement: a left click on an entry shows its
+                    // description, like a right click.
+                    if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                        input >= start_field && input <= list_bottom_field) {
+                        LIST::Set_Selected_List_Entry(&g_tech_list_header, input);
+                        g_selected_list_entry_p = LIST::Get_Selected_List_Entry(&g_tech_list_header);
+                        if (g_selected_list_entry_p != nullptr) {
+                            uint8_t click_app_id = g_selected_list_entry_p->tech_app_ids[g_selected_list_entry_p->current_app_index];
+                            if (click_app_id != 0) {
+                                LIST::Display_Selected_List_Text(&g_tech_list_header, g_selected_list_entry_p);
+                                Draw_Application_Description(0x119, click_app_id);
+                                break;
+                            }
                         }
                         continue;
                     }
@@ -1026,6 +1147,7 @@ namespace TECH {
 
                 int16_t match_val = (input > 0) ? input : -input;
                 if (match_val == hidden_field_1) {
+                    _g_list_restore_bitmap = nullptr;
                     animate::Draw(win_x + 0xBB, 0x1B2, win_bg_2);
                     timer::Mark_Time();
                     RUSS::Mox_Sync_Update();
@@ -1180,13 +1302,37 @@ namespace TECH {
 
     void __cdecl Draw_Tech_List() {
         int16_t input = fields::Scan_Input();
+
+        // Enhancement: after a keyboard navigation, a stationary hover must
+        // not steal the selection back; the mouse regains it once it moves.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+            (int16_t)mouse::Pointer_X() == _g_kbd_nav_mouse_x &&
+            (int16_t)mouse::Pointer_Y() == _g_kbd_nav_mouse_y) {
+            input = 0;
+        }
+
         if (input > 0) {
             LIST::Set_Selected_List_Entry(&g_tech_list_header, input);
         }
 
         g_selected_list_entry_p = LIST::Get_Selected_List_Entry(&g_tech_list_header);
 
+        // Enhancement: restore the clean page snapshot before drawing the
+        // selection, so no stale highlight or marker pixels linger anywhere.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+            _g_list_restore_bitmap != nullptr) {
+            animate::Draw_(_g_list_restore_x, 0x1F, _g_list_restore_bitmap);
+        }
+
         LIST::Display_Selected_List_Text_For_Tech_List(&g_tech_list_header, g_selected_list_entry_p);
+
+        // Enhancement: also draw the palette-cycled marker bracket beside the
+        // selected entry (the Info > Reference dialog's pulsating cursor), so
+        // the selection stays visible even on the already-highlighted
+        // currently-researched tech.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            LIST::Display_Selected_List_Text(&g_tech_list_header, g_selected_list_entry_p);
+        }
 
         palette::Cycle_Palette_Color(g_cursor_box_color, 8, 32, 0, 40, 63, 8, 8);
     }
