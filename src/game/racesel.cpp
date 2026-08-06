@@ -898,6 +898,11 @@ int16_t __cdecl Flag_Screen_(uint8_t* selected_color) {
 
     selection_made = 0;
 
+    // Enhancement: digits pick a banner color — top row left to right 1-4,
+    // bottom row 5-8 (matching flag_index order).
+    const bool enhanced_flags = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+    char flag_hotkey[2] = { '\0', '\0' };
+
     while (true) {
         fields::Clear_Fields_();
 
@@ -911,12 +916,13 @@ int16_t __cdecl Flag_Screen_(uint8_t* selected_color) {
                 const int16_t row_offset = static_cast<int16_t>((flag_index / 4) * 0x88);
                 const int16_t column_offset = static_cast<int16_t>((flag_index % 4) * 0x7C + column_adjust);
 
+                flag_hotkey[0] = enhanced_flags ? (char)('1' + flag_index) : '\0';
                 field_ids[flag_index] = fields::Add_Hidden_Field_(
                     static_cast<int16_t>(column_offset + 0x60),
                     static_cast<int16_t>(row_offset + 0x90),
                     static_cast<int16_t>(column_offset + 0xB3),
                     static_cast<int16_t>(row_offset + 0xF2),
-                    "",
+                    flag_hotkey,
                     0x29
                 );
             } else {
