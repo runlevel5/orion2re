@@ -1563,54 +1563,28 @@ namespace LOADSAVE {
         int32_t key = key::Read_Key_();
         bool for_music = false;
         bool for_sfx = false;
-        int16_t volume_action = 0; // -1 down, 1 up, 2 mute toggle
+        platform::e_audio_key_action action = platform::Decode_Audio_Key_(key, &for_music, &for_sfx);
 
-        if (key == platform::KEY_CODE_MUTE) {
-            for_music = for_sfx = true;
-            volume_action = 2;
-        } else if (key == platform::KEY_CODE_VOLUME_UP) {
-            for_music = for_sfx = true;
-            volume_action = 1;
-        } else if (key == platform::KEY_CODE_VOLUME_DOWN) {
-            for_music = for_sfx = true;
-            volume_action = -1;
-        } else if (key == platform::KEY_CODE_MUSIC_MUTE) {
-            for_music = true;
-            volume_action = 2;
-        } else if (key == platform::KEY_CODE_MUSIC_VOLUME_UP) {
-            for_music = true;
-            volume_action = 1;
-        } else if (key == platform::KEY_CODE_MUSIC_VOLUME_DOWN) {
-            for_music = true;
-            volume_action = -1;
-        } else if (key == platform::KEY_CODE_SFX_MUTE) {
-            for_sfx = true;
-            volume_action = 2;
-        } else if (key == platform::KEY_CODE_SFX_VOLUME_UP) {
-            for_sfx = true;
-            volume_action = 1;
-        } else if (key == platform::KEY_CODE_SFX_VOLUME_DOWN) {
-            for_sfx = true;
-            volume_action = -1;
-        } else if (key > 0) {
+        // Plain -/+/0 drive both channels too.
+        if (action == platform::AUDIO_KEY_NONE && key > 0) {
             int16_t character = (int16_t)(key & 0xFF);
             if (character == '0') {
                 for_music = for_sfx = true;
-                volume_action = 2;
+                action = platform::AUDIO_KEY_MUTE_TOGGLE;
             } else if (character == '+') {
                 for_music = for_sfx = true;
-                volume_action = 1;
+                action = platform::AUDIO_KEY_VOLUME_UP;
             } else if (character == '-') {
                 for_music = for_sfx = true;
-                volume_action = -1;
+                action = platform::AUDIO_KEY_VOLUME_DOWN;
             }
         }
 
-        if (volume_action == 0) {
+        if (action == platform::AUDIO_KEY_NONE) {
             if (key != 0) {
                 key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
             }
-        } else if (volume_action == 2) {
+        } else if (action == platform::AUDIO_KEY_MUTE_TOGGLE) {
             // Unmute only when every targeted channel is already muted.
             bool all_targets_muted = (!for_music || _music_muted != 0) &&
                                      (!for_sfx || _sfx_muted != 0);
@@ -1637,8 +1611,9 @@ namespace LOADSAVE {
                 Set_Sound_For_Game_Popup_(_sfx_muted != 0 ? 0 : 1);
             }
         } else {
-            int16_t step = (volume_action > 0) ? VOLUME_KEY_STEP
-                                               : (int16_t)-VOLUME_KEY_STEP;
+            int16_t step = (action == platform::AUDIO_KEY_VOLUME_UP)
+                               ? VOLUME_KEY_STEP
+                               : (int16_t)-VOLUME_KEY_STEP;
             if (for_music) {
                 if (_music_muted != 0) {
                     _game_popup_fields->music_level = _premute_music_level;

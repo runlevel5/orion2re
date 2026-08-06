@@ -66,6 +66,19 @@ namespace platform {
 		SDL_AtomicInt g_game_thread_exited;
 		SDL_AtomicInt g_mouse_wheel_accum; // hundredths of a wheel step
 		SDL_AtomicInt g_mouse_wheel_accum_x; // hundredths, positive = right
+
+		// Synthetic key codes for audio hotkeys (same 0xFFFFxx00 form as the
+		// F11/F12 codes), delivered through the regular key buffer and
+		// decoded back via Decode_Audio_Key_.
+		constexpr int32_t KEY_CODE_MUTE = (int32_t)0xFFFF9000;
+		constexpr int32_t KEY_CODE_VOLUME_UP = (int32_t)0xFFFF9100;
+		constexpr int32_t KEY_CODE_VOLUME_DOWN = (int32_t)0xFFFF9200;
+		constexpr int32_t KEY_CODE_MUSIC_MUTE = (int32_t)0xFFFF9300;
+		constexpr int32_t KEY_CODE_MUSIC_VOLUME_UP = (int32_t)0xFFFF9400;
+		constexpr int32_t KEY_CODE_MUSIC_VOLUME_DOWN = (int32_t)0xFFFF9500;
+		constexpr int32_t KEY_CODE_SFX_MUTE = (int32_t)0xFFFF9600;
+		constexpr int32_t KEY_CODE_SFX_VOLUME_UP = (int32_t)0xFFFF9700;
+		constexpr int32_t KEY_CODE_SFX_VOLUME_DOWN = (int32_t)0xFFFF9800;
 		SDL_AtomicInt g_middle_click_count;
 		SDL_AtomicInt g_arrow_keys_held; // ARROW_KEY_* bits, tracked across key down/up
 		struct s_observed_click {
@@ -1586,6 +1599,42 @@ namespace platform {
             SDL_AddAtomicInt(&g_mouse_wheel_accum, -steps * 100);
         }
         return (int16_t)steps;
+    }
+
+    e_audio_key_action __cdecl Decode_Audio_Key_(int32_t key_code, bool* for_music, bool* for_sfx) {
+        *for_music = false;
+        *for_sfx = false;
+        switch (key_code) {
+            case KEY_CODE_MUTE:
+                *for_music = *for_sfx = true;
+                return AUDIO_KEY_MUTE_TOGGLE;
+            case KEY_CODE_VOLUME_UP:
+                *for_music = *for_sfx = true;
+                return AUDIO_KEY_VOLUME_UP;
+            case KEY_CODE_VOLUME_DOWN:
+                *for_music = *for_sfx = true;
+                return AUDIO_KEY_VOLUME_DOWN;
+            case KEY_CODE_MUSIC_MUTE:
+                *for_music = true;
+                return AUDIO_KEY_MUTE_TOGGLE;
+            case KEY_CODE_MUSIC_VOLUME_UP:
+                *for_music = true;
+                return AUDIO_KEY_VOLUME_UP;
+            case KEY_CODE_MUSIC_VOLUME_DOWN:
+                *for_music = true;
+                return AUDIO_KEY_VOLUME_DOWN;
+            case KEY_CODE_SFX_MUTE:
+                *for_sfx = true;
+                return AUDIO_KEY_MUTE_TOGGLE;
+            case KEY_CODE_SFX_VOLUME_UP:
+                *for_sfx = true;
+                return AUDIO_KEY_VOLUME_UP;
+            case KEY_CODE_SFX_VOLUME_DOWN:
+                *for_sfx = true;
+                return AUDIO_KEY_VOLUME_DOWN;
+            default:
+                return AUDIO_KEY_NONE;
+        }
     }
 
     void __cdecl Discard_Input_Observations_() {

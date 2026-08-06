@@ -2155,6 +2155,47 @@ namespace fields {
         graphics::Set_Window_(x1, y1, x2, y2);
     }
 
+    // Enhancement: activates the field bound to the given hotkey character
+    // exactly as the native hotkey path does — pressed-state draw, the
+    // field's click sound, radio/locked toggling — and returns its id (0 if
+    // no field matches). Lets callers bind extra keys to existing buttons
+    // without injecting synthetic key presses.
+    int16_t __cdecl Activate_Field_Hotkey_(char hotkey) {
+        int16_t hotkey_char = (int16_t)(uint8_t)hotkey;
+        if (hotkey_char > 0x60 && hotkey_char < 0x7B) {
+            hotkey_char -= 0x20;
+        }
+        for (int16_t i = 1; i < _fields_count; ++i) {
+            if (_active_input_field_number != -1 || _fields[i].hotkey != hotkey_char) {
+                continue;
+            }
+            int16_t field_type = _fields[i].field_type;
+            if (field_type == FIELD_TYPE_SCROLL) {
+                return 0;
+            }
+            Push_Field_Down_(i, mouse::Pointer_X_(), mouse::Pointer_Y_());
+            if (field_type == FIELD_TYPE_RADIO) {
+                s_field_radio* radio = Field_Data_Radio_(&_fields[i]);
+                *radio->selection = (*radio->selection == 0) ? 1 : 0;
+            } else if (field_type == FIELD_TYPE_LOCKED) {
+                s_field_locked* locked = Field_Data_Locked_Button_(&_fields[i]);
+                if (*locked->selection == 0) {
+                    *locked->selection = 1;
+                }
+            } else if (field_type == FIELD_TYPE_SCROLL_RETURN) {
+                _down_mouse_button = -1;
+                return Field_Data_Scroll_(&_fields[i])->return_value;
+            }
+            if (field_type != FIELD_TYPE_HIDDEN && field_type != FIELD_TYPE_MULTI_HOTKEY) {
+                Quick_Call_Auto_Function_();
+            }
+            _down_mouse_button = -1;
+            sound::Play_Sound_(_fields[i].sound);
+            return i;
+        }
+        return 0;
+    }
+
     // Enhancement: puts a continuous string input field into editing mode
     // with the given initial text, as clicking it would.
     void __cdecl Begin_Continuous_Input_(int16_t field_id, const char* text) {

@@ -1011,7 +1011,7 @@ namespace OFFICER {
             }
         } else if (key > 0 && ((key & 0xFF) == 'c' || (key & 0xFF) == 'C') &&
                    _officer_button_mode == 0) {
-            key::Push_Key_Code_((uint32_t)'X', g_last_scan_code);
+            synth_input = fields::Activate_Field_Hotkey_('X'); // Cancel
         } else if (key == 0x0F09 && _officer_button_mode == -1 && is_fleet) {
             // Tab: the focused list selects its first entry when nothing is
             // selected yet; an existing selection is kept and scrolled to.
@@ -1038,13 +1038,13 @@ namespace OFFICER {
             Move_Fleet_Ship_Selection_(step);
             kbd->name_wins = 1;
         } else if (key > 0 && (key & 0xFF) == '<' && _officer_button_mode == -1) {
-            key::Push_Key_Code_((uint32_t)',', g_last_scan_code);
+            synth_input = fields::Activate_Field_Hotkey_(','); // previous
         } else if (key > 0 && (key & 0xFF) == '>' && _officer_button_mode == -1) {
-            key::Push_Key_Code_((uint32_t)'.', g_last_scan_code);
+            synth_input = fields::Activate_Field_Hotkey_('.'); // next
         } else if (key == 0x49E0 && _officer_button_mode == -1) { // PgUp
-            key::Push_Key_Code_((uint32_t)'-', g_last_scan_code);
+            synth_input = fields::Activate_Field_Hotkey_('-'); // scroll up
         } else if (key == 0x51E0 && _officer_button_mode == -1) { // PgDn
-            key::Push_Key_Code_((uint32_t)'+', g_last_scan_code);
+            synth_input = fields::Activate_Field_Hotkey_('+'); // scroll down
         } else if ((key == 0x48E0 || key == 0x50E0) && _officer_button_mode == -1) {
             // Up/Down move the leader selection, wrapping at the ends.
             int16_t dir = (key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
@@ -1105,7 +1105,7 @@ namespace OFFICER {
 
         // The wheel presses the same buttons: vertical the scroll bar,
         // horizontal (or Shift + wheel) the previous/next cycle.
-        if (_officer_button_mode == -1) {
+        if (_officer_button_mode == -1 && synth_input == 0) {
             int16_t wheel_v = platform::Consume_Mouse_Wheel_Steps_();
             int16_t wheel_h = platform::Consume_Mouse_Wheel_Steps_X_();
             if (wheel_v != 0 || wheel_h != 0) {
@@ -1113,9 +1113,9 @@ namespace OFFICER {
                 if (wheel_now_ms - kbd->last_wheel_ms >= WHEEL_STEP_MS) {
                     kbd->last_wheel_ms = wheel_now_ms;
                     if (wheel_v != 0) {
-                        key::Push_Key_Code_((uint32_t)((wheel_v > 0) ? '-' : '+'), g_last_scan_code);
+                        synth_input = fields::Activate_Field_Hotkey_((wheel_v > 0) ? '-' : '+');
                     } else {
-                        key::Push_Key_Code_((uint32_t)((wheel_h > 0) ? '.' : ','), g_last_scan_code);
+                        synth_input = fields::Activate_Field_Hotkey_((wheel_h > 0) ? '.' : ',');
                     }
                 }
             }

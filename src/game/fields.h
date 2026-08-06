@@ -475,6 +475,12 @@ namespace fields {
     void __cdecl F11_Key_();
 
     /**
+     * Enhancement: activates the field bound to the given hotkey character
+     * exactly as the native hotkey path does, returning its id (0 if none).
+     */
+    int16_t __cdecl Activate_Field_Hotkey_(char hotkey);
+
+    /**
      * Enhancement: puts a continuous string input field into editing mode
      * with the given initial text, as clicking it would.
      */
