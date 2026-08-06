@@ -146,6 +146,20 @@ namespace GENDRAW {
             setvesa::Add_Square_To_Scan_List_(5, 0x14, 0x24D, 0x1CB);
             RUSS::Mox_Sync_Update_();
             timer::Release_Time_(2);
+
+            // Enhancement: Space closes the box like Enter and Esc do.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                int32_t key = key::Read_Key_();
+                if (key > 0 && (key & 0xFF) == 0x20) {
+                    sound::Play_Sound_(0x29);
+                    input = _first_field;
+                    continue;
+                }
+                if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+            }
+
             input = fields::Get_Input_();
         }
 
