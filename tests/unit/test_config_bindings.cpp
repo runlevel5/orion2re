@@ -8,6 +8,7 @@
 #include "config/config_decode.h"
 #include "config/config_runtime.h"
 #include "doctest/doctest.h"
+#include "game/boarding.h"
 #include "game/cmbtfire.h"
 #include "game/ship_config.h"
 
@@ -127,6 +128,21 @@ DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default")
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
+}
+
+DOCTEST_TEST_CASE("black-hole boarding setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(BOARDING::_board_in_black_hole == 1);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat board_in_black_hole = false;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(BOARDING::_board_in_black_hole == 0);
 }
 
 DOCTEST_TEST_CASE("shorter build queue assignments replace execution through an earlier end") {

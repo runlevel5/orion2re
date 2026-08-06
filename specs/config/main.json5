@@ -970,6 +970,20 @@
       default: { enabled: false, default: 0 },
     },
 
+    board_in_black_hole: {
+      title: "Allow boarding in black holes",
+      description: "Allows ships affected by a Black Hole Generator to board or be boarded.",
+      examples: ["combat board_in_black_hole = false;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/boarding.h",
+        symbol: "BOARDING::_board_in_black_hole",
+      },
+      default: true,
+    },
+
     fighters_use_point_defense: {
       title: "Fighters use point-defense beams",
       description: "Applies point-defense accuracy and damage modifiers to fighter beam weapons.",

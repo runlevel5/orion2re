@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "game/boarding.h"
+
 namespace COMBAT1 {
 
     int32_t _end_of_turn_button;
@@ -1776,7 +1778,24 @@ namespace COMBAT1 {
             can_board = false;
             msg_idx = 0x44; // No marines
         } else {
-            if (max_range == 4) {
+            const BOARDING::e_boarding_filter boarding_filter =
+                BOARDING::Filter_Boarding_(attacker_idx, defender_idx);
+            if (boarding_filter != BOARDING::e_boarding_filter::allowed) {
+                can_board = false;
+                const char* warning = nullptr;
+                if (boarding_filter ==
+                    BOARDING::e_boarding_filter::target_in_black_hole) {
+                    warning = "Ships trapped in a black hole may not be boarded.";
+                } else if (boarding_filter ==
+                           BOARDING::e_boarding_filter::attacker_in_black_hole) {
+                    warning = "Ships trapped in a black hole may not board.";
+                }
+                if (warning != nullptr) {
+                    palette::Refresh_Palette_();
+                    GENDRAW::Warning_Box_(warning);
+                    CMBTDRW1::Refresh_Combat_Screen_Full_();
+                }
+            } else if (max_range == 4) {
                 if (range > 1 || MOX::_combat_data[defender_idx].current_speed > 0) {
                     int16_t bearing = CMBTDRW1::Relative_Bearing_(defender_idx, attacker_idx);
                     int16_t shield_idx = CMBTFIRE::Facing_Shield_(bearing);

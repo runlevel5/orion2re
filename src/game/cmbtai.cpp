@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "game/boarding.h"
+
 namespace CMBTAI {
 
 int16_t _fleet_target;
@@ -1318,6 +1320,8 @@ int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx) 
     if (MOX::_combat_data[target_idx].owner > 8 ||
         attacker_owner > 8 ||
         !COMBAT1::Combat_Ship_Is_Functional_(target_idx) ||
+        BOARDING::Filter_Boarding_(attacker_idx, target_idx) !=
+            BOARDING::e_boarding_filter::allowed ||
         MOX::_combat_data[target_idx].special_status_flag == 4 ||
         CMBTFIR2::Already_Boarded_(attacker_idx) != 0 ||
         target_idx == 0 ||

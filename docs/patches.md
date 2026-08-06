@@ -95,7 +95,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1306` - `ordinary assasin skill works`: fixed in `spy::Resolve_Assassins_()` by testing the ordinary Assassin skill in the fallback branch and applying its `(level + 1) * 2` assassination chance; this directly expresses the 1.50 one-byte skill-mask correction in source.
 - [x] `asm.pl:1315` - `navigator skill display bug`: fixed in `MOX::_skill_data` by making the Navigator and Navigator* display parameters use the same four-level and three-level bonus intervals as strategic movement; this directly expresses the two 1.50 data-record corrections in source.
 - [x] `asm.pl:1368` - `AI fighters size`: fixed in `aidesign::Add_Fighters_To_Design_()` by reporting installed fighter space using the selected fighter type instead of always pricing it as an interceptor; this directly expresses the 1.50 instruction replacement in source.
-- [ ] `asm.pl:1377` - `filter boarding for stasis, bhg`
+- [x] `asm.pl:1377` - `filter boarding for stasis, bhg`: fixed in `BOARDING::Filter_Boarding_()` and applied to manual and AI boarding by always rejecting targets in stasis and, when `combat board_in_black_hole` is disabled, rejecting BHG-trapped attackers and targets; this replaces the 1.50 register-preserving call-site wrappers with a shared source-level invariant while retaining the classic-enabled default.
 - [ ] `asm.pl:1492` - `tech field desync`
 - [ ] `asm.pl:1548` - `clip fighter damage`
 - [ ] `asm.pl:1577` - `bombardment hits fix`
