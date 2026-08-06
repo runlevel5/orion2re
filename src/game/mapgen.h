@@ -2,6 +2,7 @@
 #include <cstdint>
 
 namespace MAPGEN {
+    extern int16_t _maximum_star_count;
     extern uint8_t _n_marooned_heroes;
     extern uint8_t _n_wormholes;
     extern uint8_t _make_food_planet;

@@ -994,6 +994,18 @@
       bind: ["sound_fx_level"],
     },
 
+    maximum_star_count: {
+      title: "Maximum galaxy star count",
+      description: "Sets the number of stars generated when the Maximum galaxy size is selected.",
+      examples: ["map maximum_star_count = 99;"],
+      group: "gameplay",
+      namespace: "map",
+      type: "int16",
+      constraints: { min: 72, max: 1023 },
+      default: 99,
+      bind_root: { header: "game/mapgen.h", symbol: "MAPGEN::_maximum_star_count" },
+    },
+
     autobuild: {
       title: "Experimental autobuild",
       description: "Assigns automatic build queues to individual colonies.",

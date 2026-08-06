@@ -1,6 +1,7 @@
 #include "pch.h"
 
 namespace MAPGEN {
+    int16_t _maximum_star_count = 99;
     uint8_t _n_marooned_heroes;
     uint8_t _n_wormholes;
     uint8_t _make_food_planet;
@@ -46,9 +47,8 @@ int16_t Generation_Progress_Max_() {
 }
 
 int16_t Maximum_Galaxy_Grid_Y_() {
-    const int16_t star_count = MAX_STARS - 1;
     int16_t grid_y = 8;
-    while ((((grid_y * 5) + 3) / 4) * grid_y < star_count) {
+    while ((((grid_y * 5) + 3) / 4) * grid_y < _maximum_star_count) {
         ++grid_y;
     }
     return grid_y;
@@ -1481,7 +1481,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 break;
 #if MAX_STARS > ORIGINAL_MAX_STARS
             case GALAXY_SIZE_MAXIMUM:
-                MOX::_NUM_STARS = MAX_STARS - 1;
+                MOX::_NUM_STARS = _maximum_star_count;
                 grid_x = Maximum_Galaxy_Grid_X_();
                 grid_y = Maximum_Galaxy_Grid_Y_();
                 break;
