@@ -91,7 +91,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1137` - `raid and capture`: fixed in `COMBAT1::Initiate_Boarding_Action_()` by preserving the selected raid or capture action when Damper Field attrition leaves zero surviving marines, allowing the committed attempt to resolve normally; this replaces the 1.50 instruction suppression with a direct source-level invariant while retaining the classic one-third survival ratio.
 - [x] `asm.pl:1263` - `mutation unclickable picks`: fixed in `raceopt::Add_Race_Options_Fields_EM_()` by subtracting the current trait group's baseline cost when checking whether an evolutionary upgrade fits the pick budget; this replaces the 1.50 byte-level index correction with the equivalent direct source-level lookup.
 - [x] `asm.pl:1281` - `tolerant races maintenance bug`: fixed in `COLCALC::Compute_Potential_Colony_Info_()` by always reporting the planet climate's maintenance modifier, including for Tolerant races; this directly expresses the 1.50 removal of the trait-based popup skip.
-- [ ] `asm.pl:1290` - `telepath skill level is 1 too low bug`
+- [x] `asm.pl:1290` - `telepath skill level is 1 too low bug`: fixed in `spy::Compute_Spy_Bonuses_()` by converting the zero-based officer level to the leader's actual level before applying regular and improved Telepath multipliers; this directly expresses the two 1.50 instruction-level increments in source.
 - [ ] `asm.pl:1306` - `ordinary assasin skill works`
 - [ ] `asm.pl:1315` - `navigator skill display bug`
 - [ ] `asm.pl:1368` - `AI fighters size`

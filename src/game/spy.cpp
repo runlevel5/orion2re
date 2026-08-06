@@ -62,10 +62,10 @@ namespace spy {
 
                         int32_t current_atk_skill = 0;
                         if (leader->general_skills & LEADER_GENERAL_SKILL_TELEPATH2) {
-                            current_atk_skill = OFFICER::Owned_Officer_Level_(i) * 3;
+                            current_atk_skill = (OFFICER::Owned_Officer_Level_(i) + 1) * 3;
                         }
                         else if (leader->general_skills & LEADER_GENERAL_SKILL_TELEPATH) {
-                            current_atk_skill = OFFICER::Owned_Officer_Level_(i) * 2;
+                            current_atk_skill = (OFFICER::Owned_Officer_Level_(i) + 1) * 2;
                         }
 
                         if (current_atk_skill > max_leader_atk_bonus) {
