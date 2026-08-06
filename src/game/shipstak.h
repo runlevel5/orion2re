@@ -2,6 +2,55 @@
 #include <cstdint>
 
 namespace SHIPSTAK {
+    enum class e_stealth_size_penalty : uint8_t {
+        none,
+        race,
+        race_tech,
+    };
+
+    struct s_scan_bonus {
+        uint16_t battle_scanner;
+        uint16_t scout_lab;
+        uint16_t star_base;
+        uint8_t battlestation;
+        uint8_t star_fortress;
+        uint8_t no_scanner;
+        uint8_t tachyon_scanner;
+        uint8_t neutron_scanner;
+        uint8_t sensors;
+        uint16_t planet;
+        uint16_t fleet;
+    };
+
+    struct s_stealth_bonus {
+        int16_t stealthy_ships;
+        int16_t stealth_field;
+        int16_t cloaking_device;
+        int16_t phasing_cloak;
+    };
+
+    inline s_scan_bonus scan_bonus = {
+        2, 0, 2, 4, 6, 2, 4, 6, 9, 32000, 32000,
+    };
+    inline s_stealth_bonus stealth_bonus = {
+        500, 500, 500, 500,
+    };
+    inline e_stealth_size_penalty stealth_size_penalty =
+        e_stealth_size_penalty::race_tech;
+
+    inline bool Traveling_Size_Penalty_Applies_(
+            bool stealthy_race, bool has_stealth_device) {
+        if (stealthy_race &&
+            stealth_size_penalty != e_stealth_size_penalty::none) {
+            return false;
+        }
+        if (has_stealth_device &&
+            stealth_size_penalty == e_stealth_size_penalty::race_tech) {
+            return false;
+        }
+        return true;
+    }
+
     // Returns nonzero when the ship has the specified undamaged special device.
     // ship_idx: Ship table index to inspect.
     // special_idx: Special-device bit index to test.

@@ -526,6 +526,14 @@
       base_type: "uint8",
       values: { system: 0, event: 1 },
     },
+    stealth_size_penalty: {
+      title: "Stealth size-penalty policy",
+      description: "Selects which strategic concealment sources suppress the traveling-ship hull-size penalty.",
+      remarks: "The race_tech default matches MOO2 1.40 and MOO2 1.50 behavior.",
+      kind: "enum",
+      base_type: "uint8",
+      values: { none: 0, race: 1, race_tech: 2 },
+    },
     build_queue_instruction: {
       title: "Build queue instruction",
       description: "A mode, command, product, design, or building in an automatic build list.",
@@ -567,6 +575,33 @@
       fields: [
         { id: "enabled", title: "Enabled", description: "Enables queue-driven colony autobuild.", type: "bool", bind: ["enabled"] },
         { id: "default", title: "Default queue", description: "Queue number prefilled when assigning autobuild to a colony.", type: "uint8", constraints: { min: 0, max: 10 }, bind: ["default_preset"] },
+      ],
+    },
+    scan_bonus: {
+      title: "Strategic scan bonuses",
+      description: "Controls scanner, ship-system, orbital-base, and same-location strategic detection values.",
+      fields: [
+        { id: "battle_scanner", title: "Battle Scanner", description: "Detection added by a working Battle Scanner.", type: "uint16", constraints: { max: 32767 }, bind: ["battle_scanner"] },
+        { id: "scout_lab", title: "Scout Lab", description: "Detection added by a working Scout Lab.", type: "uint16", constraints: { max: 32767 }, bind: ["scout_lab"] },
+        { id: "star_base", title: "Star Base", description: "Detection added by a colony Star Base.", type: "uint16", constraints: { max: 32767 }, bind: ["star_base"] },
+        { id: "battlestation", title: "Battlestation", description: "Detection added by a colony Battlestation.", type: "uint8", constraints: { max: 127 }, bind: ["battlestation"] },
+        { id: "star_fortress", title: "Star Fortress", description: "Detection added by a colony Star Fortress.", type: "uint8", constraints: { max: 127 }, bind: ["star_fortress"] },
+        { id: "no_scanner", title: "No scanner", description: "Base detection range without advanced scanner technology.", type: "uint8", constraints: { max: 127 }, bind: ["no_scanner"] },
+        { id: "tachyon_scanner", title: "Tachyon Scanner", description: "Detection range with Tachyon Scanner technology.", type: "uint8", constraints: { max: 127 }, bind: ["tachyon_scanner"] },
+        { id: "neutron_scanner", title: "Neutron Scanner", description: "Detection range with Neutron Scanner technology.", type: "uint8", constraints: { max: 127 }, bind: ["neutron_scanner"] },
+        { id: "sensors", title: "Sensors", description: "Detection range with Sensors technology.", type: "uint8", constraints: { max: 127 }, bind: ["sensors"] },
+        { id: "planet", title: "Planet proximity", description: "Detection applied when the target shares a colony's location.", type: "uint16", bind: ["planet"] },
+        { id: "fleet", title: "Fleet proximity", description: "Detection applied when the target shares a friendly fleet's location.", type: "uint16", bind: ["fleet"] },
+      ],
+    },
+    stealth_bonus: {
+      title: "Strategic stealth bonuses",
+      description: "Controls strategic concealment from racial and ship-system stealth sources.",
+      fields: [
+        { id: "stealthy_ships", title: "Stealthy Ships", description: "Concealment added by the Stealthy Ships racial trait.", type: "int16", bind: ["stealthy_ships"] },
+        { id: "stealth_field", title: "Stealth Field", description: "Concealment added by a working Stealth Field.", type: "int16", bind: ["stealth_field"] },
+        { id: "cloaking_device", title: "Cloaking Device", description: "Concealment added by a working Cloaking Device.", type: "int16", bind: ["cloaking_device"] },
+        { id: "phasing_cloak", title: "Phasing Cloak", description: "Concealment added by a working Phasing Cloak.", type: "int16", bind: ["phasing_cloak"] },
       ],
     },
     predefined_ship_weapon: {
@@ -968,6 +1003,47 @@
       type: "autobuild_settings",
       bind_root: { header: "game/build_queue.h", symbol: "BUILD_QUEUE::autobuild_settings" },
       default: { enabled: false, default: 0 },
+    },
+
+    scan_bonus: {
+      title: "Strategic scan bonuses",
+      description: "Configures strategic scanner, ship-system, orbital-base, and same-location detection values.",
+      examples: ["detection scan_bonus battle_scanner = 2;", "detection scan_bonus scout_lab = 0;"],
+      group: "gameplay",
+      namespace: "detection",
+      type: "scan_bonus",
+      bind_root: { header: "game/shipstak.h", symbol: "SHIPSTAK::scan_bonus" },
+      default: {
+        battle_scanner: 2, scout_lab: 0, star_base: 2,
+        battlestation: 4, star_fortress: 6,
+        no_scanner: 2, tachyon_scanner: 4, neutron_scanner: 6, sensors: 9,
+        planet: 32000, fleet: 32000,
+      },
+    },
+
+    stealth_bonus: {
+      title: "Strategic stealth bonuses",
+      description: "Configures strategic concealment from racial and ship-system stealth sources.",
+      examples: ["detection stealth_bonus stealthy_ships = 500;"],
+      group: "gameplay",
+      namespace: "detection",
+      type: "stealth_bonus",
+      bind_root: { header: "game/shipstak.h", symbol: "SHIPSTAK::stealth_bonus" },
+      default: {
+        stealthy_ships: 500, stealth_field: 500,
+        cloaking_device: 500, phasing_cloak: 500,
+      },
+    },
+
+    stealth_size_penalty: {
+      title: "Strategic stealth size-penalty policy",
+      description: "Controls whether racial or technology-based stealth suppresses the traveling-ship hull-size penalty.",
+      examples: ["detection stealth_size_penalty = race_tech;"],
+      group: "gameplay",
+      namespace: "detection",
+      type: "stealth_size_penalty",
+      bind_root: { header: "game/shipstak.h", symbol: "SHIPSTAK::stealth_size_penalty" },
+      default: "race_tech",
     },
 
     board_in_black_hole: {

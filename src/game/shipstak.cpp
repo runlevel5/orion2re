@@ -115,16 +115,16 @@ namespace SHIPSTAK {
 
     void __cdecl Remove_Non_Detected_Ships_() {
         const int16_t player_num = MOX::_PLAYER_NUM;
-        int16_t scan_range = 2;
+        int16_t scan_range = (int16_t)scan_bonus.no_scanner;
 
         if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_TACHYON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            scan_range = 4;
+            scan_range = (int16_t)scan_bonus.tachyon_scanner;
         }
         if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_NEUTRON_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            scan_range = 6;
+            scan_range = (int16_t)scan_bonus.neutron_scanner;
         }
         if ((int8_t)MOX::_player[player_num].tech_applications[TECH_APP_SENSORS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            scan_range = 9;
+            scan_range = (int16_t)scan_bonus.sensors;
         }
 
         for (int16_t stack_idx = 0; stack_idx < MOX::_ship_stack_count; ++stack_idx) {
@@ -150,17 +150,17 @@ namespace SHIPSTAK {
                                                         30);
 
                         if (range_steps == 0) {
-                            best_detection = 1000;
+                            best_detection = (int16_t)scan_bonus.planet;
                         } else {
                             int16_t detection = scan_range;
                             if (colony.buildings[BUILDING_STAR_BASE] != 0) {
-                                detection += 2;
+                                detection += (int16_t)scan_bonus.star_base;
                             }
                             if (colony.buildings[BUILDING_BATTLESTATION] != 0) {
-                                detection += 4;
+                                detection += (int16_t)scan_bonus.battlestation;
                             }
                             if (colony.buildings[BUILDING_STAR_FORTRESS] != 0) {
-                                detection += 6;
+                                detection += (int16_t)scan_bonus.star_fortress;
                             }
                             detection -= range_steps;
                             if (best_detection < detection) {
@@ -182,11 +182,14 @@ namespace SHIPSTAK {
                                                         30);
 
                         if (range_steps == 0) {
-                            best_detection = 1000;
+                            best_detection = (int16_t)scan_bonus.fleet;
                         } else {
                             int16_t detection = scan_range - range_steps;
                             if (SHIPSTAK::Ship_Has_Special_(other_ship_idx, SPECIAL_BATTLE_SCANNER) != 0) {
-                                detection += 2;
+                                detection += (int16_t)scan_bonus.battle_scanner;
+                            }
+                            if (SHIPSTAK::Ship_Has_Special_(other_ship_idx, SPECIAL_SCOUT_LAB) != 0) {
+                                detection += (int16_t)scan_bonus.scout_lab;
                             }
                             if (best_detection < detection) {
                                 best_detection = detection;
@@ -205,25 +208,32 @@ namespace SHIPSTAK {
 
                     if (owner <= MAX_PLAYERS || ship.d.speed != 0) {
                         int16_t detection = 0;
+                        const bool stealthy_race =
+                            owner < MAX_PLAYERS &&
+                            MOX::_player[owner].traits[TRAIT_STEALTHY_SHIPS] == 1;
+                        const bool has_stealth_device =
+                            SHIPSTAK::Ship_Has_Stealth_Device_(node_ship_idx);
 
                         if (owner == MAX_PLAYERS) {
                             detection = -5;
-                        } else if (owner < MAX_PLAYERS && MOX::_player[owner].traits[TRAIT_STEALTHY_SHIPS] == 1) {
-                            detection = 500;
-                        } else {
-                            if ((int8_t)ship.status == 1) {
-                                detection = -(int16_t)ship.d.size;
-                            }
+                        } else if ((int8_t)ship.status == 1 &&
+                                   SHIPSTAK::Traveling_Size_Penalty_Applies_(
+                                       stealthy_race, has_stealth_device)) {
+                            detection = -(int16_t)ship.d.size;
+                        }
+
+                        if (stealthy_race) {
+                            detection += stealth_bonus.stealthy_ships;
                         }
 
                         if (SHIPSTAK::Ship_Has_Special_(node_ship_idx, SPECIAL_STEALTH_FIELD) != 0) {
-                            detection += 500;
+                            detection += stealth_bonus.stealth_field;
                         }
                         if (SHIPSTAK::Ship_Has_Special_(node_ship_idx, SPECIAL_CLOAKING_DEVICE) != 0) {
-                            detection += 500;
+                            detection += stealth_bonus.cloaking_device;
                         }
                         if (SHIPSTAK::Ship_Has_Special_(node_ship_idx, SPECIAL_PHASING_CLOAK) != 0) {
-                            detection += 500;
+                            detection += stealth_bonus.phasing_cloak;
                         }
 
                         if (best_detection < detection) {
