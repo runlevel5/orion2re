@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "enhanced_ux.h"
 
 namespace OFFICER {
     // Legacy galaxy-map UI encoding for race-only fleet labels. The first tagged
@@ -951,11 +952,50 @@ namespace OFFICER {
         int16_t exit_screen = 0;
         EVANHELP::Set_Officer_Screen_Help_();
 
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+
         do {
             bool is_fleet = Is_Fleet_Officer_Screen_();
             timer::Mark_Time_();
+
+            // Enhancement: while the Hire, Pool, or Dismiss target selection
+            // is active, digits 1-4 pick the corresponding on-screen leader
+            // slot, like clicking on it. 'C' and Left/Right are translated
+            // into the Cancel and previous/next buttons' native hotkeys
+            // (X, ',' and '.'), so they behave exactly like a mouse click.
+            int16_t synth_input = 0;
+            if (enhanced) {
+                const bool selecting = (_officer_button_mode == 0 ||
+                                        _officer_button_mode == 1 ||
+                                        _officer_button_mode == 2);
+                int32_t key = key::Read_Key_();
+                if (selecting && key > 0 && (key & 0xFF) >= '1' && (key & 0xFF) <= '4') {
+                    int16_t slot = (int16_t)((key & 0xFF) - '1');
+                    if (big_icons_scanned[slot] > 0) {
+                        synth_input = big_icons_scanned[slot];
+                    }
+                } else if (key > 0 && ((key & 0xFF) == 'c' || (key & 0xFF) == 'C') &&
+                           _officer_button_mode == 0) {
+                    key::Push_Key_Code_((uint32_t)'X', g_last_scan_code);
+                } else if (key == 0x4BE0 && _officer_button_mode == -1) {
+                    key::Push_Key_Code_((uint32_t)',', g_last_scan_code);
+                } else if (key == 0x4DE0 && _officer_button_mode == -1) {
+                    key::Push_Key_Code_((uint32_t)'.', g_last_scan_code);
+                } else if (key == 0x48E0 && _officer_button_mode == -1) {
+                    // Up/Down press the fleet scroll bar's buttons ('-'/'+').
+                    key::Push_Key_Code_((uint32_t)'-', g_last_scan_code);
+                } else if (key == 0x50E0 && _officer_button_mode == -1) {
+                    key::Push_Key_Code_((uint32_t)'+', g_last_scan_code);
+                } else if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+            }
+
             int16_t input = fields::Get_Input_();
             int16_t scanned_id = fields::Scan_Input_();
+            if (input == 0 && synth_input > 0) {
+                input = synth_input;
+            }
 
             if (cancel_btn == input) {
                 mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
