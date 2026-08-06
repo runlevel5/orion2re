@@ -15,12 +15,29 @@ namespace TEXTBOX {
     int32_t base_colors[3] = {160, 192, 224};
 
     // Enhancement: the current box's close button, so the shared input wait
-    // can animate it for the Esc/Enter shortcuts.
+    // can animate it.
     static s_animation_header* _g_close_anim = nullptr;
     static int16_t _g_close_x;
     static int16_t _g_close_y;
     static int16_t _g_close_field = 0;
     static uint8_t _g_close_animated;
+
+    // Enhancement helper: shows the close button pressed and released.
+    static void Animate_Close_Button_Press_() {
+        video::Set_Page_Off();
+        animate::Set_Animation_Frame(_g_close_anim, 1);
+        animate::Remap_Draw(_g_close_x, _g_close_y, _g_close_anim);
+        RUSS::Mox_Sync_Update();
+        timer::Mark_Time();
+        timer::Release_Time(2);
+        video::Set_Page_Off();
+        animate::Set_Animation_Frame(_g_close_anim, 0);
+        animate::Remap_Draw(_g_close_x, _g_close_y, _g_close_anim);
+        RUSS::Mox_Sync_Update();
+        timer::Mark_Time();
+        timer::Release_Time(1);
+        _g_close_animated = 1;
+    }
 
     void __cdecl Get_Help_Lbx_Name(char* help_lbx_name, size_t help_lbx_name_size) {
         const char* selected_name;
@@ -156,27 +173,14 @@ namespace TEXTBOX {
             RUSS::Mox_Sync_Update();
             timer::Release_Time(1);
 
-            // Enhancement: Esc and Enter press the close button — click
-            // sound plus pressed/released animation — instead of closing
-            // with the plain field sound.
+            // Enhancement: Esc and Enter press the close button with the
+            // click sound and its animation.
             if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
                 _g_close_anim != nullptr) {
                 int32_t key = key::Read_Key();
                 if (key == 0x011B || key == 0x1C0D) { // Esc or Enter
                     sound::Play_Sound(0x28);
-                    video::Set_Page_Off();
-                    animate::Set_Animation_Frame(_g_close_anim, 1);
-                    animate::Remap_Draw(_g_close_x, _g_close_y, _g_close_anim);
-                    RUSS::Mox_Sync_Update();
-                    timer::Mark_Time();
-                    timer::Release_Time(2);
-                    video::Set_Page_Off();
-                    animate::Set_Animation_Frame(_g_close_anim, 0);
-                    animate::Remap_Draw(_g_close_x, _g_close_y, _g_close_anim);
-                    RUSS::Mox_Sync_Update();
-                    timer::Mark_Time();
-                    timer::Release_Time(1);
-                    _g_close_animated = 1;
+                    Animate_Close_Button_Press_();
                     return;
                 }
                 if (key != 0) {
@@ -189,25 +193,12 @@ namespace TEXTBOX {
                 continue;
             }
 
-            // Enhancement: a click on the close button shows it pressed and
-            // released, like the Esc/Enter path (the field's own 0x28 click
-            // sound has already played).
+            // Enhancement: a click on the close button animates it too (its
+            // field sound has already played).
             if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
                 _g_close_anim != nullptr && _g_close_field > 0 &&
                 input == _g_close_field) {
-                video::Set_Page_Off();
-                animate::Set_Animation_Frame(_g_close_anim, 1);
-                animate::Remap_Draw(_g_close_x, _g_close_y, _g_close_anim);
-                RUSS::Mox_Sync_Update();
-                timer::Mark_Time();
-                timer::Release_Time(2);
-                video::Set_Page_Off();
-                animate::Set_Animation_Frame(_g_close_anim, 0);
-                animate::Remap_Draw(_g_close_x, _g_close_y, _g_close_anim);
-                RUSS::Mox_Sync_Update();
-                timer::Mark_Time();
-                timer::Release_Time(1);
-                _g_close_animated = 1;
+                Animate_Close_Button_Press_();
             }
             return;
         } while (true);
