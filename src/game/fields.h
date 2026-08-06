@@ -474,6 +474,12 @@ namespace fields {
 
     void __cdecl F11_Key_();
 
+    /**
+     * Enhancement: puts a continuous string input field into editing mode
+     * with the given initial text, as clicking it would.
+     */
+    void __cdecl Begin_Continuous_Input_(int16_t field_id, const char* text);
+
     void __cdecl Push_Field_Down_(int16_t field_idx, int16_t x, int16_t y);
 
     void __cdecl Copy_Continuous_String_();

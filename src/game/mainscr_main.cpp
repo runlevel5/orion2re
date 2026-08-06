@@ -250,6 +250,35 @@ namespace MAINSCR {
     /**
      * Runs the main-screen event loop, including map interaction, popups, and screen transitions.
      */
+    // Enhancement helper: keyboard control of the zoom selection box. The
+    // box follows the mouse pointer, so held arrow keys move the pointer
+    // itself (stepping from the box's clamped position to avoid a dead zone
+    // at the viewport edge); Esc cancels the zoom like a right click.
+    static void Handle_Zoom_Box_Keys_(int16_t* boxes_saved_flag) {
+        constexpr int16_t ZOOM_KEY_STEP = 8;
+        uint8_t arrows = platform::Arrow_Keys_Held_();
+        if (arrows != 0) {
+            int16_t ptr_x = MAINSCR::_zoom_box_x;
+            int16_t ptr_y = MAINSCR::_zoom_box_y;
+            if (arrows & platform::ARROW_KEY_UP) ptr_y -= ZOOM_KEY_STEP;
+            if (arrows & platform::ARROW_KEY_DOWN) ptr_y += ZOOM_KEY_STEP;
+            if (arrows & platform::ARROW_KEY_LEFT) ptr_x -= ZOOM_KEY_STEP;
+            if (arrows & platform::ARROW_KEY_RIGHT) ptr_x += ZOOM_KEY_STEP;
+            // Keep the pointer inside the galaxy-map viewport.
+            if (ptr_x < 22) ptr_x = 22;
+            if (ptr_x > 526) ptr_x = 526;
+            if (ptr_y < 22) ptr_y = 22;
+            if (ptr_y > 420) ptr_y = 420;
+            platform::Force_Cursor_Pos(ptr_x, ptr_y);
+        }
+        int32_t zoom_key = key::Read_Key_();
+        if (zoom_key == 0x011B) { // Esc
+            MAINSCR::Exit_Zooming_Mode_(boxes_saved_flag);
+        } else if (zoom_key != 0) {
+            key::Push_Key_Code_((uint32_t)zoom_key, g_last_scan_code);
+        }
+    }
+
     void __cdecl Main_Screen_() {
         int16_t exit_flag = 0;
         int16_t hovered_target_id = 0;
@@ -393,37 +422,9 @@ namespace MAINSCR {
             _fleet_ship_selection_status = -1;
             timer::Mark_Time_();
 
-            // Enhancement (not in the original game): keyboard control of the
-            // zoom selection box. The box follows the mouse pointer, so held
-            // arrow keys move the pointer itself; Esc cancels the zoom the
-            // same way a right click does.
+            // Enhancement: keyboard control of the zoom selection box.
             if (ENHANCED_UX::enhanced_ux_settings.enabled && MOX::_zoom_in == 1) {
-                constexpr int16_t ZOOM_KEY_STEP = 8;
-                uint8_t arrows = platform::Arrow_Keys_Held_();
-                if (arrows != 0) {
-                    // Step from the box's actual (clamped) position, not the
-                    // raw pointer: the draw pins the box at the viewport edge
-                    // while the pointer can sit far beyond it, which would
-                    // otherwise leave a dead zone before the box moves.
-                    int16_t ptr_x = MAINSCR::_zoom_box_x;
-                    int16_t ptr_y = MAINSCR::_zoom_box_y;
-                    if (arrows & platform::ARROW_KEY_UP) ptr_y -= ZOOM_KEY_STEP;
-                    if (arrows & platform::ARROW_KEY_DOWN) ptr_y += ZOOM_KEY_STEP;
-                    if (arrows & platform::ARROW_KEY_LEFT) ptr_x -= ZOOM_KEY_STEP;
-                    if (arrows & platform::ARROW_KEY_RIGHT) ptr_x += ZOOM_KEY_STEP;
-                    // Keep the pointer inside the galaxy-map viewport.
-                    if (ptr_x < 22) ptr_x = 22;
-                    if (ptr_x > 526) ptr_x = 526;
-                    if (ptr_y < 22) ptr_y = 22;
-                    if (ptr_y > 420) ptr_y = 420;
-                    platform::Force_Cursor_Pos(ptr_x, ptr_y);
-                }
-                int32_t zoom_key = key::Read_Key_();
-                if (zoom_key == 0x011B) { // Esc
-                    MAINSCR::Exit_Zooming_Mode_(&boxes_saved_flag);
-                } else if (zoom_key != 0) {
-                    key::Push_Key_Code_((uint32_t)zoom_key, g_last_scan_code);
-                }
+                Handle_Zoom_Box_Keys_(&boxes_saved_flag);
             }
 
             int16_t input = fields::Get_Input_();

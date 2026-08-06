@@ -675,6 +675,32 @@ namespace MAINPUPS {
         Add_Slider_Fields_(_g_min, _g_max, &_g_var);
     }
 
+    // Enhancement helper: Left/Right and the wheel (one step per 120ms)
+    // press the slider popup's '<'/'>' buttons via their native hotkeys, so
+    // they behave like clicks; other keys go back to the fields system.
+    static void Read_Slider_Popup_Keys_(uint32_t* last_wheel_ms) {
+        constexpr uint32_t WHEEL_STEP_MS = 120;
+        int32_t key = key::Read_Key_();
+        if (key == 0x4BE0) { // Left
+            key::Push_Key_Code_((uint32_t)(uint8_t)ESTRINGS::E_Strings_(137 /* 0x89 */)[0], g_last_scan_code);
+        } else if (key == 0x4DE0) { // Right
+            key::Push_Key_Code_((uint32_t)(uint8_t)ESTRINGS::E_Strings_(11 /* 0xb */)[0], g_last_scan_code);
+        } else if (key != 0) {
+            key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+        }
+
+        int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
+        if (wheel_steps != 0) {
+            uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
+            if (wheel_now_ms - *last_wheel_ms >= WHEEL_STEP_MS) {
+                *last_wheel_ms = wheel_now_ms;
+                key::Push_Key_Code_(
+                    (uint32_t)(uint8_t)ESTRINGS::E_Strings_((wheel_steps > 0) ? 11 /* '>' */ : 137 /* '<' */)[0],
+                    g_last_scan_code);
+            }
+        }
+    }
+
     int16_t __cdecl Slider_Popup_(int16_t min, int16_t max, int16_t initial_value, char* msg, int16_t popup_style) {
         int16_t input = 0;
         _last_scanned_field = -1;
@@ -697,35 +723,14 @@ namespace MAINPUPS {
 
         const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
         uint32_t last_wheel_ms = 0;
-        constexpr uint32_t WHEEL_STEP_MS = 120;
         if (enhanced) {
             platform::Discard_Input_Observations_();
         }
 
         do {
-            // Enhancement: Left/Right (and wheel down/up) press the '<'/'>'
-            // buttons, translated into their native hotkeys so they behave
-            // like mouse clicks.
+            // Enhancement: Left/Right and the wheel press the '<'/'>' buttons.
             if (enhanced) {
-                int32_t key = key::Read_Key_();
-                if (key == 0x4BE0) { // Left
-                    key::Push_Key_Code_((uint32_t)(uint8_t)ESTRINGS::E_Strings_(137 /* 0x89 */)[0], g_last_scan_code);
-                } else if (key == 0x4DE0) { // Right
-                    key::Push_Key_Code_((uint32_t)(uint8_t)ESTRINGS::E_Strings_(11 /* 0xb */)[0], g_last_scan_code);
-                } else if (key != 0) {
-                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
-                }
-
-                int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
-                if (wheel_steps != 0) {
-                    uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
-                    if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
-                        last_wheel_ms = wheel_now_ms;
-                        key::Push_Key_Code_(
-                            (uint32_t)(uint8_t)ESTRINGS::E_Strings_((wheel_steps > 0) ? 11 /* '>' */ : 137 /* '<' */)[0],
-                            g_last_scan_code);
-                    }
-                }
+                Read_Slider_Popup_Keys_(&last_wheel_ms);
             }
 
             input = fields::Get_Input_();

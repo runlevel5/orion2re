@@ -47,6 +47,46 @@ void Ensure_Settings_Net_Game_Name_() {
     MOX::_settings.net_game_name[6] = (char)('a' + ((int32_t)clock() % 26));
 }
 
+// Enhancement helper: shows a New Game button pressed and released. The
+// screen redraws before each present (stencil refresh), and page toggles
+// repaint buttons from fields::_down_mouse_button.
+void Animate_Newgame_Button_Press_(int16_t button_field) {
+    sound::Play_Sound_(0x28);
+    fields::_down_mouse_button = button_field;
+    fonts::Set_Font_Style_(3, &NEWGAME::_color_ken);
+    NEWGAME::Draw_Newgame_Screen_();
+    RUSS::Mox_Sync_Update_();
+    timer::Mark_Time_();
+    timer::Release_Time_(2);
+    fields::_down_mouse_button = -1;
+    fonts::Set_Font_Style_(3, &NEWGAME::_color_ken);
+    NEWGAME::Draw_Newgame_Screen_();
+    RUSS::Mox_Sync_Update_();
+    timer::Mark_Time_();
+    timer::Release_Time_(1);
+}
+
+// Enhancement helper: key pre-read for the screen. Enter presses Accept
+// (unless a name edit is active — then it commits it), 'R' starts editing
+// the net game name; other keys go back to the fields system. Returns the
+// field to activate, or 0.
+int16_t Read_Newgame_Keys_() {
+    int32_t key = key::Read_Key_();
+    if (key == 0x1C0D && fields::_input_field_active == 0) { // Enter
+        Animate_Newgame_Button_Press_(NEWGAME::_fields[8]);
+        return NEWGAME::_fields[8];
+    }
+    if (key > 0 && ((key & 0xFF) == 'r' || (key & 0xFF) == 'R') &&
+        fields::_input_field_active == 0 && _g_net_name_field_id > 0) {
+        fields::Begin_Continuous_Input_(_g_net_name_field_id, NETMOX::_net.cur_game_name);
+        return 0;
+    }
+    if (key != 0) {
+        key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+    }
+    return 0;
+}
+
 }
 
 int16_t __cdecl Newgame_Screen_(void) {
@@ -113,45 +153,10 @@ int16_t __cdecl Newgame_Screen_(void) {
             }
         }
 
-        // Enhancement: Enter is reserved for the Accept button — consumed
-        // here so it can no longer activate whatever the mouse hovers — and
-        // shows the button pressed and released. The page toggle repaints
-        // buttons from fields::_down_mouse_button.
+        // Enhancement: Enter presses Accept (or commits a name edit), 'R'
+        // starts editing the net game name.
         if (enhanced) {
-            int32_t key = key::Read_Key_();
-            if (key == 0x1C0D && fields::_input_field_active != 0) {
-                // While the net-game-name edit is active, Enter commits the
-                // edit instead of pressing Accept.
-                key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
-            } else if (key == 0x1C0D) { // Enter
-                sound::Play_Sound_(0x28);
-                fields::_down_mouse_button = NEWGAME::_fields[8];
-                fonts::Set_Font_Style_(3, &NEWGAME::_color_ken);
-                NEWGAME::Draw_Newgame_Screen_();
-                RUSS::Mox_Sync_Update_();
-                timer::Mark_Time_();
-                timer::Release_Time_(2);
-                fields::_down_mouse_button = -1;
-                fonts::Set_Font_Style_(3, &NEWGAME::_color_ken);
-                NEWGAME::Draw_Newgame_Screen_();
-                RUSS::Mox_Sync_Update_();
-                timer::Mark_Time_();
-                timer::Release_Time_(1);
-                input = NEWGAME::_fields[8];
-            } else if (key > 0 && ((key & 0xFF) == 'r' || (key & 0xFF) == 'R') &&
-                       fields::_input_field_active == 0 &&
-                       _g_net_name_field_id > 0) {
-                // 'R' starts editing the net game name, like clicking it.
-                fields::_input_field_active = 1;
-                fields::_cursor_position = 0;
-                fields::_cursor_on = 0;
-                fields::_active_input_field_number = NEWGAME::_g_net_name_field_id;
-                strlcpy(fields::_continuous_string, NETMOX::_net.cur_game_name,
-                        sizeof(fields::_continuous_string));
-                fields::_active_input_field_first = 1;
-            } else if (key != 0) {
-                key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
-            }
+            input = Read_Newgame_Keys_();
         }
 
         if (input == 0) {
@@ -160,22 +165,9 @@ int16_t __cdecl Newgame_Screen_(void) {
         FAKEBUTS::Evaluate_Click_Thru_Fields_(input);
 
         if (input == NEWGAME::_fields[6] || input == NEWGAME::_fields[7]) {
-            // Enhancement: the Esc hotkey shows the Cancel button pressed and
-            // released, as a click on it would.
+            // Enhancement: the Esc hotkey animates the Cancel button.
             if (enhanced && input == NEWGAME::_fields[7]) {
-                sound::Play_Sound_(0x28);
-                fields::_down_mouse_button = NEWGAME::_fields[6];
-                fonts::Set_Font_Style_(3, &NEWGAME::_color_ken);
-                NEWGAME::Draw_Newgame_Screen_();
-                RUSS::Mox_Sync_Update_();
-                timer::Mark_Time_();
-                timer::Release_Time_(2);
-                fields::_down_mouse_button = -1;
-                fonts::Set_Font_Style_(3, &NEWGAME::_color_ken);
-                NEWGAME::Draw_Newgame_Screen_();
-                RUSS::Mox_Sync_Update_();
-                timer::Mark_Time_();
-                timer::Release_Time_(1);
+                Animate_Newgame_Button_Press_(NEWGAME::_fields[6]);
             }
             MOX::_current_screen = MOX::_return_screen;
             exit_screen = true;

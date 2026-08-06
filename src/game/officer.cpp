@@ -967,6 +967,162 @@ namespace OFFICER {
         Scroll_Fleet_Ship_Into_View_(next);
     }
 
+    // Enhancement: keyboard/wheel state for the Leaders screen.
+    struct s_officers_kbd {
+        uint8_t panel = 0;      // fleet-view focus: 0 = officer list, 1 = ship list
+        uint8_t name_wins = 0;  // keyboard owns the ship-name display
+        int16_t prev_hover_icon = -1;
+        uint32_t last_wheel_ms = 0;
+    };
+
+    // Enhancement helper: key/wheel pre-read for the Leaders screen. While a
+    // Hire/Pool/Dismiss target selection is active, digits 1-4 pick a leader
+    // slot like a click and 'C' presses Cancel (via its native X hotkey). In
+    // normal mode: digits and Up/Down select a leader, Tab switches the
+    // fleet-view focus, arrows navigate the ship grid, Enter clicks the
+    // selected leader, 'i' shows info, '<'/'>' and PgUp/PgDn press the cycle
+    // and scroll buttons via their native hotkeys, and the wheel presses the
+    // same buttons at a paced rate. Returns the field to activate, or 0.
+    static int16_t Read_Officers_Input_(s_officers_kbd* kbd, bool is_fleet,
+                                        const int16_t* leader_row_fields) {
+        constexpr uint32_t WHEEL_STEP_MS = 120;
+        int16_t synth_input = 0;
+        const bool selecting = (_officer_button_mode == 0 ||
+                                _officer_button_mode == 1 ||
+                                _officer_button_mode == 2);
+        int32_t key = key::Read_Key_();
+        if (selecting && key > 0 && (key & 0xFF) >= '1' && (key & 0xFF) <= '4') {
+            int16_t slot = (int16_t)((key & 0xFF) - '1');
+            if (leader_row_fields[slot] > 0) {
+                synth_input = leader_row_fields[slot];
+            }
+        } else if (_officer_button_mode == -1 && key > 0 &&
+                   (key & 0xFF) >= '1' && (key & 0xFF) <= '4') {
+            int16_t slot = (int16_t)((key & 0xFF) - '1');
+            if (is_fleet && MOX::_offpop_big_icon_selected > -1) {
+                // With a ship selected, digits assign that leader to it.
+                if (leader_row_fields[slot] > 0) {
+                    MOX::_officer_selected = -1;
+                    synth_input = leader_row_fields[slot];
+                }
+            } else if (slot < MOX::_n_fltscrn_officers && MOX::_officer_id_list[slot] > -1) {
+                MOX::_officer_selected = (int8_t)MOX::_officer_id_list[slot];
+                MOX::_draw_officer_to_back = 1;
+            }
+        } else if (key > 0 && ((key & 0xFF) == 'c' || (key & 0xFF) == 'C') &&
+                   _officer_button_mode == 0) {
+            key::Push_Key_Code_((uint32_t)'X', g_last_scan_code);
+        } else if (key == 0x0F09 && _officer_button_mode == -1 && is_fleet) {
+            // Tab: the focused list selects its first entry when nothing is
+            // selected yet; an existing selection is kept and scrolled to.
+            kbd->panel = (uint8_t)(kbd->panel == 0 ? 1 : 0);
+            if (kbd->panel == 1) {
+                kbd->name_wins = 1;
+                if (MOX::_offpop_big_icon_selected < 0) {
+                    Move_Fleet_Ship_Selection_(1);
+                } else {
+                    Scroll_Fleet_Ship_Into_View_(MOX::_offpop_big_icon_selected);
+                }
+            } else if (MOX::_officer_selected < 0 &&
+                       MOX::_n_fltscrn_officers > 0 &&
+                       MOX::_officer_id_list[0] > -1) {
+                MOX::_officer_selected = (int8_t)MOX::_officer_id_list[0];
+                MOX::_draw_officer_to_back = 1;
+            }
+        } else if ((key == 0x48E0 || key == 0x50E0 || key == 0x4BE0 || key == 0x4DE0) &&
+                   _officer_button_mode == -1 && is_fleet && kbd->panel == 1) {
+            int16_t step = (key == 0x48E0) ? (int16_t)-MOX::_big_icon_display_columns
+                         : (key == 0x50E0) ? (int16_t)MOX::_big_icon_display_columns
+                         : (key == 0x4BE0) ? (int16_t)-1
+                                           : (int16_t)1;
+            Move_Fleet_Ship_Selection_(step);
+            kbd->name_wins = 1;
+        } else if (key > 0 && (key & 0xFF) == '<' && _officer_button_mode == -1) {
+            key::Push_Key_Code_((uint32_t)',', g_last_scan_code);
+        } else if (key > 0 && (key & 0xFF) == '>' && _officer_button_mode == -1) {
+            key::Push_Key_Code_((uint32_t)'.', g_last_scan_code);
+        } else if (key == 0x49E0 && _officer_button_mode == -1) { // PgUp
+            key::Push_Key_Code_((uint32_t)'-', g_last_scan_code);
+        } else if (key == 0x51E0 && _officer_button_mode == -1) { // PgDn
+            key::Push_Key_Code_((uint32_t)'+', g_last_scan_code);
+        } else if ((key == 0x48E0 || key == 0x50E0) && _officer_button_mode == -1) {
+            // Up/Down move the leader selection, wrapping at the ends.
+            int16_t dir = (key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+            int16_t count = (MOX::_n_fltscrn_officers < 4) ? (int16_t)MOX::_n_fltscrn_officers : (int16_t)4;
+            if (count > 0) {
+                int16_t cur = -1;
+                for (int16_t slot = 0; slot < count; ++slot) {
+                    if (MOX::_officer_id_list[slot] == (int16_t)MOX::_officer_selected) {
+                        cur = slot;
+                    }
+                }
+                int16_t next = (cur < 0) ? ((dir > 0) ? (int16_t)0 : (int16_t)(count - 1))
+                                         : (int16_t)((cur + count + dir) % count);
+                if (MOX::_officer_id_list[next] > -1) {
+                    MOX::_officer_selected = (int8_t)MOX::_officer_id_list[next];
+                    MOX::_draw_officer_to_back = 1;
+                }
+            }
+        } else if (key > 0 && ((key & 0xFF) == 'i' || (key & 0xFF) == 'I') &&
+                   _officer_button_mode == -1) {
+            // 'i': info for the hovered leader, else the focused selection.
+            if (MOX::_officer_scanned > -1 ||
+                (!(is_fleet && kbd->panel == 1) && MOX::_officer_selected > -1)) {
+                int16_t info_leader = (MOX::_officer_scanned > -1)
+                                          ? (int16_t)MOX::_officer_scanned
+                                          : (int16_t)MOX::_officer_selected;
+                for (int16_t slot = 0; slot < 4; ++slot) {
+                    if (MOX::_officer_id_list[slot] == info_leader) {
+                        Show_Leader_Skills_Dialog_(slot, info_leader);
+                        break;
+                    }
+                }
+            } else if (is_fleet && kbd->panel == 1 &&
+                       MOX::_offpop_big_icon_selected > -1) {
+                int16_t info_ship = MOX::_fltscrn_big_icon[MOX::_offpop_big_icon_selected].ship_idx;
+                if (info_ship > -1) {
+                    fields::Deactivate_Help_List_();
+                    CMBTDRW1::Detailed_View_Ship_(info_ship);
+                    EVANHELP::Set_Officer_Screen_Help_();
+                    MOX::_draw_officer_to_back = 1;
+                }
+            }
+        } else if (key == 0x1C0D && _officer_button_mode == -1 &&
+                   MOX::_officer_selected > -1) {
+            // Enter clicks the selected leader's row; the selection is
+            // cleared first so the click acts instead of toggling it off.
+            for (int16_t slot = 0; slot < 4; ++slot) {
+                if (MOX::_officer_id_list[slot] == (int16_t)MOX::_officer_selected &&
+                    leader_row_fields[slot] > 0) {
+                    MOX::_officer_selected = -1;
+                    synth_input = leader_row_fields[slot];
+                    break;
+                }
+            }
+        } else if (key != 0) {
+            key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+        }
+
+        // The wheel presses the same buttons: vertical the scroll bar,
+        // horizontal (or Shift + wheel) the previous/next cycle.
+        if (_officer_button_mode == -1) {
+            int16_t wheel_v = platform::Consume_Mouse_Wheel_Steps_();
+            int16_t wheel_h = platform::Consume_Mouse_Wheel_Steps_X_();
+            if (wheel_v != 0 || wheel_h != 0) {
+                uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
+                if (wheel_now_ms - kbd->last_wheel_ms >= WHEEL_STEP_MS) {
+                    kbd->last_wheel_ms = wheel_now_ms;
+                    if (wheel_v != 0) {
+                        key::Push_Key_Code_((uint32_t)((wheel_v > 0) ? '-' : '+'), g_last_scan_code);
+                    } else {
+                        key::Push_Key_Code_((uint32_t)((wheel_h > 0) ? '.' : ','), g_last_scan_code);
+                    }
+                }
+            }
+        }
+        return synth_input;
+    }
+
     void Officers_Screen_() {
         uint16_t saved_map_scale = (uint16_t)MOX::_cur_map_scale;
         int8_t needs_help_reset = 0;
@@ -1067,14 +1223,7 @@ namespace OFFICER {
         EVANHELP::Set_Officer_Screen_Help_();
 
         const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
-        uint32_t last_wheel_ms = 0;
-        constexpr uint32_t WHEEL_STEP_MS = 120;
-        // Keyboard focus on the fleet view: 0 = officer list, 1 = ship list.
-        uint8_t kbd_panel = 0;
-        // Last-input-wins state for the ship name display: set by keyboard
-        // navigation, cleared when the pointer moves onto a (new) icon.
-        uint8_t kbd_name_wins = 0;
-        int16_t prev_hover_icon = -1;
+        s_officers_kbd kbd;
         if (enhanced) {
             platform::Discard_Input_Observations_();
         }
@@ -1083,164 +1232,10 @@ namespace OFFICER {
             bool is_fleet = Is_Fleet_Officer_Screen_();
             timer::Mark_Time_();
 
-            // Enhancement: while the Hire, Pool, or Dismiss target selection
-            // is active, digits 1-4 pick the corresponding on-screen leader
-            // slot, like clicking on it. 'C' and Left/Right are translated
-            // into the Cancel and previous/next buttons' native hotkeys
-            // (X, ',' and '.'), so they behave exactly like a mouse click.
+            // Enhancement: keyboard and wheel input.
             int16_t synth_input = 0;
             if (enhanced) {
-                const bool selecting = (_officer_button_mode == 0 ||
-                                        _officer_button_mode == 1 ||
-                                        _officer_button_mode == 2);
-                int32_t key = key::Read_Key_();
-                if (selecting && key > 0 && (key & 0xFF) >= '1' && (key & 0xFF) <= '4') {
-                    int16_t slot = (int16_t)((key & 0xFF) - '1');
-                    if (big_icons_scanned[slot] > 0) {
-                        synth_input = big_icons_scanned[slot];
-                    }
-                } else if (_officer_button_mode == -1 && key > 0 &&
-                           (key & 0xFF) >= '1' && (key & 0xFF) <= '4') {
-                    int16_t slot = (int16_t)((key & 0xFF) - '1');
-                    if (is_fleet && MOX::_offpop_big_icon_selected > -1) {
-                        // With a ship selected, digits 1-4 assign the
-                        // corresponding leader to it, like clicking the
-                        // leader's row.
-                        if (big_icons_scanned[slot] > 0) {
-                            MOX::_officer_selected = -1;
-                            synth_input = big_icons_scanned[slot];
-                        }
-                    } else if (slot < MOX::_n_fltscrn_officers && MOX::_officer_id_list[slot] > -1) {
-                        // Digits 1-4 select (highlight) the corresponding leader.
-                        MOX::_officer_selected = (int8_t)MOX::_officer_id_list[slot];
-                        MOX::_draw_officer_to_back = 1;
-                    }
-                } else if (key > 0 && ((key & 0xFF) == 'c' || (key & 0xFF) == 'C') &&
-                           _officer_button_mode == 0) {
-                    key::Push_Key_Code_((uint32_t)'X', g_last_scan_code);
-                } else if (key == 0x0F09 && _officer_button_mode == -1 && is_fleet) {
-                    // Tab switches keyboard focus between the officer list
-                    // and the ship list. The focused list selects its first
-                    // entry when nothing is selected yet; an existing
-                    // selection is kept (and scrolled into view).
-                    kbd_panel = (uint8_t)(kbd_panel == 0 ? 1 : 0);
-                    if (kbd_panel == 1) {
-                        kbd_name_wins = 1;
-                        if (MOX::_offpop_big_icon_selected < 0) {
-                            Move_Fleet_Ship_Selection_(1);
-                        } else {
-                            Scroll_Fleet_Ship_Into_View_(MOX::_offpop_big_icon_selected);
-                        }
-                    } else if (MOX::_officer_selected < 0 &&
-                               MOX::_n_fltscrn_officers > 0 &&
-                               MOX::_officer_id_list[0] > -1) {
-                        MOX::_officer_selected = (int8_t)MOX::_officer_id_list[0];
-                        MOX::_draw_officer_to_back = 1;
-                    }
-                } else if ((key == 0x48E0 || key == 0x50E0 || key == 0x4BE0 || key == 0x4DE0) &&
-                           _officer_button_mode == -1 && is_fleet && kbd_panel == 1) {
-                    // Arrows navigate the ship selection while the ship list
-                    // has keyboard focus.
-                    int16_t step = (key == 0x48E0) ? (int16_t)-MOX::_big_icon_display_columns
-                                 : (key == 0x50E0) ? (int16_t)MOX::_big_icon_display_columns
-                                 : (key == 0x4BE0) ? (int16_t)-1
-                                                   : (int16_t)1;
-                    Move_Fleet_Ship_Selection_(step);
-                    kbd_name_wins = 1;
-                } else if (key > 0 && (key & 0xFF) == '<' && _officer_button_mode == -1) {
-                    // '<'/'>' press the previous/next cycle buttons via their
-                    // native ','/'.' hotkeys (arrows are reserved for list
-                    // navigation).
-                    key::Push_Key_Code_((uint32_t)',', g_last_scan_code);
-                } else if (key > 0 && (key & 0xFF) == '>' && _officer_button_mode == -1) {
-                    key::Push_Key_Code_((uint32_t)'.', g_last_scan_code);
-                } else if (key == 0x49E0 && _officer_button_mode == -1) {
-                    // PgUp/PgDn press the ship list's scroll buttons via
-                    // their native '-'/'+' hotkeys.
-                    key::Push_Key_Code_((uint32_t)'-', g_last_scan_code);
-                } else if (key == 0x51E0 && _officer_button_mode == -1) {
-                    key::Push_Key_Code_((uint32_t)'+', g_last_scan_code);
-                } else if ((key == 0x48E0 || key == 0x50E0) && _officer_button_mode == -1) {
-                    // Up/Down move the leader selection through the list,
-                    // wrapping at the ends.
-                    int16_t dir = (key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
-                    int16_t count = (MOX::_n_fltscrn_officers < 4) ? (int16_t)MOX::_n_fltscrn_officers : (int16_t)4;
-                    if (count > 0) {
-                        int16_t cur = -1;
-                        for (int16_t slot = 0; slot < count; ++slot) {
-                            if (MOX::_officer_id_list[slot] == (int16_t)MOX::_officer_selected) {
-                                cur = slot;
-                            }
-                        }
-                        int16_t next = (cur < 0) ? ((dir > 0) ? (int16_t)0 : (int16_t)(count - 1))
-                                                 : (int16_t)((cur + count + dir) % count);
-                        if (MOX::_officer_id_list[next] > -1) {
-                            MOX::_officer_selected = (int8_t)MOX::_officer_id_list[next];
-                            MOX::_draw_officer_to_back = 1;
-                        }
-                    }
-                } else if (key > 0 && ((key & 0xFF) == 'i' || (key & 0xFF) == 'I') &&
-                           _officer_button_mode == -1) {
-                    // 'i' shows info for the hovered leader; otherwise for the
-                    // focused list's selection: the ship's detailed view
-                    // (like a right click on it) or the leader's skills.
-                    if (MOX::_officer_scanned > -1 ||
-                        (!(is_fleet && kbd_panel == 1) && MOX::_officer_selected > -1)) {
-                        int16_t info_leader = (MOX::_officer_scanned > -1)
-                                                  ? (int16_t)MOX::_officer_scanned
-                                                  : (int16_t)MOX::_officer_selected;
-                        for (int16_t slot = 0; slot < 4; ++slot) {
-                            if (MOX::_officer_id_list[slot] == info_leader) {
-                                Show_Leader_Skills_Dialog_(slot, info_leader);
-                                break;
-                            }
-                        }
-                    } else if (is_fleet && kbd_panel == 1 &&
-                               MOX::_offpop_big_icon_selected > -1) {
-                        int16_t info_ship = MOX::_fltscrn_big_icon[MOX::_offpop_big_icon_selected].ship_idx;
-                        if (info_ship > -1) {
-                            fields::Deactivate_Help_List_();
-                            CMBTDRW1::Detailed_View_Ship_(info_ship);
-                            EVANHELP::Set_Officer_Screen_Help_();
-                            MOX::_draw_officer_to_back = 1;
-                        }
-                    }
-                } else if (key == 0x1C0D && _officer_button_mode == -1 &&
-                           MOX::_officer_selected > -1) {
-                    // Enter clicks the selected leader's row. The selection is
-                    // cleared first so the click acts on the row (hire,
-                    // assign, ...) instead of toggling it off.
-                    for (int16_t slot = 0; slot < 4; ++slot) {
-                        if (MOX::_officer_id_list[slot] == (int16_t)MOX::_officer_selected &&
-                            big_icons_scanned[slot] > 0) {
-                            MOX::_officer_selected = -1;
-                            synth_input = big_icons_scanned[slot];
-                            break;
-                        }
-                    }
-                } else if (key != 0) {
-                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
-                }
-
-                // The mouse wheel presses the same buttons: vertical scrolls
-                // the fleet list ('-'/'+'), horizontal (or Shift + wheel)
-                // cycles the previous/next system (','/'.'), at a readable
-                // pace.
-                if (_officer_button_mode == -1) {
-                    int16_t wheel_v = platform::Consume_Mouse_Wheel_Steps_();
-                    int16_t wheel_h = platform::Consume_Mouse_Wheel_Steps_X_();
-                    if (wheel_v != 0 || wheel_h != 0) {
-                        uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
-                        if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
-                            last_wheel_ms = wheel_now_ms;
-                            if (wheel_v != 0) {
-                                key::Push_Key_Code_((uint32_t)((wheel_v > 0) ? '-' : '+'), g_last_scan_code);
-                            } else {
-                                key::Push_Key_Code_((uint32_t)((wheel_h > 0) ? '.' : ','), g_last_scan_code);
-                            }
-                        }
-                    }
-                }
+                synth_input = Read_Officers_Input_(&kbd, is_fleet, big_icons_scanned);
             }
 
             int16_t input = fields::Get_Input_();
@@ -1299,14 +1294,14 @@ namespace OFFICER {
                 // a hovered one; the last input wins — keyboard navigation
                 // takes the display until the pointer moves onto a new icon.
                 if (enhanced) {
-                    if (b_scanned_id != prev_hover_icon) {
+                    if (b_scanned_id != kbd.prev_hover_icon) {
                         if (b_scanned_id > -1) {
-                            kbd_name_wins = 0;
+                            kbd.name_wins = 0;
                         }
-                        prev_hover_icon = b_scanned_id;
+                        kbd.prev_hover_icon = b_scanned_id;
                     }
-                    if (kbd_panel == 1 && MOX::_offpop_big_icon_selected > -1 &&
-                        (kbd_name_wins != 0 || b_scanned_id == -1)) {
+                    if (kbd.panel == 1 && MOX::_offpop_big_icon_selected > -1 &&
+                        (kbd.name_wins != 0 || b_scanned_id == -1)) {
                         MOX::_scanned_big_ship = MOX::_offpop_big_icon_selected;
                     }
                 }
