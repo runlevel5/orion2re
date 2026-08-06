@@ -29,6 +29,9 @@ namespace NEWGAME {
 
     namespace {
 
+    // Enhancement: net-game-name input field id, for the 'R' rename hotkey.
+    int16_t _g_net_name_field_id = -1000;
+
         bool Show_Net_Game_Name() {
             return MOX::game_type == 2 || (MOX::game_type == 3 && NETMOX::net.mode == 1);
         }
@@ -113,7 +116,11 @@ namespace NEWGAME {
             // buttons from fields::down_mouse_button.
             if (enhanced) {
                 int32_t key = key::Read_Key();
-                if (key == 0x1C0D) { // Enter
+                if (key == 0x1C0D && fields::input_field_active != 0) {
+                    // While the net-game-name edit is active, Enter commits the
+                    // edit instead of pressing Accept.
+                    key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+                } else if (key == 0x1C0D) { // Enter
                     sound::Play_Sound(0x28);
                     fields::down_mouse_button = NEWGAME::fields[8];
                     fonts::Set_Font_Style(3, &NEWGAME::color_ken);
@@ -128,6 +135,17 @@ namespace NEWGAME {
                     timer::Mark_Time();
                     timer::Release_Time(1);
                     input = NEWGAME::fields[8];
+                } else if (key > 0 && ((key & 0xFF) == 'r' || (key & 0xFF) == 'R') &&
+                           fields::input_field_active == 0 &&
+                           _g_net_name_field_id > 0) {
+                    // 'R' starts editing the net game name, like clicking it.
+                    fields::input_field_active = 1;
+                    fields::cursor_position = 0;
+                    fields::cursor_on = 0;
+                    fields::active_input_field_number = NEWGAME::_g_net_name_field_id;
+                    strlcpy(fields::continuous_string, NETMOX::net.cur_game_name,
+                            sizeof(fields::continuous_string));
+                    fields::active_input_field_first = 1;
                 } else if (key != 0) {
                     key::Push_Key_Code((uint32_t)key, g_last_scan_code);
                 }
@@ -349,10 +367,11 @@ namespace NEWGAME {
         fields::Add_Radio_Button_Field(gx + 0x17C, gy + 0x14A, ESTRINGS::E_Strings(0x0C), anims[2], &xenon_attacks_button_variable, enhanced ? "8" : ESTRINGS::E_Strings(0x0C), 0x29);
         fields::Add_Radio_Button_Field(gx + 0x17C, gy + 0x103, ESTRINGS::E_Strings(0x0C), anims[1], (int16_t*)&combat_button_variable, enhanced ? "6" : ESTRINGS::E_Strings(0x0C), 0x29);
 
+        _g_net_name_field_id = -1000;
         if (Show_Net_Game_Name()) {
             Ensure_Settings_Net_Game_Name();
             strlcpy(NETMOX::net.cur_game_name, MOX::settings.net_game_name, sizeof(NETMOX::net.cur_game_name));
-            fields::Add_Continuous_String_Input_Field(gx + 0xE1, gy + 0x18A, 0xA8, 0x12, NETMOX::net.cur_game_name, 8, 0, 0, 0, 0);
+            _g_net_name_field_id = fields::Add_Continuous_String_Input_Field(gx + 0xE1, gy + 0x18A, 0xA8, 0x12, NETMOX::net.cur_game_name, 8, 0, 0, 0, 0);
         }
 
         // Accept and Cancel buttons
