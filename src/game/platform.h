@@ -61,6 +61,10 @@ namespace platform {
 	bool Create_Video_Buffers_(int16_t video_mode);
 	void __cdecl Service_Pending_Window_Events_();
 	void __cdecl Pump_Game_Input_Queue_();
+	// Returns and consumes whole accumulated mouse-wheel steps (positive = up).
+	int16_t __cdecl Consume_Mouse_Wheel_Steps_();
+	// Returns and consumes the number of middle-button clicks since last call.
+	int16_t __cdecl Consume_Middle_Clicks_();
 	int16_t __cdecl Get_Mouse_X_();
 	int16_t __cdecl Get_Mouse_Y_();
 	void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y);

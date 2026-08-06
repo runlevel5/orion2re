@@ -569,6 +569,13 @@
         { id: "default", title: "Default queue", description: "Queue number prefilled when assigning autobuild to a colony.", type: "uint8", constraints: { min: 0, max: 10 }, bind: ["default_preset"] },
       ],
     },
+    enhanced_ux_settings: {
+      title: "Experimental UX enhancement settings",
+      description: "Controls interface enhancements not present in the original game.",
+      fields: [
+        { id: "enabled", title: "Enabled", description: "Enables interface enhancements such as click-to-select in the Load Game list.", type: "bool", bind: ["enabled"] },
+      ],
+    },
     predefined_ship_weapon: {
       title: "Predefined ship weapon slot",
       description: "One of the eight weapon slots in a predefined ship design.",
@@ -982,6 +989,16 @@
         symbol: "BOARDING::_board_in_black_hole",
       },
       default: true,
+    },
+
+    enhanced_ux: {
+      title: "Experimental UX enhancements",
+      description: "Enables interface enhancements not present in the original game, such as click-to-select in the Load Game list.",
+      examples: ["enhanced_ux enabled = true;"],
+      group: "interface",
+      type: "enhanced_ux_settings",
+      bind_root: { header: "game/enhanced_ux.h", symbol: "ENHANCED_UX::enhanced_ux_settings" },
+      default: { enabled: false },
     },
 
     fighters_use_point_defense: {

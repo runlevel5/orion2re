@@ -64,6 +64,8 @@ namespace platform {
 		SDL_Condition* g_exit_condition;
 		SDL_AtomicInt g_exit_requested;
 		SDL_AtomicInt g_game_thread_exited;
+		SDL_AtomicInt g_mouse_wheel_accum; // hundredths of a wheel step
+		SDL_AtomicInt g_middle_click_count;
 		e_present_scaler g_present_scaler = PRESENT_SCALER_PIXELART;
 
 		void Present_Indexed_Buffer_(const uint8_t* src_pixels);
@@ -1120,8 +1122,27 @@ namespace platform {
                 continue;
             }
 
+            if (event.type == SDL_EVENT_MOUSE_WHEEL) {
+                float delta = event.wheel.y;
+                if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) {
+                    delta = -delta;
+                }
+                int32_t hundredths = (int32_t)SDL_lroundf(delta * 100.0f);
+                if (hundredths != 0) {
+                    SDL_AddAtomicInt(&g_mouse_wheel_accum, hundredths);
+                }
+                continue;
+            }
+
             if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
                 uint16_t mouse_buttons = g_sdl_mouse_buttons;
+
+                if (event.button.button == SDL_BUTTON_MIDDLE) {
+                    if (event.button.down) {
+                        SDL_AddAtomicInt(&g_middle_click_count, 1);
+                    }
+                    continue; // the legacy mouse state only knows left/right
+                }
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (event.button.down) {
@@ -1463,6 +1484,23 @@ namespace platform {
                 Queue_Key_Code_(event.key_code, event.scan_code);
             }
         }
+    }
+
+    int16_t __cdecl Consume_Mouse_Wheel_Steps_() {
+        int32_t accumulated = SDL_GetAtomicInt(&g_mouse_wheel_accum);
+        int32_t steps = accumulated / 100;
+        if (steps != 0) {
+            SDL_AddAtomicInt(&g_mouse_wheel_accum, -steps * 100);
+        }
+        return (int16_t)steps;
+    }
+
+    int16_t __cdecl Consume_Middle_Clicks_() {
+        int32_t clicks = SDL_GetAtomicInt(&g_middle_click_count);
+        if (clicks != 0) {
+            SDL_AddAtomicInt(&g_middle_click_count, -clicks);
+        }
+        return (int16_t)clicks;
     }
 
     void __cdecl Update_Cursor_Image_() {

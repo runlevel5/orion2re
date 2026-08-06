@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "enhanced_ux.h"
+
 namespace LOADSAVE {
     char _months[12][6];
 
@@ -18,6 +20,11 @@ namespace LOADSAVE {
     s_game_popup_fields* _game_popup_fields;
     uint8_t _loaded_new_game;
     uint8_t _loaded_debug_save;
+
+    // Enhancement: the Load Game dialog's remembered selection. Kept apart
+    // from MOX::_settings.active_save_slot because it may point at an empty
+    // slot, which the rest of the game must never see as the active slot.
+    static int8_t _enhanced_load_selection = -1;
 
     /**
      * @address 00511020
@@ -247,7 +254,12 @@ namespace LOADSAVE {
             fonts::Set_Font_Special_Colors_(&colors_special);
 
             for (int16_t i = 0; i < 10; ++i) {
-                if (MOX::_settings.active_save_slot == i) {
+                // Loadable slots only: the draw code matches empty-slot
+                // descriptions by string comparison, which embedded color
+                // codes would break (reachable once the active slot can be
+                // an empty row).
+                if (MOX::_settings.active_save_slot == i &&
+                    _game_popup_fields->slot_status[i] == 0) {
                     Embed_Special_Color_Codes_(MOX::_save_game_description[i].description, 0x25);
                 } else if (MOX::_save_game_description[i].description[0] == 0x03) {
                     Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
@@ -292,6 +304,47 @@ namespace LOADSAVE {
         _game_popup_fields->screen_cancel_field_id = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, "\x1B", ')');
     }
 
+    // Enhancement helper: highlights a slot as the pending load target.
+    // Embedded color codes only on loadable slots: the draw code matches
+    // empty-slot descriptions by string comparison, which the codes would
+    // break.
+    static void Select_Save_Slot_(int16_t slot) {
+        _enhanced_load_selection = static_cast<int8_t>(slot);
+        MOX::_settings.active_save_slot = static_cast<int8_t>(slot);
+        for (int16_t i = 0; i < 10; ++i) {
+            if (MOX::_settings.active_save_slot == i &&
+                _game_popup_fields->slot_status[i] == 0) {
+                Embed_Special_Color_Codes_(MOX::_save_game_description[i].description, 0x25);
+            } else if (MOX::_save_game_description[i].description[0] == 0x03) {
+                Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
+            }
+        }
+    }
+
+    // Enhancement helper: plays the LOAD button sound and shows the button
+    // pressed, then released, as a mouse click on it would, before a load
+    // triggered by Enter or a double click. Every page toggle repaints the
+    // buttons from _down_mouse_button (fields::Draw_Visible_Fields_), so the
+    // pressed state must be expressed through that variable rather than by
+    // drawing the pressed frame directly.
+    static void Animate_Load_Button_Press_() {
+        sound::Play_Sound_('(');
+
+        fields::_down_mouse_button = _game_popup_fields->btn_popup_load_id;
+        video::Set_Page_Off_();
+        fields::Invoke_Auto_Function_();
+        RUSS::Mox_Sync_Update_();
+        timer::Mark_Time_();
+        timer::Release_Time_(2);
+
+        fields::_down_mouse_button = -1;
+        video::Set_Page_Off_();
+        fields::Invoke_Auto_Function_();
+        RUSS::Mox_Sync_Update_();
+        timer::Mark_Time_();
+        timer::Release_Time_(1);
+    }
+
     /**
      * @address 0050e910
      */
@@ -313,6 +366,17 @@ namespace LOADSAVE {
         bool from_menu = (MOX::_current_screen == SCREEN_MAIN_MENU);
         _loaded_debug_save = 0;
 
+        int8_t entry_active_slot = MOX::_settings.active_save_slot;
+        int16_t last_clicked_slot = -1;
+        uint32_t last_click_ms = 0;
+        uint32_t last_wheel_ms = 0;
+        constexpr uint32_t DOUBLE_CLICK_MS = 500;
+        constexpr uint32_t WHEEL_STEP_MS = 120;
+
+        // Discard wheel movement and middle clicks from before the popup opened.
+        platform::Consume_Mouse_Wheel_Steps_();
+        platform::Consume_Middle_Clicks_();
+
         if (!from_menu) {
             EVANHELP::Set_Load_Game_Screen_Help_List_();
             fields::Clear_Fields_();
@@ -324,15 +388,97 @@ namespace LOADSAVE {
         Add_Game_Popup_Fields_(&unused1, &unused2);
         MOX::_global_var = 0;
 
+        // Enhancement: restore the remembered selection; fall back to the
+        // game's active slot, then to the top row.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled) {
+            int16_t initial_slot = _enhanced_load_selection;
+            if (initial_slot < 0 || initial_slot > 9) {
+                initial_slot = MOX::_settings.active_save_slot;
+            }
+            if (initial_slot < 0 || initial_slot > 9) {
+                initial_slot = 0;
+            }
+            Select_Save_Slot_(initial_slot);
+        }
+
         do {
             timer::Mark_Time_();
+
+            // Enhancement: Up/Down move the selection, Enter presses LOAD.
+            // The fields system swallows these keys, so peek at the keyboard
+            // buffer first and push back anything it should still handle.
+            int16_t key_nav = 0;
+            bool key_load = false;
+            if (ENHANCED_UX::enhanced_ux_settings.enabled) {
+                int32_t key = key::Read_Key_();
+                if (key == 0x48E0) { // Up arrow
+                    key_nav = -1;
+                } else if (key == 0x50E0) { // Down arrow
+                    key_nav = 1;
+                } else if (key == 0x1C0D) { // Enter
+                    key_load = true;
+                } else if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+
+                // Middle click activates LOAD, like Enter.
+                if (platform::Consume_Middle_Clicks_() != 0) {
+                    key_load = true;
+                }
+
+                // Mouse wheel moves the selection too, capped at one slot per
+                // WHEEL_STEP_MS so fast scrolling stays at a readable pace.
+                int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
+                if (wheel_steps != 0 && key_nav == 0) {
+                    uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
+                    if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
+                        last_wheel_ms = wheel_now_ms;
+                        key_nav = (wheel_steps > 0) ? -1 : 1;
+                    }
+                }
+            }
+            if (key_nav != 0) {
+                int16_t nav_slot = MOX::_settings.active_save_slot;
+                if (nav_slot < 0 || nav_slot > 9) {
+                    nav_slot = (key_nav > 0) ? 0 : 9;
+                } else {
+                    nav_slot = static_cast<int16_t>((nav_slot + 10 + key_nav) % 10);
+                }
+                Select_Save_Slot_(nav_slot);
+                sound::Play_Sound_(')'); // same sound as clicking a slot row
+            }
+
             int16_t input_id = fields::Get_Input_();
+            if (key_load) {
+                input_id = _game_popup_fields->btn_popup_load_id;
+                Animate_Load_Button_Press_();
+            }
             int16_t selected_slot = -1;
 
             for (int16_t i = 0; i < 10; ++i) {
                 if (_game_popup_fields->saved_game_fields[i] == input_id) {
                     selected_slot = i;
                     break;
+                }
+            }
+
+            // Enhancement (not in the original game): a single click on a slot
+            // only selects it; loading takes the LOAD button or a double click
+            // on the entry.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled && selected_slot != -1) {
+                uint32_t now_ms = (uint32_t)SDL_GetTicks();
+                bool is_double_click = (selected_slot == last_clicked_slot &&
+                                        now_ms - last_click_ms <= DOUBLE_CLICK_MS);
+                last_clicked_slot = selected_slot;
+                last_click_ms = now_ms;
+
+                if (is_double_click) {
+                    Animate_Load_Button_Press_();
+                } else {
+                    if (selected_slot != MOX::_settings.active_save_slot) {
+                        Select_Save_Slot_(selected_slot);
+                    }
+                    selected_slot = -1;
                 }
             }
 
@@ -398,6 +544,18 @@ namespace LOADSAVE {
                 timer::Release_Time_(1);
             }
         } while (exit_loop == 0);
+
+        // Enhancement: the dialog selection may sit on an empty slot; never
+        // leave that as the game's active save slot — quick save/load and the
+        // save dialog assume the active slot is occupied. The selection itself
+        // is remembered in _enhanced_load_selection.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled) {
+            int8_t active = MOX::_settings.active_save_slot;
+            if (active < 0 || active > 9 ||
+                _game_popup_fields->slot_status[active] != 0) {
+                MOX::_settings.active_save_slot = entry_active_slot;
+            }
+        }
 
         for (int i = 0; i < 10; ++i) {
             Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
