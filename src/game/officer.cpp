@@ -958,6 +958,10 @@ namespace OFFICER {
         constexpr uint32_t WHEEL_STEP_MS = 120;
         // Keyboard focus on the fleet view: 0 = officer list, 1 = ship list.
         uint8_t kbd_panel = 0;
+        // Last-input-wins state for the ship name display: set by keyboard
+        // navigation, cleared when the pointer moves onto a (new) icon.
+        uint8_t kbd_name_wins = 0;
+        int16_t prev_hover_icon = -1;
         if (enhanced) {
             platform::Consume_Mouse_Wheel_Steps_(); // discard pre-screen movement
             platform::Consume_Mouse_Wheel_Steps_X_();
@@ -1009,6 +1013,7 @@ namespace OFFICER {
                     // selection is kept (and scrolled into view).
                     kbd_panel = (uint8_t)(kbd_panel == 0 ? 1 : 0);
                     if (kbd_panel == 1) {
+                        kbd_name_wins = 1;
                         if (MOX::offpop_big_icon_selected < 0) {
                             Move_Fleet_Ship_Selection_(1);
                         } else {
@@ -1029,6 +1034,7 @@ namespace OFFICER {
                                  : (key == 0x4BE0) ? (int16_t)-1
                                                    : (int16_t)1;
                     Move_Fleet_Ship_Selection_(step);
+                    kbd_name_wins = 1;
                 } else if (key > 0 && (key & 0xFF) == '<' && officer_button_mode == -1) {
                     // '<'/'>' press the previous/next cycle buttons via their
                     // native ','/'.' hotkeys (arrows are reserved for list
@@ -1062,10 +1068,12 @@ namespace OFFICER {
                         }
                     }
                 } else if (key > 0 && ((key & 0xFF) == 'i' || (key & 0xFF) == 'I') &&
-                           officer_button_mode == -1 &&
-                           (MOX::officer_scanned > -1 || MOX::officer_selected > -1)) {
-                    // 'i' shows all skills of the hovered leader, or of the
-                    // selected one when the pointer is not on a row.
+                           officer_button_mode == -1) {
+                    // 'i' shows info for the hovered leader; otherwise for the
+                    // focused list's selection: the ship's detailed view
+                    // (like a right click on it) or the leader's skills.
+                    if (MOX::officer_scanned > -1 ||
+                        (!(is_fleet && kbd_panel == 1) && MOX::officer_selected > -1)) {
                     int16_t info_leader = (MOX::officer_scanned > -1)
                                               ? (int16_t)MOX::officer_scanned
                                               : (int16_t)MOX::officer_selected;
@@ -1073,6 +1081,16 @@ namespace OFFICER {
                         if (MOX::officer_id_list[slot] == info_leader) {
                             Show_Leader_Skills_Dialog_(slot, info_leader);
                             break;
+                        }
+                    }
+                    } else if (is_fleet && kbd_panel == 1 &&
+                               MOX::offpop_big_icon_selected > -1) {
+                        int16_t info_ship = MOX::fltscrn_big_icon[MOX::offpop_big_icon_selected].ship_idx;
+                        if (info_ship > -1) {
+                            fields::Deactivate_Help_List();
+                            CMBTDRW1::Detailed_View_Ship(info_ship);
+                            EVANHELP::Set_Officer_Screen_Help();
+                            MOX::draw_officer_to_back = 1;
                         }
                     }
                 } else if (key == 0x1C0D && officer_button_mode == -1 &&
@@ -1174,6 +1192,21 @@ namespace OFFICER {
                 int16_t b_idx;
                 uint32_t scan_res = Scan_Offscrn_Big_Icon_Fields(scanned_id, input, &b_scanned_id, &b_idx);
                 MOX::scanned_big_ship = b_scanned_id;
+                // Enhancement: the keyboard-selected ship shows its name like
+                // a hovered one; the last input wins — keyboard navigation
+                // takes the display until the pointer moves onto a new icon.
+                if (enhanced) {
+                    if (b_scanned_id != prev_hover_icon) {
+                        if (b_scanned_id > -1) {
+                            kbd_name_wins = 0;
+                        }
+                        prev_hover_icon = b_scanned_id;
+                    }
+                    if (kbd_panel == 1 && MOX::offpop_big_icon_selected > -1 &&
+                        (kbd_name_wins != 0 || b_scanned_id == -1)) {
+                        MOX::scanned_big_ship = MOX::offpop_big_icon_selected;
+                    }
+                }
                 if (b_scanned_id > -1) {
                     FLT1::Restore_Current_Fleet_Summary();
                 }
