@@ -33,7 +33,7 @@ Treat connection information already supplied in the conversation as valid input
 ## Environment constraints
 
 - The Orion2 binary open in Ghidra is a slightly different 1.40 version, not the exact executable used as the MOO2 1.50 patch base. It should be very close to that base, but this expected version difference must be recorded rather than treated as exact equivalence.
-- Do not build the project in WSL; WSL builds are too slow. After implementation and static checks, ask the user to build the project in Visual Studio and report the result.
+- Do not perform a full project build in WSL; WSL builds are too slow. CMake parser-code generation is a required exception when configuration variables are added. After implementation, generation, and static checks, ask the user to build the project in Visual Studio and report the result.
 
 ## Scope
 
@@ -129,6 +129,7 @@ Record:
 - expected original chunks (`cchunk`)
 - replacement chunks (`pchunk`)
 - added code/data and diversion targets
+- every configuration variable introduced by 1.50 for the selected topic, including its name, type, default value, parser metadata, and references
 - referenced `src/c/patch.c` functions
 - related later C fixes or history that materially change the final behavior
 
@@ -166,6 +167,7 @@ Explain:
 - the exact trigger or violated invariant
 - what each 1.50 edit changes
 - why all edits in the topic are needed
+- which configuration variables 1.50 adds and how each participates in the fix
 - whether the final MOO2150 C implementation supersedes an earlier assembly workaround
 - any observable behavior, save, network, or compatibility implications
 
@@ -189,7 +191,9 @@ Determine whether the selected fix is:
 - obsolete because the restored implementation removed the faulty mechanism
 - implemented differently but equivalently
 
-Prefer a root fix in the restored abstraction over binary-compatible instruction mimicry. Preserve original behavior outside the selected defect. Avoid importing patch-specific configuration, globals, hooks, or code caves when ordinary source logic is sufficient.
+Prefer a root fix in the restored abstraction over binary-compatible instruction mimicry. Preserve original behavior outside the selected defect. Avoid importing unrelated patch-specific configuration, globals, hooks, or code caves when ordinary source logic is sufficient.
+
+If 1.50 introduces configuration variables as part of the selected topic, restore every one of them through the project's configuration-variable definitions. Do not omit a variable merely because the main behavioral fix can be approximated without it. Preserve its proven name, type, default value, parser metadata, and use sites. If a configuration variable is genuinely unnecessary because the restored architecture represents the same setting elsewhere, treat that as a material implementation difference and obtain explicit approval during pre-apply review.
 
 Identify suitable existing tests. Add a regression test when the project already has an applicable test pattern and the defect can be reproduced deterministically.
 
@@ -204,7 +208,8 @@ Present the user with:
 3. Migration status in the restored source.
 4. A file-by-file implementation plan.
 5. Focused suggested diffs for every proposed source, test, and documentation edit.
-6. Assumptions, compatibility effects, and validation commands.
+6. When configuration variables will be added, the repository-defined CMake command or target that will regenerate the C++ parser, plus the expected generated outputs.
+7. Assumptions, compatibility effects, and validation commands.
 
 Before the suggested diffs, include two short implementation paragraphs:
 
@@ -222,11 +227,14 @@ Do not apply changes until the user clearly approves. Analysis requests, clarify
 After approval:
 
 - apply only the approved semantic changes
+- restore every approved 1.50-added configuration variable before regenerating parser code
+- after adding configuration variables, use the repository's CMake generation command or target to regenerate the C++ parser code; do not hand-edit generated parser files
+- inspect the generated changes and stop if they contain unrelated output or do not reflect the restored variables
 - retain existing project style and abstractions
 - avoid unrelated cleanup
 - add the approved regression tests
 - run formatting and static checks that do not build the project
-- do not run builds or compiled tests in WSL
+- do not run full builds or compiled tests in WSL; the required CMake parser-generation target is allowed
 - ask the user to build and run relevant tests in Visual Studio, and request the result
 
 If implementation requires a material departure from the approved diffs, stop and obtain approval for the revised proposal before continuing.
@@ -256,6 +264,8 @@ If the topic is absent from `docs/patches.md`, do not invent a duplicate topic a
 Before finishing:
 
 - run `git diff --check`
+- confirm every configuration variable added by 1.50 for the topic was restored with the correct definition and use sites
+- when configuration variables changed, confirm CMake regenerated the C++ parser code and that the generated output is current
 - run applicable non-build static checks and formatting in WSL
 - ask the user to run the relevant build and tests in Visual Studio; do not build in WSL
 - verify the catalog entry describes the implemented fix accurately
@@ -294,10 +304,12 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Every patch block in the topic inventoried.
 - [ ] Original locations and bytes/instructions verified.
 - [ ] Patched behavior reconstructed, including C implementation refinements.
+- [ ] Every configuration variable introduced by 1.50 for the selected topic inventoried and restored with its proven name, type, default, parser metadata, and use sites.
 - [ ] Current semantic source path analyzed.
 - [ ] Existing migration status determined.
 - [ ] Plan and focused suggested diffs shown before modification.
 - [ ] Explicit user approval received.
 - [ ] Approved source and tests implemented.
+- [ ] If configuration variables were added, CMake used to regenerate the C++ parser code and generated changes reviewed.
 - [ ] WSL static checks and `git diff --check` passed; Visual Studio build and test results requested from the user.
 - [ ] Matching `docs/patches.md` item completed with a short semantic descriptor.

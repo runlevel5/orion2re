@@ -10,6 +10,7 @@ out/
 /test-releases/
 /CMakeUserPresets.json
 /cmake/local-user.cmake
+/src/config/generated/
 build-*/
 Testing
 *.pyc
