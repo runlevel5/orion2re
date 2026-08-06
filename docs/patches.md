@@ -58,7 +58,7 @@ Sources:
 
 ### Scope and source of truth
 
-This catalog was generated from `C:\Projects\MOO2150\src\asm.pl`. The working copy inspected contains 344 active `topic(...)` declarations, from `asm.pl:29` through `asm.pl:19821`. The ordered `line:name` inventory has SHA-256 `0a744664c0abfc4f0bc601d4e4e8fc516d46f03895c37c8bea918927c625706f`.
+This catalog was generated from `asm.pl`. The working copy inspected contains 344 active `topic(...)` declarations, from `asm.pl:29` through `asm.pl:19821`. The ordered `line:name` inventory has SHA-256 `0a744664c0abfc4f0bc601d4e4e8fc516d46f03895c37c8bea918927c625706f`.
 
 `asm.pl` is authoritative even when a hook delegates its implementation to `src/c/patch.c`. Non-Lua C files were also inspected. Game-level C fixes are concentrated in `src/c/patch.c`; they normally extend an `asm.pl` topic and are cataloged under that parent rather than as duplicate patches. `src/c/lua`, `src/c/script.c`, Lua APIs, scripting support, generic runtime wrappers, build tooling, LBX substitution, and unrelated new features are out of backport scope.
 
@@ -92,7 +92,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1263` - `mutation unclickable picks`: fixed in `raceopt::Add_Race_Options_Fields_EM_()` by subtracting the current trait group's baseline cost when checking whether an evolutionary upgrade fits the pick budget; this replaces the 1.50 byte-level index correction with the equivalent direct source-level lookup.
 - [x] `asm.pl:1281` - `tolerant races maintenance bug`: fixed in `COLCALC::Compute_Potential_Colony_Info_()` by always reporting the planet climate's maintenance modifier, including for Tolerant races; this directly expresses the 1.50 removal of the trait-based popup skip.
 - [x] `asm.pl:1290` - `telepath skill level is 1 too low bug`: fixed in `spy::Compute_Spy_Bonuses_()` by converting the zero-based officer level to the leader's actual level before applying regular and improved Telepath multipliers; this directly expresses the two 1.50 instruction-level increments in source.
-- [ ] `asm.pl:1306` - `ordinary assasin skill works`
+- [x] `asm.pl:1306` - `ordinary assasin skill works`: fixed in `spy::Resolve_Assassins_()` by testing the ordinary Assassin skill in the fallback branch and applying its `(level + 1) * 2` assassination chance; this directly expresses the 1.50 one-byte skill-mask correction in source.
 - [ ] `asm.pl:1315` - `navigator skill display bug`
 - [ ] `asm.pl:1368` - `AI fighters size`
 - [ ] `asm.pl:1377` - `filter boarding for stasis, bhg`

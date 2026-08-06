@@ -148,17 +148,13 @@ namespace spy {
                 // player_index != -1 and status is active (0) or assigned (1)
                 if (leader->player_index != -1 && (leader->status == 0 || leader->status == 1)) {
                     int32_t chance = 0;
-                    uint32_t skill_bit = leader->general_skills & LEADER_GENERAL_SKILL_ASSASSIN2;
 
-                    if (skill_bit != 0) {
+                    if ((leader->general_skills & LEADER_GENERAL_SKILL_ASSASSIN2) != 0) {
                         int32_t leader_idx = (int32_t)(leader - MOX::_leaders);
                         chance = OFFICER::Owned_Officer_Level_(leader_idx) * 3 + 3;
-                    } else {
-                        // BUG: This block is unreachable in the binary because skill_bit was just confirmed to be 0
-                        if (skill_bit != 0) {
-                            int32_t leader_idx = (int32_t)(leader - MOX::_leaders);
-                            chance = OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
-                        }
+                    } else if ((leader->general_skills & LEADER_GENERAL_SKILL_ASSASSIN) != 0) {
+                        int32_t leader_idx = (int32_t)(leader - MOX::_leaders);
+                        chance = OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
                     }
 
                     if (chance != 0) {
