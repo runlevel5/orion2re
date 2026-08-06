@@ -481,6 +481,12 @@ namespace fields {
     int16_t __cdecl Activate_Field_Hotkey_(char hotkey);
 
     /**
+     * Enhancement: registers the screen's scroll bar so the mouse wheel
+     * drives it from the input poll. Cleared by Clear_Fields_.
+     */
+    void __cdecl Set_Wheel_Scroll_Bar_(s_scroll_bar* bar);
+
+    /**
      * Enhancement: puts a continuous string input field into editing mode
      * with the given initial text, as clicking it would.
      */

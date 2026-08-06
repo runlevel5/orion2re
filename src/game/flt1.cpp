@@ -577,9 +577,8 @@ namespace FLT1 {
         ERIC::Fast_Fade_In_();
         fields::Enable_Draw_All_Fields_();
 
-        // Enhancement: wheel-scroll pacing state.
-        uint32_t last_wheel_ms = 0;
-        constexpr uint32_t WHEEL_STEP_MS = 120;
+        // Enhancement: the wheel scrolls the ship list via the input poll's
+        // generic scroll-bar handling (fields::Get_Input_).
         if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
             platform::Discard_Input_Observations_();
         }
@@ -739,23 +738,6 @@ namespace FLT1 {
                 SCROLL::Scroll_Down_One_Item_(MOX::_scroll_bar);
             } else if (input == btn_scroll_up) {
                 SCROLL::Scroll_Up_One_Item_(MOX::_scroll_bar);
-            }
-
-            // Enhancement: the mouse wheel scrolls the ship list, capped at
-            // one row per WHEEL_STEP_MS for a readable pace.
-            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
-                int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
-                if (wheel_steps != 0) {
-                    uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
-                    if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
-                        last_wheel_ms = wheel_now_ms;
-                        if (wheel_steps > 0) {
-                            SCROLL::Scroll_Up_One_Item_(MOX::_scroll_bar);
-                        } else {
-                            SCROLL::Scroll_Down_One_Item_(MOX::_scroll_bar);
-                        }
-                    }
-                }
             }
 
             if (input == btn_relocate && _relocate_button_mode != 2) {
@@ -1243,6 +1225,12 @@ namespace FLT1 {
 
         MOX::_scroll_bar->dn_btn = *down_scroll_button_field_id;
         MOX::_scroll_bar->up_btn = *up_scroll_button_field_id;
+
+        // Enhancement: the wheel drives this bar via the input poll.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+            *up_scroll_button_field_id > 0) {
+            fields::Set_Wheel_Scroll_Bar_(MOX::_scroll_bar);
+        }
 
         if (FLT1::_relocate_button_mode == 2) {
             FLT1::_relocate_button_mode = 2;

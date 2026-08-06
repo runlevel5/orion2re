@@ -1103,20 +1103,16 @@ namespace OFFICER {
             key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
         }
 
-        // The wheel presses the same buttons: vertical the scroll bar,
-        // horizontal (or Shift + wheel) the previous/next cycle.
+        // The horizontal wheel (or Shift + wheel) presses the previous/next
+        // cycle buttons; the vertical wheel is handled generically by the
+        // input poll (fields::Get_Input_).
         if (_officer_button_mode == -1 && synth_input == 0) {
-            int16_t wheel_v = platform::Consume_Mouse_Wheel_Steps_();
             int16_t wheel_h = platform::Consume_Mouse_Wheel_Steps_X_();
-            if (wheel_v != 0 || wheel_h != 0) {
+            if (wheel_h != 0) {
                 uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
                 if (wheel_now_ms - kbd->last_wheel_ms >= WHEEL_STEP_MS) {
                     kbd->last_wheel_ms = wheel_now_ms;
-                    if (wheel_v != 0) {
-                        synth_input = fields::Activate_Field_Hotkey_((wheel_v > 0) ? '-' : '+');
-                    } else {
-                        synth_input = fields::Activate_Field_Hotkey_((wheel_h > 0) ? '.' : ',');
-                    }
+                    synth_input = fields::Activate_Field_Hotkey_((wheel_h > 0) ? '.' : ',');
                 }
             }
         }
@@ -3251,6 +3247,11 @@ namespace OFFICER {
 
         MOX::_scroll_bar->up_btn = *up_btn;
         MOX::_scroll_bar->dn_btn = *dn_btn;
+
+        // Enhancement: the wheel drives this bar via the input poll.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && *up_btn > 0) {
+            fields::Set_Wheel_Scroll_Bar_(MOX::_scroll_bar);
+        }
 
         *next_btn = fields::Add_Button_Field_(
             0x238, 
