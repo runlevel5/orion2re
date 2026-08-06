@@ -204,6 +204,9 @@ namespace fields {
         Reset_Mouse_Wheel_Input();
     }
 
+    static int16_t Scroll_With_Wheel_();
+    static s_scroll_bar* _wheel_scroll_bar = nullptr;
+
     int16_t __cdecl Get_Input() {
         platform::Check_Exit();
 
@@ -220,7 +223,13 @@ namespace fields {
             return 0;
         }
 
-        int16_t input_result = Interpret_Mouse_Input();
+        int16_t input_result = 0;
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            input_result = Scroll_With_Wheel_();
+        }
+        if (input_result == 0) {
+            input_result = Interpret_Mouse_Input();
+        }
         video::Set_Page_Off();
 
         if (input_result != 0) {
@@ -234,6 +243,7 @@ namespace fields {
     }
 
     void __cdecl Clear_Fields() {
+        _wheel_scroll_bar = nullptr;
         fields_count = 1;
         input_delay = 0;
         down_mouse_button = -1;
@@ -2143,11 +2153,38 @@ namespace fields {
         graphics::Set_Window(x1, y1, x2, y2);
     }
 
-    // Enhancement: activates the field bound to the given hotkey character
-    // exactly as the native hotkey path does — pressed-state draw, the
-    // field's click sound, radio/locked toggling — and returns its id (0 if
-    // no field matches). Lets callers bind extra keys to existing buttons
-    // without injecting synthetic key presses.
+    // Enhancement helper: activates a field exactly as the native hotkey
+    // path does — pressed-state draw, radio/locked toggling — and returns
+    // its id (the caller plays the field sound). Returns 0 for scroll bars.
+    static int16_t Do_Activate_Field_(int16_t field_idx) {
+        int16_t field_type = fields[field_idx].field_type;
+        if (field_type == FIELD_TYPE_SCROLL) {
+            return 0;
+        }
+        Push_Field_Down(field_idx, mouse::Pointer_X(), mouse::Pointer_Y());
+        if (field_type == FIELD_TYPE_RADIO) {
+            s_field_radio* radio = Field_Data_Radio(&fields[field_idx]);
+            *radio->selection = (*radio->selection == 0) ? 1 : 0;
+        } else if (field_type == FIELD_TYPE_LOCKED) {
+            s_field_locked* locked = Field_Data_Locked_Button(&fields[field_idx]);
+            if (*locked->selection == 0) {
+                *locked->selection = 1;
+            }
+        } else if (field_type == FIELD_TYPE_SCROLL_RETURN) {
+            down_mouse_button = -1;
+            return Field_Data_Scroll(&fields[field_idx])->return_value;
+        }
+        if (field_type != FIELD_TYPE_HIDDEN && field_type != FIELD_TYPE_MULTI_HOTKEY) {
+            Quick_Call_Auto_Function();
+        }
+        down_mouse_button = -1;
+        return field_idx;
+    }
+
+    // Enhancement: activates the field bound to the given hotkey character,
+    // with its click sound, and returns its id (0 if no field matches). Lets
+    // callers bind extra keys to existing buttons without injecting
+    // synthetic key presses.
     int16_t __cdecl Activate_Field_Hotkey_(char hotkey) {
         int16_t hotkey_char = (int16_t)(uint8_t)hotkey;
         if (hotkey_char > 0x60 && hotkey_char < 0x7B) {
@@ -2157,29 +2194,55 @@ namespace fields {
             if (active_input_field_number != -1 || fields[i].hotkey != hotkey_char) {
                 continue;
             }
-            int16_t field_type = fields[i].field_type;
-            if (field_type == FIELD_TYPE_SCROLL) {
+            int16_t result = Do_Activate_Field_(i);
+            if (result != 0) {
+                sound::Play_Sound(fields[i].sound);
+            }
+            return result;
+        }
                 return 0;
             }
-            Push_Field_Down(i, mouse::Pointer_X(), mouse::Pointer_Y());
-            if (field_type == FIELD_TYPE_RADIO) {
-                s_field_radio* radio = Field_Data_Radio(&fields[i]);
-                *radio->selection = (*radio->selection == 0) ? 1 : 0;
-            } else if (field_type == FIELD_TYPE_LOCKED) {
-                s_field_locked* locked = Field_Data_Locked_Button(&fields[i]);
-                if (*locked->selection == 0) {
-                    *locked->selection = 1;
+
+    // Enhancement: the wheel drives the screen's scroll bar from the input
+    // poll — one step per 120ms — by activating the up/down button of the
+    // registered SCROLL-module bar, or stepping a scroll field directly.
+    // Registration is cleared with the fields (Clear_Fields), so a bar can
+    // never go stale across screens. Screens that consume the wheel before
+    // polling are unaffected.
+    static uint32_t _wheel_scroll_last_ms = 0;
+
+    void __cdecl Set_Wheel_Scroll_Bar_(s_scroll_bar* bar) {
+        _wheel_scroll_bar = bar;
                 }
-            } else if (field_type == FIELD_TYPE_SCROLL_RETURN) {
-                down_mouse_button = -1;
-                return Field_Data_Scroll(&fields[i])->return_value;
+
+    static int16_t Scroll_With_Wheel_() {
+        int16_t steps = platform::Consume_Mouse_Wheel_Steps_();
+        if (steps == 0) {
+            return 0;
             }
-            if (field_type != FIELD_TYPE_HIDDEN && field_type != FIELD_TYPE_MULTI_HOTKEY) {
-                Quick_Call_Auto_Function();
+        uint32_t now_ms = (uint32_t)SDL_GetTicks();
+        if (now_ms - _wheel_scroll_last_ms < 120) {
+            return 0;
+        }
+        if (_wheel_scroll_bar != nullptr) {
+            int16_t btn = (steps > 0) ? _wheel_scroll_bar->up_btn : _wheel_scroll_bar->dn_btn;
+            if (btn > 0 && btn < fields_count && fields[btn].field_type == FIELD_TYPE_BUTTON) {
+                _wheel_scroll_last_ms = now_ms;
+                return Do_Activate_Field_(btn);
+            }
+            return 0;
+        }
+        for (int16_t i = 1; i < fields_count; ++i) {
+            if (fields[i].field_type == FIELD_TYPE_SCROLL) {
+                _wheel_scroll_last_ms = now_ms;
+                if (steps > 0) {
+                    Decrement_Scroll_Bar(i);
+                } else {
+                    Increment_Scroll_Bar(i);
             }
             down_mouse_button = -1;
-            sound::Play_Sound(fields[i].sound);
             return i;
+        }
         }
         return 0;
     }
