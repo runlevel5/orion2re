@@ -31,6 +31,22 @@ namespace FAKEBUTS {
         }
     }
 
+    // Enhancement: cycles the click-thru field matching the given field id
+    // (either its own or its linked field) by direction, wrapping. Returns 1
+    // when one matched.
+    uint8_t __cdecl Cycle_Click_Thru_Field_(int16_t field_id, int16_t direction) {
+        for (int16_t i = 0; i < _n_click_thru_fields; ++i) {
+            if (_click_thru_fields[i].field_id1 == field_id ||
+                _click_thru_fields[i].field_id2 == field_id) {
+                int16_t count = _click_thru_fields[i].state_count;
+                *_click_thru_fields[i].value =
+                    (int16_t)((*_click_thru_fields[i].value + count + direction) % count);
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     void __cdecl Draw_Click_Thru_Fields_() {
         if (_n_click_thru_fields != 0) {
             for (int16_t i = 0; i < _n_click_thru_fields; ++i) {

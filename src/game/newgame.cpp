@@ -88,9 +88,29 @@ int16_t __cdecl Newgame_Screen_(void) {
     mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
     const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+    uint32_t last_wheel_ms = 0;
+    constexpr uint32_t WHEEL_STEP_MS = 120;
+    if (enhanced) {
+        platform::Consume_Mouse_Wheel_Steps_(); // discard pre-screen movement
+    }
 
     while (!exit_screen) {
         int16_t input = 0;
+
+        // Enhancement: the mouse wheel cycles the option under the cursor
+        // (wheel down = forward, wheel up = backward), at a readable pace.
+        if (enhanced) {
+            int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
+            if (wheel_steps != 0) {
+                uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
+                if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
+                    last_wheel_ms = wheel_now_ms;
+                    FAKEBUTS::Cycle_Click_Thru_Field_(
+                        fields::Scan_Input_(),
+                        (wheel_steps > 0) ? (int16_t)-1 : (int16_t)1);
+                }
+            }
+        }
 
         // Enhancement: Enter is reserved for the Accept button — consumed
         // here so it can no longer activate whatever the mouse hovers — and

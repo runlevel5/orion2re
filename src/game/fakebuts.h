@@ -46,6 +46,12 @@ namespace FAKEBUTS {
     // Advances the selected state for click-through fields triggered by the given field ID.
     void __cdecl Evaluate_Click_Thru_Fields_(int16_t activated_field_id);
 
+    /**
+     * Enhancement: cycles the click-thru field matching the given field id
+     * (own or linked) by direction, wrapping. Returns 1 when one matched.
+     */
+    uint8_t __cdecl Cycle_Click_Thru_Field_(int16_t field_id, int16_t direction);
+
     // Draws registered click-through fields using their current string state.
     void __cdecl Draw_Click_Thru_Fields_();
 
