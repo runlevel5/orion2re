@@ -1125,7 +1125,7 @@ namespace diplomac {
             }
 
             if (final_change != 0) {
-                int new_rel = MOX::_player[p_b].relations[p_a] + (int8_t)final_change;
+                int new_rel = MOX::_player[p_b].relations[p_a] + final_change;
                 if (new_rel < -100) new_rel = -100;
                 if (new_rel > 100) new_rel = 100;
                 MOX::_player[p_b].relations[p_a] = (int8_t)new_rel;
