@@ -65,6 +65,13 @@ namespace platform {
 	int16_t __cdecl Consume_Mouse_Wheel_Steps_();
 	// Returns and consumes the number of middle-button clicks since last call.
 	int16_t __cdecl Consume_Middle_Clicks_();
+
+	constexpr uint8_t ARROW_KEY_UP = 1;
+	constexpr uint8_t ARROW_KEY_DOWN = 2;
+	constexpr uint8_t ARROW_KEY_LEFT = 4;
+	constexpr uint8_t ARROW_KEY_RIGHT = 8;
+	// Returns the ARROW_KEY_* bits of the arrow keys currently held down.
+	uint8_t __cdecl Arrow_Keys_Held_();
 	int16_t __cdecl Get_Mouse_X_();
 	int16_t __cdecl Get_Mouse_Y_();
 	void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y);
