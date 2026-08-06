@@ -98,6 +98,34 @@ namespace TURNSUM {
         _g_turn_sum_header.group_colors[0] = &_turn_sum_normal_color;
     }
 
+    // Enhancement helper: keyboard input for the popup. Up/Down move the
+    // selection (flipping pages at the edges, setting *kbd_page_flip for the
+    // landing). Returns the list field to activate for Enter, -1 when a page
+    // flip needs the fields rebuilt, or 0.
+    static int16_t Read_Popup_Nav_Keys_(int16_t* kbd_page_flip) {
+        int32_t nav_key = key::Read_Key_();
+        if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+            int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+            if (LIST::Selection_At_Page_Edge_(&_g_turn_sum_header, nav_dir, 1)) {
+                int8_t page_flipped = (nav_dir > 0)
+                                          ? LIST::Next_List_Page_(&_g_turn_sum_header)
+                                          : LIST::Previous_List_Page_(&_g_turn_sum_header);
+                if (page_flipped != 0) {
+                    *kbd_page_flip = (nav_dir > 0) ? (int16_t)1 : (int16_t)2;
+                    return -1;
+                }
+            }
+            _g_selected_msg_p = LIST::Move_List_Selection_(&_g_turn_sum_header, nav_dir, 1);
+        } else if (nav_key == 0x1C0D) { // Enter opens the selection
+            if (_g_selected_msg_p != nullptr) {
+                return INFO::_g_first_list_field;
+            }
+        } else if (nav_key != 0) {
+            key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+        }
+        return 0;
+    }
+
     void __cdecl Turn_Summary_Popup_()
     {
         int16_t num_msgs;
@@ -200,39 +228,14 @@ namespace TURNSUM {
 
                 while (true)
                 {
-                    // Enhancement: Up/Down move through the messages (flipping
-                    // pages at the edges), Enter opens the selected one like a
-                    // click on it.
+                    // Enhancement: keyboard navigation and activation.
                     int16_t input_field = 0;
                     if (enhanced)
                     {
-                        int32_t nav_key = key::Read_Key_();
-                        if (nav_key == 0x48E0 || nav_key == 0x50E0) // Up/Down
+                        input_field = Read_Popup_Nav_Keys_(&kbd_page_flip);
+                        if (input_field < 0)
                         {
-                            int16_t nav_dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
-                            if (LIST::Selection_At_Page_Edge_(&_g_turn_sum_header, nav_dir, 1))
-                            {
-                                int8_t page_flipped = (nav_dir > 0)
-                                                          ? LIST::Next_List_Page_(&_g_turn_sum_header)
-                                                          : LIST::Previous_List_Page_(&_g_turn_sum_header);
-                                if (page_flipped != 0)
-                                {
-                                    kbd_page_flip = (nav_dir > 0) ? (int16_t)1 : (int16_t)2;
-                                    break;
-                                }
-                            }
-                            _g_selected_msg_p = LIST::Move_List_Selection_(&_g_turn_sum_header, nav_dir, 1);
-                        }
-                        else if (nav_key == 0x1C0D) // Enter
-                        {
-                            if (_g_selected_msg_p != nullptr)
-                            {
-                                input_field = INFO::_g_first_list_field;
-                            }
-                        }
-                        else if (nav_key != 0)
-                        {
-                            key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+                            break; // page flipped; rebuild the list fields
                         }
                     }
 

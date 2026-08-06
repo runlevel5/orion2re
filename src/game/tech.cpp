@@ -108,6 +108,62 @@ namespace TECH {
         &_tech_color[2],
     };
 
+    // Enhancement helper: keyboard input for the research select screen.
+    // Tab cycles the research boxes, Up/Down move within one, 'i' shows the
+    // highlighted tech's description. Returns the commit field for Enter,
+    // -1 when the screen needs a redraw, or 0. Other keys go back to the
+    // fields system.
+    static int16_t Read_Tech_Select_Nav_(s_list_item_research* entries) {
+        int32_t nav_key = key::Read_Key_();
+        if (nav_key == 0) {
+            return 0;
+        }
+        int16_t nav_char = (int16_t)(nav_key & 0xFF);
+        s_list_item_research* sel = Get_Selected_Entry_(entries);
+        if (nav_key == 0x0F09) { // Tab
+            int16_t start_idx = (sel != nullptr) ? (int16_t)(sel - entries) : (int16_t)-1;
+            for (int16_t off = 1; off <= 8; ++off) {
+                int16_t idx = (int16_t)((start_idx + off + 8) % 8);
+                if (entries[idx].tech_field_id != 0 && entries[idx].visible_app_count > 0) {
+                    for (int16_t k = 0; k < 8; ++k) {
+                        entries[k].current_app_index = 0;
+                    }
+                    entries[idx].current_app_index = 1;
+                    entries[idx].selected_app_index = 0;
+                    break;
+                }
+            }
+            _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X_();
+            _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y_();
+        } else if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
+            if (sel != nullptr && sel->visible_app_count > 0) {
+                int16_t dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+                sel->selected_app_index = (int16_t)(
+                    (sel->selected_app_index + sel->visible_app_count + dir) %
+                    sel->visible_app_count);
+            }
+            _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X_();
+            _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y_();
+        } else if (nav_key == 0x1C0D) { // Enter
+            if (sel != nullptr && sel->app_ids[sel->selected_app_index] != 0) {
+                return _g_first_tech_field;
+            }
+        } else if (nav_char == 'i' || nav_char == 'I') {
+            if (sel != nullptr) {
+                int16_t info_app_id = sel->app_ids[sel->selected_app_index];
+                if (info_app_id != 0) {
+                    _g_selected_entry_p = sel;
+                    Display_Selected_Entry_Text_(sel);
+                    Draw_Application_Description_(0x119, info_app_id);
+                    return -1;
+                }
+            }
+        } else {
+            key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+        }
+        return 0;
+    }
+
     void __cdecl Tech_Select_() {
         void* animation_buffer;
 
@@ -344,57 +400,13 @@ namespace TECH {
                     JIM::Play_Streaming_Music_(0x75, -2, 1);
                 }
 
-                // Enhancement: keyboard navigation — Tab cycles the research
-                // boxes, Up/Down move within a box, Enter picks the
-                // highlighted tech, and 'i' shows its description.
+                // Enhancement: keyboard navigation and activation.
                 int16_t synth_commit = 0;
                 if (enhanced) {
-                    int32_t nav_key = key::Read_Key_();
-                    if (nav_key != 0) {
-                        int16_t nav_char = (int16_t)(nav_key & 0xFF);
-                        s_list_item_research* sel = Get_Selected_Entry_(entries);
-                        if (nav_key == 0x0F09) { // Tab
-                            int16_t start_idx = (sel != nullptr) ? (int16_t)(sel - entries) : (int16_t)-1;
-                            for (int16_t off = 1; off <= 8; ++off) {
-                                int16_t idx = (int16_t)((start_idx + off + 8) % 8);
-                                if (entries[idx].tech_field_id != 0 && entries[idx].visible_app_count > 0) {
-                                    for (int16_t k = 0; k < 8; ++k) {
-                                        entries[k].current_app_index = 0;
-                                    }
-                                    entries[idx].current_app_index = 1;
-                                    entries[idx].selected_app_index = 0;
-                                    break;
-                                }
-                            }
-                            _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X_();
-                            _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y_();
-                        } else if (nav_key == 0x48E0 || nav_key == 0x50E0) { // Up/Down
-                            if (sel != nullptr && sel->visible_app_count > 0) {
-                                int16_t dir = (nav_key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
-                                sel->selected_app_index = (int16_t)(
-                                    (sel->selected_app_index + sel->visible_app_count + dir) %
-                                    sel->visible_app_count);
-                            }
-                            _g_kbd_nav_mouse_x = (int16_t)mouse::Pointer_X_();
-                            _g_kbd_nav_mouse_y = (int16_t)mouse::Pointer_Y_();
-                        } else if (nav_key == 0x1C0D) { // Enter
-                            if (sel != nullptr && sel->app_ids[sel->selected_app_index] != 0) {
-                                synth_commit = _g_first_tech_field;
-                            }
-                        } else if (nav_char == 'i' || nav_char == 'I') { // info
-                            if (sel != nullptr) {
-                                int16_t info_app_id = sel->app_ids[sel->selected_app_index];
-                                if (info_app_id != 0) {
-                                    _g_selected_entry_p = sel;
-                                    Display_Selected_Entry_Text_(sel);
-                                    Draw_Application_Description_(0x119, info_app_id);
-                                    redraw = true;
-                                    break;
-                                }
-                            }
-                        } else {
-                            key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
-                        }
+                    synth_commit = Read_Tech_Select_Nav_(entries);
+                    if (synth_commit < 0) {
+                        redraw = true;
+                        break;
                     }
                 }
 

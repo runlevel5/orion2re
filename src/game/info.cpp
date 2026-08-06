@@ -1882,6 +1882,130 @@ namespace INFO {
         }
     }
 
+    // Enhancement: single-highlight state for the Reference main page.
+    // Exactly one entry is highlighted at any time, owned by whichever input
+    // acted last: Up/Down move within a column, Left/Right jump between the
+    // Categories and How To? columns, and the mouse takes over when it moves
+    // onto an entry. Released highlights are erased in the normal color for
+    // two frames so both flip pages are cleaned.
+    struct s_reference_highlight {
+        int16_t cur_col = -1; // 0 = Categories, 1 = How To?
+        int16_t cur_row = 0;
+        int16_t prev_ptr_x = 0;
+        int16_t prev_ptr_y = 0;
+        int16_t font_style = 4;
+        s_colors* high_color = nullptr;
+        int16_t category_count = 0;
+        int16_t record_count = 0;
+        char (*category_strs)[48] = nullptr;
+        char (*how_to_strs)[48] = nullptr;
+        struct {
+            int16_t col = -1;
+            int16_t row = 0;
+            uint8_t frames = 0;
+        } erase_slots[2];
+    };
+
+    // Enhancement helper: per-frame update and painting of the highlight.
+    // Returns the field to activate when Enter opens the highlight, else 0.
+    static int16_t Update_Reference_Highlight_(s_reference_highlight* hl) {
+        int16_t synth_input = 0;
+
+        // Map the current hover to an entry, if any.
+        int16_t hover_field = fields::Scan_Input_();
+        int16_t hover_col = -1;
+        int16_t hover_row = 0;
+        if (hover_field >= INFO::_g_first_how_to_field &&
+            hover_field < (int16_t)(INFO::_g_first_how_to_field + hl->record_count)) {
+            hover_col = 1;
+            hover_row = (int16_t)(hover_field - INFO::_g_first_how_to_field);
+        } else if (hover_field >= INFO::_g_first_category_field &&
+                   hover_field < (int16_t)(INFO::_g_first_category_field + hl->category_count)) {
+            hover_col = 0;
+            hover_row = (int16_t)(hover_field - INFO::_g_first_category_field);
+        }
+
+        int16_t new_col = hl->cur_col;
+        int16_t new_row = hl->cur_row;
+
+        // Mouse wins when it moves onto an entry.
+        int16_t ptr_x = (int16_t)mouse::Pointer_X_();
+        int16_t ptr_y = (int16_t)mouse::Pointer_Y_();
+        bool mouse_moved = (ptr_x != hl->prev_ptr_x || ptr_y != hl->prev_ptr_y);
+        hl->prev_ptr_x = ptr_x;
+        hl->prev_ptr_y = ptr_y;
+        if (mouse_moved && hover_col >= 0) {
+            new_col = hover_col;
+            new_row = hover_row;
+        }
+
+        // Keyboard wins when a key is pressed, from the current highlight.
+        int32_t nav_key = key::Read_Key_();
+        if (nav_key != 0) {
+            int16_t col = (new_col >= 0) ? new_col : (int16_t)0;
+            int16_t row = (new_col >= 0) ? new_row : (int16_t)0;
+            int16_t col_count = (col == 0) ? hl->category_count : hl->record_count;
+            if (nav_key == 0x48E0 && col_count > 0) { // Up
+                new_col = col;
+                new_row = (int16_t)((row + col_count - 1) % col_count);
+            } else if (nav_key == 0x50E0 && col_count > 0) { // Down
+                new_col = col;
+                new_row = (int16_t)((row + 1) % col_count);
+            } else if (nav_key == 0x4BE0 || nav_key == 0x4DE0) { // Left/Right
+                int16_t other_col = (int16_t)(1 - col);
+                int16_t other_count = (other_col == 0) ? hl->category_count : hl->record_count;
+                if (other_count > 0) {
+                    new_col = other_col;
+                    new_row = (row < other_count) ? row : (int16_t)(other_count - 1);
+                }
+            } else if (nav_key == 0x1C0D) { // Enter opens the highlight
+                if (new_col >= 0) {
+                    synth_input = (new_col == 0)
+                                      ? (int16_t)(INFO::_g_first_category_field + new_row)
+                                      : (int16_t)(INFO::_g_first_how_to_field + new_row);
+                }
+            } else {
+                key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+            }
+        }
+
+        // Highlight moved: queue an erase of the old entry.
+        if ((new_col != hl->cur_col || new_row != hl->cur_row) && hl->cur_col >= 0) {
+            auto* slot = (hl->erase_slots[0].frames == 0) ? &hl->erase_slots[0]
+                                                          : &hl->erase_slots[1];
+            slot->col = hl->cur_col;
+            slot->row = hl->cur_row;
+            slot->frames = 2;
+        }
+        hl->cur_col = new_col;
+        hl->cur_row = new_row;
+
+        // Per-frame painting: erases first, then the live highlight.
+        for (int slot_ix = 0; slot_ix < 2; ++slot_ix) {
+            auto* slot = &hl->erase_slots[slot_ix];
+            if (slot->frames > 0 && slot->col >= 0 &&
+                !(slot->col == hl->cur_col && slot->row == hl->cur_row)) {
+                fonts::Set_Font_Style_(hl->font_style, &INFO::_info_normal_color);
+                if (slot->col == 0) {
+                    fonts::Print_(0xdd, (slot->row + 5) * 20, hl->category_strs[slot->row]);
+                } else {
+                    fonts::Print_(0x1a5, (slot->row + 5) * 20, hl->how_to_strs[slot->row]);
+                }
+                slot->frames--;
+            }
+        }
+        if (hl->cur_col >= 0) {
+            fonts::Set_Font_Style_(hl->font_style, hl->high_color);
+            if (hl->cur_col == 0) {
+                fonts::Print_(0xdd, (hl->cur_row + 5) * 20, hl->category_strs[hl->cur_row]);
+            } else {
+                fonts::Print_(0x1a5, (hl->cur_row + 5) * 20, hl->how_to_strs[hl->cur_row]);
+            }
+        }
+
+        return synth_input;
+    }
+
     int16_t __cdecl Reference_Main_Subscreen_(s_animation_header** unused_anims, int16_t exit_code) {
         char header_text[40];
         char lbx_name[20];
@@ -1963,126 +2087,28 @@ namespace INFO {
             fonts::Set_Font_Style_(4, reference_high_color);
         }
 
-        // Enhancement: single-highlight keyboard/mouse selection — exactly one
-        // entry is highlighted at any time, owned by whichever input acted
-        // last. Up/Down move within a column, Left/Right jump between the
-        // Categories and How To? columns (keyboard picks up from the current
-        // highlight), Enter opens it. Moving the mouse onto an entry takes
-        // the highlight over to hover. All painting happens here, with
-        // released highlights erased in the normal color for two frames so
-        // both flip pages are cleaned.
+        // Enhancement: single-highlight keyboard/mouse selection — one entry
+        // highlighted at a time, owned by whichever input acted last.
         const bool kbd_nav = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
-        const int16_t ref_font_style =
+        s_reference_highlight hl;
+        hl.font_style =
             (MOX::_settings.language == 1 || MOX::_settings.language == 2) ? (int16_t)3 : (int16_t)4;
-        int16_t cur_col = -1; // highlighted entry: 0 = Categories, 1 = How To?
-        int16_t cur_row = 0;
-        int16_t prev_ptr_x = (int16_t)mouse::Pointer_X_();
-        int16_t prev_ptr_y = (int16_t)mouse::Pointer_Y_();
-        struct s_erase_slot {
-            int16_t col;
-            int16_t row;
-            uint8_t frames;
-        } erase_slots[2] = { { -1, 0, 0 }, { -1, 0, 0 } };
+        hl.high_color = reference_high_color;
+        hl.category_count = category_count;
+        hl.record_count = (int16_t)record_count;
+        hl.category_strs = category_strs;
+        hl.how_to_strs = how_to_strs;
+        hl.prev_ptr_x = (int16_t)mouse::Pointer_X_();
+        hl.prev_ptr_y = (int16_t)mouse::Pointer_Y_();
         if (kbd_nav && category_count > 0) {
-            cur_col = 0;
-            cur_row = 0;
+            hl.cur_col = 0;
+            hl.cur_row = 0;
         }
 
         while (true) {
             int16_t synth_input = 0;
             if (kbd_nav) {
-                // Map the current hover to an entry, if any.
-                int16_t hover_field = fields::Scan_Input_();
-                int16_t hover_col = -1;
-                int16_t hover_row = 0;
-                if (hover_field >= INFO::_g_first_how_to_field &&
-                    hover_field < (int16_t)(INFO::_g_first_how_to_field + (int16_t)record_count)) {
-                    hover_col = 1;
-                    hover_row = (int16_t)(hover_field - INFO::_g_first_how_to_field);
-                } else if (hover_field >= INFO::_g_first_category_field &&
-                           hover_field < (int16_t)(INFO::_g_first_category_field + category_count)) {
-                    hover_col = 0;
-                    hover_row = (int16_t)(hover_field - INFO::_g_first_category_field);
-                }
-
-                int16_t new_col = cur_col;
-                int16_t new_row = cur_row;
-
-                // Mouse wins when it moves onto an entry.
-                int16_t ptr_x = (int16_t)mouse::Pointer_X_();
-                int16_t ptr_y = (int16_t)mouse::Pointer_Y_();
-                bool mouse_moved = (ptr_x != prev_ptr_x || ptr_y != prev_ptr_y);
-                prev_ptr_x = ptr_x;
-                prev_ptr_y = ptr_y;
-                if (mouse_moved && hover_col >= 0) {
-                    new_col = hover_col;
-                    new_row = hover_row;
-                }
-
-                // Keyboard wins when a key is pressed, starting from the
-                // current highlight.
-                int32_t nav_key = key::Read_Key_();
-                if (nav_key != 0) {
-                    int16_t col = (new_col >= 0) ? new_col : (int16_t)0;
-                    int16_t row = (new_col >= 0) ? new_row : (int16_t)0;
-                    int16_t col_count = (col == 0) ? category_count : (int16_t)record_count;
-                    if (nav_key == 0x48E0 && col_count > 0) { // Up
-                        new_col = col;
-                        new_row = (int16_t)((row + col_count - 1) % col_count);
-                    } else if (nav_key == 0x50E0 && col_count > 0) { // Down
-                        new_col = col;
-                        new_row = (int16_t)((row + 1) % col_count);
-                    } else if (nav_key == 0x4BE0 || nav_key == 0x4DE0) { // Left/Right
-                        int16_t other_col = (int16_t)(1 - col);
-                        int16_t other_count = (other_col == 0) ? category_count : (int16_t)record_count;
-                        if (other_count > 0) {
-                            new_col = other_col;
-                            new_row = (row < other_count) ? row : (int16_t)(other_count - 1);
-                        }
-                    } else if (nav_key == 0x1C0D) { // Enter opens the highlight
-                        if (new_col >= 0) {
-                            synth_input = (new_col == 0)
-                                              ? (int16_t)(INFO::_g_first_category_field + new_row)
-                                              : (int16_t)(INFO::_g_first_how_to_field + new_row);
-                        }
-                    } else {
-                        key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
-                    }
-                }
-
-                // Highlight moved: erase the old entry.
-                if ((new_col != cur_col || new_row != cur_row) && cur_col >= 0) {
-                    s_erase_slot* slot = (erase_slots[0].frames == 0) ? &erase_slots[0]
-                                                                      : &erase_slots[1];
-                    slot->col = cur_col;
-                    slot->row = cur_row;
-                    slot->frames = 2;
-                }
-                cur_col = new_col;
-                cur_row = new_row;
-
-                // Per-frame painting: erases first, then the live highlight.
-                for (int slot_ix = 0; slot_ix < 2; ++slot_ix) {
-                    s_erase_slot* slot = &erase_slots[slot_ix];
-                    if (slot->frames > 0 && slot->col >= 0 &&
-                        !(slot->col == cur_col && slot->row == cur_row)) {
-                        fonts::Set_Font_Style_(ref_font_style, &INFO::_info_normal_color);
-                        if (slot->col == 0) {
-                            fonts::Print_(0xdd, (slot->row + 5) * 20, category_strs[slot->row]);
-                        } else {
-                            fonts::Print_(0x1a5, (slot->row + 5) * 20, how_to_strs[slot->row]);
-                        }
-                        slot->frames--;
-                    }
-                }
-                if (cur_col >= 0) {
-                    fonts::Set_Font_Style_(ref_font_style, reference_high_color);
-                    if (cur_col == 0) {
-                        fonts::Print_(0xdd, (cur_row + 5) * 20, category_strs[cur_row]);
-                    } else {
-                        fonts::Print_(0x1a5, (cur_row + 5) * 20, how_to_strs[cur_row]);
-                    }
-                }
+                synth_input = Update_Reference_Highlight_(&hl);
             }
 
             input = (synth_input != 0) ? synth_input : fields::Get_Input_();
