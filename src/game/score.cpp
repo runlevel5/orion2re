@@ -226,10 +226,12 @@ namespace SCORE {
         for (int i = 0; i < 8; ++i) {
             int16_t idx1 = (int16_t)game_random::Random_(8) + 1;
             int16_t idx2 = (int16_t)game_random::Random_(8) + 1;
-            char temp_name[20];
-            strlcpy(temp_name, _default_names[idx1], sizeof(temp_name));
-            strlcpy(_default_names[idx1], _default_names[idx2], sizeof(_default_names[idx1]));
-            strlcpy(_default_names[idx2], temp_name, sizeof(_default_names[idx2]));
+            if (idx2 != idx1) {
+                char temp_name[20];
+                strlcpy(temp_name, _default_names[idx1], sizeof(temp_name));
+                strlcpy(_default_names[idx1], _default_names[idx2], sizeof(_default_names[idx1]));
+                strlcpy(_default_names[idx2], temp_name, sizeof(_default_names[idx2]));
+            }
         }
 
         int16_t score_base = 1500;
