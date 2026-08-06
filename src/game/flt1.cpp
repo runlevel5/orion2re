@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "enhanced_ux.h"
+
 namespace FLT1 {
 
     int16_t _fleet_screen_bad_ship_id;
@@ -577,6 +579,14 @@ namespace FLT1 {
         ERIC::Fast_Fade_In_();
         fields::Enable_Draw_All_Fields_();
 
+        // Enhancement: wheel-scroll pacing state; stale wheel movement from
+        // before the screen opened is discarded.
+        uint32_t last_wheel_ms = 0;
+        constexpr uint32_t WHEEL_STEP_MS = 120;
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            platform::Consume_Mouse_Wheel_Steps_();
+        }
+
         do {
             MAINSCR::_fleet_ship_selection_status = -1;
             fields::Clear_Fields_();
@@ -732,6 +742,23 @@ namespace FLT1 {
                 SCROLL::Scroll_Down_One_Item_(MOX::_scroll_bar);
             } else if (input == btn_scroll_up) {
                 SCROLL::Scroll_Up_One_Item_(MOX::_scroll_bar);
+            }
+
+            // Enhancement: the mouse wheel scrolls the ship list, capped at
+            // one row per WHEEL_STEP_MS for a readable pace.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
+                if (wheel_steps != 0) {
+                    uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
+                    if (wheel_now_ms - last_wheel_ms >= WHEEL_STEP_MS) {
+                        last_wheel_ms = wheel_now_ms;
+                        if (wheel_steps > 0) {
+                            SCROLL::Scroll_Up_One_Item_(MOX::_scroll_bar);
+                        } else {
+                            SCROLL::Scroll_Down_One_Item_(MOX::_scroll_bar);
+                        }
+                    }
+                }
             }
 
             if (input == btn_relocate && _relocate_button_mode != 2) {
