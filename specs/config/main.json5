@@ -2055,6 +2055,13 @@
         { id: "sabotage_and_frame", title: "Sabotage with framing", description: "Minimum roll for sabotage that frames another player.", type: "uint8", constraints: { max: 127 }, bind: ["sabotage_and_frame"] },
       ],
     },
+    enhanced_ux_settings: {
+      title: "Experimental UX enhancement settings",
+      description: "Controls interface enhancements not present in the original game.",
+      fields: [
+        { id: "enabled", title: "Enabled", description: "Enables interface enhancements such as click-to-select in the Load Game list.", type: "bool", bind: ["enabled"] },
+      ],
+    },
     invasion_technology_chance: {
       title: "Invasion technology capture chances",
       description: "Base weights used when an invasion captures technology from colony buildings or population.",
@@ -9769,6 +9776,16 @@
         header: "game/mainscr.h",
         symbol: "MAINSCR::main_map_overview_markers",
       },
+    },
+
+    enhanced_ux: {
+      title: "Experimental UX enhancements",
+      description: "Enables interface enhancements not present in the original game, such as click-to-select in the Load Game list.",
+      examples: ["enhanced_ux enabled = true;"],
+      group: "interface",
+      type: "enhanced_ux_settings",
+      bind_root: { header: "game/enhanced_ux.h", symbol: "ENHANCED_UX::enhanced_ux_settings" },
+      default: { enabled: false },
     },
 
     maximum_galaxy_display: {

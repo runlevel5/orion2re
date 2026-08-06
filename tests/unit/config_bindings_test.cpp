@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "game/build_queue.h"
+#include "game/enhanced_ux.h"
 
 #include <cstring>
 
@@ -2507,6 +2508,21 @@ DOCTEST_TEST_CASE("Antaran Star Fortress space preserves and replaces the 1.50 d
 
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
     DOCTEST_REQUIRE(config::Commit_State(&state));
+}
+
+DOCTEST_TEST_CASE("experimental enhanced ux settings bind and default to disabled") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(ENHANCED_UX::enhanced_ux_settings.enabled == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "enhanced_ux enabled = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(ENHANCED_UX::enhanced_ux_settings.enabled == 1);
 }
 
 DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default") {
