@@ -779,8 +779,71 @@ namespace OFFICER {
         }
 
         if (body[0] != '\0') {
-            Text_Box_With_Refresh("SKILLS", body);
+            if (MOX::current_screen == SCREEN_OFFICERS) {
+                Text_Box_With_Refresh("SKILLS", body);
+            } else {
+                TEXTBOX::Text_Box("SKILLS", body);
+            }
         }
+    }
+
+    // Enhancement helper: scrolls the fleet officers screen's ship grid so
+    // the given icon index is on a visible row.
+    static void Scroll_Fleet_Ship_Into_View_(int16_t idx) {
+        int16_t row = (int16_t)(idx / MOX::big_icon_display_columns);
+        while (row < MOX::scroll_bar->first_visible_row) {
+            SCROLL::Scroll_Up_One_Item(MOX::scroll_bar);
+        }
+        while (row >= (int16_t)(MOX::scroll_bar->first_visible_row + MOX::big_icon_display_rows)) {
+            SCROLL::Scroll_Down_One_Item(MOX::scroll_bar);
+        }
+    }
+
+    // Enhancement helper: moves the keyboard ship selection on the fleet
+    // officers screen by step through the icon grid (+-1 horizontally,
+    // +-columns vertically), skipping empty slots and non-combat ships, and
+    // scrolls the visible rows to keep the selection in view.
+    static void Move_Fleet_Ship_Selection_(int16_t step) {
+        int16_t count = (int16_t)MOX::n_fltscrn_big_icons;
+        if (count <= 0) {
+            return;
+        }
+
+        auto selectable = [](int16_t i) {
+            return MOX::fltscrn_big_icon[i].ship_idx > -1 &&
+                   HACCESS::Is_Combat_Ship(MOX::fltscrn_big_icon[i].ship_idx);
+        };
+
+        int16_t cur = MOX::offpop_big_icon_selected;
+        int16_t next = -1;
+        int16_t dir = (step > 0) ? (int16_t)1 : (int16_t)-1;
+
+        if (cur < 0) {
+            for (int16_t i = 0; i < count; ++i) {
+                if (selectable(i)) {
+                    next = i;
+                    break;
+                }
+            }
+        } else {
+            for (int16_t i = (int16_t)(cur + step); i >= 0 && i < count; i = (int16_t)(i + dir)) {
+                if (selectable(i)) {
+                    next = i;
+                    break;
+                }
+            }
+        }
+
+        if (next < 0 || next == cur) {
+            return;
+        }
+
+        FLT2::Clear_All_Selection_Status();
+        MOX::offpop_big_icon_selected = next;
+        MOX::fltscrn_big_icon[next].selected = 1;
+        MOX::draw_officer_to_back = 1;
+
+        Scroll_Fleet_Ship_Into_View_(next);
     }
 
     void Officers_Screen() {
@@ -893,6 +956,8 @@ namespace OFFICER {
         const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
         uint32_t last_wheel_ms = 0;
         constexpr uint32_t WHEEL_STEP_MS = 120;
+        // Keyboard focus on the fleet view: 0 = officer list, 1 = ship list.
+        uint8_t kbd_panel = 0;
         if (enhanced) {
             platform::Consume_Mouse_Wheel_Steps_(); // discard pre-screen movement
             platform::Consume_Mouse_Wheel_Steps_X_();
@@ -920,19 +985,63 @@ namespace OFFICER {
                     }
                 } else if (officer_button_mode == -1 && key > 0 &&
                            (key & 0xFF) >= '1' && (key & 0xFF) <= '4') {
-                    // Digits 1-4 select (highlight) the corresponding leader.
                     int16_t slot = (int16_t)((key & 0xFF) - '1');
-                    if (slot < MOX::n_fltscrn_officers && MOX::officer_id_list[slot] > -1) {
+                    if (is_fleet && MOX::offpop_big_icon_selected > -1) {
+                        // With a ship selected, digits 1-4 assign the
+                        // corresponding leader to it, like clicking the
+                        // leader's row.
+                        if (big_icons_scanned[slot] > 0) {
+                            MOX::officer_selected = -1;
+                            synth_input = big_icons_scanned[slot];
+                        }
+                    } else if (slot < MOX::n_fltscrn_officers && MOX::officer_id_list[slot] > -1) {
+                        // Digits 1-4 select (highlight) the corresponding leader.
                         MOX::officer_selected = (int8_t)MOX::officer_id_list[slot];
                         MOX::draw_officer_to_back = 1;
                     }
                 } else if (key > 0 && ((key & 0xFF) == 'c' || (key & 0xFF) == 'C') &&
                            officer_button_mode == 0) {
                     key::Push_Key_Code((uint32_t)'X', g_last_scan_code);
-                } else if (key == 0x4BE0 && officer_button_mode == -1) {
+                } else if (key == 0x0F09 && officer_button_mode == -1 && is_fleet) {
+                    // Tab switches keyboard focus between the officer list
+                    // and the ship list. The focused list selects its first
+                    // entry when nothing is selected yet; an existing
+                    // selection is kept (and scrolled into view).
+                    kbd_panel = (uint8_t)(kbd_panel == 0 ? 1 : 0);
+                    if (kbd_panel == 1) {
+                        if (MOX::offpop_big_icon_selected < 0) {
+                            Move_Fleet_Ship_Selection_(1);
+                        } else {
+                            Scroll_Fleet_Ship_Into_View_(MOX::offpop_big_icon_selected);
+                        }
+                    } else if (MOX::officer_selected < 0 &&
+                               MOX::n_fltscrn_officers > 0 &&
+                               MOX::officer_id_list[0] > -1) {
+                        MOX::officer_selected = (int8_t)MOX::officer_id_list[0];
+                        MOX::draw_officer_to_back = 1;
+                    }
+                } else if ((key == 0x48E0 || key == 0x50E0 || key == 0x4BE0 || key == 0x4DE0) &&
+                           officer_button_mode == -1 && is_fleet && kbd_panel == 1) {
+                    // Arrows navigate the ship selection while the ship list
+                    // has keyboard focus.
+                    int16_t step = (key == 0x48E0) ? (int16_t)-MOX::big_icon_display_columns
+                                 : (key == 0x50E0) ? (int16_t)MOX::big_icon_display_columns
+                                 : (key == 0x4BE0) ? (int16_t)-1
+                                                   : (int16_t)1;
+                    Move_Fleet_Ship_Selection_(step);
+                } else if (key > 0 && (key & 0xFF) == '<' && officer_button_mode == -1) {
+                    // '<'/'>' press the previous/next cycle buttons via their
+                    // native ','/'.' hotkeys (arrows are reserved for list
+                    // navigation).
                     key::Push_Key_Code((uint32_t)',', g_last_scan_code);
-                } else if (key == 0x4DE0 && officer_button_mode == -1) {
+                } else if (key > 0 && (key & 0xFF) == '>' && officer_button_mode == -1) {
                     key::Push_Key_Code((uint32_t)'.', g_last_scan_code);
+                } else if (key == 0x49E0 && officer_button_mode == -1) {
+                    // PgUp/PgDn press the ship list's scroll buttons via
+                    // their native '-'/'+' hotkeys.
+                    key::Push_Key_Code((uint32_t)'-', g_last_scan_code);
+                } else if (key == 0x51E0 && officer_button_mode == -1) {
+                    key::Push_Key_Code((uint32_t)'+', g_last_scan_code);
                 } else if ((key == 0x48E0 || key == 0x50E0) && officer_button_mode == -1) {
                     // Up/Down move the leader selection through the list,
                     // wrapping at the ends.
@@ -1675,6 +1784,18 @@ namespace OFFICER {
                 strlcpy(format_buf, HAROLD::H_Message(HESTR_117_YOU_MAY_NOT_ASSIGN_S_T), sizeof(format_buf));
                 snprintf(display_buf, sizeof(display_buf), format_buf, Leader_Name(leader_idx, 0));
                 Officer_Screen_User_Box(display_buf, 3);
+                return;
+            }
+
+            // Enhancement: assigning the ship's current captain to the same
+            // ship offers to return them to the pool instead of the
+            // assign-then-replace dialogs.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                MOX::ship[ship_idx].officer_index == leader_idx) {
+                snprintf(display_buf, sizeof(display_buf), "Return %s to the pool?", Leader_Name_(leader_idx, 0));
+                if (Officer_Screen_User_Box(display_buf, 1)) {
+                    Move_Officer_To_Limbo(leader_idx);
+                }
                 return;
             }
 
@@ -3980,5 +4101,14 @@ namespace OFFICER {
         OFFICER::Print_Officer_Skill_Help(skill_id, skill_bonus, officer_idx);
         allocate::Pop_Block(MOX::screen_seg);
     }
+
+// Enhancement: shows the SKILLS dialog for the leader offered in the hire
+// popup, whose skill help slots live in officer_skill_help[0].
+void __cdecl Show_Officer_Popup_Skills_Dialog_(int16_t officer_idx) {
+    allocate::Push_Block(MOX::screen_seg);
+    OFFICER::Load_Officer_Skill_Name_Descriptions();
+    Show_Leader_Skills_Dialog_(0, officer_idx);
+    allocate::Pop_Block(MOX::screen_seg);
+}
 
 } // namespace OFFICER
