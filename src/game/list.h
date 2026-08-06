@@ -111,6 +111,13 @@ namespace LIST {
     s_list_item* __cdecl Get_Selected_List_Entry_(s_list_state* state);
 
     /**
+     * Enhancement: moves the selection one step through the current page,
+     * wrapping at the ends. With per_item set, each item counts as one step;
+     * otherwise every visible line counts. Returns the new selection.
+     */
+    s_list_item* __cdecl Move_List_Selection_(s_list_state* state, int16_t direction, uint8_t per_item);
+
+    /**
      * Computes item positions and page boundaries for the list.
      * @param state List layout state and item array.
      */

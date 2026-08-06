@@ -183,6 +183,45 @@ namespace LIST {
         return found_item;
     }
 
+    // Enhancement helper: moves the selection one step through the current
+    // page, wrapping at the ends. With per_item set, each item counts as one
+    // step (its first line); otherwise every visible line counts.
+    s_list_item* __cdecl Move_List_Selection_(s_list_state* state, int16_t direction, uint8_t per_item) {
+        int16_t line_field_ids[256];
+        int16_t line_count = 0;
+        int16_t current_line = -1;
+
+        s_list_item* item = state->selected_item;
+        s_list_item* end = &state->items[(uint8_t)state->num_items];
+        while (item < end && line_count < (int16_t)(sizeof(line_field_ids) / sizeof(line_field_ids[0]))) {
+            uint8_t lines_this_item = per_item ? (uint8_t)1 : item->app_count;
+            for (uint8_t i = 0; i < lines_this_item; ++i) {
+                if (item->is_selectable != 0 &&
+                    (per_item || item->current_app_index == i)) {
+                    current_line = line_count;
+                }
+                line_field_ids[line_count++] = (int16_t)(int8_t)item->app_ids[i];
+            }
+            if (item + 1 >= end || item[1].stop_flag != 0) {
+                break;
+            }
+            ++item;
+        }
+
+        if (line_count == 0) {
+            return Get_Selected_List_Entry_(state);
+        }
+
+        int16_t next_line;
+        if (current_line < 0) {
+            next_line = (direction > 0) ? 0 : (int16_t)(line_count - 1);
+        } else {
+            next_line = (int16_t)((current_line + line_count + direction) % line_count);
+        }
+        Set_Selected_List_Entry_(state, line_field_ids[next_line]);
+        return Get_Selected_List_Entry_(state);
+    }
+
     s_list_item* __cdecl Get_Selected_List_Entry_(s_list_state* state) {
         s_list_item* item = state->selected_item;
         s_list_item* end = &state->items[(uint8_t)state->num_items];
