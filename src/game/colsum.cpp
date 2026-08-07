@@ -183,7 +183,20 @@ namespace COLSUM {
 
         while (true) {
             timer::Mark_Time();
-            input_val = fields::Get_Input();
+
+            // Enhancement: Esc presses the Return button like a click, with
+            // its animation, instead of the invisible hot key.
+            int16_t synth_input = 0;
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                int32_t key = key::Read_Key();
+                if (key == 0x011B) {
+                    synth_input = fields::Activate_Field_(x_fields[3]);
+                } else if (key != 0) {
+                    key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+                }
+            }
+
+            input_val = (synth_input != 0) ? synth_input : fields::Get_Input();
             scan_val = fields::Scan_Input();
 
             if (!COLSUM::Evaluate_Input(&input_val, &scan_val)) {
