@@ -48,6 +48,12 @@ namespace MAINPUPS {
     extern uint8_t _g_using_colony_ship;
     extern int16_t _g_max;
     extern int16_t _g_min;
+
+    /**
+     * Enhancement: optional per-frame overlay for the slider popup, called
+     * with the current value so a caller can preview the effect live.
+     */
+    extern void (__cdecl* _g_slider_preview_cb)(int16_t value);
     extern char* _g_msg;
     extern int16_t _g_var;
     extern int16_t _g_temp_tax_rate;
