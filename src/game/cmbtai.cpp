@@ -1693,7 +1693,7 @@ int16_t __cdecl Get_Current_Missile_Target_(int16_t unit_idx, int32_t* value_out
         s_missile* missile = &MOX::_missile[i];
 
         if (missile->type > 0 && missile->quantity > 0) {
-            if (MOX::_combat_data[missile->source_unit_idx].owner != MOX::_combat_data[unit_idx].owner) {
+            if (CMBTMIS::Missile_Owner_(i) != MOX::_combat_data[unit_idx].owner) {
                 if (CMBTAI::Will_Missile_Do_Damage_(unit_idx, i)) {
                     int8_t weapon_type_class = TECHDATA::_weapons[missile->type].type;
                     if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_FIGHTER) {

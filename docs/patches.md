@@ -107,7 +107,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:2364` - `recalc prod`: fixed in `COLCALC::Colony_Empire_Base_Food2_Produced_()`, `COLCALC::Colony_Empire_Base_Industry_Produced_()`, and `COLCALC::Colony_Empire_Base_Research_Produced_()` by recomputing each result from current colony and player state instead of returning values from state-blind per-race caches; this directly expresses the three 1.50 cache-branch removals in source.
 - [x] `asm.pl:2885` - `displacer, cloak missile`: fixed in `CMBTMIS::Resolve_Missile_()`, `CMBTFIRE::Energy_Absorber_Attack_()`, `CMBTFIR2::Ship_Specials_Defensive_Bonus_()`, and `CMBTAI::Expected_Missile_Damage_()` by using inclusive configured miss chances, applying Displacement Device's 30% protection consistently, and making live combat and AI prediction use either classic independent cloak miss chance or configured Missile Evasion without double application; this replaces the 1.50 branch patches and diversions with direct source-level combat rules while restoring only the inseparable cloak dependency from the later expected-damage work.
 - [ ] `asm.pl:3474` - `teleporter + tractor fix`
-- [ ] `asm.pl:4421` - `AI missile targeting`
+- [x] `asm.pl:4421` - `AI missile targeting`: fixed in `CMBTAI::Get_Current_Missile_Target_()` by classifying missiles using their stored launch owner rather than the current owner of the source ship; this directly expresses the 1.50 owner-helper call in source.
 - [ ] `asm.pl:5530` - `speed calc speed driveless no div zero`
 - [ ] `asm.pl:5877` - `other player's portal fix`
 - [ ] `asm.pl:6090` - `BHG slot multiple shots`
