@@ -470,7 +470,6 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     bool no_defender_ships = star_idx != MOX::_NUM_STARS;
     int16_t has_tractor_beam = 0;
     int16_t has_plasma_web = 0;
-    int16_t has_cloaking = 0;
     int16_t has_special_26 = 0;
     int16_t has_bhg = 0;
     int16_t has_stellar_converter = 0;
@@ -523,8 +522,9 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_cmbt_colony_id = colony_idx;
 
     MOX::_combat_data = (s_combat_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, kCombatDataBytes);
-    // Resetting the screen pool invalidates the missile table from the previous combat.
+    // Resetting the screen pool invalidates resources from the previous combat.
     MOX::_missile = nullptr;
+    MOX::_darken_plasma_map = nullptr;
     struct_::Clear_Structure_(MOX::_combat_data, kCombatDataBytes);
 
     MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
@@ -573,11 +573,6 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
             if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_PHASING_CLOAK) == 0) {
                 COMBINIT::_real_attack_flag = 1;
-                if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_CLOAKING_DEVICE) != 0) {
-                    has_cloaking = 1;
-                }
-            } else {
-                has_cloaking = 1;
             }
 
             // Original binary calls this and discards the result.
@@ -787,13 +782,6 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                         }
                     }
 
-                    if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_CLOAKING_DEVICE) == 0 &&
-                        Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_PHASING_CLOAK) == 0) {
-                        // Empty
-                    } else {
-                        has_cloaking = 1;
-                    }
-
                     // Original binary calls this and discards the result.
                     Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 10);
                     if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_REFLECTION_FIELD) != 0) {
@@ -818,7 +806,17 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         Load_Combat_Ship_Palette_(MOX::_combat_defender_player);
         RUSS::Mox_Update_();
 
-        if (has_cloaking != 0) {
+        bool needs_plasma_darkening = false;
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            s_combat_data* ship = &MOX::_combat_data[i];
+            if (struct_::Test_Bit_Field_(ship->special_device_flags, SPECIAL_CLOAKING_DEVICE) ||
+                struct_::Test_Bit_Field_(ship->special_device_flags, SPECIAL_PHASING_CLOAK)) {
+                needs_plasma_darkening = true;
+                break;
+            }
+        }
+
+        if (needs_plasma_darkening) {
             MOX::_darken_plasma_map = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 0x31, MOX::_screen_seg);
             RUSS::Mox_Update_();
             CMBTDRW1::Create_Ship_Darken_Map_();
