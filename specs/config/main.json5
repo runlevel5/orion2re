@@ -1166,9 +1166,10 @@
     lightning_field_ratio: {
       title: "Lightning Field destruction chance",
       description: "Sets the chance for Lightning Field to destroy a missile, torpedo, or fighter.",
-      examples: ["lightning_field_ratio = 50;"],
+      examples: ["combat lightning_field_ratio = 50;"],
       units: "percent",
       group: "gameplay",
+      namespace: "combat",
       type: "uint8",
       constraints: { min: 0, max: 100 },
       default: 50,
@@ -1181,8 +1182,9 @@
     lightning_field_mode: {
       title: "Lightning Field distribution",
       description: "Selects the classic shrinking-stack distribution or independent uniform rolls.",
-      examples: ["lightning_field_mode = uniform;"],
+      examples: ["combat lightning_field_mode = uniform;"],
       group: "gameplay",
+      namespace: "combat",
       type: "lightning_field_mode",
       default: "classic",
       bind_root: {
