@@ -224,6 +224,24 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
         int16_t dest_x_px = dest_x * 20;
         int16_t dest_y_px = dest_y * 20;
 
+        int16_t tractor_ships[MAX_SHIPS + 1];
+        int16_t tractor_target_idx;
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+
+        if (CMBTSPEC::Try_Get_Active_Tractor_Target_(ship_idx, &tractor_target_idx)) {
+            tractor_ships[tractor_count++] = ship_idx;
+        }
+
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            const int16_t active_tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
+                ? int16_t{-1}
+                : MOX::_combat_data[i].special_cooldown;
+            if (active_tractor_target_idx == ship_idx &&
+                CMBTSPEC::Try_Get_Active_Tractor_Target_(i, &tractor_target_idx)) {
+                tractor_ships[tractor_count++] = i;
+            }
+        }
+
         bool has_teleporter = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) != 0 ||
                               COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_PHASE_SHIFTER) != 0;
 
@@ -237,27 +255,9 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
             }
         }
 
-        int16_t tractor_ships[MAX_SHIPS + 1];
-        s_combat_data* ship = &MOX::_combat_data[ship_idx];
-
         if (!skip_normal_move) {
             int16_t center_x, center_y;
             COMBINIT::Ship_Center_Offsets_(ship_idx, &center_x, &center_y);
-
-            int16_t tractor_target_idx;
-            if (CMBTSPEC::Try_Get_Active_Tractor_Target_(ship_idx, &tractor_target_idx)) {
-                tractor_ships[tractor_count++] = ship_idx;
-            }
-
-            for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-                const int16_t active_tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
-                    ? int16_t{-1}
-                    : MOX::_combat_data[i].special_cooldown;
-                if (active_tractor_target_idx == ship_idx &&
-                    CMBTSPEC::Try_Get_Active_Tractor_Target_(i, &tractor_target_idx)) {
-                    tractor_ships[tractor_count++] = i;
-                }
-            }
 
             MOX::_shields_flag = 0;
 
