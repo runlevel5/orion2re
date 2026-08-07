@@ -690,6 +690,44 @@ namespace RACESCRN {
         return 0;
     }
 
+    // Enhancement helper: spy mission hotkeys — a digit (1-7, same layout
+    // as the "Who?" prompt) picks a race, then E/S/H sets Espionage,
+    // Sabotage or Hide for it, like clicking its mission button. Returns 1
+    // when a mission changed and the fields need repainting; other keys go
+    // back to the fields system and clear the pending digit.
+    static uint8_t Read_Spy_Mission_Keys_(s_racescrn_race_display* displays, int16_t* pending_race) {
+        int32_t key = key::Read_Key_();
+        if (key == 0) {
+            return 0;
+        }
+        int16_t ch = (int16_t)(key & 0xFF);
+        if (key > 0 && ch >= '1' && ch <= '7') {
+            if ((int16_t)(ch - '1') < (int16_t)MOX::_active_count) {
+                *pending_race = (int16_t)(ch - '1');
+            }
+            return 0;
+        }
+        if (*pending_race >= 0 && key > 0) {
+            int16_t mission = 0;
+            if (ch == 'e' || ch == 'E') {
+                mission = 1;
+            } else if (ch == 's' || ch == 'S') {
+                mission = 2;
+            } else if (ch == 'h' || ch == 'H') {
+                mission = 3;
+            }
+            if (mission != 0) {
+                displays[*pending_race].agent_mission_idx = mission;
+                *pending_race = -1;
+                sound::Play_Sound_(')');
+                return 1;
+            }
+        }
+        *pending_race = -1;
+        key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+        return 0;
+    }
+
     void __cdecl Race_Screen_() {
         int16_t selected_race_idx = -1;
         int16_t old_mission_idx = -1;
@@ -846,12 +884,24 @@ namespace RACESCRN {
             int16_t active_action_field = 0;
             uint8_t net_cancel_requested = 0;
             uint8_t human_rejected = 0;
+            int16_t pending_spy_race = -1;
 
             while (true) {
-                // Enhancement: digits answer the "Who?" prompt.
+                // Enhancement: digits answer the "Who?" prompt; outside it,
+                // digit + E/S/H sets a race's spy mission.
                 int16_t synth_input = 0;
-                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_in_who_mode) {
-                    synth_input = Read_Who_Mode_Digit_(race_display_data);
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                    if (_g_in_who_mode) {
+                        synth_input = Read_Who_Mode_Digit_(race_display_data);
+                    } else if (!_g_in_spy_mode) {
+                        if (Read_Spy_Mission_Keys_(race_display_data, &pending_spy_race) != 0) {
+                            fields::Enable_Draw_All_Fields_();
+                            fields::Draw_Visible_Fields_();
+                            fields::Disable_Draw_All_Fields_();
+                            fields::Draw_All_Fields_();
+                            video::Copy_Off_To_Back_();
+                        }
+                    }
                 }
 
                 int16_t input = (synth_input != 0) ? synth_input : fields::Get_Input_();
