@@ -179,10 +179,7 @@ namespace CMBTFIRE {
     }
 
     void __cdecl Remove_Stasis_Beam_(int16_t ship_idx) {
-        for (int i = 0; i < 8; ++i) {
-            MOX::_combat_data[ship_idx].weapons[i].shots_left = 0;
-        }
-        MOX::_combat_data[ship_idx].stasis_source_idx = 0xFF;
+        MOX::_combat_data[ship_idx].stasis_source_idx = UINT8_MAX;
     }
 
     void __cdecl Destroy_Ship_(int16_t ship_idx, int16_t draw_x, int16_t draw_y, int16_t death_state) {

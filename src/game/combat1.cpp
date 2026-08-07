@@ -218,7 +218,7 @@ namespace COMBAT1 {
         if (MOX::_combat_total_ship_count > 0) {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[i].unit_status == 0) {
-                    if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0) {
+                    if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0 || MOX::_combat_init != 0) {
                         if (time_warp_only == 0 || COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TIME_WARP_FACILITATOR) != 0) {
                             if (MOX::_combat_init != 0 || MOX::_combat_data[i].owner == active_player_id) {
                                 if (MOX::_combat_data[i].is_captured == 0) {
@@ -1099,7 +1099,6 @@ namespace COMBAT1 {
 
     void __cdecl Init_Ship_For_Start_Of_Turn_(int16_t ship_idx) {
         int16_t is_captured_now = CMBTFIR2::Being_Captured_(ship_idx);
-        uint8_t capture_flag8 = (uint8_t)is_captured_now;
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
         ship->combat_status_flags = 0;
@@ -1148,7 +1147,8 @@ namespace COMBAT1 {
                     slot->shots_left = 0;
                     stasis_count -= (int16_t)count;
                 } else {
-                    slot->shots_left = (int8_t)((uint8_t)count - capture_flag8);
+                    slot->shots_left = (int8_t)((int16_t)count - stasis_count);
+                    stasis_count = 0;
                 }
             } else {
                 slot->shots_left = count;
