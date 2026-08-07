@@ -1641,6 +1641,11 @@ namespace platform {
         return (SDL_GetModState() & SDL_KMOD_CTRL) != 0 ? 1 : 0;
     }
 
+    uint8_t __cdecl Space_Key_Held_() {
+        const bool* key_state = SDL_GetKeyboardState(nullptr);
+        return (key_state != nullptr && key_state[SDL_SCANCODE_SPACE]) ? 1 : 0;
+    }
+
     void __cdecl Discard_Input_Observations_() {
         SDL_SetAtomicInt(&g_mouse_wheel_accum, 0);
         SDL_SetAtomicInt(&g_mouse_wheel_accum_x, 0);

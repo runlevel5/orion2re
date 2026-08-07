@@ -346,11 +346,16 @@ namespace MAINMENU {
             // Enhancement: with the menu loop ticking three times faster
             // while the credits roll, scroll 1px on two of every three frames
             // — the same net speed as the stock 2px per slow frame, but three
-            // times the temporal resolution.
+            // times the temporal resolution. Holding Space rolls 3px every
+            // frame instead (4.5x the stock speed).
             if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
-                MAINMENU::_credit_step_phase = (uint8_t)((MAINMENU::_credit_step_phase + 1) % 3);
-                if (MAINMENU::_credit_step_phase != 0) {
-                    MAINMENU::_credit_y_slot.y -= 1;
+                if (platform::Space_Key_Held_() != 0) {
+                    MAINMENU::_credit_y_slot.y -= 3;
+                } else {
+                    MAINMENU::_credit_step_phase = (uint8_t)((MAINMENU::_credit_step_phase + 1) % 3);
+                    if (MAINMENU::_credit_step_phase != 0) {
+                        MAINMENU::_credit_y_slot.y -= 1;
+                    }
                 }
             } else {
                 MAINMENU::_credit_y_slot.y -= 2;
