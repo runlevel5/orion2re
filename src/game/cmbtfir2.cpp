@@ -674,9 +674,21 @@ namespace CMBTFIR2 {
             if (ship->special_hits[i] < ship->special_device_hits[i]) {
                 int16_t needed = ship->special_device_hits[i] - ship->special_hits[i];
                 int16_t amt = (pool < (int32_t)needed) ? (int16_t)pool : needed;
+                ship->special_hits[i] += amt;
                 pool -= (int32_t)amt;
-                // Note: Logic in binary sets hits to max even if pool was insufficient
-                ship->special_hits[i] = ship->special_device_hits[i];
+            }
+        }
+
+        int special_slot_idx = 0;
+        for (int special_id = 0; special_id < SPECIAL_COUNT && special_slot_idx < 8; ++special_id) {
+            if (struct_::Test_Bit_Field_(ship->special_device_flags, special_id)) {
+                if (ship->special_hits[special_slot_idx] > 0) {
+                    struct_::Clear_Bit_Field_(ship->special_device_damage_flags, special_id);
+                    if (special_id == SPECIAL_HARD_SHIELDS) {
+                        ship->shield_arc_max = COMBINIT::Calc_Combat_Shield_Max_(ship_idx);
+                    }
+                }
+                ++special_slot_idx;
             }
         }
     }

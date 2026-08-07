@@ -113,8 +113,8 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:6090` - `BHG slot multiple shots`: fixed in `CMBTFIRE::Fire_Ship_()` and `CMBTFIRE::Fire_Special_Weapon_()` by consuming one BHG shot and ending the current firing pass, preserving additional generators in the same slot for later targets; this directly expresses the 1.50 jump reroute and caller helper in source.
 - [x] `asm.pl:6295` - `lightning field`: implemented inline in `CMBTMIS::Resolve_Missile_()` with configurable classic and uniform roll distributions and an inclusive destruction ratio; this replaces the 1.50 call-site diversion while retaining classic mode as the default.
 - [x] `asm.pl:6433` - `woes of stasis`: fixed in `COMBAT1::Do_Combat_Turn_()`, `COMBAT1::Init_Ship_For_Start_Of_Turn_()`, and `CMBTFIRE::Remove_Stasis_Beam_()` by retaining stasis ships in initiative turn order, preserving their shots when released, and reserving one Stasis Field shot per existing target; this replaces the 1.50 branch diversion and instruction suppression with direct source-level state invariants while retaining classic-mode stall prevention.
-- [ ] `asm.pl:6573` - `tractor cuts`
-- [ ] `asm.pl:6787` - `specials repair`
+- [x] `asm.pl:6573` - `tractor cuts`: fixed in `COMBAT1::Do_Combat_Turn_()` by severing both outgoing and incoming tractor links when a ship completes phasing cloak, recalculating released ships' speeds, and refreshing combat rendering; this directly expresses the 1.50 cloak wrapper and tractor-scan helper while retaining the restored unsigned target representation with `255` as invalid.
+- [x] `asm.pl:6787` - `specials repair`: fixed inline in `CMBTFIR2::Repair_Combat_Ship_()` by applying only the repair points consumed, re-enabling repaired special devices, and refreshing Hard Shields capacity; this replaces the 1.50 instruction patch and call-site wrapper with direct source-level repair invariants.
 - [ ] `asm.pl:6812` - `ICS cloak`
 - [ ] `asm.pl:6866` - `starbase capture`
 - [ ] `asm.pl:6994` - `retreat fix`

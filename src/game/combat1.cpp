@@ -976,6 +976,25 @@ namespace COMBAT1 {
                         if (MOX::_combat_data[i].special_status_flag == 7) {
                             CMBTSPEC::Draw_Cloak_(i, 4);
                             MOX::_combat_data[i].special_status_flag = 4;
+
+                            const uint8_t tractor_target_idx = MOX::_combat_data[i].special_cooldown;
+                            MOX::_combat_data[i].special_cooldown = UINT8_MAX;
+                            if (tractor_target_idx < MOX::_combat_total_ship_count) {
+                                MOX::_combat_data[tractor_target_idx].current_speed =
+                                    Calc_Current_Speed_(tractor_target_idx);
+                            }
+
+                            for (int16_t tractor_ship_idx = 0;
+                                 tractor_ship_idx < MOX::_combat_total_ship_count;
+                                 ++tractor_ship_idx) {
+                                if (MOX::_combat_data[tractor_ship_idx].special_cooldown == i) {
+                                    MOX::_combat_data[tractor_ship_idx].special_cooldown = UINT8_MAX;
+                                }
+                            }
+
+                            MOX::_combat_data[i].current_speed = Calc_Current_Speed_(i);
+                            CMBTDRW1::Refresh_Combat_Screen_Full_();
+
                             for (int16_t m = 0; m < 300; ++m) {
                                 if (MOX::_missile[m].type > 0 && MOX::_missile[m].target_unit_idx == i && MOX::_missile[m].source_unit_idx != i) {
                                     CMBTMIS::Retarget_Missile_(m);
