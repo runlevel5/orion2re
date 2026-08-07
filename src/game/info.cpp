@@ -915,6 +915,31 @@ namespace INFO {
                         refresh_list_content = true;
                         inner_break = true;
                         continue;
+                    } else if (nav_key > 0) {
+                        // A/C/W/E jump straight to a category.
+                        int16_t nav_char = (int16_t)(nav_key & 0xFF);
+                        int16_t tab_ix = -1;
+                        if (nav_char == 'a' || nav_char == 'A') {
+                            tab_ix = 0; // Achievements
+                        } else if (nav_char == 'c' || nav_char == 'C') {
+                            tab_ix = 1; // Colony
+                        } else if (nav_char == 'w' || nav_char == 'W') {
+                            tab_ix = 2; // Weapons
+                        } else if (nav_char == 'e' || nav_char == 'E') {
+                            tab_ix = 3; // Equipment
+                        }
+                        if (tab_ix >= 0) {
+                            if (tab_ix != _tech_review_tab_index) {
+                                sound::Play_Sound_(40);
+                                _tech_review_tab_index = tab_ix;
+                                list_changed = false;
+                                refresh_list_content = true;
+                                inner_break = true;
+                                continue;
+                            }
+                        } else {
+                            key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+                        }
                     } else if (nav_key != 0) {
                         key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
                     }
