@@ -2,6 +2,7 @@
 
 #include "doctest/doctest.h"
 #include "game/combat1.h"
+#include "game/combinit.h"
 
 DOCTEST_TEST_CASE("interactive speed loss preserves movement already spent") {
     int16_t reserve = 0;
@@ -33,4 +34,18 @@ DOCTEST_TEST_CASE("interactive immobilization never makes movement negative") {
 
     DOCTEST_CHECK(movement == 3);
     DOCTEST_CHECK(reserve == 0);
+}
+
+DOCTEST_TEST_CASE("combat damage storage uses the percentage of lost hit points") {
+    DOCTEST_CHECK(COMBINIT::Damage_Percent_From_Hits_(14, 10) == 28);
+    DOCTEST_CHECK(COMBINIT::Damage_Percent_From_Hits_(9, 6) == 33);
+    DOCTEST_CHECK(COMBINIT::Damage_Percent_From_Hits_(20, 13) == 35);
+    DOCTEST_CHECK(COMBINIT::Damage_Percent_From_Hits_(0, 0) == 0);
+}
+
+DOCTEST_TEST_CASE("combat damage storage reconstructs surviving fighter units") {
+    DOCTEST_CHECK(COMBINIT::Surviving_Weapon_Count_From_Hits_(7, 3) == 3);
+    DOCTEST_CHECK(COMBINIT::Surviving_Weapon_Count_From_Hits_(6, 3) == 2);
+    DOCTEST_CHECK(COMBINIT::Surviving_Weapon_Count_From_Hits_(0, 3) == 0);
+    DOCTEST_CHECK(COMBINIT::Surviving_Weapon_Count_From_Hits_(7, 0) == 0);
 }

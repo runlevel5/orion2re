@@ -121,7 +121,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:7084` - `flyer targeting`: fixed in `CMBTMIS::Draw_Missile_()`, `CMBTMIS::Draw_Fighter_()`, and the `CMBTMOV1` ship-movement paths by resolving anti-missile chains to their final ship for drawing while excluding missile-targeting flyers from ship movement and impact checks; this replaces the 1.50 register wrappers and six call-site filters with shared source-level target-domain invariants.
 - [x] `asm.pl:7224` - `stolen prod`: fixed in `invasion::Change_Pop_Ownership_()` by clearing purchased production when a colony changes ownership, so the conqueror cannot inherit production bought by the previous owner; this replaces the 1.50 four-byte assembly clear with a named source-field reset.
 - [x] `asm.pl:7839` - `turn 1 research`: fixed in `COLCALC::Check_For_Research_Breakthrough_()` by banking signed research production when no field is selected, so first-turn output survives until a research choice is made; this directly expresses the 1.50 call-site helper as a source-level branch.
-- [ ] `asm.pl:7864` - `unload ship damage storage`
+- [x] `asm.pl:7864` - `unload ship damage storage`: fixed in `COMBINIT::Unload_Combat_Ship_()` by persisting actual computer damage, calculating shield and drive damage directly from lost hit points, and reconstructing surviving fighter counts from slot hit points; this replaces the 1.50 diverted wrapper with direct source-level strategic-state persistence.
 - [ ] `asm.pl:7887` - `destroying combat cloaks`
 - [ ] `asm.pl:8101` - `miniaturization`
 - [ ] `asm.pl:8114` - `mark stack overflow`

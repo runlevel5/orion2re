@@ -2816,16 +2816,32 @@ void __cdecl Unload_Combat_Ship_(int16_t combat_ship_idx) {
 
         MOX::_ship[ship_idx].structural_damage = MOX::_combat_data[combat_ship_idx].structure_damage;
         MOX::_ship[ship_idx].armor_damage = INITSHIP::Get_Ship_Armor_Hits_(ship_idx) - MOX::_combat_data[combat_ship_idx].armor_remaining;
-        MOX::_ship[ship_idx].computer_damage = 0;
+        MOX::_ship[ship_idx].computer_damage =
+            MOX::_combat_data[combat_ship_idx].computer_max_hits -
+            MOX::_combat_data[combat_ship_idx].computer_current_hits;
 
         if (MOX::_combat_data[combat_ship_idx].shield_max_hits > 0) {
             MOX::_ship[ship_idx].shield_damage_percent =
-                100 - (MOX::_combat_data[combat_ship_idx].shield_current_hits * 100) / MOX::_combat_data[combat_ship_idx].shield_max_hits;
+                Damage_Percent_From_Hits_(
+                    MOX::_combat_data[combat_ship_idx].shield_max_hits,
+                    MOX::_combat_data[combat_ship_idx].shield_current_hits);
         }
 
         if (MOX::_combat_data[combat_ship_idx].drive_max_hits > 0) {
             MOX::_ship[ship_idx].drive_damage_percent =
-                100 - (MOX::_combat_data[combat_ship_idx].drive_current_hits * 100) / MOX::_combat_data[combat_ship_idx].drive_max_hits;
+                Damage_Percent_From_Hits_(
+                    MOX::_combat_data[combat_ship_idx].drive_max_hits,
+                    MOX::_combat_data[combat_ship_idx].drive_current_hits);
+        }
+
+        for (int16_t i = 0; i < 8; ++i) {
+            int16_t weapon_id = MOX::_combat_data[combat_ship_idx].weapons[i].weapon_id;
+            if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_FIGHTER) {
+                MOX::_ship[ship_idx].d.ship_weapon[i].current_count =
+                    Surviving_Weapon_Count_From_Hits_(
+                        MOX::_combat_data[combat_ship_idx].weapon_hits[i],
+                        MOX::_combat_data[combat_ship_idx].weapon_hits_per_unit[i]);
+            }
         }
     }
 }

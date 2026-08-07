@@ -168,6 +168,24 @@ namespace COMBINIT {
     // retreat_flag: Initial retreat-control flag.
     int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int16_t retreat_flag);
 
+    // Converts subsystem hit-point loss to a strategic damage percentage.
+    inline int16_t Damage_Percent_From_Hits_(int16_t maximum_hits, int16_t current_hits) {
+        if (maximum_hits <= 0) {
+            return 0;
+        }
+
+        return (100 * (maximum_hits - current_hits)) / maximum_hits;
+    }
+
+    // Reconstructs surviving units from a slot's aggregate hit points.
+    inline int8_t Surviving_Weapon_Count_From_Hits_(int16_t current_hits, int16_t hits_per_unit) {
+        if (current_hits <= 0 || hits_per_unit <= 0) {
+            return 0;
+        }
+
+        return (int8_t)((current_hits + hits_per_unit - 1) / hits_per_unit);
+    }
+
     // Writes tactical combat damage state back to the strategic ship record.
     // combat_ship_idx: Combat-data ship index to unload.
     void __cdecl Unload_Combat_Ship_(int16_t combat_ship_idx);
