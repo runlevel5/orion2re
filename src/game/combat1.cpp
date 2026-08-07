@@ -1030,7 +1030,7 @@ namespace COMBAT1 {
     {
         int16_t speed = 0;
 
-        if (MOX::_combat_data[ship_idx].ftl_type == 0 || CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
+        if (MOX::_combat_data[ship_idx].ship_idx == -1 || CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
             speed = 0;
         } else {
             int combat_speed = (uint8_t)MOX::_combat_data[ship_idx].combat_speed_base;
@@ -1041,15 +1041,18 @@ namespace COMBAT1 {
             }
             
             int owner = MOX::_combat_data[ship_idx].owner;
-            int current_hits = MOX::_combat_data[ship_idx].drive_current_hits;
-            int max_hits = MOX::_combat_data[ship_idx].drive_max_hits;
-            
-            if (owner <= 9) {
-                int half_max = max_hits / 2;
-                int range = max_hits - half_max;
-                speed = (int16_t)(((current_hits - half_max) * combat_speed) / range);
-            } else {
-                speed = (int16_t)((current_hits * combat_speed) / max_hits);
+
+            if (MOX::_combat_data[ship_idx].ftl_type != DRIVE_NO_DRIVE) {
+                int current_hits = MOX::_combat_data[ship_idx].drive_current_hits;
+                int max_hits = MOX::_combat_data[ship_idx].drive_max_hits;
+
+                if (owner <= 9) {
+                    int half_max = max_hits / 2;
+                    int range = max_hits - half_max;
+                    speed = (int16_t)(((current_hits - half_max) * combat_speed) / range);
+                } else {
+                    speed = (int16_t)((current_hits * combat_speed) / max_hits);
+                }
             }
             
             if (speed < 0) {
