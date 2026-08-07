@@ -19,6 +19,23 @@ namespace raceopt {
     extern s_animation_header* _off_button_seg;
     extern int16_t _option_toggle[24];
     extern int16_t _button_variable[10];
+
+    /**
+     * Enhancement: keyboard selection over the option lines, shared by the
+     * Custom Race and Evolutionary Mutation screens — spatial navigation,
+     * Space/Enter toggling and a pulsating selection text. Last input wins
+     * between arrow keys and mouse hover.
+     */
+    struct s_raceopt_nav {
+        int16_t sel_option_field = -1;
+        int16_t prev_ptr_x = 0;
+        int16_t prev_ptr_y = 0;
+    };
+    bool __cdecl Raceopt_Is_Option_Field_(int16_t field_id);
+    const char* __cdecl Raceopt_Field_Text_(int16_t field_id, int16_t* out_x, int16_t* out_y);
+    int16_t __cdecl Raceopt_Nav_(int16_t cur_field, int16_t dir_x, int16_t dir_y);
+    int16_t __cdecl Read_Raceopt_Keys_(s_raceopt_nav* nav, uint8_t allow_rename);
+    void __cdecl Draw_Raceopt_Selection_Pulse_(const s_raceopt_nav* nav, uint32_t* last_pulse_ms);
     extern s_animation_header* _special_button_seg;
     extern int16_t _name_button;
     extern char _cur_race_name[16];

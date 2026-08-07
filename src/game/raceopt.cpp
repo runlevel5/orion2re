@@ -47,6 +47,211 @@ namespace raceopt {
         plr.picked_evolutionary_upgrade = 1;
     }
 
+    // Enhancement helpers for keyboard selection over the option lines,
+    // shared by the Custom Race and Evolutionary Mutation screens.
+
+    bool __cdecl Raceopt_Is_Option_Field_(int16_t field_id) {
+        if (field_id <= 0) {
+            return false;
+        }
+        for (int16_t i = 0; i <= 0x28; ++i) {
+            if (_group_button[i] == field_id) {
+                return true;
+            }
+        }
+        for (int16_t k = 0; k < 0x16; ++k) {
+            if (_option_button[k] == field_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Returns the option line's text and its on-screen position (the text is
+    // printed 0x14 right of the field's left edge, at the field's top).
+    const char* __cdecl Raceopt_Field_Text_(int16_t field_id, int16_t* out_x, int16_t* out_y) {
+        const char* text = nullptr;
+        for (int16_t i = 0; i <= 0x28 && text == nullptr; ++i) {
+            if (_group_button[i] == field_id) {
+                text = _opt_string[i];
+            }
+        }
+        for (int16_t k = 0; k < 0x16 && text == nullptr; ++k) {
+            if (_option_button[k] == field_id) {
+                // Ability strings start at 0x2A: index 0x29 is skipped
+                // between the government block and the ability list.
+                text = _opt_string[0x2A + k];
+            }
+        }
+        if (text != nullptr) {
+            *out_x = (int16_t)(fields::_fields[field_id].x + 0x14);
+            *out_y = fields::_fields[field_id].y;
+        }
+        return text;
+    }
+
+    // Moves the keyboard selection spatially: dir_y walks the current column
+    // (wrapping), dir_x jumps to the nearest line of the adjacent column
+    // (wrapping around the sides).
+    int16_t __cdecl Raceopt_Nav_(int16_t cur_field, int16_t dir_x, int16_t dir_y) {
+        int16_t candidates[0x40];
+        int16_t count = 0;
+        for (int16_t i = 0; i <= 0x28; ++i) {
+            if (_group_button[i] > 0) {
+                candidates[count++] = _group_button[i];
+            }
+        }
+        for (int16_t k = 0; k < 0x16; ++k) {
+            if (_option_button[k] > 0) {
+                candidates[count++] = _option_button[k];
+            }
+        }
+        if (count == 0) {
+            return -1;
+        }
+        if (cur_field <= 0 || !Raceopt_Is_Option_Field_(cur_field)) {
+            return candidates[0];
+        }
+
+        int16_t cur_x = fields::_fields[cur_field].x;
+        int16_t cur_y = fields::_fields[cur_field].y;
+        int16_t best = -1;
+        int32_t best_metric = 0x7FFFFFFF;
+
+        if (dir_y != 0) {
+            // Nearest line above/below within the same column; wrap to the
+            // opposite end when none.
+            int16_t wrap = -1;
+            int32_t wrap_metric = dir_y > 0 ? 0x7FFFFFFF : -0x7FFFFFFF;
+            for (int16_t c = 0; c < count; ++c) {
+                int16_t id = candidates[c];
+                if (id == cur_field || abs(fields::_fields[id].x - cur_x) > 30) {
+                    continue;
+                }
+                int32_t dy = fields::_fields[id].y - cur_y;
+                if (dir_y > 0) {
+                    if (dy > 0 && dy < best_metric) { best_metric = dy; best = id; }
+                    if (fields::_fields[id].y < wrap_metric) { wrap_metric = fields::_fields[id].y; wrap = id; }
+                } else {
+                    if (dy < 0 && -dy < best_metric) { best_metric = -dy; best = id; }
+                    if (fields::_fields[id].y > wrap_metric) { wrap_metric = fields::_fields[id].y; wrap = id; }
+                }
+            }
+            return (best > 0) ? best : ((wrap > 0) ? wrap : cur_field);
+        }
+
+        // Left/Right: nearest-by-row line in the closest column in that
+        // direction; wrap to the far side when at the edge.
+        for (int16_t pass = 0; pass < 2; ++pass) {
+            for (int16_t c = 0; c < count; ++c) {
+                int16_t id = candidates[c];
+                int32_t dx = fields::_fields[id].x - cur_x;
+                bool in_dir = (pass == 0) ? (dx * dir_x > 30) : (dx * dir_x < -30);
+                if (!in_dir) {
+                    continue;
+                }
+                // Prefer the closest column, then the closest row.
+                int32_t metric = (pass == 0 ? abs(dx) : -abs(dx)) * 1000 +
+                                 abs(fields::_fields[id].y - cur_y);
+                if (metric < best_metric) {
+                    best_metric = metric;
+                    best = id;
+                }
+            }
+            if (best > 0) {
+                return best;
+            }
+            best_metric = 0x7FFFFFFF; // wrap pass: farthest column on the other side
+        }
+        return cur_field;
+    }
+
+    // Arrows move the option selection spatially, Space or Enter toggles it,
+    // Backspace presses Clear (animated, when the screen has one) and 'R'
+    // starts renaming the race (when allowed); other keys go back to the
+    // fields system. Moving the mouse onto a line takes the selection over.
+    // Returns the field to activate, or 0.
+    int16_t __cdecl Read_Raceopt_Keys_(s_raceopt_nav* nav, uint8_t allow_rename) {
+        int16_t synth_input = 0;
+        int32_t nav_key = key::Read_Key_();
+        if (nav_key == 0x48E0 || nav_key == 0x50E0 ||
+            nav_key == 0x4BE0 || nav_key == 0x4DE0) {
+            int16_t dir_x = (nav_key == 0x4BE0) ? (int16_t)-1
+                          : (nav_key == 0x4DE0) ? (int16_t)1 : (int16_t)0;
+            int16_t dir_y = (nav_key == 0x48E0) ? (int16_t)-1
+                          : (nav_key == 0x50E0) ? (int16_t)1 : (int16_t)0;
+            int16_t next_field = Raceopt_Nav_(nav->sel_option_field, dir_x, dir_y);
+            if (next_field != nav->sel_option_field) {
+                nav->sel_option_field = next_field;
+                MOX::_FULL_DRAW_SCREEN_FLAG = 1; // erase the old pulse text
+            }
+        } else if ((nav_key > 0 && (nav_key & 0xFF) == 0x20) ||
+                   nav_key == 0x1C0D) { // Space or Enter toggles
+            if (nav->sel_option_field > 0) {
+                synth_input = nav->sel_option_field;
+            }
+        } else if (nav_key == 0x0E08 && _defalt > 0) { // Backspace presses Clear
+            sound::Play_Sound_(0x28);
+            fields::_down_mouse_button = _defalt;
+            video::Set_Page_Off_();
+            Draw_Racial_Option_Screen_();
+            RUSS::Mox_Sync_Update_();
+            timer::Mark_Time_();
+            timer::Release_Time_(2);
+            fields::_down_mouse_button = -1;
+            video::Set_Page_Off_();
+            Draw_Racial_Option_Screen_();
+            RUSS::Mox_Sync_Update_();
+            timer::Mark_Time_();
+            timer::Release_Time_(1);
+            synth_input = _defalt;
+        } else if (allow_rename != 0 && _name_button > 0 && nav_key > 0 &&
+                   ((nav_key & 0xFF) == 'r' || (nav_key & 0xFF) == 'R')) {
+            // 'R' starts renaming the race, like clicking the name label.
+            fields::Begin_Continuous_Input_(_name_button, _cur_race_name);
+        } else if (nav_key != 0) {
+            key::Push_Key_Code_((uint32_t)nav_key, g_last_scan_code);
+        }
+
+        // The mouse takes the selection over when it moves onto a line.
+        int16_t ptr_x = (int16_t)mouse::Pointer_X_();
+        int16_t ptr_y = (int16_t)mouse::Pointer_Y_();
+        if (ptr_x != nav->prev_ptr_x || ptr_y != nav->prev_ptr_y) {
+            nav->prev_ptr_x = ptr_x;
+            nav->prev_ptr_y = ptr_y;
+            int16_t hover_field = fields::Scan_Input_();
+            if (hover_field != nav->sel_option_field &&
+                Raceopt_Is_Option_Field_(hover_field)) {
+                nav->sel_option_field = hover_field;
+                MOX::_FULL_DRAW_SCREEN_FLAG = 1; // erase the old pulse text
+            }
+        }
+        return synth_input;
+    }
+
+    // Paints the selection's pulsating text; the cycle advances at one step
+    // per ~110ms since the option loops are not frame-paced.
+    void __cdecl Draw_Raceopt_Selection_Pulse_(const s_raceopt_nav* nav, uint32_t* last_pulse_ms) {
+        if (nav->sel_option_field <= 0) {
+            return;
+        }
+        int16_t pulse_x, pulse_y;
+        const char* pulse_text = Raceopt_Field_Text_(nav->sel_option_field, &pulse_x, &pulse_y);
+        if (pulse_text != nullptr) {
+            s_colors pulse_colors;
+            for (int i = 0; i < 8; ++i) {
+                pulse_colors.colors[i] = (uint8_t)0xFF;
+            }
+            fonts::Set_Font_Style_Shadow_Down_(2, &pulse_colors);
+            fonts::Print_(pulse_x, pulse_y, pulse_text);
+        }
+        uint32_t pulse_now_ms = (uint32_t)SDL_GetTicks();
+        if (pulse_now_ms - *last_pulse_ms >= 110) {
+            *last_pulse_ms = pulse_now_ms;
+            palette::Cycle_Palette_Color_(0xFF, 8, 32, 0, 40, 63, 8, 8);
+        }
+    }
+
     void __cdecl Evolutionary_Mutation_Screen_(int8_t *traits) {
         MOX2::action_func_t previous_auto_function;
         int16_t previous_button_values[10];
@@ -93,6 +298,22 @@ namespace raceopt {
             previous_button_values[i] = _button_variable[i];
         }
         
+        // Enhancement: keyboard selection over the option lines, and the
+        // entry state for the Clear button to restore.
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        int16_t entry_button_values[10];
+        int16_t entry_option_toggles[22];
+        for (int i = 0; i < 10; ++i) {
+            entry_button_values[i] = _button_variable[i];
+        }
+        for (int i = 0; i < 22; ++i) {
+            entry_option_toggles[i] = _option_toggle[i];
+        }
+        s_raceopt_nav em_nav;
+        em_nav.prev_ptr_x = (int16_t)mouse::Pointer_X_();
+        em_nav.prev_ptr_y = (int16_t)mouse::Pointer_Y_();
+        uint32_t last_pulse_ms = 0;
+        
         video::Set_Page_Back_();
         Draw_Race_Option_Background_();
         video::Copy_Back_To_Off_();
@@ -119,7 +340,11 @@ namespace raceopt {
         bool done = false;
         while (!done) {
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
-            int16_t input = fields::Get_Input_();
+            int16_t synth_input = 0;
+            if (enhanced) {
+                synth_input = Read_Raceopt_Keys_(&em_nav, 0);
+            }
+            int16_t input = (synth_input != 0) ? synth_input : fields::Get_Input_();
             
             for (int i = 0; i < 36; ++i) {
                 if (_group_button[i] == input) {
@@ -203,6 +428,15 @@ namespace raceopt {
                 }
             }
             
+            if (_defalt > 0 && _defalt == input) {
+                for (int i = 0; i < 10; ++i) {
+                    _button_variable[i] = entry_button_values[i];
+                }
+                for (int i = 0; i < 22; ++i) {
+                    _option_toggle[i] = entry_option_toggles[i];
+                }
+            }
+            
             if (_accept == input) {
                 if (_picks < 0) {
                     KEN::Ken_Get_Text_Message_(75, message_text, 80);
@@ -230,6 +464,9 @@ namespace raceopt {
                 Add_Race_Options_Fields_EM_(baseline_flags, orig_picks);
                 video::Set_Page_Off_();
                 Draw_Racial_Option_Screen_();
+                if (enhanced) {
+                    Draw_Raceopt_Selection_Pulse_(&em_nav, &last_pulse_ms);
+                }
                 RUSS::Mox_Sync_Update_();
                 
                 for (int i = 0; i < 10; ++i) {
@@ -1013,8 +1250,16 @@ namespace raceopt {
 
         fields::Clear_Fields_();
         _exit_ken = -1000;
-        _accept = fields::Add_Button_Field_(506, 448, "", (s_animation_header*)_accept_button_seg, "", 40);
-        _defalt = -1000;
+        // Enhancement: hotkey 'A' on Accept, and a field for the Clear
+        // button — vanilla draws its art but never registers it, so it is
+        // unclickable there.
+        const bool enhanced_em = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        _accept = fields::Add_Button_Field_(506, 448, "", (s_animation_header*)_accept_button_seg, enhanced_em ? "a" : "", 40);
+        if (enhanced_em) {
+            _defalt = fields::Add_Button_Field_(0x004C, 0x01C0, "", (s_animation_header*)_default_button_seg, "c", 40);
+        } else {
+            _defalt = -1000;
+        }
 
         int16_t col_idx = 0;
         int16_t row_idx = 0;
