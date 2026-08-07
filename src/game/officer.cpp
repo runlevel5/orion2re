@@ -915,10 +915,6 @@ namespace OFFICER {
                                            : (int16_t)1;
             Move_Fleet_Ship_Selection_(step);
             kbd->name_wins = 1;
-        } else if (key > 0 && (key & 0xFF) == '<' && officer_button_mode == -1) {
-            synth_input = fields::Activate_Field_Hotkey_(','); // previous
-        } else if (key > 0 && (key & 0xFF) == '>' && officer_button_mode == -1) {
-            synth_input = fields::Activate_Field_Hotkey_('.'); // next
         } else if (key == 0x49E0 && officer_button_mode == -1) { // PgUp
             synth_input = fields::Activate_Field_Hotkey_('-'); // scroll up
         } else if (key == 0x51E0 && officer_button_mode == -1) { // PgDn
@@ -990,7 +986,7 @@ namespace OFFICER {
                 uint32_t wheel_now_ms = (uint32_t)SDL_GetTicks();
                 if (wheel_now_ms - kbd->last_wheel_ms >= WHEEL_STEP_MS) {
                     kbd->last_wheel_ms = wheel_now_ms;
-                        synth_input = fields::Activate_Field_Hotkey_((wheel_h > 0) ? '.' : ',');
+                    synth_input = fields::Activate_Field_Hotkey_((wheel_h > 0) ? '>' : '<');
                     }
                 }
             }
@@ -3074,12 +3070,14 @@ namespace OFFICER {
             fields::Set_Wheel_Scroll_Bar_(MOX::scroll_bar);
         }
 
+        // Enhancement: the cycle buttons answer to '<'/'>' instead of the
+        // vanilla ','/'.' hotkeys.
         *next_btn = fields::Add_Button_Field(
             0x238,
             0xcd,
             s__00551100,
             MOX::officer_next_button_seg,
-            ".",
+            (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? ">" : ".",
             0x28);
 
         *prev_btn = fields::Add_Button_Field(
@@ -3087,7 +3085,7 @@ namespace OFFICER {
             0xcd,
             s__00551100,
             MOX::officer_prev_button_seg,
-            ",",
+            (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? "<" : ",",
             0x28);
 
         MAINSCR::debug_field = fields::Add_Hidden_Field(
