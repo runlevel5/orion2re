@@ -407,12 +407,15 @@ namespace LOADSAVE {
     }
 
     // Enhancement helper: reads Up/Down/wheel navigation (wheel paced to one
-    // step per WHEEL_STEP_MS) and Enter/middle-click activation. When
-    // out_digit_slot is given, digits pick a slot directly (1-9 the first
-    // nine rows, 0 the tenth). Other keys go back to the fields system.
+    // step per WHEEL_STEP_MS) and Enter/middle-click activation (also the
+    // activate_char key, when given). When out_digit_slot is given, digits
+    // pick a slot directly (1-9 the first nine rows, 0 the tenth); when
+    // out_escape is given, Esc is captured for the caller. Other keys go
+    // back to the fields system.
     static int16_t Read_Popup_Nav_Input_(int16_t wheel_steps, int16_t middle_clicks,
                                          uint32_t* last_wheel_ms, bool* out_activate,
-                                         int16_t* out_digit_slot) {
+                                         int16_t* out_digit_slot, bool* out_escape,
+                                         char activate_char) {
         int16_t nav = 0;
         *out_activate = false;
         int32_t key = key::Read_Key_();
@@ -422,10 +425,16 @@ namespace LOADSAVE {
             nav = 1;
         } else if (key == 0x1C0D) { // Enter
             *out_activate = true;
+        } else if (activate_char != 0 && key > 0 &&
+                   ((key & 0xFF) == activate_char ||
+                    (key & 0xFF) == (activate_char + 0x20))) {
+            *out_activate = true;
         } else if (out_digit_slot != nullptr && key > 0 &&
                    (key & 0xFF) >= '0' && (key & 0xFF) <= '9') {
             int16_t ch = (int16_t)(key & 0xFF);
             *out_digit_slot = (ch == '0') ? (int16_t)9 : (int16_t)(ch - '1');
+        } else if (out_escape != nullptr && key == 0x011B) { // Esc
+            *out_escape = true;
         } else if (key != 0) {
             key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
         }
@@ -527,26 +536,28 @@ namespace LOADSAVE {
             // selects its row — pressed again on the selected row it loads.
             bool key_load = false;
             int16_t digit_slot = -1;
+            int16_t synth_input = 0;
             if (ENHANCED_UX::enhanced_ux_settings.enabled) {
+                bool esc_cancel = false;
                 int16_t key_nav = Read_Popup_Nav_Input_(
                     platform::Consume_Mouse_Wheel_Steps_(),
                     platform::Consume_Middle_Clicks_(),
-                    &last_wheel_ms, &key_load, &digit_slot);
+                    &last_wheel_ms, &key_load, &digit_slot, &esc_cancel, 'L');
                 if (key_nav != 0) {
                     Select_Save_Slot_(Step_Slot_(MOX::_settings.active_save_slot, key_nav));
                     sound::Play_Sound_(')'); // same sound as clicking a row
                 }
-                if (digit_slot >= 0) {
-                    if (digit_slot == (int16_t)MOX::_settings.active_save_slot) {
-                        key_load = true;
-                    } else {
-                        Select_Save_Slot_(digit_slot);
-                        sound::Play_Sound_(')');
-                    }
+                if (digit_slot >= 0 && digit_slot != (int16_t)MOX::_settings.active_save_slot) {
+                    Select_Save_Slot_(digit_slot);
+                    sound::Play_Sound_(')');
+                }
+                if (esc_cancel) {
+                    // Esc presses the Cancel button like a click.
+                    synth_input = fields::Activate_Field_(_game_popup_fields->btn_popup_close_id);
                 }
             }
 
-            int16_t input_id = fields::Get_Input_();
+            int16_t input_id = (synth_input != 0) ? synth_input : fields::Get_Input_();
             if (key_load) {
                 input_id = _game_popup_fields->btn_popup_load_id;
                 Animate_Popup_Button_Press_(_game_popup_fields->btn_popup_load_id);
@@ -570,12 +581,14 @@ namespace LOADSAVE {
                 last_clicked_slot = selected_slot;
                 last_click_ms = now_ms;
 
-                if (is_double_click) {
+                // A click on the already-selected row loads it (however the
+                // selection was made — click, digit or arrows), as does a
+                // double click on any row.
+                if (is_double_click ||
+                    selected_slot == (int16_t)MOX::_settings.active_save_slot) {
                     Animate_Popup_Button_Press_(_game_popup_fields->btn_popup_load_id);
                 } else {
-                    if (selected_slot != MOX::_settings.active_save_slot) {
-                        Select_Save_Slot_(selected_slot);
-                    }
+                    Select_Save_Slot_(selected_slot);
                     selected_slot = -1;
                 }
             }
@@ -723,7 +736,13 @@ namespace LOADSAVE {
 
             if (_game_popup_fields->screen_cancel_field_id == input) {
                 exit_loop = true;
-                *exit_code = 1;
+                // Enhancement: Esc goes back to the Game panel, like Accept,
+                // instead of leaving to the main screen.
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                    MOX::_screen_data = 0;
+                } else {
+                    *exit_code = 1;
+                }
             } else if (_game_popup_fields->btn_settings_accept_id == input) {
                 exit_loop = true;
                 MOX::_screen_data = 0;
@@ -803,11 +822,18 @@ namespace LOADSAVE {
             // directly, bypassing name editing.
             int16_t wheel_steps = platform::Consume_Mouse_Wheel_Steps_();
             int16_t middle_clicks = platform::Consume_Middle_Clicks_();
+            int16_t synth_input = 0;
             if (enhanced && fields::_input_field_active == 0) {
                 bool begin_edit = false;
+                bool esc_cancel = false;
                 int16_t digit_slot = -1;
                 int16_t nav = Read_Popup_Nav_Input_(wheel_steps, middle_clicks,
-                                                    &last_wheel_ms, &begin_edit, &digit_slot);
+                                                    &last_wheel_ms, &begin_edit, &digit_slot, &esc_cancel, 0);
+                if (esc_cancel) {
+                    // Esc presses the Cancel button like a click — animation
+                    // and sound included — returning to the Game panel.
+                    synth_input = fields::Activate_Field_(_game_popup_fields->btn_popup_close_id);
+                }
                 if (nav != 0) {
                     active_slot_idx = Step_Slot_(active_slot_idx, nav);
                     Select_Save_Popup_Slot_(active_slot_idx);
@@ -831,7 +857,7 @@ namespace LOADSAVE {
             }
             int16_t double_click_slot = enhanced ? Detect_Save_Row_Double_Click_(&row_clicks) : -1;
 
-            int16_t input_id = fields::Get_Input_();
+            int16_t input_id = (synth_input != 0) ? synth_input : fields::Get_Input_();
 
             if (double_click_slot != -1) {
                 if (fields::_input_field_active != 0) {
