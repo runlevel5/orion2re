@@ -169,6 +169,10 @@ orion2re_add_unit_test(test_settler
 orion2re_add_unit_test(test_colony_production_helpers
     SOURCES
         tests/unit/test_colony_production_helpers.cpp
+    PRODUCTION_SOURCES
+        src/game/colcalc_base.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colcalc_base_runtime.cpp
 )
 
 orion2re_add_unit_test(test_build_queue

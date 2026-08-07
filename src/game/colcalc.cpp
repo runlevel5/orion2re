@@ -25,7 +25,6 @@ namespace COLCALC {
     char* _morale_summary_msg;
     char* _total_morale_msg;
     char* _command_summary_msg;
-    int8_t _colony_calc_food_cache[10];
     char* _ship_maintenance_costs_msg;
     char* _d_from_1_s_ship_msg;
     char* _d_from_d_battlestations_msg;
@@ -44,12 +43,6 @@ namespace COLCALC {
     char* _from_imperium_msg;
     char* _d_from_1_battlestation_msg;
     char* _d_from_1_fortress_msg;
-
-    const s_colony* _colony_calc_food_colony;
-    uint8_t _colony_calc_food_type;
-    const s_colony* _colony_calc_industry_colony;
-    uint8_t _colony_calc_industry_type;
-    int8_t _colony_calc_industry_cache[10];
 
     int8_t _assimilation_rate_by_government[GOVERNMENT_COUNT] = {30, 60, 30, 60, 60, 120, 12, 16};
 
@@ -92,10 +85,6 @@ namespace COLCALC {
 
     char* _taxed_msg;
     char* _base_msg;
-
-    const s_colony* _colony_calc_research_colony;
-    uint8_t _colony_calc_research_type;
-    int8_t _colony_calc_research_cache[10];
 
     char _tmp_quotient[20];
 

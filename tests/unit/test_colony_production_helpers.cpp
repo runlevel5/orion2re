@@ -3,6 +3,10 @@
 #include "game/build_queue.h"
 #include "doctest/doctest.h"
 
+namespace TEST_COLCALC_BASE {
+    void Reset_();
+}
+
 DOCTEST_TEST_SUITE("colony production helpers") {
 
 DOCTEST_TEST_CASE("building product classification excludes sentinels and upper boundary") {
@@ -51,6 +55,28 @@ DOCTEST_TEST_CASE("ship product encodings round trip through their matching rang
         DOCTEST_CHECK(COLBLDG::Colony_Production_Is_Ship_Design_(production_id));
         DOCTEST_CHECK(COLBLDG::Colony_Production_Ship_Design_Index_(production_id) == design_idx);
     }
+}
+
+DOCTEST_TEST_CASE("base production reflects recalculated colony fields") {
+    TEST_COLCALC_BASE::Reset_();
+
+    s_colony colony = {};
+    colony.owner = 0;
+    colony.food2_per_farmer = 8;
+    colony.industry_per_worker = 7;
+    colony.research_per_scientist = 6;
+
+    DOCTEST_CHECK(COLCALC::Colony_Empire_Base_Food2_Produced_(&colony, 0, 0, nullptr) == 8);
+    DOCTEST_CHECK(COLCALC::Colony_Empire_Base_Industry_Produced_(&colony, 0, 0, nullptr) == 7);
+    DOCTEST_CHECK(COLCALC::Colony_Empire_Base_Research_Produced_(&colony, 0, 0, nullptr) == 6);
+
+    colony.food2_per_farmer = 4;
+    colony.industry_per_worker = 3;
+    colony.research_per_scientist = 2;
+
+    DOCTEST_CHECK(COLCALC::Colony_Empire_Base_Food2_Produced_(&colony, 0, 0, nullptr) == 4);
+    DOCTEST_CHECK(COLCALC::Colony_Empire_Base_Industry_Produced_(&colony, 0, 0, nullptr) == 3);
+    DOCTEST_CHECK(COLCALC::Colony_Empire_Base_Research_Produced_(&colony, 0, 0, nullptr) == 2);
 }
 
 DOCTEST_TEST_CASE("build queue hotkeys map to all eleven numeric presets") {
