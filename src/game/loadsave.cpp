@@ -1553,21 +1553,25 @@ namespace LOADSAVE {
     /**
      * @address 005110a0
      */
-    // Enhancement helper: audio hotkeys while the Game panel is open. Plain
-    // -/+/0 and the media keys drive both sliders, Ctrl + -/=/0 the Music
-    // one, Alt + -/=/0 the Sound FX one; 0 toggles mute (levels remembered),
-    // volume keys leave mute by restoring them. Other keys go back to the
-    // fields system.
-    static void Handle_Game_Popup_Audio_Keys_() {
+    // Enhancement helper: hotkeys while the Game panel is open. Plain -/+/0
+    // and the media keys drive both sliders, Ctrl + -/=/0 the Music one,
+    // Alt + -/=/0 the Sound FX one; 0 toggles mute (levels remembered),
+    // volume keys leave mute by restoring them. 'E' presses the Settings
+    // button (whose native hotkey is the unlabeled 'O'). Other keys go back
+    // to the fields system. Returns the field to activate, or 0.
+    static int16_t Read_Game_Popup_Keys_() {
         constexpr int16_t VOLUME_KEY_STEP = 16; // sliders range 0..0x9C
         int32_t key = key::Read_Key_();
         bool for_music = false;
         bool for_sfx = false;
         platform::e_audio_key_action action = platform::Decode_Audio_Key_(key, &for_music, &for_sfx);
 
-        // Plain -/+/0 drive both channels too.
+        // Plain -/+/0 drive both channels too; 'E' opens Settings.
         if (action == platform::AUDIO_KEY_NONE && key > 0) {
             int16_t character = (int16_t)(key & 0xFF);
+            if (character == 'e' || character == 'E') {
+                return fields::Activate_Field_Hotkey_('O');
+            }
             if (character == '0') {
                 for_music = for_sfx = true;
                 action = platform::AUDIO_KEY_MUTE_TOGGLE;
@@ -1584,7 +1588,9 @@ namespace LOADSAVE {
             if (key != 0) {
                 key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
             }
-        } else if (action == platform::AUDIO_KEY_MUTE_TOGGLE) {
+            return 0;
+        }
+        if (action == platform::AUDIO_KEY_MUTE_TOGGLE) {
             // Unmute only when every targeted channel is already muted.
             bool all_targets_muted = (!for_music || _music_muted != 0) &&
                                      (!for_sfx || _sfx_muted != 0);
@@ -1633,6 +1639,7 @@ namespace LOADSAVE {
                 Set_Sound_For_Game_Popup_(1);
             }
         }
+        return 0;
     }
 
     void __cdecl Do_Main_Game_Popup_(int16_t* out_finished) {
@@ -1648,11 +1655,12 @@ namespace LOADSAVE {
         while (true) {
             timer::Mark_Time_();
 
+            int16_t synth_input = 0;
             if (enhanced) {
-                Handle_Game_Popup_Audio_Keys_();
+                synth_input = Read_Game_Popup_Keys_();
             }
 
-            int16_t input = fields::Get_Input_();
+            int16_t input = (synth_input != 0) ? synth_input : fields::Get_Input_();
 
             if (input == _game_popup_fields->btn_main_close_id) {
                 _draw_game_popup_to_back = 1;
