@@ -151,6 +151,21 @@ DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {
     DOCTEST_CHECK(COMBINIT::_satellite_capture_enabled == 1);
 }
 
+DOCTEST_TEST_CASE("planetary Damper Field setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_planet_damper_enabled == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "planet_damper = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_planet_damper_enabled == 1);
+}
+
 DOCTEST_TEST_CASE("satellite capture state applies once to the matching colony") {
     COMBINIT::s_satellite_capture_state state;
     COMBINIT::Record_Captured_Satellite_State_(

@@ -1198,6 +1198,20 @@
       default: false,
     },
 
+    planet_damper: {
+      title: "Planetary Damper Field",
+      description: "Equips planetary defensive installations with a Damper Field when the defender has researched the technology.",
+      remarks: "Planetary shield absorption is applied before Damper Field reduction, and the protection ends when the last defensive installation is destroyed.",
+      examples: ["planet_damper = true;"],
+      group: "gameplay",
+      type: "bool",
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::_planet_damper_enabled",
+      },
+      default: false,
+    },
+
     board_in_black_hole: {
       title: "Allow boarding in black holes",
       description: "Allows ships affected by a Black Hole Generator to board or be boarded.",

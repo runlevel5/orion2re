@@ -1731,6 +1731,15 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     }
 
     if (weapon_index > 0) {
+        if (_planet_damper_enabled != 0 &&
+            MOX::_player[MOX::_combat_defender_player]
+                .tech_applications[TECH_APP_DAMPER_FIELD] ==
+                TECH_RESEARCH_STATUS_RESEARCHED) {
+            struct_::Set_Bit_Field_(
+                MOX::_combat_data->special_device_flags,
+                SPECIAL_DAMPER_FIELD);
+        }
+
         if (MOX::_player[MOX::_combat_defender_player].tech_applications[TECH_APP_BATTLE_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
             struct_::Set_Bit_Field_(MOX::_combat_data->special_device_flags, SPECIAL_BATTLE_SCANNER);
         }

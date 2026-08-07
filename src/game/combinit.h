@@ -1,6 +1,7 @@
 #pragma once
 
 namespace COMBINIT {
+    inline uint8_t _planet_damper_enabled = 0;
     inline uint8_t _satellite_capture_enabled = 0;
 
     struct s_satellite_capture_state {

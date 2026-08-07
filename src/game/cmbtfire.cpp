@@ -90,6 +90,15 @@ namespace CMBTFIRE {
                 n_to_destroy--;
             } while (n_to_destroy != 0);
         }
+
+        if (Does_Combat_Planet_Have_Defenses_() == 0) {
+            struct_::Clear_Bit_Field_(
+                MOX::_combat_data->special_device_flags,
+                SPECIAL_DAMPER_FIELD);
+            struct_::Clear_Bit_Field_(
+                MOX::_combat_data->special_device_flags,
+                SPECIAL_RANGEMASTER_UNIT);
+        }
     }
 
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_() {
@@ -920,13 +929,19 @@ namespace CMBTFIRE {
             }
         }
         else {
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(0, 7 /* HARD_SHIELDS */) == 1) {
-                *damage = (int16_t)((*damage + (((int32_t)*damage >> 31) & 3)) >> 2);
-                *damage -= 1;
-            }
-
             if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() > 0) {
-                defense_hits = *damage - MOX::_combat_data->shield_arc_current[0];
+                if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                        0, SPECIAL_DAMPER_FIELD) != 0) {
+                    defense_hits =
+                        *damage - MOX::_combat_data->shield_arc_current[1];
+                    if (defense_hits < 0) {
+                        defense_hits = 0;
+                    }
+                    defense_hits /= 4;
+                } else {
+                    defense_hits =
+                        *damage - MOX::_combat_data->shield_arc_current[0];
+                }
                 if (MOX::_combat_data->shield_type > 0) {
                     shield_hit_flag = 1;
                 }

@@ -126,7 +126,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8101` - `miniaturization`: implemented in `DESIGN::Miniaturization_Category_()`, `DESIGN::Cost_Given_M_Level_()`, and `DESIGN::Space_Given_M_Level_()` with configurable technology categories and normalized six-level cost and per-category space curves; this replaces the 1.50 call diversions, immediate rewrites, and flattened multiplier fields with direct source-level data bindings.
 - [x] `asm.pl:8114` - `mark stack overflow`: fixed in `INFO::_Tech_Review_Subscreen_()` by popping its active technology-image allocation before every return, preserving push-stack balance for both the info screen and race report; this replaces the 1.50 race-report cursor stash with cleanup at the allocation owner.
 - [ ] `asm.pl:8145` - `turn order ini overflow`
-- [ ] `asm.pl:8169` - `damper planet`
+- [x] `asm.pl:8169` - `damper planet`: implemented in `COMBINIT::Load_Tactical_Colony_()`, `CMBTFIRE::Apply_Damage_To_Planet_()`, and `CMBTFIRE::Destroy_Colony_Defense_()` with the optional `planet_damper` setting; eligible planetary defenses subtract planetary shield absorption before reducing remaining damage to one quarter, and Damper and Rangemaster protection ends when the last defense is destroyed, replacing the 1.50 wrappers and byte clears with direct source-level rules.
 - [ ] `asm.pl:8263` - `satellites plasma darkening`
 - [ ] `asm.pl:8272` - `shuttle hijack`
 - [ ] `asm.pl:8367` - `marines overload`
