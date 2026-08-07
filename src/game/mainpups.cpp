@@ -18,6 +18,10 @@ namespace MAINPUPS {
     uint8_t g_using_colony_ship;
     int16_t g_max;
     int16_t g_min;
+
+    // Enhancement: optional per-frame overlay for the slider popup (drawn
+    // with the current value), letting a caller preview the effect live.
+    void (__cdecl* _g_slider_preview_cb)(int16_t value) = nullptr;
     char* g_msg;
     int16_t g_var;
     int16_t g_temp_tax_rate;
@@ -732,18 +736,52 @@ namespace MAINPUPS {
         Add_Slider_Fields(g_min, g_max, &g_var);
     }
 
-    // Enhancement helper: Left/Right and the wheel (one step per 120ms)
-    // press the slider popup's '<'/'>' buttons via their native hotkey
-    // characters, so they behave like clicks; other keys go back to the
-    // fields system. Returns the activated field, or 0.
+    // Enhancement helper: shows a slider popup button pressed and released
+    // with its click sound. The frames are remap-drawn directly (like the
+    // rest of the popup art) on both flip pages, since screens under the
+    // popup may run with field drawing disabled or a different palette.
+    static void Animate_Slider_Button_Press_(s_animation_header* pic, int16_t x, int16_t y) {
+        sound::Play_Sound(0x28);
+        for (int i = 0; i < 2; ++i) {
+            video::Set_Page_Off();
+            animate::Set_Animation_Frame(pic, 1);
+            animate::Remap_Draw(x, y, pic);
+            RUSS::Mox_Sync_Update();
+        }
+        timer::Mark_Time();
+        timer::Release_Time(2);
+        for (int i = 0; i < 2; ++i) {
+            video::Set_Page_Off();
+            animate::Set_Animation_Frame(pic, 0);
+            animate::Remap_Draw(x, y, pic);
+            RUSS::Mox_Sync_Update();
+        }
+        timer::Mark_Time();
+        timer::Release_Time(1);
+    }
+
+    // Enhancement helper: Left/'<'/'-' and Right/'>'/'+' (and the wheel,
+    // one step per 120ms) press the slider popup's '<'/'>' buttons via
+    // their native hotkey characters, so they behave like clicks — the
+    // vanilla hotkey characters on those buttons are swapped relative to
+    // -/+, so the keys are routed here explicitly. Enter and Esc press
+    // Accept and Cancel with the press/release animation. Other keys go
+    // back to the fields system. Returns the activated field, or 0.
     static int16_t Read_Slider_Popup_Keys_(uint32_t* last_wheel_ms) {
         constexpr uint32_t WHEEL_STEP_MS = 120;
         int16_t synth_input = 0;
         int32_t key = key::Read_Key();
-        if (key == 0x4BE0) { // Left
+        int16_t ch = (key > 0) ? (int16_t)(key & 0xFF) : (int16_t)0;
+        if (key == 0x4BE0 || ch == '<' || ch == '-') { // decrease
             synth_input = fields::Activate_Field_Hotkey_(ESTRINGS::E_Strings(137 /* 0x89 */)[0]);
-        } else if (key == 0x4DE0) { // Right
+        } else if (key == 0x4DE0 || ch == '>' || ch == '+') { // increase
             synth_input = fields::Activate_Field_Hotkey_(ESTRINGS::E_Strings(11 /* 0xb */)[0]);
+        } else if (key == 0x1C0D) { // Enter presses Accept
+            Animate_Slider_Button_Press_(anims[4], (int16_t)(g_x + 208), (int16_t)(g_y + 174));
+            return mp_fields[3];
+        } else if (key == 0x011B) { // Esc presses Cancel
+            Animate_Slider_Button_Press_(anims[35], (int16_t)(g_x + 15), (int16_t)(g_y + 174));
+            return mp_fields[2];
         } else if (key != 0) {
             key::Push_Key_Code((uint32_t)key, g_last_scan_code);
         }
@@ -786,11 +824,20 @@ namespace MAINPUPS {
             platform::Discard_Input_Observations_();
         }
 
+        int16_t last_preview_value = g_var;
+
         do {
             // Enhancement: Left/Right and the wheel press the '<'/'>' buttons.
             int16_t synth_input = 0;
             if (enhanced) {
                 synth_input = Read_Slider_Popup_Keys_(&last_wheel_ms);
+            }
+
+            // A value change redraws the background so the preview overlay
+            // never leaves stale marks.
+            if (enhanced && _g_slider_preview_cb != nullptr && g_var != last_preview_value) {
+                last_preview_value = g_var;
+                COLONY::full_draw = 1;
             }
 
             input = (synth_input != 0) ? synth_input : fields::Get_Input();
@@ -1887,6 +1934,18 @@ namespace MAINPUPS {
         if (value == mp_fields[10]) {
             --g_var;
         }
+
+        // Enhancement: the '<'/'>' buttons stay within the slider's range
+        // (only the thumb drag was clamped).
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+            (value == mp_fields[9] || value == mp_fields[10])) {
+            if (g_var < g_min) {
+                g_var = g_min;
+            }
+            if (g_var > g_max) {
+                g_var = g_max;
+            }
+        }
     }
 
     void __cdecl Mainpups_Tested_Execute_Autofunction() {
@@ -2325,6 +2384,11 @@ namespace MAINPUPS {
         fonts::Print_Integer_Centered(MAINPUPS::g_x + 32, MAINPUPS::g_y + 132, (int)MAINPUPS::g_min);
         fonts::Print_Integer_Centered(MAINPUPS::g_x + 145, MAINPUPS::g_y + 130, (int)MAINPUPS::g_var);
         fonts::Print_Integer_Centered(MAINPUPS::g_x + 257, MAINPUPS::g_y + 132, (int)MAINPUPS::g_max);
+
+        // Enhancement: live preview overlay for the current value.
+        if (MAINPUPS::_g_slider_preview_cb != nullptr) {
+            MAINPUPS::_g_slider_preview_cb((int16_t)MAINPUPS::g_var);
+        }
 
         // Calculate handle horizontal position: 207 is track width
         slider_offset = (int16_t)((207 * (MAINPUPS::g_var - MAINPUPS::g_min)) / (MAINPUPS::g_max - MAINPUPS::g_min) + 37);

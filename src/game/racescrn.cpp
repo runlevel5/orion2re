@@ -695,9 +695,10 @@ namespace RACESCRN {
         }
     }
 
-    // Enhancement helper: in the "Who?" prompt, digits pick a race — 1-4
-    // the left column top to bottom, 5-7 the right one. Returns the race's
-    // field to activate, or 0; other keys go back to the fields system.
+    // Enhancement helper: in the "Who?" prompt (or carrying agents), digits
+    // pick a race — 1-4 the left column top to bottom, 5-7 the right one.
+    // Returns the race's field to activate, -1 when Esc cancels the "Who?"
+    // prompt, or 0; other keys go back to the fields system.
     static int16_t Read_Who_Mode_Digit_(s_racescrn_race_display* displays) {
         int32_t key = key::Read_Key();
         if (key > 0 && (key & 0xFF) >= '1' && (key & 0xFF) <= '7') {
@@ -705,18 +706,27 @@ namespace RACESCRN {
             if (race_idx < (int16_t)MOX::active_count) {
                 return displays[race_idx].main_interaction_field_id;
             }
+        } else if (key == 0x011B && (g_in_who_mode != 0 || g_in_spy_mode != 0)) {
+            return -1; // Esc backs out of the mode, not the screen
+        } else if (g_in_spy_mode != 0 && key > 0 &&
+                   ((key & 0xFF) == 'p' || (key & 0xFF) == 'P')) {
+            return g_agent_field; // 'P' drops carried agents into the pool
         } else if (key != 0) {
             key::Push_Key_Code((uint32_t)key, g_last_scan_code);
         }
         return 0;
     }
 
-    // Enhancement helper: spy mission hotkeys — a digit (1-7, same layout
-    // as the "Who?" prompt) picks a race, then E/S/H sets Espionage,
-    // Sabotage or Hide for it, like clicking its mission button. Returns 1
-    // when a mission changed and the fields need repainting; other keys go
-    // back to the fields system and clear the pending digit.
-    static uint8_t Read_Spy_Mission_Keys_(s_racescrn_race_display* displays, int16_t* pending_race) {
+    // Enhancement helper: spy hotkeys — a digit (1-7, same layout as the
+    // "Who?" prompt) picks a race, then E/S/H sets Espionage, Sabotage or
+    // Hide for it, like clicking its mission button, and 'X' asks to move
+    // that race's agents back to the pool. 'X' with no pending digit asks
+    // for the pool assignment dialog. Returns 1 when a mission changed and
+    // the fields need repainting, 2 for the assign dialog, 3 for the
+    // unassign dialog (race in *out_unassign_race); other keys go back to
+    // the fields system and clear the pending digit.
+    static uint8_t Read_Spy_Mission_Keys_(s_racescrn_race_display* displays, int16_t* pending_race,
+                                          int16_t* out_unassign_race) {
         int32_t key = key::Read_Key();
         if (key == 0) {
             return 0;
@@ -743,15 +753,82 @@ namespace RACESCRN {
                 sound::Play_Sound(')');
                 return 1;
             }
+            if (ch == 'x' || ch == 'X') {
+                *out_unassign_race = *pending_race;
+                *pending_race = -1;
+                return 3;
+            }
         }
         *pending_race = -1;
+        if (key > 0 && (ch == 'x' || ch == 'X')) {
+            return 2;
+        }
         key::Push_Key_Code((uint32_t)key, g_last_scan_code);
         return 0;
+    }
+
+    // Enhancement: pristine panel backgrounds behind the agent pool ([0])
+    // and each race's spy row ([1 + race]), captured before any icons are
+    // drawn, so the agents dialog's preview can erase its bracket cleanly.
+    struct s_preview_capture {
+        int16_t x1;
+        int16_t y1;
+        int16_t x2;
+        int16_t y2;
+        s_animation_header* bmp;
+    };
+    static s_preview_capture _g_preview_captures[MAX_PLAYERS] = {};
+    static s_racescrn_mouse_group* _g_preview_group = nullptr;
+    static int16_t _g_preview_capture_ix = 0;
+
+    // Enhancement helper: while the agents dialog is open, brackets the last
+    // <value> agents of the previewed group (pool or a race's spy row), like
+    // hovering them does — after restoring the group's background and
+    // redrawing its current icons, so no stale bracket marks are left.
+    static void Draw_Assign_Agents_Preview_(int16_t value) {
+        s_racescrn_mouse_group* group = _g_preview_group;
+        if (group == nullptr || group->count == 0 || value < 1) {
+            return;
+        }
+        s_preview_capture* cap = &_g_preview_captures[_g_preview_capture_ix];
+        // Skip the preview when its region lies under the dialog, which
+        // would otherwise be painted over.
+        int16_t popup_x2 = (int16_t)(MAINPUPS::g_x + animate::Get_Width(MAINPUPS::anims[14]));
+        int16_t popup_y2 = (int16_t)(MAINPUPS::g_y + animate::Get_Height(MAINPUPS::anims[14]));
+        if (cap->x1 < popup_x2 && cap->x2 > MAINPUPS::g_x &&
+            cap->y1 < popup_y2 && cap->y2 > MAINPUPS::g_y) {
+            return;
+        }
+        if (cap->bmp != nullptr) {
+            animate::Draw_(cap->x1, cap->y1, cap->bmp);
+        }
+        Draw_Icon_Group(group);
+        int16_t n = (value > (int16_t)group->count) ? (int16_t)group->count : value;
+        int16_t x_pos = (int16_t)(group->x1 + group->spacing_x * (group->count - n));
+        fonts::Set_Font_Style_Outline(2, &race_high_color);
+        Draw_Icon_Group_Cursor(group, x_pos, 0xFF, true);
+    }
+
+    // Enhancement helper: captures one preview background region.
+    static void Capture_Preview_Region_(int16_t ix, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        s_preview_capture* cap = &_g_preview_captures[ix];
+        cap->x1 = x1;
+        cap->y1 = y1;
+        cap->x2 = x2;
+        cap->y2 = y2;
+        int16_t w = (int16_t)(x2 - x1 + 1);
+        int16_t h = (int16_t)(y2 - y1 + 1);
+        cap->bmp = (s_animation_header*)allocate::Allocate_Next_Block(MOX::screen_seg, bitmap::Get_Bitmap_Size(w, h));
+        bitmap::Create_Blank_Bitmap(w, h, cap->bmp);
+        bitmap::Screen_Bitmap_Capture(x1, y1, x2, y2, cap->bmp);
     }
 
     void __cdecl Race_Screen() {
         int16_t selected_race_idx = -1;
         int16_t old_mission_idx = -1;
+        int16_t pending_spy_pickup = 0; // enhancement: agents chosen via 'X'
+        int16_t pending_spy_return = 0; // enhancement: agents to send back
+        int16_t pending_spy_return_race = -1;
         MOX2::action_func_t auto_function = nullptr;
 
         MOX2::Get_Auto_Function(&auto_function);
@@ -851,6 +928,22 @@ namespace RACESCRN {
             animate::Draw(0, 0, anim);
             RUSS::Mox_Update();
 
+            // Enhancement: capture the pristine backgrounds of the agent
+            // pool and every race's spy row for the agents dialog preview
+            // (the screen segment was reset above, so last round's captures
+            // are gone either way).
+            memset(_g_preview_captures, 0, sizeof(_g_preview_captures));
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                Capture_Preview_Region_(0, 320, 378, 621, 421);
+                for (int16_t i = 0; i < (int16_t)MOX::active_count; ++i) {
+                    int16_t spy_x = race_spies[i * 2];
+                    int16_t spy_y = race_spies[i * 2 + 1];
+                    Capture_Preview_Region_((int16_t)(1 + i),
+                                            (int16_t)(spy_x - 4), (int16_t)(spy_y - 10),
+                                            (int16_t)(spy_x + 191), (int16_t)(spy_y + 29));
+                }
+            }
+
             if (ERIC::Get_Fade_Percent() > 0) {
                 BILL::Turn_Off_Palettes(0, 255);
             }
@@ -907,20 +1000,106 @@ namespace RACESCRN {
             uint8_t human_rejected = 0;
             int16_t pending_spy_race = -1;
 
+            // Enhancement: agents chosen in the digit + 'X' dialog go onto
+            // the cursor, exactly like a mouse pickup from that race's row;
+            // a click (or 'P' for the pool) then drops them.
+            if (pending_spy_return > 0 && pending_spy_return_race >= 0 &&
+                pending_spy_return_race < (int16_t)MOX::active_count) {
+                s_racescrn_mouse_group* src = &race_display_data[pending_spy_return_race].spy_icons_group;
+                int16_t n = pending_spy_return;
+                if (n > (int16_t)src->count) {
+                    n = (int16_t)src->count;
+                }
+                if (n > 0) {
+                    g_spy_xfer_count = n;
+                    Move_Spies_Group(src, arrow_seg);
+                    g_in_spy_mode = 1;
+                    active_spy_group = src;
+                    selected_race_idx = pending_spy_return_race;
+                    old_mission_idx = race_display_data[pending_spy_return_race].agent_mission_idx;
+                    Adjust_Spy_Mission_Data();
+                }
+            }
+            pending_spy_return = 0;
+            pending_spy_return_race = -1;
+
+            // Enhancement: agents chosen in the 'X' dialog go onto the
+            // cursor now, exactly like a mouse pickup from the agent pool.
+            if (pending_spy_pickup > 0) {
+                int16_t n = pending_spy_pickup;
+                pending_spy_pickup = 0;
+                if (n > (int16_t)agent_group.count) {
+                    n = (int16_t)agent_group.count;
+                }
+                if (n > 0) {
+                    g_spy_xfer_count = n;
+                    Move_Spies_Group(&agent_group, arrow_seg);
+                    g_in_spy_mode = 1;
+                    active_spy_group = &agent_group;
+                    selected_race_idx = 0;
+                    old_mission_idx = race_display_data[0].agent_mission_idx;
+                    Adjust_Spy_Mission_Data();
+                }
+            }
+
             while (true) {
-                // Enhancement: digits answer the "Who?" prompt; outside it,
-                // digit + E/S/H sets a race's spy mission.
+                // Enhancement: digits answer the "Who?" prompt, or drop
+                // carried agents onto a race; outside those modes,
+                // digit + E/S/H sets a spy mission and 'S' opens the
+                // assign-agents dialog.
                 int16_t synth_input = 0;
                 if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
-                    if (g_in_who_mode) {
+                    if (g_in_who_mode || g_in_spy_mode) {
                     synth_input = Read_Who_Mode_Digit_(race_display_data);
-                    } else if (!g_in_spy_mode) {
-                        if (Read_Spy_Mission_Keys_(race_display_data, &pending_spy_race) != 0) {
+                        if (synth_input < 0) {
+                            if (g_in_who_mode) {
+                                // Esc replays a click on the armed action
+                                // button, which cancels the prompt.
+                                sound::Play_Sound('(');
+                                synth_input = active_action_field;
+                            } else {
+                                // Esc drops the carried agents back where
+                                // they came from, like clicking empty space.
+                                synth_input = who_cancel_field;
+                            }
+                        }
+                    } else {
+                        int16_t unassign_race = -1;
+                        uint8_t key_action = Read_Spy_Mission_Keys_(race_display_data, &pending_spy_race, &unassign_race);
+                        if (key_action == 1) {
                             fields::Enable_Draw_All_Fields();
                             fields::Draw_Visible_Fields();
                             fields::Disable_Draw_All_Fields();
                             fields::Draw_All_Fields();
                             video::Copy_Off_To_Back();
+                        } else if (key_action == 2 && agent_group.count > 0) {
+                            static char assign_prompt[] = "HOW MANY AGENTS?";
+                            _g_preview_group = &agent_group;
+                            _g_preview_capture_ix = 0;
+                            MAINPUPS::_g_slider_preview_cb = Draw_Assign_Agents_Preview_;
+                            int16_t n = MAINPUPS::Slider_Popup(
+                                1, (int16_t)agent_group.count, 1, assign_prompt, 0);
+                            MAINPUPS::_g_slider_preview_cb = nullptr;
+                            if (n > 0) {
+                                pending_spy_pickup = n;
+                            }
+                            MOX::FULL_DRAW_SCREEN_FLAG = 1;
+                        } else if (key_action == 3 && unassign_race >= 0 &&
+                                   unassign_race < (int16_t)MOX::active_count &&
+                                   race_display_data[unassign_race].spy_icons_group.count > 0) {
+                            static char return_prompt[] = "HOW MANY AGENTS?";
+                            _g_preview_group = &race_display_data[unassign_race].spy_icons_group;
+                            _g_preview_capture_ix = (int16_t)(1 + unassign_race);
+                            MAINPUPS::_g_slider_preview_cb = Draw_Assign_Agents_Preview_;
+                            int16_t n = MAINPUPS::Slider_Popup(
+                                1, (int16_t)race_display_data[unassign_race].spy_icons_group.count,
+                                1, return_prompt, 0);
+                            MAINPUPS::_g_slider_preview_cb = nullptr;
+                            if (n > 0) {
+                                pending_spy_return = n;
+                                pending_spy_return_race = unassign_race;
+                            }
+                            MOX::FULL_DRAW_SCREEN_FLAG = 1;
                         }
                     }
                 }
