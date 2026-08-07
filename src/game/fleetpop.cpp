@@ -1642,7 +1642,9 @@ bool __cdecl Set_Attack_Antares_Button_Flag_(void) {
 
             if (found_matching_ship) {
                 has_dimensional_portal =
-                        HAROLD::Star_Has_Dimensional_Portal_(&MOX::_star[star_idx]);
+                        HAROLD::Player_Has_Dimensional_Portal_(
+                            &MOX::_player[MOX::_ship[selected_ship_idx].owner],
+                            &MOX::_star[star_idx]);
             }
         }
     }

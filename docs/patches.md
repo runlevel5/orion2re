@@ -109,7 +109,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:3474` - `teleporter + tractor fix`: fixed in `CMBTMOV1::Move_Ship_()` by collecting active tractor links before selecting teleport or ordinary movement, so the shared post-move range check breaks beams beyond four squares after either path; this directly expresses the 1.50 control-flow reorder in source.
 - [x] `asm.pl:4421` - `AI missile targeting`: fixed in `CMBTAI::Get_Current_Missile_Target_()` by classifying missiles using their stored launch owner rather than the current owner of the source ship; this directly expresses the 1.50 owner-helper call in source.
 - [ ] `asm.pl:5530` - `speed calc speed driveless no div zero`
-- [ ] `asm.pl:5877` - `other player's portal fix`
+- [x] `asm.pl:5877` - `other player's portal fix`: fixed in `FLEETPOP::Set_Attack_Antares_Button_Flag_()` by requiring the selected fleet owner's dimensional-portal bit instead of accepting any player's portal in the system; this replaces the 1.50 register bridge and diverted call with a direct source-level ownership check.
 - [ ] `asm.pl:6090` - `BHG slot multiple shots`
 - [ ] `asm.pl:6295` - `lightning field`
 - [ ] `asm.pl:6433` - `woes of stasis`
