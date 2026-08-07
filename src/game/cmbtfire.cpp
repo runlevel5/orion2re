@@ -1215,7 +1215,8 @@ namespace CMBTFIRE {
                                         }
                                         case WEAPON_TYPE_SPECIAL: {
                                             Fire_Special_Weapon_(source_ship_idx, sx, sy, target_ship_idx, weapon_slot_idx, flag);
-                                            if (weapon->weapon_id == WEAPON_STASIS_FIELD) {
+                                            if (weapon->weapon_id == WEAPON_STASIS_FIELD ||
+                                                weapon->weapon_id == WEAPON_BLACK_HOLE_GENERATOR) {
                                                 continue_firing = 0;
                                             }
                                             break;
@@ -1400,12 +1401,14 @@ namespace CMBTFIRE {
                 }
                 MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 break;
-            case WEAPON_BLACK_HOLE_GENERATOR:
-                if (target_idx != 0 && target_type == 0) {
+            case WEAPON_BLACK_HOLE_GENERATOR: {
+                s_combat_weapon_slot* weapon = &MOX::_combat_data[ship_idx].weapons[weapon_slot_idx];
+                if (target_idx != 0 && target_type == 0 && weapon->shots_left > 0) {
                     BHG_(ship_idx, target_idx);
-                    MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
+                    weapon->shots_left--;
                 }
                 break;
+            }
             case WEAPON_STELLAR_CONVERTER:
                 if (target_type == 0) {
                     CMBTSPEC::Stellar_Converter_(ship_idx, target_idx, MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left);
