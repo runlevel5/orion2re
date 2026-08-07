@@ -557,6 +557,7 @@ namespace CMBTFIR2 {
                     if (hits < 2) {
                         hits = 1;
                     }
+                    hits++;
                     ship->special_device_hits[device_idx] = hits;
                 }
                 device_idx++;
@@ -1192,12 +1193,25 @@ namespace CMBTFIR2 {
                                 if (new_count == 0) {
                                     MOX::_combat_data[i].black_hole_flag = 0;
                                     MOX::_combat_data[i].black_hole_source_idx = UINT8_MAX;
+                                    COMBAT1::Recalculate_Combat_Ship_(i);
                                 } else {
                                     new_count--;
                                 }
                             }
                         }
                     }
+                } else if (ship->weapons[count].weapon_id == WEAPON_TRACTOR_BEAM) {
+                    const uint8_t target_idx = ship->special_cooldown;
+                    if (ship->weapons[count].count == 0) {
+                        ship->special_cooldown = UINT8_MAX;
+                    }
+                    if (target_idx < MOX::_combat_total_ship_count) {
+                        COMBAT1::Recalculate_Combat_Ship_(target_idx);
+                    }
+                }
+
+                if (ship->weapons[count].shots_left > ship->weapons[count].count) {
+                    ship->weapons[count].shots_left = ship->weapons[count].count;
                 }
             } else if (sys_index == 5) {
                 ship->drive_current_hits -= initial_damage;
@@ -1207,7 +1221,6 @@ namespace CMBTFIR2 {
                 } else {
                     *remaining_damage = 0;
                 }
-                ship->current_speed = COMBAT1::Calc_Current_Speed_(target_ship_idx);
 
                 if (*remaining_damage > 0) {
                     ship->structure_damage += *remaining_damage;
@@ -1226,7 +1239,7 @@ namespace CMBTFIR2 {
                 }
             } else if (sys_index == 9) {
                 ship->special_hits[count] -= initial_damage;
-                if (ship->special_hits[count] < 0) {
+                if (ship->special_hits[count] <= 0) {
                     *remaining_damage = -ship->special_hits[count];
                     ship->special_hits[count] = 0;
 
@@ -1268,6 +1281,8 @@ namespace CMBTFIR2 {
                 MOX::_ken_trace = 0;
             }
         }
+
+        COMBAT1::Recalculate_Combat_Ship_(target_ship_idx);
     }
 
     void __cdecl Resolve_Raid_(int16_t attacker_idx, int16_t target_idx, int16_t* raiders) {

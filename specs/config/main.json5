@@ -1121,6 +1121,34 @@
       default: true,
     },
 
+    interactive_combat_stats: {
+      title: "Interactive combat statistics",
+      description: "Updates ship speed, remaining movement, combat bonuses, initiative, and fleet ordnance as combat state changes within a turn.",
+      examples: ["combat interactive_combat_stats = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/combat1.h",
+        symbol: "COMBAT1::_interactive_combat_stats",
+      },
+      default: false,
+    },
+
+    non_ics_tractor_and_bhg_mode: {
+      title: "Immediate tractor and black-hole immobilization",
+      description: "When interactive combat statistics are disabled, immediately caps remaining movement after a Tractor Beam or Black Hole Generator takes effect without restoring movement when the effect ends.",
+      examples: ["combat non_ics_tractor_and_bhg_mode = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/combat1.h",
+        symbol: "COMBAT1::_non_ics_tractor_and_bhg_mode",
+      },
+      default: false,
+    },
+
     fighters_use_point_defense: {
       title: "Fighters use point-defense beams",
       description: "Applies point-defense accuracy and damage modifiers to fighter beam weapons.",

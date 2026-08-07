@@ -312,6 +312,11 @@ namespace CMBTFIRE {
         specials = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].specials;
         weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
 
+        if (weapon_id == WEAPON_TRACTOR_BEAM && target_type == 0 &&
+            MOX::_combat_data[ship_idx].special_cooldown == target_idx) {
+            return 0;
+        }
+
         if (range == 0) {
             if (target_type == 1) {
                 range = CMBTAI::Range_To_Missile_(ship_idx, target_idx);
@@ -1097,6 +1102,7 @@ namespace CMBTFIRE {
                                         CMBTSPEC::Draw_Cloak_(source_ship_idx, 2);
                                     }
                                     MOX::_combat_data[source_ship_idx].special_status_flag = 2;
+                                    COMBAT1::Recalculate_Combat_Ship_(source_ship_idx);
                                 } else if (MOX::_combat_data[source_ship_idx].special_status_flag == 4) {
                                     if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
                                         CMBTSPEC::Draw_Cloak_(source_ship_idx, 5);
@@ -1780,5 +1786,6 @@ namespace CMBTFIRE {
 
         MOX::_combat_data[target_idx].black_hole_flag = 1;
         MOX::_combat_data[target_idx].black_hole_source_idx = (uint8_t)source_idx;
+        COMBAT1::Recalculate_Combat_Ship_(target_idx);
     }
 }

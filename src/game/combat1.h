@@ -4,6 +4,42 @@
 namespace COMBAT1 {
     extern int32_t _end_of_turn_button;
 
+    inline uint8_t _interactive_combat_stats = 0;
+    inline uint8_t _non_ics_tractor_and_bhg_mode = 0;
+
+    inline int16_t Adjust_Movement_After_Speed_Change_(
+        int16_t old_speed,
+        int16_t new_speed,
+        int16_t maximum_speed,
+        int16_t movement_left,
+        int16_t* movement_reserve
+    ) {
+        const int16_t speed_delta = new_speed - old_speed;
+        int16_t movement_delta;
+
+        if (speed_delta < 0) {
+            movement_delta = -movement_left;
+            if (movement_delta < speed_delta) {
+                movement_delta = speed_delta;
+            }
+        } else {
+            movement_delta = speed_delta;
+            if (*movement_reserve - movement_delta < maximum_speed - new_speed) {
+                movement_delta = *movement_reserve - (maximum_speed - new_speed);
+                if (movement_delta < 0) {
+                    movement_delta = 0;
+                }
+            }
+        }
+
+        *movement_reserve -= movement_delta;
+        return movement_left + movement_delta;
+    }
+
+    // Refreshes speed and, when configured, current-turn movement and combat bonuses.
+    // tractor_applied: nonzero when this refresh immediately follows a new tractor link.
+    void Recalculate_Combat_Ship_(int16_t ship_idx, bool tractor_applied = false);
+
     // Returns nonzero when the indexed combat ship is active, uncaptured, and not in stasis.
     // ship_idx: combat ship index to test.
     int16_t __cdecl Combat_Ship_Is_Functional_(int16_t ship_idx);

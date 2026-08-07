@@ -198,6 +198,11 @@ orion2re_add_unit_test(test_missile_defense
         tests/unit/test_missile_defense.cpp
 )
 
+orion2re_add_unit_test(test_combat_stats
+    SOURCES
+        tests/unit/test_combat_stats.cpp
+)
+
 orion2re_add_unit_test(test_boarding
     SOURCES
         tests/unit/test_boarding.cpp

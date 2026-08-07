@@ -443,6 +443,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
                 if (CMBTSPEC::Try_Get_Active_Tractor_Target_(t_ship_idx, &target_ship_idx)) {
                     if (CMBTAI::Range_To_Ship_(t_ship_idx, target_ship_idx) > 4) {
                         MOX::_combat_data[t_ship_idx].special_cooldown = 0xFF;
+                        COMBAT1::Recalculate_Combat_Ship_(target_ship_idx);
                     }
                 }
             }
