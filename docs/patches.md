@@ -120,7 +120,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:6994` - `retreat fix`: fixed in `COMBAT1::Do_Combat_Turn_()`, `COMBAT1::Calc_Current_Speed_()`, and `COMBAT1::Retreat_Ship_()` by fully initializing pending retreaters, preserving their retreat marker during speed calculation, and allowing only living mobile ships not blocked by Warp Dissipator to escape; this replaces the 1.50 call-site wrappers with a source-level post-initialization retreat pass.
 - [x] `asm.pl:7084` - `flyer targeting`: fixed in `CMBTMIS::Draw_Missile_()`, `CMBTMIS::Draw_Fighter_()`, and the `CMBTMOV1` ship-movement paths by resolving anti-missile chains to their final ship for drawing while excluding missile-targeting flyers from ship movement and impact checks; this replaces the 1.50 register wrappers and six call-site filters with shared source-level target-domain invariants.
 - [x] `asm.pl:7224` - `stolen prod`: fixed in `invasion::Change_Pop_Ownership_()` by clearing purchased production when a colony changes ownership, so the conqueror cannot inherit production bought by the previous owner; this replaces the 1.50 four-byte assembly clear with a named source-field reset.
-- [ ] `asm.pl:7839` - `turn 1 research`
+- [x] `asm.pl:7839` - `turn 1 research`: fixed in `COLCALC::Check_For_Research_Breakthrough_()` by banking signed research production when no field is selected, so first-turn output survives until a research choice is made; this directly expresses the 1.50 call-site helper as a source-level branch.
 - [ ] `asm.pl:7864` - `unload ship damage storage`
 - [ ] `asm.pl:7887` - `destroying combat cloaks`
 - [ ] `asm.pl:8101` - `miniaturization`

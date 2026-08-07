@@ -27,4 +27,17 @@ namespace COLCALC {
     int16_t __cdecl Colony_Research_Per_Scientist_(const s_colony* colony, int16_t, s_colony_job_production*) {
         return (uint8_t)colony->research_per_scientist;
     }
+
+    int32_t __cdecl Chance_For_Research_Breakthrough_(s_player*) {
+        return 0;
+    }
+
+    void __cdecl Give_Player_Field_(s_player*, int, char) {
+    }
+}
+
+namespace game_random {
+    uint32_t __cdecl Random_(uint32_t max_val) {
+        return max_val;
+    }
 }

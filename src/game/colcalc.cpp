@@ -2280,24 +2280,6 @@ namespace COLCALC {
         } while (current < &MOX::_colony[num_colonies]);
     }
 
-    void __cdecl Check_For_Research_Breakthrough_(s_player* player) {
-        uint8_t field = (uint8_t)player->current_research_field;
-
-        if (field == 0) {
-            return;
-        }
-
-        int32_t breakthrough_chance = Chance_For_Research_Breakthrough_(player);
-        player->research_breakthrough = 0;
-        player->research_accumulated += (int32_t)player->research_produced;
-
-        if ((int32_t)game_random::Random_(100) <= breakthrough_chance) {
-            player->research_breakthrough = 1;
-            player->research_accumulated = 0;
-            Give_Player_Field_(player, field, 0);
-        }
-    }
-
     bool __cdecl May_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t recipient_idx) {
         if (MOX::_player[player_idx].home_planet_id != -1) {
             if (MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index == star_idx) {

@@ -79,6 +79,31 @@ DOCTEST_TEST_CASE("base production reflects recalculated colony fields") {
     DOCTEST_CHECK(COLCALC::Colony_Empire_Base_Research_Produced_(&colony, 0, 0, nullptr) == 2);
 }
 
+DOCTEST_TEST_CASE("research production is banked when no field is selected") {
+    struct s_research_case {
+        int32_t accumulated;
+        int16_t produced;
+        int32_t expected;
+    };
+
+    const s_research_case cases[] = {
+        {0, 6, 6},
+        {17, 6, 23},
+        {17, -6, 11},
+    };
+
+    for (const s_research_case& test_case : cases) {
+        s_player player = {};
+        player.current_research_field = 0;
+        player.research_accumulated = test_case.accumulated;
+        player.research_produced = test_case.produced;
+
+        COLCALC::Check_For_Research_Breakthrough_(&player);
+
+        DOCTEST_CHECK(player.research_accumulated == test_case.expected);
+    }
+}
+
 DOCTEST_TEST_CASE("build queue hotkeys map to all eleven numeric presets") {
     DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Hotkey_('q') == 0);
     DOCTEST_CHECK(BUILD_QUEUE::Preset_For_Hotkey_('Q') == 0);

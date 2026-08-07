@@ -119,4 +119,23 @@ namespace COLCALC {
 
         return (int16_t)base_research_per_scientist + trait_bonus + (int16_t)intelligence_bonus;
     }
+
+    void __cdecl Check_For_Research_Breakthrough_(s_player* player) {
+        uint8_t field = (uint8_t)player->current_research_field;
+
+        if (field == 0) {
+            player->research_accumulated += (int32_t)player->research_produced;
+            return;
+        }
+
+        int32_t breakthrough_chance = Chance_For_Research_Breakthrough_(player);
+        player->research_breakthrough = 0;
+        player->research_accumulated += (int32_t)player->research_produced;
+
+        if ((int32_t)game_random::Random_(100) <= breakthrough_chance) {
+            player->research_breakthrough = 1;
+            player->research_accumulated = 0;
+            Give_Player_Field_(player, field, 0);
+        }
+    }
 }
