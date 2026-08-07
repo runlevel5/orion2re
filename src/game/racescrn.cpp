@@ -537,6 +537,13 @@ namespace RACESCRN {
         mouse_x = mouse::Pointer_X();
         mouse_y = mouse::Pointer_Y();
 
+        // Enhancement: holding Ctrl shows every race's relationship text,
+        // like hovering each slider does.
+        const bool ctrl_tooltips = (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                                    RACESCRN::g_in_who_mode == 0 &&
+                                    RACESCRN::g_in_spy_mode == 0 &&
+                                    platform::Ctrl_Key_Held_() != 0);
+
         fields::Enable_Draw_All_Fields();
         fields::Draw_Visible_Fields();
         fields::Disable_Draw_All_Fields();
@@ -573,6 +580,11 @@ namespace RACESCRN {
                     fonts::Set_Font_Style_Outline(2, &RACESCRN::race_high_color);
                     fonts::Print_Centered(RACESCRN::race_bar[list_idx * 2] + 4, display->relationship_slider_y + 1, display->relationship_text);
                 }
+            }
+
+            if (ctrl_tooltips && display->relationship_text != nullptr) {
+                fonts::Set_Font_Style_Outline(2, &RACESCRN::race_high_color);
+                fonts::Print_Centered(RACESCRN::race_bar[list_idx * 2] + 4, display->relationship_slider_y + 1, display->relationship_text);
             }
 
             if ((1 << display->player_idx) & MOX::cur_plyr_ptr->ignoring) {
