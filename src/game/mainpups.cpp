@@ -674,17 +674,50 @@ namespace MAINPUPS {
         );
     }
 
+    // Enhancement: original hit rect and hotkey of the '<'/'>' buttons, so
+    // they can be disabled at the range limits and restored.
+    static int16_t _g_slider_btn_x_end[2];
+    static char _g_slider_btn_hotkey[2];
+
+    static void Update_Slider_Button_Limits_() {
+        if (ENHANCED_UX::enhanced_ux_settings.enabled == 0) {
+            return;
+        }
+        const int16_t ids[2] = {_mp_fields[10], _mp_fields[9]}; // decrement, increment
+        const bool disabled[2] = {_g_var <= _g_min, _g_var >= _g_max};
+        for (int i = 0; i < 2; ++i) {
+            s_field* field = &fields::_fields[ids[i]];
+            if (disabled[i]) {
+                field->x_end = (int16_t)(field->x - 1);
+                field->hotkey = 0;
+            } else {
+                field->x_end = _g_slider_btn_x_end[i];
+                field->hotkey = _g_slider_btn_hotkey[i];
+            }
+        }
+    }
+
     void __cdecl Load_Slider_Fields_() {
         Eric_Push_Fields_();
         Add_Slider_Fields_(_g_min, _g_max, &_g_var);
+
+        _g_slider_btn_x_end[0] = fields::_fields[_mp_fields[10]].x_end;
+        _g_slider_btn_hotkey[0] = (char)fields::_fields[_mp_fields[10]].hotkey;
+        _g_slider_btn_x_end[1] = fields::_fields[_mp_fields[9]].x_end;
+        _g_slider_btn_hotkey[1] = (char)fields::_fields[_mp_fields[9]].hotkey;
+        Update_Slider_Button_Limits_();
     }
 
     // Enhancement helper: shows a slider popup button pressed and released
     // with its click sound. The frames are remap-drawn directly (like the
     // rest of the popup art) on both flip pages, since screens under the
     // popup may run with field drawing disabled or a different palette.
-    static void Animate_Slider_Button_Press_(s_animation_header* pic, int16_t x, int16_t y) {
+    static void Animate_Slider_Button_Press_(s_animation_header* pic, int16_t x, int16_t y, int16_t button_field) {
         sound::Play_Sound_(0x28);
+        // Screens with field drawing enabled repaint buttons at every page
+        // toggle from _down_mouse_button, so it must agree with the frames
+        // drawn here (which cover screens with field drawing disabled).
+        fields::_down_mouse_button = button_field;
         for (int i = 0; i < 2; ++i) {
             video::Set_Page_Off_();
             animate::Set_Animation_Frame_(pic, 1);
@@ -693,6 +726,7 @@ namespace MAINPUPS {
         }
         timer::Mark_Time_();
         timer::Release_Time_(2);
+        fields::_down_mouse_button = -1;
         for (int i = 0; i < 2; ++i) {
             video::Set_Page_Off_();
             animate::Set_Animation_Frame_(pic, 0);
@@ -720,10 +754,10 @@ namespace MAINPUPS {
         } else if (key == 0x4DE0 || ch == '>' || ch == '+') { // increase
             synth_input = fields::Activate_Field_Hotkey_(ESTRINGS::E_Strings_(11 /* 0xb */)[0]);
         } else if (key == 0x1C0D) { // Enter presses Accept
-            Animate_Slider_Button_Press_(_anims[4], (int16_t)(_g_x + 208), (int16_t)(_g_y + 174));
+            Animate_Slider_Button_Press_(_anims[4], (int16_t)(_g_x + 208), (int16_t)(_g_y + 174), _mp_fields[3]);
             return _mp_fields[3];
         } else if (key == 0x011B) { // Esc presses Cancel
-            Animate_Slider_Button_Press_(_anims[35], (int16_t)(_g_x + 15), (int16_t)(_g_y + 174));
+            Animate_Slider_Button_Press_(_anims[35], (int16_t)(_g_x + 15), (int16_t)(_g_y + 174), _mp_fields[2]);
             return _mp_fields[2];
         } else if (key != 0) {
             key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
@@ -1889,15 +1923,17 @@ namespace MAINPUPS {
         }
 
         // Enhancement: the '<'/'>' buttons stay within the slider's range
-        // (only the thumb drag was clamped).
-        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
-            (value == _mp_fields[9] || value == _mp_fields[10])) {
-            if (_g_var < _g_min) {
-                _g_var = _g_min;
+        // (only the thumb drag was clamped) and go dead at the limits.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            if (value == _mp_fields[9] || value == _mp_fields[10]) {
+                if (_g_var < _g_min) {
+                    _g_var = _g_min;
+                }
+                if (_g_var > _g_max) {
+                    _g_var = _g_max;
+                }
             }
-            if (_g_var > _g_max) {
-                _g_var = _g_max;
-            }
+            Update_Slider_Button_Limits_();
         }
     }
 
