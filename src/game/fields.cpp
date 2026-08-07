@@ -2193,6 +2193,20 @@ namespace fields {
         return field_idx;
     }
 
+    // Enhancement: activates a field by id exactly as the native hotkey
+    // path does — pressed-state draw and the field's click sound — and
+    // returns its id (0 for scroll bars).
+    int16_t __cdecl Activate_Field_(int16_t field_id) {
+        if (field_id <= 0 || field_id >= _fields_count) {
+            return 0;
+        }
+        int16_t result = Do_Activate_Field_(field_id);
+        if (result != 0) {
+            sound::Play_Sound_(_fields[field_id].sound);
+        }
+        return result;
+    }
+
     // Enhancement: activates the field bound to the given hotkey character,
     // with its click sound, and returns its id (0 if no field matches). Lets
     // callers bind extra keys to existing buttons without injecting

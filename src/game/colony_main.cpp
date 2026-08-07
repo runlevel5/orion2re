@@ -334,7 +334,20 @@ namespace COLONY {
             Draw_Colony_Screen_();
             RUSS::Mox_Sync_Update_();
 
-            input_val = fields::Get_Input_();
+            // Enhancement: Esc presses the Return button like a click, so
+            // the exit takes the button path (with its fade) instead of the
+            // abrupt cancel.
+            int16_t synth_input = 0;
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                int32_t key = key::Read_Key_();
+                if (key == 0x011B) {
+                    synth_input = fields::Activate_Field_(_colony_fields[1]);
+                } else if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+            }
+
+            input_val = (synth_input != 0) ? synth_input : fields::Get_Input_();
             scanned_val = fields::Scan_Input_();
             input_received = (input_val != 0);
 
@@ -370,6 +383,15 @@ namespace COLONY {
             }
             else {
                 MOX::_current_screen = MOX::_return_screen;
+            }
+
+            // Enhancement (experiment): Return leaves as quickly as the
+            // Leaders transition — the main palette loads here and the main
+            // screen's fade is skipped via its vanilla already-faded path.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                MOX::_current_screen == SCREEN_MAIN) {
+                fonts::Load_Palette_(0, 0, 255);
+                MAINSCR::_already_faded_into_main_screen = 1;
             }
         }
 

@@ -481,6 +481,12 @@ namespace fields {
     int16_t __cdecl Activate_Field_Hotkey_(char hotkey);
 
     /**
+     * Enhancement: activates a field by id exactly as the native hotkey
+     * path does, returning its id (0 for scroll bars or invalid ids).
+     */
+    int16_t __cdecl Activate_Field_(int16_t field_id);
+
+    /**
      * Enhancement: registers the screen's scroll bar so the mouse wheel
      * drives it from the input poll. Cleared by Clear_Fields_.
      */
