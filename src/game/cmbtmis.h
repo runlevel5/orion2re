@@ -2,6 +2,14 @@
 #include <cstdint>
 
 namespace CMBTMIS {
+    enum e_lightning_field_mode : uint8_t {
+        LIGHTNING_FIELD_MODE_CLASSIC,
+        LIGHTNING_FIELD_MODE_UNIFORM,
+    };
+
+    inline uint8_t _lightning_field_ratio = 50;
+    inline e_lightning_field_mode _lightning_field_mode = LIGHTNING_FIELD_MODE_CLASSIC;
+
     struct s_missile_defense {
         uint8_t cloaking_device_missile_defense;
         uint8_t cloaking_device_missile_miss_percent;

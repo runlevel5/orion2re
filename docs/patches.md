@@ -111,7 +111,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:5530` - `speed calc speed driveless no div zero`: fixed in `COMBAT1::Calc_Current_Speed_()` by skipping drive-hit division for real driveless ships while retaining later Trans-Dimensional and tractor modifiers; this replaces the 1.50 code-cave diversion with a direct source-level drive-presence guard while keeping synthetic combat units immobile.
 - [x] `asm.pl:5877` - `other player's portal fix`: fixed in `FLEETPOP::Set_Attack_Antares_Button_Flag_()` by requiring the selected fleet owner's dimensional-portal bit instead of accepting any player's portal in the system; this replaces the 1.50 register bridge and diverted call with a direct source-level ownership check.
 - [x] `asm.pl:6090` - `BHG slot multiple shots`: fixed in `CMBTFIRE::Fire_Ship_()` and `CMBTFIRE::Fire_Special_Weapon_()` by consuming one BHG shot and ending the current firing pass, preserving additional generators in the same slot for later targets; this directly expresses the 1.50 jump reroute and caller helper in source.
-- [ ] `asm.pl:6295` - `lightning field`
+- [x] `asm.pl:6295` - `lightning field`: implemented inline in `CMBTMIS::Resolve_Missile_()` with configurable classic and uniform roll distributions and an inclusive destruction ratio; this replaces the 1.50 call-site diversion while retaining classic mode as the default.
 - [ ] `asm.pl:6433` - `woes of stasis`
 - [ ] `asm.pl:6573` - `tractor cuts`
 - [ ] `asm.pl:6787` - `specials repair`

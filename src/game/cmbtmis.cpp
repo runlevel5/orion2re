@@ -292,14 +292,21 @@ namespace CMBTMIS {
 
         if (is_anti_missile_rocket == 0) {
             if (COMBINIT::Does_Combat_Ship_Have_Special_(target_unit_idx, SPECIAL_LIGHTNING_FIELD)) {
-                int16_t loop_count = 0;
-                if (missile->quantity > 0) {
-                    do {
-                        if (game_random::Random_(100) < 50) {
+                if (_lightning_field_mode == LIGHTNING_FIELD_MODE_UNIFORM) {
+                    int16_t destroyed = 0;
+                    int16_t roll_count = missile->quantity;
+                    for (int16_t i = 0; i < roll_count; ++i) {
+                        if (game_random::Random_(100) <= _lightning_field_ratio) {
+                            destroyed++;
+                        }
+                    }
+                    missile->quantity -= destroyed;
+                } else {
+                    for (int16_t i = 0; i < missile->quantity; ++i) {
+                        if (game_random::Random_(100) <= _lightning_field_ratio) {
                             missile->quantity--;
                         }
-                        loop_count++;
-                    } while (loop_count < missile->quantity);
+                    }
                 }
 
                 if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
