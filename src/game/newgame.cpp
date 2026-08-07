@@ -62,15 +62,22 @@ namespace NEWGAME {
             timer::Release_Time(1);
         }
 
-        // Enhancement helper: key pre-read for the screen. Enter presses Accept
-        // (unless a name edit is active — then it commits it), 'R' starts editing
-        // the net game name; other keys go back to the fields system. Returns the
-        // field to activate, or 0.
+        // Enhancement helper: key pre-read for the screen. Enter or 'A' presses
+        // Accept (unless a name edit is active — then Enter commits it), 'C'
+        // presses Cancel like Esc, 'R' starts editing the net game name; other
+        // keys go back to the fields system. Returns the field to activate, or 0.
         int16_t Read_Newgame_Keys_() {
             int32_t key = key::Read_Key();
-            if (key == 0x1C0D && fields::input_field_active == 0) { // Enter
+            if (fields::input_field_active == 0 &&
+                (key == 0x1C0D || // Enter
+                 (key > 0 && ((key & 0xFF) == 'a' || (key & 0xFF) == 'A')))) {
                 Animate_Newgame_Button_Press_(NEWGAME::fields[8]);
                 return NEWGAME::fields[8];
+            }
+            if (key > 0 && ((key & 0xFF) == 'c' || (key & 0xFF) == 'C') &&
+                fields::input_field_active == 0) {
+                Animate_Newgame_Button_Press_(NEWGAME::fields[6]);
+                return NEWGAME::fields[6];
             }
             if (key > 0 && ((key & 0xFF) == 'r' || (key & 0xFF) == 'R') &&
                 fields::input_field_active == 0 && _g_net_name_field_id > 0) {
