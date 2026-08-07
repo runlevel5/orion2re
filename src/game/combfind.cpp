@@ -1413,6 +1413,8 @@ void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_id
 }
 
 int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_idx, int16_t planet_idx, s_battle_results* result, int8_t is_sneak_attack) {
+    COMBINIT::Reset_Satellite_Capture_();
+
     int16_t colony_idx;
     int16_t plr1_ship_offset;
     int16_t plr2_ship_offset;
@@ -1543,7 +1545,9 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         }
     }
 
-    return (int16_t)result->player_info.combat_result;
+    const int16_t combat_result = (int16_t)result->player_info.combat_result;
+    COMBINIT::Reset_Satellite_Capture_();
+    return combat_result;
 }
 
 int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int16_t attacker_count, int16_t defender_idx, int16_t* defender_ships, int16_t defender_count, int16_t star_idx, int16_t colony_idx, int8_t is_sneak_attack, s_battle_results* results)

@@ -116,7 +116,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:6573` - `tractor cuts`: fixed in `COMBAT1::Do_Combat_Turn_()` by severing both outgoing and incoming tractor links when a ship completes phasing cloak, recalculating released ships' speeds, and refreshing combat rendering; this directly expresses the 1.50 cloak wrapper and tractor-scan helper while retaining the restored unsigned target representation with `255` as invalid.
 - [x] `asm.pl:6787` - `specials repair`: fixed inline in `CMBTFIR2::Repair_Combat_Ship_()` by applying only the repair points consumed, re-enabling repaired special devices, and refreshing Hard Shields capacity; this replaces the 1.50 instruction patch and call-site wrapper with direct source-level repair invariants.
 - [ ] `asm.pl:6812` - `ICS cloak`
-- [ ] `asm.pl:6866` - `starbase capture`
+- [x] `asm.pl:6866` - `starbase capture`: implemented in `COMBINIT::End_Of_Combat_()`, `invasion::Change_Colony_Ownership_()`, and the `COMBINIT` satellite-capture state by recording an attacker-captured satellite before removal and restoring it only when the same colony is captured immediately afterward; this replaces the 1.50 call-site state machine with bounded source-level state and retains classic behavior by default through `combat satellite_capture`.
 - [ ] `asm.pl:6994` - `retreat fix`
 - [ ] `asm.pl:7084` - `flyer targeting`
 - [ ] `asm.pl:7224` - `stolen prod`

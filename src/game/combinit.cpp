@@ -8,6 +8,7 @@ namespace {
     constexpr int kMaxCombatMissiles = 300;
     constexpr size_t kCombatDataBytes = sizeof(s_combat_data) * kMaxCombatShips;
     constexpr size_t kCombatMissileBytes = sizeof(s_missile) * kMaxCombatMissiles;
+    COMBINIT::s_satellite_capture_state satellite_capture_state;
 }
 
 namespace COMBINIT {
@@ -16,6 +17,18 @@ const char s_cmbtmisl_lbx_00551234[13] = "cmbtmisl.lbx";
 const char s_sphersfx_lbx_00551218[13] = "sphersfx.lbx";
 
 uint8_t _real_attack_flag;
+
+void __cdecl Reset_Satellite_Capture_() {
+    Reset_Satellite_Capture_State_(&satellite_capture_state);
+}
+
+void __cdecl Record_Captured_Satellite_(int16_t colony_idx, int16_t building_idx) {
+    Record_Captured_Satellite_State_(&satellite_capture_state, colony_idx, building_idx);
+}
+
+int16_t __cdecl Take_Captured_Satellite_(int16_t colony_idx) {
+    return Take_Captured_Satellite_State_(&satellite_capture_state, colony_idx);
+}
 
 void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     if (MOX::_settings.strategic_combat_flag == 1) {
@@ -2585,12 +2598,21 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
         if (ship->ftl_type == DRIVE_NO_DRIVE && (ship->unit_status == 5 || ship->owner != MOX::_combat_defender_player)) {
             if (star_idx != MOX::_NUM_STARS) {
                 s_colony* col = &MOX::_colony[MOX::_cmbt_colony_id];
+                int16_t satellite_building = -1;
                 if (col->buildings[BUILDING_STAR_BASE] != 0) {
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_STAR_BASE);
+                    satellite_building = BUILDING_STAR_BASE;
                 } else if (col->buildings[BUILDING_BATTLESTATION] != 0) {
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_BATTLESTATION);
+                    satellite_building = BUILDING_BATTLESTATION;
                 } else if (col->buildings[BUILDING_STAR_FORTRESS] != 0) {
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_STAR_FORTRESS);
+                    satellite_building = BUILDING_STAR_FORTRESS;
+                }
+
+                if (satellite_building != -1) {
+                    if (Satellite_Was_Captured_By_Attacker_(
+                            ship->owner, victor_player, MOX::_combat_attacker_player)) {
+                        Record_Captured_Satellite_(MOX::_cmbt_colony_id, satellite_building);
+                    }
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, satellite_building);
                 }
             }
             continue;

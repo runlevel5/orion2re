@@ -1093,6 +1093,20 @@
       default: "race_tech",
     },
 
+    satellite_capture: {
+      title: "Captured satellites survive",
+      description: "Keeps a captured Star Base, Battlestation, or Star Fortress when its colony is captured immediately after combat.",
+      examples: ["combat satellite_capture = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::_satellite_capture_enabled",
+      },
+      default: false,
+    },
+
     board_in_black_hole: {
       title: "Allow boarding in black holes",
       description: "Allows ships affected by a Black Hole Generator to board or be boarded.",

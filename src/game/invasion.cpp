@@ -505,6 +505,11 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
     invasion::Change_Pop_Ownership_(colony_idx, new_owner_idx);
 
+    const int16_t captured_satellite = COMBINIT::Take_Captured_Satellite_(colony_idx);
+    if (captured_satellite != -1) {
+        ERICNET::Add_Building_(colony_idx, captured_satellite);
+    }
+
     // Remove defensive/security buildings upon capture
     if (colony->buildings[BUILDING_ARMOR_BARRACKS] != 0) {
         ERICNET::Remove_Building_(colony_idx, BUILDING_ARMOR_BARRACKS);

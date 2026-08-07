@@ -10,6 +10,7 @@
 #include "doctest/doctest.h"
 #include "game/boarding.h"
 #include "game/cmbtfire.h"
+#include "game/combinit.h"
 #include "game/cmbtmis.h"
 #include "game/mapgen.h"
 #include "game/ship_config.h"
@@ -131,6 +132,44 @@ DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default")
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
+}
+
+DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_satellite_capture_enabled == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat satellite_capture = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_satellite_capture_enabled == 1);
+}
+
+DOCTEST_TEST_CASE("satellite capture state applies once to the matching colony") {
+    COMBINIT::s_satellite_capture_state state;
+    COMBINIT::Record_Captured_Satellite_State_(
+        &state, 4, BUILDING_BATTLESTATION);
+
+    DOCTEST_CHECK(COMBINIT::Take_Captured_Satellite_State_(&state, 5) == -1);
+    DOCTEST_CHECK(COMBINIT::Take_Captured_Satellite_State_(&state, 4) ==
+                  BUILDING_BATTLESTATION);
+    DOCTEST_CHECK(COMBINIT::Take_Captured_Satellite_State_(&state, 4) == -1);
+}
+
+DOCTEST_TEST_CASE("satellite capture requires an attacker-owned prize") {
+    COMBINIT::_satellite_capture_enabled = 0;
+    DOCTEST_CHECK_FALSE(COMBINIT::Satellite_Was_Captured_By_Attacker_(1, 1, 1));
+
+    COMBINIT::_satellite_capture_enabled = 1;
+    DOCTEST_CHECK(COMBINIT::Satellite_Was_Captured_By_Attacker_(1, 1, 1));
+    DOCTEST_CHECK_FALSE(COMBINIT::Satellite_Was_Captured_By_Attacker_(0, 1, 1));
+    DOCTEST_CHECK_FALSE(COMBINIT::Satellite_Was_Captured_By_Attacker_(1, 0, 1));
+
+    COMBINIT::_satellite_capture_enabled = 0;
 }
 
 DOCTEST_TEST_CASE("black-hole boarding setting preserves the classic default") {

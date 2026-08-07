@@ -1,6 +1,49 @@
 #pragma once
 
 namespace COMBINIT {
+    inline uint8_t _satellite_capture_enabled = 0;
+
+    struct s_satellite_capture_state {
+        int16_t colony_idx = -1;
+        int16_t building_idx = -1;
+    };
+
+    inline void Reset_Satellite_Capture_State_(s_satellite_capture_state* state) {
+        state->colony_idx = -1;
+        state->building_idx = -1;
+    }
+
+    inline void Record_Captured_Satellite_State_(
+        s_satellite_capture_state* state, int16_t colony_idx, int16_t building_idx) {
+        state->colony_idx = colony_idx;
+        state->building_idx = building_idx;
+    }
+
+    inline int16_t Take_Captured_Satellite_State_(
+        s_satellite_capture_state* state, int16_t colony_idx) {
+        if (state->colony_idx != colony_idx) {
+            return -1;
+        }
+
+        const int16_t building_idx = state->building_idx;
+        Reset_Satellite_Capture_State_(state);
+        return building_idx;
+    }
+
+    inline bool Satellite_Was_Captured_By_Attacker_(
+        int16_t satellite_owner, int16_t victor_player, int16_t attacker_player) {
+        return _satellite_capture_enabled != 0 &&
+               victor_player == attacker_player &&
+               satellite_owner == attacker_player;
+    }
+
+    // Clears any satellite awaiting the outcome of colony capture.
+    void __cdecl Reset_Satellite_Capture_();
+    // Records a removed satellite that may transfer with its colony.
+    void __cdecl Record_Captured_Satellite_(int16_t colony_idx, int16_t building_idx);
+    // Returns and clears the satellite recorded for this colony, or -1.
+    int16_t __cdecl Take_Captured_Satellite_(int16_t colony_idx);
+
     // Loads the tactical planet graphics for the specified colony.
     // colony_idx: Colony whose planet art should be loaded.
     void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx);
