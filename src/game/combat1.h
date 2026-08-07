@@ -62,6 +62,36 @@ namespace COMBAT1 {
         return movement_left + movement_delta;
     }
 
+    inline void Restore_Captured_Ship_To_Turn_Order_(
+        int16_t* turn_order,
+        int16_t turn_order_count,
+        int16_t ship_idx
+    ) {
+        int16_t empty_idx = -1;
+
+        for (int16_t i = 0; i < turn_order_count; ++i) {
+            const int16_t order_ship_idx = turn_order[i];
+            if (order_ship_idx == ship_idx) {
+                return;
+            }
+            if (order_ship_idx == -1) {
+                empty_idx = i;
+                continue;
+            }
+            if (order_ship_idx != -10) {
+                continue;
+            }
+
+            if (empty_idx >= 0) {
+                turn_order[empty_idx] = ship_idx;
+            } else if (i + 1 < turn_order_count) {
+                turn_order[i] = ship_idx;
+                turn_order[i + 1] = -10;
+            }
+            return;
+        }
+    }
+
     // Refreshes speed and, when configured, current-turn movement and combat bonuses.
     // tractor_applied: nonzero when this refresh immediately follows a new tractor link.
     void Recalculate_Combat_Ship_(int16_t ship_idx, bool tractor_applied = false);

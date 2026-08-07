@@ -1804,18 +1804,12 @@ namespace CMBTFIR2 {
         combat_ship->is_retreating = 0;
         combat_ship->special_cooldown = 0xFF;
 
-        int16_t i = 0;
-        while (MOX::_ship_turn_order[i] != -10) {
-            i++;
-        }
-
-        for (int16_t j = i; j >= 0; j--) {
-            MOX::_ship_turn_order[j + 1] = MOX::_ship_turn_order[j];
-        }
-
-        MOX::_ship_turn_order[0] = -1;
-        MOX::_cur_ptr++;
-        MOX::_wait_ptr++;
+        COMBAT1::Restore_Captured_Ship_To_Turn_Order_(
+            MOX::_ship_turn_order,
+            sizeof(MOX::_ship_turn_order) / sizeof(MOX::_ship_turn_order[0]),
+            ship_idx
+        );
+        struct_::Clear_Bit_Field_(&combat_ship->combat_status_flags, 2);
     }
 
     int16_t __cdecl Damage_From_Ship_Exploding_(int16_t ship_idx) {

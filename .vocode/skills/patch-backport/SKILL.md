@@ -9,6 +9,8 @@ Use this skill to backport one change from `C:\Projects\MOO2150\src\asm.pl` into
 
 The goal is not to translate patched machine code literally. Recover the defect, intended behavior, and relevant invariants, then implement the clearest semantic fix in the restored source.
 
+Every proposed implementation must also evaluate whether the restored architecture permits a simpler, safer, or more maintainable source-level solution than the original patch mechanism. Do not introduce helpers, public APIs, persistent state, or binary-shaped control flow solely to resemble or test the assembly patch when an existing source abstraction can enforce the same invariant directly.
+
 Use the `grpc` skill for all Ghidra access and follow its read-only and assembly-validation rules.
 
 ## Required inputs
@@ -198,6 +200,17 @@ Determine whether the selected fix is:
 
 Prefer a root fix in the restored abstraction over binary-compatible instruction mimicry. Preserve original behavior outside the selected defect. Avoid importing unrelated patch-specific configuration, globals, hooks, or code caves when ordinary source logic is sufficient.
 
+Before selecting an implementation, compare at least these source-level options where applicable:
+
+- a direct fix at the owner of the violated invariant
+- reuse of an existing helper, state transition, or subsystem abstraction
+- deriving state from authoritative data instead of adding duplicated persistent state
+- updating state at the event that invalidates it instead of checking or repairing it in a hot path
+- keeping logic file-local instead of adding a public helper used only by tests
+- removing an obsolete faulty mechanism instead of reproducing its patched control flow
+
+Choose the smallest option that fully preserves the proven behavior, including all required configuration, AI, UI, network, save, and compatibility effects. Reject an apparently simpler option if it bypasses existing consumers or changes observable behavior. Document the alternatives considered and why the selected design is better for the restored source.
+
 If 1.50 introduces configuration variables as part of the selected topic, restore every one of them through the project's configuration-variable definitions. Do not omit a variable merely because the main behavioral fix can be approximated without it. Preserve its proven name, type, default value, parser metadata, and use sites. If a configuration variable is genuinely unnecessary because the restored architecture represents the same setting elsewhere, treat that as a material implementation difference and obtain explicit approval during pre-apply review.
 
 Identify suitable existing tests. Add a regression test when the project already has an applicable test pattern and the defect can be reproduced deterministically.
@@ -212,15 +225,16 @@ Present the user with:
 2. A plain-language statement of the actual bug and what the patch fixes, including the trigger and incorrect result. If the topic is not a bug fix, identify it as a behavior or feature change and explain that change instead.
 3. The verified original and patched behavior.
 4. Migration status in the restored source.
-5. A file-by-file implementation plan.
-6. Focused suggested diffs for every proposed source, test, and documentation edit.
-7. When configuration variables will be added, the repository-defined CMake command or target that will regenerate the C++ parser, plus the expected generated outputs.
-8. Assumptions, compatibility effects, and validation commands.
+5. A source-level design comparison describing the faithful patch-shaped approach, any simpler alternatives, and why the recommended option best fits the restored architecture.
+6. A file-by-file implementation plan.
+7. Focused suggested diffs for every proposed source, test, and documentation edit.
+8. When configuration variables will be added, the repository-defined CMake command or target that will regenerate the C++ parser, plus the expected generated outputs.
+9. Assumptions, compatibility effects, and validation commands.
 
 Before the suggested diffs, include two short implementation paragraphs:
 
 - **Original patch implementation:** state concretely what the selected `asm.pl` edits do, including saved/restored state, changed instructions, wrappers, diversions, and added code or data that matter to the behavior.
-- **Proposed source implementation:** when the source-level fix differs from the original binary implementation, explain how it enforces the same invariant in the restored code and why the binary mechanism is unnecessary or inappropriate. If it is equivalent in structure, say so explicitly.
+- **Proposed source implementation:** compare the viable source-level designs, including whether state can be derived, an existing abstraction can be reused, cleanup can occur at the invalidating event, or logic can remain local. Explain why the recommended design is simpler, safer, or more maintainable without losing any proven behavior. When it differs from the original binary implementation, explain how it enforces the same invariant and why the binary mechanism is unnecessary or inappropriate. If the patch-shaped approach is still best, say why explicitly.
 
 Suggested diffs must be based on complete current file contents, not summaries. Keep them focused; do not print complete files.
 

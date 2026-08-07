@@ -2,6 +2,7 @@
 
 #include "doctest/doctest.h"
 #include "game/boarding.h"
+#include "game/combat1.h"
 
 namespace TEST_BOARDING {
     void Reset_();
@@ -40,4 +41,56 @@ DOCTEST_TEST_CASE("disabled black-hole boarding filters both participants") {
     DOCTEST_CHECK(
         BOARDING::Filter_Boarding_(0, 1) ==
         BOARDING::e_boarding_filter::attacker_in_black_hole);
+}
+
+DOCTEST_TEST_CASE("captured ships retain an existing turn-order entry") {
+    int16_t turn_order[4] = { 3, 1, -10, -1 };
+
+    COMBAT1::Restore_Captured_Ship_To_Turn_Order_(
+        turn_order, 4, 1);
+
+    DOCTEST_CHECK(turn_order[0] == 3);
+    DOCTEST_CHECK(turn_order[1] == 1);
+    DOCTEST_CHECK(turn_order[2] == -10);
+}
+
+DOCTEST_TEST_CASE("captured ships reuse a vacant turn-order entry") {
+    int16_t turn_order[4] = { 3, -1, -10, -1 };
+
+    COMBAT1::Restore_Captured_Ship_To_Turn_Order_(
+        turn_order, 4, 1);
+
+    DOCTEST_CHECK(turn_order[0] == 3);
+    DOCTEST_CHECK(turn_order[1] == 1);
+    DOCTEST_CHECK(turn_order[2] == -10);
+}
+
+DOCTEST_TEST_CASE("captured ships append when turn order has capacity") {
+    int16_t turn_order[4] = { 3, -10, -1, -1 };
+
+    COMBAT1::Restore_Captured_Ship_To_Turn_Order_(
+        turn_order, 4, 1);
+
+    DOCTEST_CHECK(turn_order[0] == 3);
+    DOCTEST_CHECK(turn_order[1] == 1);
+    DOCTEST_CHECK(turn_order[2] == -10);
+}
+
+DOCTEST_TEST_CASE("captured ships cannot overflow a full turn order") {
+    struct {
+        int16_t turn_order[210];
+        int16_t canary;
+    } state;
+
+    for (int16_t i = 0; i < 209; ++i) {
+        state.turn_order[i] = 3;
+    }
+    state.turn_order[209] = -10;
+    state.canary = 0x1234;
+
+    COMBAT1::Restore_Captured_Ship_To_Turn_Order_(
+        state.turn_order, 210, 1);
+
+    DOCTEST_CHECK(state.turn_order[209] == -10);
+    DOCTEST_CHECK(state.canary == 0x1234);
 }
