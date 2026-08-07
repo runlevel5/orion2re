@@ -105,7 +105,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:2219` - `relax end of turn`: fixed at the `COMBAT1::Next_Ship_()` winner-check site by keeping combat active for a human-controlled surviving side while hostile missiles remain and by allowing a manual attacker to finish actions against an undefended colony; this replaces the 1.50 register-preserving diversion and C wrapper with a direct source-level end-of-combat predicate.
 - [x] `asm.pl:2261` - `pop limit bug`: fixed in `SETTLER::Room_For_Another_()` by counting settlers already heading to the destination and validating every applicable mixed-race capacity tier plus the 42-population bound; this replaces the 1.50 call-site wrappers with the restored function's explicit freight-inclusion parameter.
 - [ ] `asm.pl:2364` - `recalc prod`
-- [ ] `asm.pl:2885` - `displacer, cloak missile`
+- [x] `asm.pl:2885` - `displacer, cloak missile`: fixed in `CMBTMIS::Resolve_Missile_()`, `CMBTFIRE::Energy_Absorber_Attack_()`, `CMBTFIR2::Ship_Specials_Defensive_Bonus_()`, and `CMBTAI::Expected_Missile_Damage_()` by using inclusive configured miss chances, applying Displacement Device's 30% protection consistently, and making live combat and AI prediction use either classic independent cloak miss chance or configured Missile Evasion without double application; this replaces the 1.50 branch patches and diversions with direct source-level combat rules while restoring only the inseparable cloak dependency from the later expected-damage work.
 - [ ] `asm.pl:3474` - `teleporter + tractor fix`
 - [ ] `asm.pl:4421` - `AI missile targeting`
 - [ ] `asm.pl:5530` - `speed calc speed driveless no div zero`

@@ -2,6 +2,35 @@
 #include <cstdint>
 
 namespace CMBTMIS {
+    struct s_missile_defense {
+        uint8_t cloaking_device_missile_defense;
+        uint8_t cloaking_device_missile_miss_percent;
+        uint8_t displacement_device_missiles_miss_percent;
+    };
+
+    inline s_missile_defense missile_defense = {
+        0,
+        50,
+        30,
+    };
+
+    inline bool Missile_Defense_Roll_Succeeds_(uint32_t roll, uint8_t chance) {
+        return roll <= chance;
+    }
+
+    inline int32_t Expected_Damage_After_Cloak_(int32_t damage, bool actively_cloaked) {
+        if (!actively_cloaked || missile_defense.cloaking_device_missile_defense != 0) {
+            return damage;
+        }
+
+        uint8_t miss_percent = missile_defense.cloaking_device_missile_miss_percent;
+        if (miss_percent >= 100) {
+            return 0;
+        }
+
+        return damage * (100 - miss_percent) / 100;
+    }
+
     extern int16_t _missile_group_offset[16][16];
     extern int16_t _torpedo_group_offset[16][8];
 

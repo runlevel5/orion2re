@@ -189,6 +189,11 @@ orion2re_add_unit_test(test_colonize
         tests/fakes/fake_colonize_runtime.cpp
 )
 
+orion2re_add_unit_test(test_missile_defense
+    SOURCES
+        tests/unit/test_missile_defense.cpp
+)
+
 orion2re_add_unit_test(test_boarding
     SOURCES
         tests/unit/test_boarding.cpp

@@ -1677,7 +1677,7 @@ namespace fields {
 
         video::Clear_Display_And_Release_Palette_();
 
-        Show_Message_Box_(platform::g_main_window, buffer, "Microprose", true);
+        Show_Message_Box_(platform::g_main_window, buffer, "Orion2re", true);
 
         platform::Prepare_Exit_();
         platform::Check_Exit_();

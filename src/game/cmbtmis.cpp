@@ -427,13 +427,18 @@ namespace CMBTMIS {
                     int16_t roll = game_random::Random_(100);
 
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(target_unit_idx, SPECIAL_DISPLACEMENT_DEVICE)) {
-                        if (game_random::Random_(100) < 30) {
+                        if (Missile_Defense_Roll_Succeeds_(
+                                game_random::Random_(100),
+                                missile_defense.displacement_device_missiles_miss_percent)) {
                             roll = -1000;
                         }
                     }
 
-                    if (MOX::_combat_data[target_unit_idx].special_status_flag == 1) {
-                        if (game_random::Random_(100) < 50) {
+                    if (MOX::_combat_data[target_unit_idx].special_status_flag == 1 &&
+                        missile_defense.cloaking_device_missile_defense == 0) {
+                        if (Missile_Defense_Roll_Succeeds_(
+                                game_random::Random_(100),
+                                missile_defense.cloaking_device_missile_miss_percent)) {
                             roll = -1000;
                         }
                     }

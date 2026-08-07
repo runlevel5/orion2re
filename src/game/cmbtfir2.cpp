@@ -686,8 +686,12 @@ namespace CMBTFIR2 {
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
         // target_type: 0 = Ship, 1 = Missile/Other
-        if (ship->special_status_flag == 1 /* STATUS_PHANTOM_SHADOW */ && target_type == 0) {
-            total_bonus = 80;
+        if (ship->special_status_flag == 1 /* STATUS_PHANTOM_SHADOW */) {
+            if (target_type == 0) {
+                total_bonus = 80;
+            } else {
+                total_bonus = CMBTMIS::missile_defense.cloaking_device_missile_defense;
+            }
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x26 /* SPECIAL_DISPLACEMENT_FIELD */)) {

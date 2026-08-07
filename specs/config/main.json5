@@ -569,6 +569,33 @@
     },
   },
   records: {
+    missile_defense: {
+      title: "Tactical missile defense",
+      description: "Controls Cloaking Device and Displacement Device protection against tactical missiles.",
+      fields: [
+        {
+          id: "cloaking_device_missile_defense",
+          title: "Cloaking Device missile evasion",
+          description: "Missile Evasion added while actively cloaked. Zero retains the classic independent cloak miss chance.",
+          type: "uint8",
+          bind: ["cloaking_device_missile_defense"],
+        },
+        {
+          id: "cloaking_device_missile_miss_percent",
+          title: "Cloaking Device missile miss chance",
+          description: "Independent missile miss chance while actively cloaked when cloak missile evasion is zero.",
+          type: "uint8",
+          bind: ["cloaking_device_missile_miss_percent"],
+        },
+        {
+          id: "displacement_device_missiles_miss_percent",
+          title: "Displacement Device missile miss chance",
+          description: "Chance for a missile or an Energy Absorber attack to miss a ship with a working Displacement Device.",
+          type: "uint8",
+          bind: ["displacement_device_missiles_miss_percent"],
+        },
+      ],
+    },
     autobuild_settings: {
       title: "Experimental autobuild settings",
       description: "Controls queue-driven colony autobuild behavior.",
@@ -1084,6 +1111,27 @@
         symbol: "CMBTFIRE::_fighters_use_point_defense",
       },
       default: false,
+    },
+
+    missile_defense: {
+      title: "Tactical missile defense",
+      description: "Configures Cloaking Device and Displacement Device protection against tactical missiles.",
+      examples: [
+        "combat missile_defense cloaking_device_missile_defense = 50;",
+        "combat missile_defense displacement_device_missiles_miss_percent = 30;",
+      ],
+      group: "gameplay",
+      namespace: "combat",
+      type: "missile_defense",
+      bind_root: {
+        header: "game/cmbtmis.h",
+        symbol: "CMBTMIS::missile_defense",
+      },
+      default: {
+        cloaking_device_missile_defense: 0,
+        cloaking_device_missile_miss_percent: 50,
+        displacement_device_missiles_miss_percent: 30,
+      },
     },
   },
 }

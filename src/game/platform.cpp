@@ -1324,7 +1324,7 @@ namespace platform {
         SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
 #endif
 
-        g_sdl_window = SDL_CreateWindow("Microprose", nWidth, nHeight, window_flags);
+        g_sdl_window = SDL_CreateWindow("Orion2 Redone", nWidth, nHeight, window_flags);
         if (g_sdl_window == nullptr) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateWindow failed: %s", SDL_GetError());
 			SDL_DestroyMutex(g_present_cursor_mutex);

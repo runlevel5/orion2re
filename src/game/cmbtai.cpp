@@ -1984,9 +1984,9 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
         int16_t volley_damage = (int16_t)((damage - shield_reduction) * weapon_count);
         result_damage = (int16_t)(((100 - evade) * (int32_t)volley_damage) / 100);
 
-        if (MOX::_combat_data[target_ship_idx].special_status_flag == 1) {
-            result_damage /= 2;
-        }
+        result_damage = (int16_t)CMBTMIS::Expected_Damage_After_Cloak_(
+            result_damage,
+            MOX::_combat_data[target_ship_idx].special_status_flag == 1);
     }
 
     if (result_damage < 1) {

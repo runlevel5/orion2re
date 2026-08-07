@@ -10,6 +10,7 @@
 #include "doctest/doctest.h"
 #include "game/boarding.h"
 #include "game/cmbtfire.h"
+#include "game/cmbtmis.h"
 #include "game/mapgen.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
@@ -145,6 +146,30 @@ DOCTEST_TEST_CASE("black-hole boarding setting preserves the classic default") {
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(BOARDING::_board_in_black_hole == 0);
+}
+
+DOCTEST_TEST_CASE("missile defense settings preserve classic defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMIS::missile_defense.cloaking_device_missile_defense == 0);
+    DOCTEST_CHECK(CMBTMIS::missile_defense.cloaking_device_missile_miss_percent == 50);
+    DOCTEST_CHECK(CMBTMIS::missile_defense.displacement_device_missiles_miss_percent == 30);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat missile_defense cloaking_device_missile_defense = 60;"
+        "combat missile_defense cloaking_device_missile_miss_percent = 45;"
+        "combat missile_defense displacement_device_missiles_miss_percent = 35;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMIS::missile_defense.cloaking_device_missile_defense == 60);
+    DOCTEST_CHECK(CMBTMIS::missile_defense.cloaking_device_missile_miss_percent == 45);
+    DOCTEST_CHECK(CMBTMIS::missile_defense.displacement_device_missiles_miss_percent == 35);
 }
 
 DOCTEST_TEST_CASE("maximum galaxy star count binds and validates its storage range") {

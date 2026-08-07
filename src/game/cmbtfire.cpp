@@ -1616,7 +1616,9 @@ namespace CMBTFIRE {
         int16_t damage = (int16_t)(((bonus - 100) * MOX::_combat_data[source_ship_idx].reflected_damage_pool + 50) / 100);
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_DISPLACEMENT_DEVICE) != 0) {
-            if (game_random::Random_(100) > 30) {
+            if (CMBTMIS::Missile_Defense_Roll_Succeeds_(
+                    game_random::Random_(100),
+                    CMBTMIS::missile_defense.displacement_device_missiles_miss_percent)) {
                 damage = 0;
             }
         }
