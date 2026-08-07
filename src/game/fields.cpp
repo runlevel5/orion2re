@@ -2232,17 +2232,23 @@ namespace fields {
             }
             return 0;
         }
-        for (int16_t i = 1; i < fields_count; ++i) {
-            if (fields[i].field_type == FIELD_TYPE_SCROLL) {
+        // A scroll field steps only while the pointer hovers it. Wheel up
+        // raises the value on horizontal sliders (volume) and scrolls
+        // upward (value down) on vertical bars.
+        int16_t hovered = Scan_Field();
+        if (hovered > 0 && hovered < fields_count &&
+            fields[hovered].field_type == FIELD_TYPE_SCROLL) {
                 _wheel_scroll_last_ms = now_ms;
-                if (steps > 0) {
-                    Decrement_Scroll_Bar(i);
+            bool horizontal = (fields[hovered].x_end - fields[hovered].x) >
+                              (fields[hovered].y_end - fields[hovered].y);
+            bool increment = horizontal ? (steps > 0) : (steps < 0);
+            if (increment) {
+                Increment_Scroll_Bar(hovered);
                 } else {
-                    Increment_Scroll_Bar(i);
+                Decrement_Scroll_Bar(hovered);
             }
             down_mouse_button = -1;
-            return i;
-        }
+            return hovered;
         }
         return 0;
     }
