@@ -679,6 +679,7 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
     COLBLDG::Clear_Colony_Queue_(colony_idx);
 
     colony->production_spent = 0;
+    colony->bought_outright = 0;
     colony->just_produced = COLONY_PRODUCTION_JUST_CONQUERED;
     colony->occupation_points = 0;
     colony->occupation_policy = 4;

@@ -119,7 +119,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:6866` - `starbase capture`: implemented in `COMBINIT::End_Of_Combat_()`, `invasion::Change_Colony_Ownership_()`, and the `COMBINIT` satellite-capture state by recording an attacker-captured satellite before removal and restoring it only when the same colony is captured immediately afterward; this replaces the 1.50 call-site state machine with bounded source-level state and retains classic behavior by default through `combat satellite_capture`.
 - [x] `asm.pl:6994` - `retreat fix`: fixed in `COMBAT1::Do_Combat_Turn_()`, `COMBAT1::Calc_Current_Speed_()`, and `COMBAT1::Retreat_Ship_()` by fully initializing pending retreaters, preserving their retreat marker during speed calculation, and allowing only living mobile ships not blocked by Warp Dissipator to escape; this replaces the 1.50 call-site wrappers with a source-level post-initialization retreat pass.
 - [ ] `asm.pl:7084` - `flyer targeting`
-- [ ] `asm.pl:7224` - `stolen prod`
+- [x] `asm.pl:7224` - `stolen prod`: fixed in `invasion::Change_Pop_Ownership_()` by clearing purchased production when a colony changes ownership, so the conqueror cannot inherit production bought by the previous owner; this replaces the 1.50 four-byte assembly clear with a named source-field reset.
 - [ ] `asm.pl:7839` - `turn 1 research`
 - [ ] `asm.pl:7864` - `unload ship damage storage`
 - [ ] `asm.pl:7887` - `destroying combat cloaks`
