@@ -29,6 +29,9 @@ namespace LOADSAVE {
     static int16_t _premute_music_level = 0;
     static int16_t _premute_sfx_level = 0;
 
+    // Enhancement: the Settings popup's keyboard-selected row (-1 = none).
+    static int16_t _g_options_selection = -1;
+
     void __cdecl Allocate_Data_Space_For_Game_Popup() {
         // Allocate space for game animations and clear the block
         game_anims = (s_game_anims*)allocate::Allocate_First_Block(MOX::screen_seg, sizeof(*game_anims));
@@ -617,11 +620,35 @@ namespace LOADSAVE {
         return load_success;
     }
 
+    // Enhancement helper: Up/Down move the Settings popup's row selection
+    // (wrapping; the first press selects the first or last row), Enter
+    // toggles the selected row like a click. Returns the field to activate,
+    // or 0; other keys go back to the fields system.
+    static int16_t Read_Options_Popup_Keys_() {
+        int32_t key = key::Read_Key();
+        if (key == 0x48E0 || key == 0x50E0) { // Up/Down
+            int16_t dir = (key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
+            _g_options_selection = (_g_options_selection < 0)
+                                       ? ((dir > 0) ? (int16_t)0 : (int16_t)12)
+                                       : (int16_t)((_g_options_selection + 13 + dir) % 13);
+            sound::Play_Sound(')');
+        } else if (key == 0x1C0D && _g_options_selection >= 0) { // Enter
+            sound::Play_Sound(')');
+            return game_popup_fields->option_toggles[_g_options_selection];
+        } else if (key != 0) {
+            key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+        }
+        return 0;
+    }
+
     void __cdecl Do_Options_Game_Popup(int16_t* exit_code) {
         uint8_t initial_language = MOX::settings.language;
         bool exit_loop = false;
         int16_t dummy_x;
         int16_t dummy_y;
+
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        _g_options_selection = -1;
 
         EVANHELP::Set_Options_Game_Screen_Help_List();
         fields::Clear_Fields();
@@ -636,7 +663,14 @@ namespace LOADSAVE {
 
         while (true) {
             timer::Mark_Time();
-            int16_t input = fields::Get_Input();
+
+            // Enhancement: Up/Down move the row selection, Enter toggles it.
+            int16_t synth_input = 0;
+            if (enhanced) {
+                synth_input = Read_Options_Popup_Keys_();
+            }
+
+            int16_t input = (synth_input != 0) ? synth_input : fields::Get_Input();
 
             for (int16_t i = 0; i < 13; ++i) {
                 if (game_popup_fields->option_names[i] == input || game_popup_fields->option_toggles[i] == input) {
@@ -1832,27 +1866,49 @@ namespace LOADSAVE {
             int16_t text_x1 = draw_x + 4 + btn_width;
             int16_t text_x2 = text_x1 + 0x96;
 
-            fonts::Print(text_x1, draw_y + 0x02, HAROLD::H_Message(0xA6));
-            fonts::Print(text_x2, draw_y + 0x02, "(ALT-F1)");
-            fonts::Print(text_x1, draw_y + 0x13, HAROLD::H_Message(0xA7));
-            fonts::Print(text_x2, draw_y + 0x13, "(ALT-F2)");
-            fonts::Print(text_x1, draw_y + 0x24, HAROLD::H_Message(0xA8));
-            fonts::Print(text_x2, draw_y + 0x24, "(ALT-F3)");
-            fonts::Print(text_x1, draw_y + 0x35, HAROLD::H_Message(0xA9));
-            fonts::Print(text_x1, draw_y + 0x46, HAROLD::H_Message(0xAA));
-            fonts::Print(text_x2, draw_y + 0x46, "(ALT-F4)");
-            fonts::Print(text_x1, draw_y + 0x57, HAROLD::H_Message(0xAB));
-            fonts::Print(text_x2, draw_y + 0x57, "(ALT-F5)");
-            fonts::Print(text_x1, draw_y + 0x68, HAROLD::H_Message(0xAC));
-            fonts::Print(text_x2, draw_y + 0x68, "(ALT-F6)");
-            fonts::Print(text_x1, draw_y + 0x79, HAROLD::H_Message(0xAD));
-            fonts::Print(text_x2, draw_y + 0x79, "(ALT-F7)");
-            fonts::Print(text_x1, draw_y + 0x8A, HAROLD::H_Message(0xAE));
-            fonts::Print(text_x2, draw_y + 0x8A, "(ALT-F8)");
-            fonts::Print(text_x1, draw_y + 0x9B, HAROLD::H_Message(0xAF));
-            fonts::Print(text_x1, draw_y + 0xAC, HAROLD::H_Message(0xB0));
-            fonts::Print(text_x1, draw_y + 0xBD, HAROLD::H_Message(0xB1));
-            fonts::Print(text_x1, draw_y + 0xCE, HAROLD::H_Message(0x187));
+            static const struct {
+                int16_t msg_id;
+                const char* alt_label;
+            } option_rows[13] = {
+                { 0xA6, "(ALT-F1)" },
+                { 0xA7, "(ALT-F2)" },
+                { 0xA8, "(ALT-F3)" },
+                { 0xA9, nullptr },
+                { 0xAA, "(ALT-F4)" },
+                { 0xAB, "(ALT-F5)" },
+                { 0xAC, "(ALT-F6)" },
+                { 0xAD, "(ALT-F7)" },
+                { 0xAE, "(ALT-F8)" },
+                { 0xAF, nullptr },
+                { 0xB0, nullptr },
+                { 0xB1, nullptr },
+                { 0x187, nullptr },
+            };
+
+            // Enhancement: the keyboard-selected row prints in the popup's
+            // brighter highlight color instead of the normal one.
+            for (int16_t i = 0; i < 13; ++i) {
+                bool highlighted = (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                                    i == _g_options_selection);
+                if (highlighted) {
+                    s_colors normal_colors;
+                    s_colors active_colors;
+                    Get_Game_Popup_Colors(2, &normal_colors, &active_colors);
+                    fonts::Set_Font_Style_Outline(2, &active_colors);
+                    fonts::Set_Outline_Color(0, static_cast<uint16_t>(outline_colors.colors[0]));
+                    fonts::Set_Font_Spacing(1);
+                }
+                int16_t y = (int16_t)(draw_y + 0x02 + i * 0x11);
+                fonts::Print(text_x1, y, HAROLD::H_Message(option_rows[i].msg_id));
+                if (option_rows[i].alt_label != nullptr) {
+                    fonts::Print(text_x2, y, option_rows[i].alt_label);
+                }
+                if (highlighted) {
+                    fonts::Set_Font_Style_Outline(2, &outline_colors);
+                    fonts::Set_Outline_Color(0, static_cast<uint16_t>(outline_colors.colors[0]));
+                    fonts::Set_Font_Spacing(1);
+                }
+            }
         }
     }
 
