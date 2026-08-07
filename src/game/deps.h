@@ -167,6 +167,7 @@
 #include "graphics.h"
 #include "line.h"
 #include "draw.h"
+#include "design_config.h"
 #include "design.h"
 #include "aibuild.h"
 #include "colxport.h"

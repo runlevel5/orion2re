@@ -1488,28 +1488,7 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Cost_Given_M_Level_(int16_t base_cost, int16_t m_level) {
-        int16_t multiplier;
-
-        switch (m_level) {
-            case 0:
-                multiplier = 100;
-                break;
-            case 1:
-                multiplier = 75;
-                break;
-            case 2:
-                multiplier = 55;
-                break;
-            case 3:
-                multiplier = 40;
-                break;
-            case 4:
-                multiplier = 30;
-                break;
-            default:
-                multiplier = 25;
-                break;
-        }
+        uint16_t multiplier = Miniaturization_Cost_Multiplier_(m_level);
 
         int32_t result = ((int32_t)multiplier * (int32_t)base_cost) / 100;
 
@@ -1552,53 +1531,7 @@ namespace DESIGN {
     }
 
     int32_t __cdecl Space_Given_M_Level_(int16_t amount, int16_t miniaturization_level, int8_t mode) {
-        int multiplier;
-
-        if (mode == 0) {
-            switch (miniaturization_level) {
-                case 0:
-                    multiplier = 1000;
-                    break;
-                case 1:
-                    multiplier = 800;
-                    break;
-                case 2:
-                    multiplier = 650;
-                    break;
-                case 3:
-                    multiplier = 500;
-                    break;
-                case 4:
-                    multiplier = 350;
-                    break;
-                default:
-                    multiplier = 250;
-                    break;
-            }
-        } else if (mode == 1) {
-            switch (miniaturization_level) {
-                case 0:
-                    multiplier = 1000;
-                    break;
-                case 1:
-                    multiplier = 800;
-                    break;
-                case 2:
-                    multiplier = 700;
-                    break;
-                case 3:
-                    multiplier = 600;
-                    break;
-                case 4:
-                    multiplier = 500;
-                    break;
-                default:
-                    multiplier = 400;
-                    break;
-            }
-        } else {
-            multiplier = 1000;
-        }
+        uint16_t multiplier = Miniaturization_Space_Multiplier_(miniaturization_level, mode);
 
         int result = (static_cast<int>(amount) * multiplier + 500) / 1000;
 
@@ -1610,34 +1543,7 @@ namespace DESIGN {
     }
 
     int8_t __cdecl Miniaturization_Category_(int16_t tech_app) {
-        auto& app = TECHDATA::_technology_applications[tech_app];
-
-        if (app.type == TECH_APPLICATION_TYPE_WEAPON) {
-            if (tech_app == TECHDATA::_weapons[WEAPON_INTERCEPTOR].tech_app_id ||
-                tech_app == TECHDATA::_weapons[WEAPON_BOMBER].tech_app_id ||
-                tech_app == TECHDATA::_weapons[WEAPON_ASSAULT_SHUTTLE].tech_app_id ||
-                tech_app == TECHDATA::_weapons[WEAPON_HEAVY_FIGHTER].tech_app_id) {
-                return 2;
-            }
-
-            int16_t weapon_idx = HACCESS::Weapons_Index_From_Tech_App_(tech_app);
-            int8_t weapon_type_class = TECHDATA::_weapons[weapon_idx].type;
-
-            if (weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BEAM) {
-                return 0;
-            }
-        } else if (app.type == TECH_APPLICATION_TYPE_SPECIAL) {
-            if (tech_app == TECHDATA::_specials[SPECIAL_AUGMENTED_ENGINES].tech_app_id ||
-                tech_app == TECHDATA::_specials[SPECIAL_REINFORCED_HULL].tech_app_id ||
-                tech_app == TECHDATA::_specials[SPECIAL_EXTENDED_FUEL_TANKS].tech_app_id ||
-                tech_app == TECHDATA::_specials[SPECIAL_HEAVY_ARMOR].tech_app_id ||
-                tech_app == TECHDATA::_specials[SPECIAL_TROOP_PODS].tech_app_id) {
-                return 2;
-            }
-            return 1;
-        }
-
-        return 1;
+        return (int8_t)miniaturization_categories[tech_app];
     }
 
     void __cdecl Bonus_For_Special_Mods_(int16_t flags, int16_t *bonus1_out, int16_t *bonus2_out) {

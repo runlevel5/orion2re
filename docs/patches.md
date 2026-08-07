@@ -123,7 +123,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:7839` - `turn 1 research`: fixed in `COLCALC::Check_For_Research_Breakthrough_()` by banking signed research production when no field is selected, so first-turn output survives until a research choice is made; this directly expresses the 1.50 call-site helper as a source-level branch.
 - [x] `asm.pl:7864` - `unload ship damage storage`: fixed in `COMBINIT::Unload_Combat_Ship_()` by persisting actual computer damage, calculating shield and drive damage directly from lost hit points, and reconstructing surviving fighter counts from slot hit points; this replaces the 1.50 diverted wrapper with direct source-level strategic-state persistence.
 - [ ] `asm.pl:7887` - `destroying combat cloaks`
-- [ ] `asm.pl:8101` - `miniaturization`
+- [x] `asm.pl:8101` - `miniaturization`: implemented in `DESIGN::Miniaturization_Category_()`, `DESIGN::Cost_Given_M_Level_()`, and `DESIGN::Space_Given_M_Level_()` with configurable technology categories and normalized six-level cost and per-category space curves; this replaces the 1.50 call diversions, immediate rewrites, and flattened multiplier fields with direct source-level data bindings.
 - [x] `asm.pl:8114` - `mark stack overflow`: fixed in `INFO::_Tech_Review_Subscreen_()` by popping its active technology-image allocation before every return, preserving push-stack balance for both the info screen and race report; this replaces the 1.50 race-report cursor stash with cleanup at the allocation owner.
 - [ ] `asm.pl:8145` - `turn order ini overflow`
 - [ ] `asm.pl:8169` - `damper planet`

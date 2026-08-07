@@ -13,6 +13,7 @@
 #include "game/combinit.h"
 #include "game/cmbtmis.h"
 #include "game/combat1.h"
+#include "game/design_config.h"
 #include "game/mapgen.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
@@ -250,6 +251,79 @@ DOCTEST_TEST_CASE("missile defense settings preserve classic defaults") {
     DOCTEST_CHECK(CMBTMIS::missile_defense.cloaking_device_missile_defense == 60);
     DOCTEST_CHECK(CMBTMIS::missile_defense.cloaking_device_missile_miss_percent == 45);
     DOCTEST_CHECK(CMBTMIS::missile_defense.displacement_device_missiles_miss_percent == 35);
+}
+
+DOCTEST_TEST_CASE("miniaturization curves and categories preserve 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const uint16_t expected_cost[DESIGN::MINIATURIZATION_LEVEL_COUNT] = {
+        100, 75, 55, 40, 30, 25,
+    };
+    const uint16_t expected_space[DESIGN::MINIATURIZATION_CATEGORY_COUNT]
+                                     [DESIGN::MINIATURIZATION_LEVEL_COUNT] = {
+        { 1000, 800, 650, 500, 350, 250 },
+        { 1000, 800, 700, 600, 500, 400 },
+        { 1000, 1000, 1000, 1000, 1000, 1000 },
+    };
+    DOCTEST_CHECK(std::memcmp(DESIGN::miniaturization.cost, expected_cost,
+                              sizeof(expected_cost)) == 0);
+    DOCTEST_CHECK(std::memcmp(DESIGN::miniaturization.space, expected_space,
+                              sizeof(expected_space)) == 0);
+
+    int category_counts[DESIGN::MINIATURIZATION_CATEGORY_COUNT] = {};
+    for (int tech = 0; tech < TECH_APP_COUNT; ++tech) {
+        DOCTEST_REQUIRE(DESIGN::miniaturization_categories[tech] <
+                        DESIGN::MINIATURIZATION_CATEGORY_COUNT);
+        category_counts[DESIGN::miniaturization_categories[tech]]++;
+    }
+    DOCTEST_CHECK(category_counts[DESIGN::MINIATURIZATION_CATEGORY_GROUP_1] == 154);
+    DOCTEST_CHECK(category_counts[DESIGN::MINIATURIZATION_CATEGORY_GROUP_2] == 49);
+    DOCTEST_CHECK(category_counts[DESIGN::MINIATURIZATION_CATEGORY_GROUP_3] == 9);
+    DOCTEST_CHECK(DESIGN::miniaturization_categories[TECH_APP_ANTI_MATTER_TORPEDOES] ==
+                  DESIGN::MINIATURIZATION_CATEGORY_GROUP_2);
+    DOCTEST_CHECK(DESIGN::miniaturization_categories[TECH_APP_REINFORCED_HULL] ==
+                  DESIGN::MINIATURIZATION_CATEGORY_GROUP_3);
+    DOCTEST_CHECK(DESIGN::Miniaturization_Cost_Multiplier_(2) == 55);
+    DOCTEST_CHECK(DESIGN::Miniaturization_Cost_Multiplier_(6) == 25);
+    DOCTEST_CHECK(DESIGN::Miniaturization_Space_Multiplier_(2,
+                      DESIGN::MINIATURIZATION_CATEGORY_GROUP_1) == 650);
+    DOCTEST_CHECK(DESIGN::Miniaturization_Space_Multiplier_(2,
+                      DESIGN::MINIATURIZATION_CATEGORY_GROUP_2) == 700);
+    DOCTEST_CHECK(DESIGN::Miniaturization_Space_Multiplier_(5,
+                      DESIGN::MINIATURIZATION_CATEGORY_GROUP_3) == 1000);
+}
+
+DOCTEST_TEST_CASE("miniaturization curves and categories bind by normalized names") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "miniaturization cost = 100 75 60 40 30 25;"
+        "miniaturization space group1 = 1000 800 675 500 350 250;"
+        "miniaturization space group3 = 1000 1000 900 800 700 600;"
+        "tech_mini anti_matter_torpedo = group1;"
+        "tech_mini reinforced_hull = group2;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(DESIGN::Miniaturization_Cost_Multiplier_(2) == 60);
+    DOCTEST_CHECK(DESIGN::Miniaturization_Space_Multiplier_(2,
+                      DESIGN::MINIATURIZATION_CATEGORY_GROUP_1) == 675);
+    DOCTEST_CHECK(DESIGN::Miniaturization_Space_Multiplier_(5,
+                      DESIGN::MINIATURIZATION_CATEGORY_GROUP_3) == 600);
+    DOCTEST_CHECK(DESIGN::miniaturization_categories[TECH_APP_ANTI_MATTER_TORPEDOES] ==
+                  DESIGN::MINIATURIZATION_CATEGORY_GROUP_1);
+    DOCTEST_CHECK(DESIGN::miniaturization_categories[TECH_APP_REINFORCED_HULL] ==
+                  DESIGN::MINIATURIZATION_CATEGORY_GROUP_2);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "tech_mini reinforced_hull = group4;", &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("maximum galaxy star count binds and validates its storage range") {
