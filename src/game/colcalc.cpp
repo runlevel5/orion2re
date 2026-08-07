@@ -1731,7 +1731,7 @@ namespace COLCALC {
                 if (MOX::_NUM_PLAYERS > 0) {
                     for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
                         int8_t target = MOX::_star[star_idx].surrender_to[player_idx];
-                        if (target != -1) {
+                        if (target >= 0 && target < MAX_PLAYERS) {
                             Do_Surrender_Star_(star_idx, player_idx, target);
                         }
                     }

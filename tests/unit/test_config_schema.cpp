@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 
@@ -172,7 +173,7 @@ DOCTEST_TEST_CASE("main schema game-domain types are documented and match native
         CONFIG_MAIN_SCHEMA_PATH, &root, &diagnostic));
     const config::tool::s_json_value* types = Member_(&root, "types");
     DOCTEST_REQUIRE(types != nullptr);
-    DOCTEST_REQUIRE(types->member_names.size() == 27);
+    DOCTEST_REQUIRE(types->member_names.size() == 29);
 
     for (const config::tool::s_json_value& type : types->values) {
         for (const char* field : {"title", "description", "remarks"}) {
@@ -290,6 +291,62 @@ DOCTEST_TEST_CASE("primitive schema preserves declaration order and normalizes C
     DOCTEST_REQUIRE(encoded.size() == 5);
     DOCTEST_CHECK(static_cast<uint8_t>(encoded[2]) == 0x81);
     DOCTEST_CHECK(static_cast<uint8_t>(encoded[3]) == 0xE1);
+}
+
+DOCTEST_TEST_CASE("interleaved namespace members receive contiguous depth-first runtime IDs") {
+    config::tool::s_schema schema;
+    std::string diagnostic;
+
+    DOCTEST_REQUIRE(Load_("valid_interleaved_namespaces.json5", &schema, &diagnostic));
+    DOCTEST_REQUIRE(schema.parameters.size() == 3);
+    DOCTEST_CHECK(schema.parameters[0].path == "combat.first");
+    DOCTEST_CHECK(schema.parameters[1].path == "combat.second");
+    DOCTEST_CHECK(schema.parameters[2].path == "standalone");
+    DOCTEST_REQUIRE(schema.nodes.size() == 4);
+    DOCTEST_CHECK(schema.nodes[0].kind == config::tool::NODE_NAMESPACE);
+    DOCTEST_CHECK(schema.nodes[0].first_parameter == 0);
+    DOCTEST_CHECK(schema.nodes[0].last_parameter == 1);
+    DOCTEST_CHECK(schema.nodes[1].parameter == 0);
+    DOCTEST_CHECK(schema.nodes[2].parent == UINT32_MAX);
+    DOCTEST_CHECK(schema.nodes[2].first_parameter == 2);
+    DOCTEST_CHECK(schema.nodes[2].last_parameter == 2);
+    DOCTEST_CHECK(schema.nodes[3].parent == 0);
+    DOCTEST_CHECK(schema.nodes[3].parameter == 1);
+    DOCTEST_CHECK(config::tool::Validate_Runtime_Layout(&schema, &diagnostic));
+
+    const std::filesystem::path output = std::filesystem::temp_directory_path() /
+        "orion2re-config-interleaved-namespace-test";
+    std::filesystem::remove_all(output);
+    DOCTEST_REQUIRE(config::tool::Generate_Cpp(
+        &schema, output.string().c_str(), &diagnostic));
+    std::ifstream generated_file(output / "config.cpp", std::ios::binary);
+    const std::string generated((std::istreambuf_iterator<char>(generated_file)),
+                                std::istreambuf_iterator<char>());
+    DOCTEST_CHECK(generated.find(
+        "{ \"combat\", CONFIG_NODE_NAMESPACE, CONFIG_NO_NODE, 0, 0, 1") !=
+        std::string::npos);
+    DOCTEST_CHECK(generated.find(
+        "{ \"standalone\", CONFIG_NODE_SCALAR, CONFIG_NO_NODE, 0, 2, 2, 2") !=
+        std::string::npos);
+    std::filesystem::remove_all(output);
+}
+
+DOCTEST_TEST_CASE("C++ generation rejects invalid runtime variable ranges") {
+    config::tool::s_schema schema;
+    std::string diagnostic;
+    DOCTEST_REQUIRE(Load_("valid_interleaved_namespaces.json5", &schema, &diagnostic));
+    schema.nodes[0].last_parameter = 2;
+
+    DOCTEST_CHECK_FALSE(config::tool::Validate_Runtime_Layout(&schema, &diagnostic));
+    DOCTEST_CHECK(diagnostic.find("aggregate range does not match its descendants") !=
+                  std::string::npos);
+    const std::filesystem::path output = std::filesystem::temp_directory_path() /
+        "orion2re-config-invalid-layout-test";
+    std::filesystem::remove_all(output);
+    DOCTEST_CHECK_FALSE(config::tool::Generate_Cpp(
+        &schema, output.string().c_str(), &diagnostic));
+    DOCTEST_CHECK_FALSE(std::filesystem::exists(output / "config.cpp"));
+    std::filesystem::remove_all(output);
 }
 
 DOCTEST_TEST_CASE("schema diagnostics reject malformed and unsupported declarations") {

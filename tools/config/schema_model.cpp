@@ -2,6 +2,7 @@
 
 #include <climits>
 #include <numeric>
+#include <utility>
 
 #include "json5_reader.h"
 
@@ -1402,6 +1403,92 @@ namespace {
                            schema, diagnostic);
     }
 
+    bool Normalize_Node_(uint32_t node_index,
+                         const std::vector<std::vector<uint32_t>>& children,
+                         std::vector<uint8_t>* node_states,
+                         std::vector<bool>* parameter_seen,
+                         std::vector<s_parameter>* old_parameters,
+                         s_schema* schema, std::string* diagnostic) {
+        if ((*node_states)[node_index] != 0) {
+            *diagnostic = "configuration schema node graph is cyclic";
+            return false;
+        }
+        (*node_states)[node_index] = 1;
+        s_node& node = schema->nodes[node_index];
+        node.first_parameter = static_cast<uint32_t>(schema->parameters.size());
+        if (node.kind == NODE_SCALAR) {
+            if (!children[node_index].empty() || node.parameter >= old_parameters->size() ||
+                (*parameter_seen)[node.parameter]) {
+                *diagnostic = "configuration schema scalar has an invalid parameter mapping";
+                return false;
+            }
+            (*parameter_seen)[node.parameter] = true;
+            schema->parameters.push_back(std::move((*old_parameters)[node.parameter]));
+            node.parameter = node.first_parameter;
+            node.last_parameter = node.first_parameter;
+        } else {
+            if (children[node_index].empty()) {
+                *diagnostic = "configuration schema aggregate has no writable descendants";
+                return false;
+            }
+            node.parameter = UINT32_MAX;
+            for (uint32_t child : children[node_index]) {
+                if (!Normalize_Node_(child, children, node_states, parameter_seen,
+                                     old_parameters, schema, diagnostic)) {
+                    return false;
+                }
+            }
+            node.last_parameter = static_cast<uint32_t>(schema->parameters.size() - 1);
+        }
+        (*node_states)[node_index] = 2;
+        return true;
+    }
+
+    bool Normalize_Runtime_Layout_(s_schema* schema, std::string* diagnostic) {
+        std::vector<std::vector<uint32_t>> children(schema->nodes.size());
+        std::vector<uint32_t> roots;
+        for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+            const uint32_t parent = schema->nodes[node_index].parent;
+            if (parent == UINT32_MAX) {
+                roots.push_back(node_index);
+            } else if (parent < schema->nodes.size()) {
+                children[parent].push_back(node_index);
+            } else {
+                *diagnostic = "configuration schema node has an invalid parent";
+                return false;
+            }
+        }
+        if (roots.empty()) {
+            *diagnostic = "configuration schema has no root nodes";
+            return false;
+        }
+
+        std::vector<s_parameter> old_parameters = std::move(schema->parameters);
+        schema->parameters.clear();
+        schema->parameters.reserve(old_parameters.size());
+        std::vector<uint8_t> node_states(schema->nodes.size(), 0);
+        std::vector<bool> parameter_seen(old_parameters.size(), false);
+        for (uint32_t root : roots) {
+            if (!Normalize_Node_(root, children, &node_states, &parameter_seen,
+                                 &old_parameters, schema, diagnostic)) {
+                return false;
+            }
+        }
+        for (uint8_t state : node_states) {
+            if (state != 2) {
+                *diagnostic = "configuration schema contains an unreachable node";
+                return false;
+            }
+        }
+        for (bool seen : parameter_seen) {
+            if (!seen) {
+                *diagnostic = "configuration schema contains an unreachable parameter";
+                return false;
+            }
+        }
+        return schema->parameters.size() == old_parameters.size();
+    }
+
     std::string Default_Text_(const s_json_value* value) {
         if (value == nullptr) {
             return {};
@@ -1741,6 +1828,106 @@ const char* Primitive_Name(e_primitive_type type) {
     return names[type];
 }
 
+bool Validate_Runtime_Layout(const s_schema* schema, std::string* diagnostic) {
+    if (schema == nullptr || diagnostic == nullptr) {
+        return false;
+    }
+    std::vector<std::vector<uint32_t>> children(schema->nodes.size());
+    std::vector<uint32_t> roots;
+    for (uint32_t node_index = 0; node_index < schema->nodes.size(); ++node_index) {
+        const uint32_t parent = schema->nodes[node_index].parent;
+        if (parent == UINT32_MAX) {
+            roots.push_back(node_index);
+        } else if (parent < schema->nodes.size()) {
+            children[parent].push_back(node_index);
+        } else {
+            *diagnostic = "configuration schema node has an invalid parent";
+            return false;
+        }
+    }
+    if (roots.empty() || schema->parameters.empty()) {
+        *diagnostic = "configuration schema runtime layout is empty";
+        return false;
+    }
+
+    std::vector<uint8_t> states(schema->nodes.size(), 0);
+    std::vector<uint32_t> parameter_owners(schema->parameters.size(), 0);
+    const auto validate_node = [&](const auto& self, uint32_t node_index) -> bool {
+        if (states[node_index] != 0) {
+            *diagnostic = "configuration schema node graph is cyclic";
+            return false;
+        }
+        states[node_index] = 1;
+        const s_node& node = schema->nodes[node_index];
+        if (node.first_parameter > node.last_parameter ||
+            node.last_parameter >= schema->parameters.size()) {
+            *diagnostic = "configuration schema node has an invalid variable range";
+            return false;
+        }
+        if (node.kind == NODE_SCALAR) {
+            if (!children[node_index].empty() || node.parameter != node.first_parameter ||
+                node.parameter != node.last_parameter) {
+                *diagnostic = "configuration schema scalar has an invalid variable range";
+                return false;
+            }
+            ++parameter_owners[node.parameter];
+        } else {
+            if (children[node_index].empty() || node.parameter != UINT32_MAX) {
+                *diagnostic = "configuration schema aggregate has an invalid variable mapping";
+                return false;
+            }
+            uint32_t expected = node.first_parameter;
+            for (uint32_t child : children[node_index]) {
+                if (!self(self, child)) {
+                    return false;
+                }
+                const s_node& child_node = schema->nodes[child];
+                if (child_node.first_parameter != expected) {
+                    *diagnostic = "configuration schema sibling variable ranges overlap or have gaps";
+                    return false;
+                }
+                expected = child_node.last_parameter + 1;
+            }
+            if (expected != node.last_parameter + 1) {
+                *diagnostic = "configuration schema aggregate range does not match its descendants";
+                return false;
+            }
+        }
+        states[node_index] = 2;
+        return true;
+    };
+
+    uint32_t expected_root_parameter = 0;
+    for (uint32_t root : roots) {
+        if (!validate_node(validate_node, root)) {
+            return false;
+        }
+        const s_node& root_node = schema->nodes[root];
+        if (root_node.first_parameter != expected_root_parameter) {
+            *diagnostic = "configuration schema root variable ranges overlap or have gaps";
+            return false;
+        }
+        expected_root_parameter = root_node.last_parameter + 1;
+    }
+    if (expected_root_parameter != schema->parameters.size()) {
+        *diagnostic = "configuration schema root ranges do not cover every variable";
+        return false;
+    }
+    for (uint8_t state : states) {
+        if (state != 2) {
+            *diagnostic = "configuration schema contains an unreachable node";
+            return false;
+        }
+    }
+    for (uint32_t owners : parameter_owners) {
+        if (owners != 1) {
+            *diagnostic = "configuration schema variable does not have exactly one scalar owner";
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* diagnostic) {
     if (path == nullptr || schema == nullptr || diagnostic == nullptr) {
         return false;
@@ -1845,19 +2032,10 @@ bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* d
                     loaded.nodes.push_back(std::move(node));
                 }
             }
-            const size_t child_index = loaded.nodes.size();
             if (!Rich_Parameter_(&root, parameters->member_names[index],
                                  &parameter_value, schema_path, parent, name_space,
                                  &loaded, diagnostic)) {
                 return false;
-            }
-            if (parent != UINT32_MAX) {
-                const s_node& child = loaded.nodes[child_index];
-                s_node& namespace_node = loaded.nodes[parent];
-                if (namespace_node.first_parameter == UINT32_MAX) {
-                    namespace_node.first_parameter = child.first_parameter;
-                }
-                namespace_node.last_parameter = child.last_parameter;
             }
         }
     }
@@ -1877,6 +2055,10 @@ bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* d
                           ".group: unknown group '" + name + "'";
             return false;
         }
+    }
+    if (!Normalize_Runtime_Layout_(&loaded, diagnostic) ||
+        !Validate_Runtime_Layout(&loaded, diagnostic)) {
+        return false;
     }
     if (!Build_Documentation_Model_(&root, schema_path, &loaded, diagnostic)) {
         return false;

@@ -207,6 +207,27 @@ DOCTEST_TEST_CASE("interactive combat stat settings preserve classic defaults") 
     DOCTEST_CHECK(COMBAT1::_non_ics_tractor_and_bhg_mode == 1);
 }
 
+DOCTEST_TEST_CASE("combat namespace settings resolve bidirectionally and commit defaults") {
+    const char* paths[] = {
+        "combat.lightning_field_ratio",
+        "combat.lightning_field_mode",
+    };
+    for (const char* expected : paths) {
+        config::t_variable_id id = config::CONFIG_NO_VARIABLE;
+        DOCTEST_REQUIRE(config::Find_Variable(expected, std::strlen(expected), &id));
+        std::string resolved;
+        DOCTEST_REQUIRE(config::Get_Variable_Name(id, &resolved));
+        DOCTEST_CHECK(resolved == expected);
+        DOCTEST_CHECK(config::Get_Variable_Type(id) != nullptr);
+    }
+
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTMIS::_lightning_field_ratio == 50);
+    DOCTEST_CHECK(CMBTMIS::_lightning_field_mode == CMBTMIS::LIGHTNING_FIELD_MODE_CLASSIC);
+}
+
 DOCTEST_TEST_CASE("missile defense settings preserve classic defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
