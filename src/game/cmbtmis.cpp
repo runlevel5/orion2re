@@ -1013,6 +1013,7 @@ namespace CMBTMIS {
         int16_t window_height;
         int16_t facing_dir;
         s_animation_header* fighter_anim;
+        int16_t final_target_idx = Final_Flyer_Target_(MOX::_missile, missile_idx);
 
         num_missiles = MOX::_missile[missile_idx].quantity / 4;
         if (num_missiles > 9) {
@@ -1048,7 +1049,7 @@ namespace CMBTMIS {
             facing_dir = (uint8_t)MOX::_missile[missile_idx].facing_dir;
             fighter_anim = MOX::_fighter_seg[owner][type * 16 + facing_dir];
 
-            if (MOX::_missile[missile_idx].target_unit_idx == MOX::_cur_ship) {
+            if (final_target_idx == MOX::_cur_ship) {
                 animate::Set_Animation_Frame_(fighter_anim, (MOX::_ship_frame + missile_idx) % 3);
             } else {
                 animate::Reset_Animation_Frame_(fighter_anim);
@@ -1069,6 +1070,7 @@ namespace CMBTMIS {
                 Missile_Owner_(missile_idx);
                 int16_t type_idx = Missile_Type_(missile_idx);
                 int16_t facing_idx = (int16_t)(uint8_t)MOX::_missile[missile_idx].facing_dir;
+                int16_t final_target_idx = Final_Flyer_Target_(MOX::_missile, missile_idx);
 
                 if (TECHDATA::_weapons[MOX::_missile[missile_idx].type].type != WEAPON_TYPE_FIGHTER) {
                     if (MOX::_missile[missile_idx].target_unit_idx == MOX::_cur_ship || MOX::_missile[missile_idx].type == WEAPON_PROTON_TORPEDO) {
@@ -1078,7 +1080,7 @@ namespace CMBTMIS {
                     }
                 }
 
-                if (MOX::_missile[missile_idx].target_unit_idx != MOX::_cur_ship || MOX::_draw_active_missiles == 1) {
+                if (final_target_idx != MOX::_cur_ship || MOX::_draw_active_missiles == 1) {
                     int16_t weapon_type = MOX::_missile[missile_idx].type;
                     if (TECHDATA::_weapons[weapon_type].type == WEAPON_TYPE_FIGHTER) {
                         Draw_Fighter_(missile_idx, screen_x, screen_y, draw_fullscreen_view);

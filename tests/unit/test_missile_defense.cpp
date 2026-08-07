@@ -30,3 +30,31 @@ DOCTEST_TEST_CASE("expected missile damage applies only the active cloak defense
 
     CMBTMIS::missile_defense = { 0, 50, 30 };
 }
+
+DOCTEST_TEST_CASE("flyer targeting follows anti-missile chains to the final ship") {
+    s_missile missiles[3] = {};
+
+    missiles[0].is_anti_missile_rocket = 1;
+    missiles[0].target_unit_idx = 1;
+    missiles[1].is_anti_missile_rocket = 1;
+    missiles[1].target_unit_idx = 2;
+    missiles[2].target_unit_idx = 7;
+
+    DOCTEST_CHECK(CMBTMIS::Final_Flyer_Target_(missiles, 0) == 7);
+    DOCTEST_CHECK(CMBTMIS::Final_Flyer_Target_(missiles, 2) == 7);
+}
+
+DOCTEST_TEST_CASE("ship movement excludes flyers targeting another missile") {
+    s_missile missile = {};
+    missile.type = WEAPON_NUCLEAR_MISSILE;
+    missile.target_unit_idx = 4;
+
+    DOCTEST_CHECK(CMBTMIS::Missile_Targets_Ship_(&missile, 4));
+
+    missile.is_anti_missile_rocket = 1;
+    DOCTEST_CHECK_FALSE(CMBTMIS::Missile_Targets_Ship_(&missile, 4));
+
+    missile.is_anti_missile_rocket = 0;
+    missile.type = WEAPON_NO_WEAPONS;
+    DOCTEST_CHECK_FALSE(CMBTMIS::Missile_Targets_Ship_(&missile, 4));
+}

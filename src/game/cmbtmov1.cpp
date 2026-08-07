@@ -64,7 +64,7 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
 
         for (int16_t i = 0; i < 300; ++i) {
             s_missile* missile = &MOX::_missile[i];
-            if (missile->type > 0 && missile->target_unit_idx == ship_idx) {
+            if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx)) {
                 int16_t move_speed = 5;
                 if (ship->current_speed != 0) {
                     move_speed = (int16_t)((missile->speed * 5) / ship->current_speed);
@@ -98,7 +98,7 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
 
             for (int16_t i = 0; i < 300; ++i) {
                 s_missile* missile = &MOX::_missile[i];
-                if (missile->type > 0 && missile->target_unit_idx == ship_idx) {
+                if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx)) {
                     CMBTMIS::Draw_Missile_(i, missile->x - MOX::_cur_combat_x * 20, missile->y - MOX::_cur_combat_y * 20, 0);
                 }
             }
@@ -357,7 +357,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
 
                     for (int16_t m = 0; m < 300; ++m) {
                         s_missile* msl = &MOX::_missile[m];
-                        if (msl->type > 0 && msl->target_unit_idx == ship_idx) {
+                        if (CMBTMIS::Missile_Targets_Ship_(msl, ship_idx)) {
                             int16_t msl_speed = 5;
                             if (ship->current_speed != 0) {
                                 msl_speed = ((uint8_t)msl->speed * speed_px) / ship->current_speed;
@@ -389,7 +389,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
 
                         for (int16_t m = 0; m < 300; ++m) {
                             s_missile* msl = &MOX::_missile[m];
-                            if (msl->type > 0 && msl->target_unit_idx == ship_idx) {
+                            if (CMBTMIS::Missile_Targets_Ship_(msl, ship_idx)) {
                                 CMBTMIS::Draw_Missile_(m, msl->x - MOX::_cur_combat_x * 20, msl->y - MOX::_cur_combat_y * 20, 0);
                             }
                         }
@@ -573,7 +573,8 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
 
                 for (int32_t i = 0; i < 300; ++i) {
                     s_missile* missile = &MOX::_missile[i];
-                    if (missile->type > 0 && missile->target_unit_idx == ship_idx && missile->source_unit_idx != ship_idx) {
+                    if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx) &&
+                        missile->source_unit_idx != ship_idx) {
                         int16_t move_speed = 5;
                         if (ship->current_speed != 0) {
                             move_speed = (int16_t)(((int32_t)missile->speed * 5) / (int32_t)ship->current_speed);
@@ -678,7 +679,8 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
 
             for (int16_t i = 0; i < 300; ++i) {
                 s_missile *missile = &MOX::_missile[i];
-                if (missile->type > 0 && missile->target_unit_idx == ship_idx && missile->source_unit_idx != ship_idx) {
+                if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx) &&
+                    missile->source_unit_idx != ship_idx) {
                     
                     int16_t missile_speed = 5;
                     if (ship->current_speed != 0) {

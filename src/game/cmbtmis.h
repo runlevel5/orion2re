@@ -39,6 +39,20 @@ namespace CMBTMIS {
         return damage * (100 - miss_percent) / 100;
     }
 
+    inline int16_t Final_Flyer_Target_(const s_missile* missiles, int16_t missile_idx) {
+        const s_missile* missile = &missiles[missile_idx];
+        while (missile->is_anti_missile_rocket != 0) {
+            missile = &missiles[missile->target_unit_idx];
+        }
+        return missile->target_unit_idx;
+    }
+
+    inline bool Missile_Targets_Ship_(const s_missile* missile, int16_t ship_idx) {
+        return missile->type > WEAPON_NO_WEAPONS &&
+               missile->is_anti_missile_rocket == 0 &&
+               missile->target_unit_idx == ship_idx;
+    }
+
     extern int16_t _missile_group_offset[16][16];
     extern int16_t _torpedo_group_offset[16][8];
 
