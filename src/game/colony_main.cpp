@@ -254,6 +254,9 @@ namespace COLONY {
         _colony_handle = MOX::_planet[_planet_handle].colony_index;
         _g_scanned_star = -1;
         _g_scanned_planet = -1;
+        _g_kbd_bldg_row = -1; // enhancement: no structure selected at entry
+        _g_kbd_bldg_col = -1;
+        _g_kbd_satellite_ix = -1;
         _sys_disp_star_handle = _star_handle;
 
         if (_colony_handle == -1) {
@@ -334,14 +337,19 @@ namespace COLONY {
             Draw_Colony_Screen_();
             RUSS::Mox_Sync_Update_();
 
-            // Enhancement: Esc presses the Return button like a click, so
-            // the exit takes the button path (with its fade) instead of the
-            // abrupt cancel.
+            // Enhancement: Esc presses the Return button like a click (so
+            // the exit takes the button path with its fade), Tab cycles the
+            // structures with the hover highlight, and Enter asks to destroy
+            // the selected one like a click on it.
             int16_t synth_input = 0;
             if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
                 int32_t key = key::Read_Key_();
                 if (key == 0x011B) {
                     synth_input = fields::Activate_Field_(_colony_fields[1]);
+                } else if (key == 0x0F09) { // Tab
+                    Cycle_Kbd_Building_();
+                } else if (key == 0x1C0D) { // Enter
+                    synth_input = Kbd_Building_Field_();
                 } else if (key != 0) {
                     key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
                 }
@@ -1009,7 +1017,11 @@ namespace COLONY {
         _colony_fields[20] = fields::Add_Multi_Hot_Key_Field_(ESTRINGS::E_Strings_(0x218));
 
         _colony_fields[1] = fields::Add_Button_Field_(0x22c, 0x1cb, ESTRINGS::E_Strings_(0xc), COLONY::C_Anims_(0x15), ESTRINGS::E_Strings_(0xc), 0x28);
-        _colony_fields[5] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(0xd5));
+        // Enhancement: the recalc hot key shares 'c' with the Change button
+        // and wins the match, leaving the button unreachable; disable it so
+        // C presses Change.
+        _colony_fields[5] = fields::Add_Hot_Key_(
+            (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? "" : ESTRINGS::E_Strings_(0xd5));
 
         if (MOX::_star[_star_handle].officer_index[MOX::_PLAYER_NUM] == -1) {
             _colony_fields[17] = fields::Add_Button_Field_(0x22c, 0x1ab, ESTRINGS::E_Strings_(0xc), COLONY::C_Anims_(0x20), ESTRINGS::E_Strings_(0x158), 0x28);
@@ -1018,11 +1030,14 @@ namespace COLONY {
             _colony_fields[17] = fields::Add_Hidden_Field_(0x226, 0x165, 0x26f, 0x1bd, ESTRINGS::E_Strings_(0x158), 0);
         }
 
-        _colony_fields[12] = fields::Add_Hidden_Field_(0x136, 0x20, 0x1fe, 0x3d, ESTRINGS::E_Strings_(0xc), 0);
-        _colony_fields[13] = fields::Add_Hidden_Field_(0x80, 0x20, 0x12d, 0x3d, ESTRINGS::E_Strings_(0xc), 0);
-        _colony_fields[14] = fields::Add_Hidden_Field_(0x80, 0x3e, 0x12d, 0x5b, ESTRINGS::E_Strings_(0xc), 0);
-        _colony_fields[15] = fields::Add_Hidden_Field_(0x80, 0x5c, 0x12d, 0x79, ESTRINGS::E_Strings_(0xc), 0);
-        _colony_fields[16] = fields::Add_Hidden_Field_(0x80, 0x7a, 0x12d, 0x97, ESTRINGS::E_Strings_(0xc), 0);
+        // Enhancement: hotkeys for the summary modals — M for Morale, $ for
+        // BC, F for Food, I for Industry, R for Research.
+        const bool enhanced_keys = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        _colony_fields[12] = fields::Add_Hidden_Field_(0x136, 0x20, 0x1fe, 0x3d, enhanced_keys ? "M" : ESTRINGS::E_Strings_(0xc), 0);
+        _colony_fields[13] = fields::Add_Hidden_Field_(0x80, 0x20, 0x12d, 0x3d, enhanced_keys ? "$" : ESTRINGS::E_Strings_(0xc), 0);
+        _colony_fields[14] = fields::Add_Hidden_Field_(0x80, 0x3e, 0x12d, 0x5b, enhanced_keys ? "F" : ESTRINGS::E_Strings_(0xc), 0);
+        _colony_fields[15] = fields::Add_Hidden_Field_(0x80, 0x5c, 0x12d, 0x79, enhanced_keys ? "I" : ESTRINGS::E_Strings_(0xc), 0);
+        _colony_fields[16] = fields::Add_Hidden_Field_(0x80, 0x7a, 0x12d, 0x97, enhanced_keys ? "R" : ESTRINGS::E_Strings_(0xc), 0);
 
         if (_valid_colony != 0) {
             _colony_fields[4] = fields::Add_Button_Field_(0x207, 0x7b, ESTRINGS::E_Strings_(0xc), COLONY::C_Anims_(0x13), ESTRINGS::E_Strings_(0xd5), 0x28);

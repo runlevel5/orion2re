@@ -407,10 +407,12 @@ namespace LOADSAVE {
     }
 
     // Enhancement helper: reads Up/Down/wheel navigation (wheel paced to one
-    // step per WHEEL_STEP_MS) and Enter/middle-click activation; other keys
-    // go back to the fields system.
+    // step per WHEEL_STEP_MS) and Enter/middle-click activation. When
+    // out_digit_slot is given, digits pick a slot directly (1-9 the first
+    // nine rows, 0 the tenth). Other keys go back to the fields system.
     static int16_t Read_Popup_Nav_Input_(int16_t wheel_steps, int16_t middle_clicks,
-                                         uint32_t* last_wheel_ms, bool* out_activate) {
+                                         uint32_t* last_wheel_ms, bool* out_activate,
+                                         int16_t* out_digit_slot) {
         int16_t nav = 0;
         *out_activate = false;
         int32_t key = key::Read_Key_();
@@ -420,6 +422,10 @@ namespace LOADSAVE {
             nav = 1;
         } else if (key == 0x1C0D) { // Enter
             *out_activate = true;
+        } else if (out_digit_slot != nullptr && key > 0 &&
+                   (key & 0xFF) >= '0' && (key & 0xFF) <= '9') {
+            int16_t ch = (int16_t)(key & 0xFF);
+            *out_digit_slot = (ch == '0') ? (int16_t)9 : (int16_t)(ch - '1');
         } else if (key != 0) {
             key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
         }
@@ -517,16 +523,26 @@ namespace LOADSAVE {
             timer::Mark_Time_();
 
             // Enhancement: Up/Down/wheel move the selection, Enter or a
-            // middle click presses LOAD.
+            // middle click presses LOAD, and a digit (1-9, 0 = row ten)
+            // selects its row — pressed again on the selected row it loads.
             bool key_load = false;
+            int16_t digit_slot = -1;
             if (ENHANCED_UX::enhanced_ux_settings.enabled) {
                 int16_t key_nav = Read_Popup_Nav_Input_(
                     platform::Consume_Mouse_Wheel_Steps_(),
                     platform::Consume_Middle_Clicks_(),
-                    &last_wheel_ms, &key_load);
+                    &last_wheel_ms, &key_load, &digit_slot);
                 if (key_nav != 0) {
                     Select_Save_Slot_(Step_Slot_(MOX::_settings.active_save_slot, key_nav));
                     sound::Play_Sound_(')'); // same sound as clicking a row
+                }
+                if (digit_slot >= 0) {
+                    if (digit_slot == (int16_t)MOX::_settings.active_save_slot) {
+                        key_load = true;
+                    } else {
+                        Select_Save_Slot_(digit_slot);
+                        sound::Play_Sound_(')');
+                    }
                 }
             }
 
@@ -658,7 +674,6 @@ namespace LOADSAVE {
             _g_options_selection = (_g_options_selection < 0)
                                        ? ((dir > 0) ? (int16_t)0 : (int16_t)12)
                                        : (int16_t)((_g_options_selection + 13 + dir) % 13);
-            sound::Play_Sound_(')');
         } else if (key == 0x1C0D && _g_options_selection >= 0) { // Enter
             sound::Play_Sound_(')');
             return _game_popup_fields->option_toggles[_g_options_selection];
@@ -790,12 +805,24 @@ namespace LOADSAVE {
             int16_t middle_clicks = platform::Consume_Middle_Clicks_();
             if (enhanced && fields::_input_field_active == 0) {
                 bool begin_edit = false;
+                int16_t digit_slot = -1;
                 int16_t nav = Read_Popup_Nav_Input_(wheel_steps, middle_clicks,
-                                                    &last_wheel_ms, &begin_edit);
+                                                    &last_wheel_ms, &begin_edit, &digit_slot);
                 if (nav != 0) {
                     active_slot_idx = Step_Slot_(active_slot_idx, nav);
                     Select_Save_Popup_Slot_(active_slot_idx);
                     sound::Play_Sound_(')');
+                }
+                if (digit_slot >= 0) {
+                    // A digit selects its row; on the selected row it starts
+                    // editing the name, like Enter.
+                    if (digit_slot == active_slot_idx) {
+                        begin_edit = true;
+                    } else {
+                        active_slot_idx = digit_slot;
+                        Select_Save_Popup_Slot_(active_slot_idx);
+                        sound::Play_Sound_(')');
+                    }
                 }
                 if (begin_edit && active_slot_idx >= 0 && active_slot_idx < 10) {
                     Begin_Save_Slot_Edit_(active_slot_idx);

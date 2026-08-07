@@ -374,6 +374,16 @@ namespace COLONY {
 
     void __cdecl Check_Bldg_Fields_(int16_t* input_field, int16_t* scan_field);
 
+    /**
+     * Enhancement: keyboard structure selection — Tab cycling state, the
+     * cycle step, and the selected structure's field id.
+     */
+    extern int16_t _g_kbd_bldg_row;
+    extern int16_t _g_kbd_bldg_col;
+    extern int16_t _g_kbd_satellite_ix;
+    void __cdecl Cycle_Kbd_Building_();
+    int16_t __cdecl Kbd_Building_Field_();
+
     void __cdecl Fix_Colony_Queue_(int16_t colony_idx);
 
     void __cdecl Squish_Out_Colony_Queue_Slot_(int16_t colony_idx, int16_t slot_idx);

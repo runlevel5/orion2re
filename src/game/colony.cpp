@@ -103,6 +103,66 @@ namespace COLONY {
 
     int16_t _scanned_bldg_C = -1;
     int16_t _scanned_bldg_R = -1;
+
+    // Enhancement: keyboard-selected structure (Tab cycling), as row into
+    // _colony_bldgs and column within it; -1 = none. The highlight belongs
+    // to whichever input acted last.
+    int16_t _g_kbd_bldg_row = -1;
+    int16_t _g_kbd_bldg_col = -1;
+    int16_t _g_kbd_satellite_ix = -1;
+    static uint8_t _g_kbd_bldg_wins = 0;
+    static int16_t _g_bldg_prev_ptr_x = -1;
+    static int16_t _g_bldg_prev_ptr_y = -1;
+
+    // Enhancement: advances the keyboard structure selection to the next
+    // occupied slot — ground structures first, then the orbital satellites
+    // (star bases and kin) — and past the last one returns to nothing
+    // selected.
+    void __cdecl Cycle_Kbd_Building_() {
+        if (_g_kbd_satellite_ix < 0) {
+            int16_t start = (_g_kbd_bldg_row < 0)
+                                ? (int16_t)-1
+                                : (int16_t)(_g_kbd_bldg_row * 6 + _g_kbd_bldg_col);
+            for (int16_t lin = (int16_t)(start + 1); lin < 36; ++lin) {
+                int16_t row = (int16_t)(lin / 6);
+                int16_t col = (int16_t)(lin % 6);
+                if (_colony_bldgs[row].buildings[col] != 0) {
+                    _g_kbd_bldg_row = row;
+                    _g_kbd_bldg_col = col;
+                    _g_kbd_bldg_wins = 1;
+                    return;
+                }
+            }
+            _g_kbd_bldg_row = -1;
+            _g_kbd_bldg_col = -1;
+        }
+        for (int16_t i = (int16_t)(_g_kbd_satellite_ix + 1); i < 10; ++i) {
+            if (_colony_satellites[i] != 0) {
+                _g_kbd_satellite_ix = i;
+                _g_kbd_bldg_wins = 1;
+                return;
+            }
+        }
+        _g_kbd_satellite_ix = -1;
+        _g_kbd_bldg_wins = 0;
+    }
+
+    // Enhancement: the keyboard-selected structure's field id, or 0 — also
+    // when the mouse currently owns the highlight, so Enter never targets an
+    // unhighlighted structure. Covers ground structures and satellites.
+    int16_t __cdecl Kbd_Building_Field_() {
+        if (_g_kbd_bldg_wins == 0) {
+            return 0;
+        }
+        if (_g_kbd_bldg_row >= 0 &&
+            _colony_bldgs[_g_kbd_bldg_row].buildings[_g_kbd_bldg_col] != 0) {
+            return _colony_bldg_fields[_g_kbd_bldg_row * 6 + _g_kbd_bldg_col];
+        }
+        if (_g_kbd_satellite_ix >= 0 && _colony_satellites[_g_kbd_satellite_ix] != 0) {
+            return _colony_satellite_fields[_g_kbd_satellite_ix];
+        }
+        return 0;
+    }
     uint8_t _full_draw = 1;
     int16_t _colony_handle;
     int16_t _building_cr_xy[7][7][4] = {
@@ -823,6 +883,29 @@ namespace COLONY {
     }
 
     void __cdecl Draw_Colony_Info_Scanned_() {
+        // Enhancement: holding Ctrl shows the colony's totals — marines,
+        // farmers, workers and scientists — in the info line.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+            platform::Ctrl_Key_Held_() != 0 && _valid_colony != 0) {
+            s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
+            int16_t job_counts[4] = {};
+            for (int16_t i = 0; i < (int16_t)colony->n_pops; ++i) {
+                job_counts[(colony->pop[i] >> 7) & 3]++;
+            }
+            int16_t marines = (int16_t)colony->military[0];
+            char buffer[240];
+            // Unit names are already plural in the data ("Marines"); only
+            // the job words are singular and need the suffix.
+            snprintf(buffer, sizeof(buffer), "%d %s, %d %s%s, %d %s%s, %d %s%s",
+                     (int)marines, TECHDATA::_units[1].name,
+                     (int)job_counts[0], Job_String_(0), (job_counts[0] == 1) ? "" : "s",
+                     (int)job_counts[1], Job_String_(1), (job_counts[1] == 1) ? "" : "s",
+                     (int)job_counts[2], Job_String_(2), (job_counts[2] == 1) ? "" : "s");
+            Set_Colony_Font_();
+            Print_Scanned_String_(buffer);
+            return;
+        }
+
         Print_Scanned_Military_();
         Print_Scanned_Satellite_();
         Print_Building_Name_(_scanned_bldg_C, _scanned_bldg_R);
@@ -908,12 +991,65 @@ namespace COLONY {
         }
     }
 
+    // Enhancement helper: the race name for a raw pop race index.
+    static char* Pop_Race_Index_Name_(uint32_t race_index) {
+        if (race_index == 8) {
+            return ESTRINGS::E_Strings_((int16_t)0xB3);
+        }
+        if (race_index == 9) {
+            return ESTRINGS::E_Strings_((int16_t)0x255);
+        }
+        return MOX::_player[race_index].race_name;
+    }
+
     void __cdecl Draw_Colony_Info_Pop_Scanned_() {
         char buffer[500];
+
+        // Enhancement: while Ctrl shows the colony totals, the hover text
+        // yields the info line to it.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+            platform::Ctrl_Key_Held_() != 0) {
+            return;
+        }
 
         if (COLONY::_scanned_pop != -1) {
             int16_t handle_s = COLONY::_colony_handle;
             uint32_t pop_data = MOX::_colony[COLONY::_colony_handle].pop[COLONY::_scanned_pop];
+
+            // Enhancement: hovering a job slot shows the colony's totals for
+            // that job, split by race — "10 Trilarian farmers, 10 Android
+            // farmers" — instead of just the hovered unit's race.
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                s_colony* colony = &MOX::_colony[handle_s];
+                uint32_t hovered_job = (pop_data >> 7) & 3;
+                int16_t race_counts[16] = {};
+                for (int16_t i = 0; i < (int16_t)colony->n_pops; ++i) {
+                    uint32_t unit = colony->pop[i];
+                    if (((unit >> 7) & 3) == hovered_job) {
+                        race_counts[unit & 0x0F]++;
+                    }
+                }
+                char* job_word = Job_String_((int16_t)hovered_job);
+                buffer[0] = '\0';
+                for (int16_t race = 0; race < 16; ++race) {
+                    if (race_counts[race] == 0) {
+                        continue;
+                    }
+                    char entry[100];
+                    snprintf(entry, sizeof(entry), "%d %s %s%s",
+                             (int)race_counts[race], Pop_Race_Index_Name_((uint32_t)race),
+                             job_word, (race_counts[race] == 1) ? "" : "s");
+                    if (buffer[0] != '\0') {
+                        strlcat(buffer, ", ", sizeof(buffer));
+                    }
+                    strlcat(buffer, entry, sizeof(buffer));
+                }
+                if (buffer[0] != '\0') {
+                    Set_Colony_Font_();
+                    Print_Scanned_String_(buffer);
+                    return;
+                }
+            }
 
             char* str_state;
             char* str_conquered;
@@ -1935,6 +2071,8 @@ namespace COLONY {
 
         int16_t mouse_x = mouse::Pointer_X_();
         int16_t mouse_y = mouse::Pointer_Y_();
+        int16_t hover_row = -1;
+        int16_t hover_col = -1;
 
         char buffer[1000];
 
@@ -2019,10 +2157,52 @@ namespace COLONY {
                 }
 
                 if (scan_match) {
-                    _scanned_bldg_C = (int16_t)row;
-                    _scanned_bldg_R = (int16_t)col;
-                    return;
+                    if (ENHANCED_UX::enhanced_ux_settings.enabled == 0) {
+                        _scanned_bldg_C = (int16_t)row;
+                        _scanned_bldg_R = (int16_t)col;
+                        return;
+                    }
+                    if (hover_row < 0) {
+                        hover_row = (int16_t)row;
+                        hover_col = (int16_t)col;
+                    }
                 }
+            }
+        }
+
+        // Enhancement: the info line belongs to whichever input acted last.
+        // The mouse owns it while it hovers anything that shows info
+        // (structure, satellite, pop or military stack); the keyboard owns
+        // it after a Tab, or again once the mouse hovers nothing. Only the
+        // owner's text is shown, so the line never overlaps.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            bool mouse_moved = (mouse_x != _g_bldg_prev_ptr_x || mouse_y != _g_bldg_prev_ptr_y);
+            _g_bldg_prev_ptr_x = mouse_x;
+            _g_bldg_prev_ptr_y = mouse_y;
+            bool hover_any = (hover_row >= 0 || _scanned_pop != -1 ||
+                              _scanned_military != -1 || _scanned_satellite != -1);
+            bool kbd_bldg_valid = (_g_kbd_bldg_row >= 0 &&
+                                   _colony_bldgs[_g_kbd_bldg_row].buildings[_g_kbd_bldg_col] != 0);
+            bool kbd_sat_valid = (_g_kbd_satellite_ix >= 0 &&
+                                  _colony_satellites[_g_kbd_satellite_ix] != 0);
+            if (mouse_moved && hover_any) {
+                _g_kbd_bldg_wins = 0;
+            } else if (!hover_any && (kbd_bldg_valid || kbd_sat_valid)) {
+                _g_kbd_bldg_wins = 1;
+            }
+            if (_g_kbd_bldg_wins != 0 && (kbd_bldg_valid || kbd_sat_valid)) {
+                _scanned_pop = -1;
+                _scanned_military = -1;
+                if (kbd_bldg_valid) {
+                    _scanned_satellite = -1;
+                    _scanned_bldg_C = _g_kbd_bldg_row;
+                    _scanned_bldg_R = _g_kbd_bldg_col;
+                } else {
+                    _scanned_satellite = _colony_satellites[_g_kbd_satellite_ix];
+                }
+            } else if (hover_row >= 0) {
+                _scanned_bldg_C = hover_row;
+                _scanned_bldg_R = hover_col;
             }
         }
     }
