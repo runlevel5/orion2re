@@ -1637,6 +1637,10 @@ namespace platform {
         }
     }
 
+    uint8_t __cdecl Ctrl_Key_Held_() {
+        return (SDL_GetModState() & SDL_KMOD_CTRL) != 0 ? 1 : 0;
+    }
+
     void __cdecl Discard_Input_Observations_() {
         SDL_SetAtomicInt(&g_mouse_wheel_accum, 0);
         SDL_SetAtomicInt(&g_mouse_wheel_accum_x, 0);

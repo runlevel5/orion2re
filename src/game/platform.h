@@ -95,6 +95,8 @@ namespace platform {
 	constexpr uint8_t ARROW_KEY_RIGHT = 8;
 	// Returns the ARROW_KEY_* bits of the arrow keys currently held down.
 	uint8_t __cdecl Arrow_Keys_Held_();
+	// Returns nonzero while a Ctrl key is held down.
+	uint8_t __cdecl Ctrl_Key_Held_();
 	int16_t __cdecl Get_Mouse_X_();
 	int16_t __cdecl Get_Mouse_Y_();
 	void __cdecl Set_Logical_Mouse_Position_(int16_t x, int16_t y);
