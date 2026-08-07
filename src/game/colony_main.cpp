@@ -18,6 +18,7 @@ namespace COLMOVE {
                     animate::Draw(x, y, anim);
 
                     s_colony& col = MOX::colony[cluster_colony_n];
+                    int16_t carried = 0;
                     if (col.n_pops > 0) {
                         int16_t current_x = x + 5;
                         for (int16_t i = 0; i < col.n_pops; ++i) {
@@ -25,8 +26,16 @@ namespace COLMOVE {
                                 s_animation_header* pop_anim = COLONY::Colony_Pop_Anim(cluster_colony_n, i);
                                 animate::Draw(current_x, y - 10, pop_anim);
                                 current_x += 20; // 0x14
+                                carried++;
                             }
                         }
+                    }
+
+                    // Enhancement: show the number of carried colonists,
+                    // like the spy carry on the Races screen.
+                    if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && carried > 1) {
+                        COLONY::Set_Colony_Font();
+                        fonts::Print_Integer(x - 2, y + 6, carried);
                     }
 
                     video::Clip_Off();
