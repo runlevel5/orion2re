@@ -1047,11 +1047,20 @@ namespace COMBAT1 {
                                 MOX::_combat_data[i].weapons[j].status = 1;
                             }
                         }
-                        if (MOX::_combat_data[i].special_status_flag == 3) {
+                        const int8_t recloak_state =
+                            _recloak_next_turn != 0 ? 2 : 3;
+                        if (MOX::_combat_data[i].special_status_flag == recloak_state &&
+                            COMBINIT::Does_Combat_Ship_Have_Special_(
+                                i, SPECIAL_CLOAKING_DEVICE) != 0) {
                             CMBTSPEC::Draw_Cloak_(i, 1);
                             MOX::_combat_data[i].special_status_flag = 1;
                         }
-                        if (MOX::_combat_data[i].special_status_flag == 7) {
+                        const int8_t rephase_state =
+                            _rephase_cloak_next_turn != 0 ? 6 : 7;
+                        if (MOX::_combat_data[i].special_status_flag == rephase_state &&
+                            MOX::_combat_data[i].special_status_timer > 0 &&
+                            COMBINIT::Does_Combat_Ship_Have_Special_(
+                                i, SPECIAL_PHASING_CLOAK) != 0) {
                             CMBTSPEC::Draw_Cloak_(i, 4);
                             MOX::_combat_data[i].special_status_flag = 4;
 
@@ -1106,7 +1115,9 @@ namespace COMBAT1 {
             }
 
             s_combat_data* ship = &MOX::_combat_data[i];
-            if (ship->special_status_flag != 4) {
+            if (ship->special_status_flag != 4 ||
+                COMBINIT::Does_Combat_Ship_Have_Special_(
+                    i, SPECIAL_PHASING_CLOAK) == 0) {
                 continue;
             }
 
@@ -1215,6 +1226,12 @@ namespace COMBAT1 {
         ship->movement_left = speed;
         movement_reserve[ship_idx] = Maximum_Combat_Speed_(ship_idx) - speed;
 
+        if (ship->special_status_flag < 4 &&
+            ship->special_status_timer != 0 &&
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                ship_idx, SPECIAL_PHASING_CLOAK) != 0) {
+            ship->special_status_flag = 6;
+        }
         if (ship->special_status_flag == 2) {
             ship->special_status_flag = 3;
         }

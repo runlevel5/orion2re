@@ -1248,6 +1248,19 @@ namespace CMBTFIR2 {
                         if (struct_::Test_Bit_Field_(ship->special_device_flags, i)) {
                             if (flag_idx == count) {
                                 struct_::Set_Bit_Field_(ship->special_device_damage_flags, i);
+                                if (i == SPECIAL_CLOAKING_DEVICE ||
+                                    i == SPECIAL_PHASING_CLOAK) {
+                                    COMBAT1::Handle_Destroyed_Cloak_(
+                                        &ship->special_status_flag,
+                                        ship->special_status_timer,
+                                        i == SPECIAL_PHASING_CLOAK,
+                                        COMBINIT::Does_Combat_Ship_Have_Special_(
+                                            target_ship_idx,
+                                            SPECIAL_CLOAKING_DEVICE) != 0,
+                                        COMBINIT::Does_Combat_Ship_Have_Special_(
+                                            target_ship_idx,
+                                            SPECIAL_PHASING_CLOAK) != 0);
+                                }
                                 if (i == 13 && MOX::_in_nebula_flag == 1) {
                                     for (int j = 0; j < 4; ++j) {
                                         ship->shield_arc_current[j] = 0;

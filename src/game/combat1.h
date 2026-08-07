@@ -6,6 +6,32 @@ namespace COMBAT1 {
 
     inline uint8_t _interactive_combat_stats = 0;
     inline uint8_t _non_ics_tractor_and_bhg_mode = 0;
+    inline uint8_t _recloak_next_turn = 0;
+    inline uint8_t _rephase_cloak_next_turn = 0;
+
+    inline void Handle_Destroyed_Cloak_(
+        int8_t* cloak_state,
+        uint8_t phasing_timeout,
+        bool phasing_cloak_destroyed,
+        bool has_cloaking_device,
+        bool has_phasing_cloak
+    ) {
+        if (phasing_timeout != 0) {
+            if (has_cloaking_device && phasing_cloak_destroyed) {
+                if (*cloak_state == 4) {
+                    *cloak_state = 1;
+                } else if (*cloak_state == 6) {
+                    *cloak_state = 2;
+                } else if (*cloak_state == 7) {
+                    *cloak_state = 3;
+                }
+            } else if (phasing_cloak_destroyed) {
+                *cloak_state = 6;
+            }
+        } else if (!has_cloaking_device && !has_phasing_cloak) {
+            *cloak_state = 2;
+        }
+    }
 
     inline int16_t Adjust_Movement_After_Speed_Change_(
         int16_t old_speed,

@@ -1240,6 +1240,34 @@
       default: false,
     },
 
+    recloak_next_turn: {
+      title: "Recloak without waiting a turn",
+      description: "Allows a ship that fired or boarded while cloaked to restore its Cloaking Device at the end of the current turn instead of waiting one turn.",
+      examples: ["combat recloak_next_turn = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/combat1.h",
+        symbol: "COMBAT1::_recloak_next_turn",
+      },
+      default: false,
+    },
+
+    rephase_cloak_next_turn: {
+      title: "Rephase without waiting a turn",
+      description: "Allows a ship that fired or boarded while phase-cloaked to restore its Phasing Cloak at the end of the current turn instead of waiting one turn.",
+      examples: ["combat rephase_cloak_next_turn = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/combat1.h",
+        symbol: "COMBAT1::_rephase_cloak_next_turn",
+      },
+      default: false,
+    },
+
     fighters_use_point_defense: {
       title: "Fighters use point-defense beams",
       description: "Applies point-defense accuracy and damage modifiers to fighter beam weapons.",
