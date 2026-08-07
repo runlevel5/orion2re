@@ -237,6 +237,40 @@ namespace COMBAT1 {
         return is_functional;
     }
 
+    static void Process_Retreating_Ships_(int16_t active_player_id, int16_t time_warp_only) {
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            if (Combat_Ship_Is_Functional_(i) == 0) {
+                continue;
+            }
+            if (time_warp_only != 0 &&
+                COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TIME_WARP_FACILITATOR) == 0) {
+                continue;
+            }
+
+            s_combat_data* ship = &MOX::_combat_data[i];
+            if ((MOX::_combat_init == 0 && ship->owner != active_player_id) ||
+                ship->is_retreating != 1) {
+                continue;
+            }
+
+            if (ship->current_speed <= 0 || Enemy_Dissipator_Exists_(ship->owner) != 0) {
+                ship->is_retreating = 0;
+                continue;
+            }
+
+            if (MOX::_net_flag != 0 && MOX::_combat_init != 0) {
+                NETMOX::Net_Debug_Log_(
+                    "Wait_Until_Net_Opponent_Finished_: caller=%s:%d",
+                    __FILE__,
+                    __LINE__);
+                CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
+            }
+
+            MOX::_cur_ship = i;
+            Retreat_Ship_(i);
+        }
+    }
+
     void __cdecl Do_Combat_Turn_(int16_t active_player_id, int16_t time_warp_only) {
         MOX::_player_mode[MOX::_combat_attacker_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_attacker_player);
         MOX::_player_mode[MOX::_combat_defender_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_defender_player);
@@ -257,6 +291,7 @@ namespace COMBAT1 {
             }
         }
 
+        Process_Retreating_Ships_(active_player_id, time_warp_only);
         RUSS::Mox_Update_();
         
         int16_t order_idx = 0;
@@ -1150,11 +1185,7 @@ namespace COMBAT1 {
                 }
             }
         }
-        
-        if (speed <= 0) {
-            MOX::_combat_data[ship_idx].is_retreating = 0;
-        }
-        
+
         return speed;
     }
 
@@ -1167,15 +1198,6 @@ namespace COMBAT1 {
             CMBTFIR2::Set_Capturing_Flag_(ship_idx);
         }
         ship->field42_0x49 = 0;
-
-        if (ship->is_retreating == 1) {
-            if (MOX::_net_flag != 0 && MOX::_combat_init != 0) {
-                NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
-                CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
-            }
-            Retreat_Ship_(ship_idx);
-            return;
-        }
 
         if (ship->is_captured == 1) {
             ship->movement_left = 0;
@@ -1484,19 +1506,32 @@ namespace COMBAT1 {
     }
 
     void __cdecl Retreat_Ship_(int16_t ship_idx) {
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+        int16_t is_dead = CMBTFIRE::Is_Combat_Ship_Dead_(ship_idx);
+        int16_t speed = 0;
+        if (is_dead == 0) {
+            speed = Calc_Current_Speed_(ship_idx);
+        }
+
+        if (is_dead != 0 || speed <= 0 || ship->is_retreating != 1) {
+            if (is_dead != 0 || speed <= 0) {
+                ship->movement_left = 0;
+            }
+            ship->is_retreating = 0;
+            return;
+        }
+
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
             if (CMBTDRW1::Ship_On_Screen_(ship_idx) == 0) {
-                COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[ship_idx].x, MOX::_combat_data[ship_idx].y);
+                COMBINIT::Snap_Center_Combat_Screen_(ship->x, ship->y);
             }
             CMBTDRW1::Draw_Retreating_Ship_(ship_idx);
         }
 
-        if (CMBTFIRE::Is_Combat_Ship_Dead_(ship_idx) == 0) {
-            MOX::_combat_data[ship_idx].unit_status = 5;
-            MOX::_combat_data[ship_idx].is_retreating = 2;
-            CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
-            COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
-        }
+        ship->unit_status = 5;
+        ship->is_retreating = 2;
+        CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
+        COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
     }
 
     int16_t __cdecl Get_Number_Of_Ships_In_Stasis_(int16_t source_ship_idx) {
