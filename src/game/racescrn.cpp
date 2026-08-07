@@ -683,6 +683,22 @@ namespace RACESCRN {
         }
     }
 
+    // Enhancement helper: in the "Who?" prompt, digits pick a race — 1-4
+    // the left column top to bottom, 5-7 the right one. Returns the race's
+    // field to activate, or 0; other keys go back to the fields system.
+    static int16_t Read_Who_Mode_Digit_(s_racescrn_race_display* displays) {
+        int32_t key = key::Read_Key();
+        if (key > 0 && (key & 0xFF) >= '1' && (key & 0xFF) <= '7') {
+            int16_t race_idx = (int16_t)((key & 0xFF) - '1');
+            if (race_idx < (int16_t)MOX::active_count) {
+                return displays[race_idx].main_interaction_field_id;
+            }
+        } else if (key != 0) {
+            key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+        }
+        return 0;
+    }
+
     void __cdecl Race_Screen() {
         int16_t selected_race_idx = -1;
         int16_t old_mission_idx = -1;
@@ -841,7 +857,13 @@ namespace RACESCRN {
             uint8_t human_rejected = 0;
 
             while (true) {
-                int16_t input = fields::Get_Input();
+                // Enhancement: digits answer the "Who?" prompt.
+                int16_t synth_input = 0;
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && g_in_who_mode) {
+                    synth_input = Read_Who_Mode_Digit_(race_display_data);
+                }
+
+                int16_t input = (synth_input != 0) ? synth_input : fields::Get_Input();
 
                 if (MOX::FULL_DRAW_SCREEN_FLAG != 0) {
                     if (g_in_spy_mode) {
