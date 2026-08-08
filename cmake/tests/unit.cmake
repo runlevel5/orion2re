@@ -90,6 +90,7 @@ orion2re_add_unit_test(test_config_decode
         src/config/config_decode.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/colcalc_config.cpp
         src/game/design_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
@@ -104,6 +105,7 @@ orion2re_add_unit_test(test_config_bindings
         src/config/config_decode.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/colcalc_config.cpp
         src/game/design_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
@@ -119,6 +121,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/config/config_lifecycle.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/colcalc_config.cpp
         src/game/design_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
@@ -137,6 +140,7 @@ orion2re_add_unit_test(test_config_loader
         src/config/mod_manager.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/colcalc_config.cpp
         src/game/design_config.cpp
         src/game/ship_config.cpp
         src/game/compat.cpp
@@ -175,6 +179,7 @@ orion2re_add_unit_test(test_colony_production_helpers
         tests/unit/test_colony_production_helpers.cpp
     PRODUCTION_SOURCES
         src/game/colcalc_base.cpp
+        src/game/colcalc_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_colcalc_base_runtime.cpp
 )

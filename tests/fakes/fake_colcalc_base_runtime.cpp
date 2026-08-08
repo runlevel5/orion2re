@@ -2,11 +2,31 @@
 
 namespace {
     s_player players[MAX_PLAYERS];
+    int32_t breakthrough_chance;
+    int32_t research_cost;
+    uint32_t random_value;
+    int give_player_field_calls;
 }
 
 namespace TEST_COLCALC_BASE {
     void Reset_() {
         memset(players, 0, sizeof(players));
+        breakthrough_chance = 0;
+        research_cost = 0;
+        random_value = 100;
+        give_player_field_calls = 0;
+        COLCALC::_keep_research_on_breakthrough = 0;
+        COLCALC::_keep_research_on_finds = 0;
+    }
+
+    void Set_Breakthrough_(int32_t chance, uint32_t roll, int32_t cost) {
+        breakthrough_chance = chance;
+        random_value = roll;
+        research_cost = cost;
+    }
+
+    int Give_Player_Field_Calls_() {
+        return give_player_field_calls;
     }
 }
 
@@ -29,15 +49,20 @@ namespace COLCALC {
     }
 
     int32_t __cdecl Chance_For_Research_Breakthrough_(s_player*) {
-        return 0;
+        return breakthrough_chance;
     }
 
     void __cdecl Give_Player_Field_(s_player*, int, char) {
+        give_player_field_calls++;
+    }
+
+    int __cdecl Player_Research_Cost_(s_player*, int16_t) {
+        return research_cost;
     }
 }
 
 namespace game_random {
-    uint32_t __cdecl Random_(uint32_t max_val) {
-        return max_val;
+    uint32_t __cdecl Random_(uint32_t) {
+        return random_value;
     }
 }

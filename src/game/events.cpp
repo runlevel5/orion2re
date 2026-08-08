@@ -473,11 +473,13 @@ namespace EVENTS {
 
                 case 18:
                 {
-                    int8_t field = MOX::_player[_event_data[i].player_idx].current_research_field;
+                    s_player* player = &MOX::_player[_event_data[i].player_idx];
+                    int8_t field = player->current_research_field;
                     _event_data[i].target_id = (int16_t)field;
-                    COLCALC::Give_Player_Field_(&MOX::_player[_event_data[i].player_idx], (int)field, 1);
-                    MOX::_player[_event_data[i].player_idx].research_accumulated = 0;
-                    MOX::_player[_event_data[i].player_idx].current_research_field = 0;
+                    COLCALC::Give_Player_Field_(player, (int)field, 1);
+                    bool keep_points = COLCALC::_keep_research_on_breakthrough != 0 &&
+                        player->research_breakthrough != 0;
+                    COLCALC::Resolve_Research_Completion_(player, keep_points, 0);
                     _event_data[i].status = 5;
                     break;
                 }

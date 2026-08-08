@@ -732,7 +732,12 @@ namespace COLCALC {
             plr->tech_fields[static_cast<uint8_t>(plr->current_research_field)] == 2) {
 
             bool advance_field = true;
-            if (plr->traits[TRAIT_CREATIVE] != 0 || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
+            bool inspect_remaining_apps =
+                plr->traits[TRAIT_CREATIVE] != 0 || _keep_research_on_finds != 0;
+            if (inspect_remaining_apps && plr->traits[TRAIT_UNCREATIVE] != 0) {
+                Ensure_Uncreative_Field_OK_(plr, static_cast<uint8_t>(plr->current_research_field));
+            }
+            if (inspect_remaining_apps || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
                 auto& field_data = TECHDATA::_technology_fields[static_cast<uint8_t>(plr->current_research_field)];
                 int16_t* field_techs = field_data.tech;
 
@@ -746,8 +751,7 @@ namespace COLCALC {
 
             if (advance_field) {
                 Advance_Player_Field_(plr, static_cast<uint8_t>(plr->current_research_field), 1);
-                plr->current_research_field = 0;
-                plr->research_accumulated = 0;
+                Resolve_Research_Completion_(plr, _keep_research_on_finds != 0, 0);
             }
         }
         else {

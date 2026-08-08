@@ -1,6 +1,20 @@
 #include "pch.h"
 
 namespace COLCALC {
+    void __cdecl Resolve_Research_Completion_(s_player* player, bool keep_points, int32_t points_spent) {
+        player->research_breakthrough = 1;
+
+        if (!keep_points) {
+            player->research_accumulated = 0;
+            return;
+        }
+
+        player->research_accumulated -= points_spent;
+        if (player->research_accumulated < 0) {
+            player->research_accumulated = 0;
+        }
+    }
+
     int16_t __cdecl Colony_Empire_Base_Food2_Produced_(const s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out) {
         int32_t idx = (int32_t)player_idx;
         int16_t food_per_farmer;
@@ -129,12 +143,15 @@ namespace COLCALC {
         }
 
         int32_t breakthrough_chance = Chance_For_Research_Breakthrough_(player);
-        player->research_breakthrough = 0;
         player->research_accumulated += (int32_t)player->research_produced;
 
         if ((int32_t)game_random::Random_(100) <= breakthrough_chance) {
-            player->research_breakthrough = 1;
-            player->research_accumulated = 0;
+            int32_t points_spent = 0;
+            if (_keep_research_on_breakthrough != 0) {
+                points_spent = Player_Research_Cost_(player, field) * 2;
+            }
+            Resolve_Research_Completion_(
+                player, _keep_research_on_breakthrough != 0, points_spent);
             Give_Player_Field_(player, field, 0);
         }
     }

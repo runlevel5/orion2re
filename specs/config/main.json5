@@ -1434,5 +1434,35 @@
         "group1", "group1", "group1", "group1", "group1", "group1", "group1", "group1",
       ],
     },
+
+    keep_research_on_breakthrough: {
+      title: "Keep research after breakthroughs",
+      description: "Retains research points above twice the completed field's cost after a research breakthrough.",
+      remarks: "False preserves classic behavior and spends all accumulated research.",
+      examples: ["research keep_research_on_breakthrough = true;"],
+      group: "gameplay",
+      namespace: "research",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_keep_research_on_breakthrough",
+      },
+    },
+
+    keep_research_on_finds: {
+      title: "Keep research after finding technology",
+      description: "Retains accumulated research when the currently researched application is acquired by non-research means.",
+      remarks: "False preserves classic behavior and spends all accumulated research.",
+      examples: ["research keep_research_on_finds = true;"],
+      group: "gameplay",
+      namespace: "research",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_keep_research_on_finds",
+      },
+    },
   },
 }

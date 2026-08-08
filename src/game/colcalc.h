@@ -3,6 +3,9 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    extern uint8_t _keep_research_on_breakthrough;
+    extern uint8_t _keep_research_on_finds;
+
     typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, int16_t player_idx, s_colony_job_production* out);
 
     extern ColonyBaseFunc _colony_empire_base_functions[3];
@@ -352,6 +355,8 @@ namespace COLCALC {
     void __cdecl Apply_All_Player_Changes_();
 
     void __cdecl Check_For_Research_Breakthrough_(s_player* player);
+
+    void __cdecl Resolve_Research_Completion_(s_player* player, bool keep_points, int32_t points_spent);
 
     void __cdecl Give_Player_Field_(s_player* player, int field_id, char get_all_flag);
 

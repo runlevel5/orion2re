@@ -103,6 +103,8 @@ namespace TECH {
         animation_buffer = allocate::Allocate_First_Block_(MOX::_screen_seg, 0x7C830);
         file_ani::Set_File_Animation_Buffer_(animation_buffer);
         SCIENCE::Show_Off_Researched_Tech_(MOX::_PLAYER_NUM);
+        MOX::_player[MOX::_PLAYER_NUM].current_research_field = 0;
+        MOX::_player[MOX::_PLAYER_NUM].research_breakthrough = 0;
         TECH::_Tech_Select_(0);
         ERIC::Fast_Fade_Out_();
         TECH::Reset_Screen_();
@@ -1179,7 +1181,11 @@ namespace TECH {
         video::Set_Page_Off_();
         fields::Draw_Visible_Fields_();
         video::Copy_Off_To_Back_();
+        int8_t previous_field = MOX::_player[MOX::_PLAYER_NUM].current_research_field;
         _Tech_Select_(1);
+        if (MOX::_player[MOX::_PLAYER_NUM].current_research_field != previous_field) {
+            MOX::_player[MOX::_PLAYER_NUM].research_breakthrough = 0;
+        }
         MOX::_current_screen = MOX::_return_screen;
     }
 

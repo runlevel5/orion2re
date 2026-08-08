@@ -1447,6 +1447,9 @@ namespace MAINSCR {
             tech_app_idx++;
         } while (tech_app_idx < 204); // 0xcc
 
+        current_player->current_research_field = 0;
+        current_player->research_breakthrough = 0;
+
         const char* format_str = HAROLD::H_Message_(0xdc);
         snprintf(buffer, sizeof(buffer), format_str, (int)num_granted);
 
