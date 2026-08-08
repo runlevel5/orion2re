@@ -223,6 +223,22 @@ namespace RACESEL {
         }
     }
 
+    // Enhancement: each race portrait picks with a unique letter from its name
+    // — first letters, except Mrrshan and Silicoid which take their second
+    // letter to stay unique next to Meklar and Sakkra — and 'C' on the Custom
+    // slot. The same letters serve the Select Race Picture mode, where the grid
+    // re-appears as the custom race's picture choices. The hotkey activates the
+    // portrait like a click.
+    static const char* Race_Grid_Hotkey_(int16_t grid_idx) {
+        static const char* const race_hotkeys[14] = {
+            "a", "b", "d", "e", "g", "h", "k", "m", "r", "p", "s", "i", "t", "c"
+        };
+        if (ENHANCED_UX::enhanced_ux_settings.enabled == 0) {
+            return "";
+        }
+        return race_hotkeys[grid_idx];
+    }
+
     int16_t Race_Selection_Screen(s_player* plr) {
         int16_t field_ids[14];
         int16_t hotkey_field;
@@ -259,7 +275,8 @@ namespace RACESEL {
         RUSS::Mox_Update();
         for (int i = 0; i < 14; ++i) {
             field_ids[i] = fields::Add_Radio_Button_Field(
-                (i / 7) * 126 + 351, (i % 7) * 48 + 90, "", race_button[i], &race_button_status[i], "", 40);
+                (i / 7) * 126 + 351, (i % 7) * 48 + 90, "", race_button[i], &race_button_status[i],
+                Race_Grid_Hotkey_(i), 40);
         }
 
         fields::Assign_Auto_Function(Draw_Race_Selection_Screen, 2);
@@ -287,6 +304,28 @@ namespace RACESEL {
             int16_t input_field = fields::Get_Input();
         if (synth_input != 0) {
             input_field = synth_input;
+        }
+        // Enhancement: a race hotkey claims the highlight, exactly as if the
+        // pointer were sitting on that portrait when it was clicked; the
+        // mouse takes it back on its next move. When the pressed portrait
+        // was not already lit, show the new highlight for a beat before the
+        // pick proceeds, so the choice is visible before the next screen.
+        if (enhanced && input_field > 0) {
+            for (int j = 0; j < 14; ++j) {
+                if (field_ids[j] == input_field) {
+                    grid_nav.kbd_race = (int16_t)j;
+                    grid_nav.kbd_active = true;
+                    if (j != displayed_race) {
+                        displayed_race = (int16_t)j;
+                        video::Set_Page_Off();
+                        Draw_Race_Selection_Screen();
+                        RUSS::Mox_Sync_Update();
+                        timer::Mark_Time();
+                        timer::Release_Time(5);
+                    }
+                    break;
+                }
+            }
         }
             int16_t scan_idx = fields::Scan_Input();
             displayed_race = scan_idx - field_ids[0];
@@ -364,7 +403,7 @@ namespace RACESEL {
                                 race_button_status[displayed_race] = 1;
                                 if (MOX::game_type == 0 || MOX::game_type == 1) hotkey_field = fields::Add_Hot_Key("\x1B");
                                 for (int j = 0; j < 14; ++j) {
-                                    field_ids[j] = fields::Add_Radio_Button_Field((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", race_button[j], &race_button_status[j], "", 40);
+                                    field_ids[j] = fields::Add_Radio_Button_Field((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", race_button[j], &race_button_status[j], Race_Grid_Hotkey_(j), 40);
                                 }
                                 video::Set_Page_Off();
                                 Draw_Race_Selection_Screen();
@@ -394,9 +433,9 @@ namespace RACESEL {
                                 video::Copy_Back_To_Off();
                                 if (MOX::game_type == 0 || MOX::game_type == 1) hotkey_field = fields::Add_Hot_Key("\x1B");
                                 for (int j = 0; j < STOCK_RACE_COUNT; ++j) {
-                                    field_ids[j] = fields::Add_Radio_Button_Field((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", race_button[j], &race_button_status[j], "", 40);
+                                    field_ids[j] = fields::Add_Radio_Button_Field((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", race_button[j], &race_button_status[j], Race_Grid_Hotkey_(j), 40);
                                 }
-                                field_ids[13] = fields::Add_Radio_Button_Field(477, 378, "", race_button[13], &race_button_status[13], "", 40);
+                                field_ids[13] = fields::Add_Radio_Button_Field(477, 378, "", race_button[13], &race_button_status[13], Race_Grid_Hotkey_(13), 40);
                                 fields::Assign_Auto_Function(Draw_Race_Selection_Screen, 2);
                                 RACESEL::Set_Race_Select_Help();
                                 custom_flag = 0;
@@ -415,7 +454,19 @@ namespace RACESEL {
                 }
                 custom_flag = 0;
                 fields::Clear_Fields_Above(field_ids[STOCK_RACE_TRILARIAN]);
-                field_ids[13] = fields::Add_Radio_Button_Field(477, 378, "", race_button[13], &race_button_status[13], "", 40);
+                field_ids[13] = fields::Add_Radio_Button_Field(477, 378, "", race_button[13], &race_button_status[13], Race_Grid_Hotkey_(13), 40);
+
+                // Enhancement: the mode switch clears every highlight — the
+                // hotkey can arrive with the pointer elsewhere, which otherwise
+                // leaves the hovered race and the radio-pressed slot both lit.
+                if (enhanced) {
+                    for (int j = 0; j < 14; ++j) {
+                        race_button_status[j] = 0;
+                    }
+                    old_race = displayed_race;
+                    grid_nav.kbd_active = false;
+                    grid_nav.kbd_race = -1;
+                }
             }
 
             if (input_field == field_ids[13]) {
@@ -423,10 +474,22 @@ namespace RACESEL {
                 if (custom_flag == 0) {
                     custom_flag = 1;
                     fields::Clear_Fields_Above(field_ids[STOCK_RACE_TRILARIAN]);
+
+                    // Enhancement: the mode switch clears every highlight — the
+                    // hotkey can arrive with the pointer elsewhere, which otherwise
+                    // leaves the hovered race and the radio-pressed slot both lit.
+                    if (enhanced) {
+                        for (int j = 0; j < 14; ++j) {
+                            race_button_status[j] = 0;
+                        }
+                        old_race = displayed_race;
+                        grid_nav.kbd_active = false;
+                        grid_nav.kbd_race = -1;
+                    }
                     if (!race_file) {
                         field_ids[13] = -1000;
                     } else {
-                        field_ids[13] = fields::Add_Radio_Button_Field(477, 378, "", (s_animation_header*)last_race_seg, &race_button_status[13], "", 40);
+                        field_ids[13] = fields::Add_Radio_Button_Field(477, 378, "", (s_animation_header*)last_race_seg, &race_button_status[13], Race_Grid_Hotkey_(13), 40);
                         fclose(race_file);
                     }
                 } else if (race_file) {
@@ -481,9 +544,9 @@ namespace RACESEL {
                             video::Copy_Back_To_Off();
                             if (MOX::game_type == 0 || MOX::game_type == 1) hotkey_field = fields::Add_Hot_Key("\x1B");
                             for (int j = 0; j < STOCK_RACE_COUNT; ++j) {
-                                field_ids[j] = fields::Add_Radio_Button_Field((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", race_button[j], &race_button_status[j], "", 40);
+                                field_ids[j] = fields::Add_Radio_Button_Field((j / 7) * 126 + 351, (j % 7) * 48 + 90, "", race_button[j], &race_button_status[j], Race_Grid_Hotkey_(j), 40);
                             }
-                            field_ids[13] = fields::Add_Radio_Button_Field(477, 378, "", race_button[13], &race_button_status[13], "", 40);
+                            field_ids[13] = fields::Add_Radio_Button_Field(477, 378, "", race_button[13], &race_button_status[13], Race_Grid_Hotkey_(13), 40);
                             fields::Assign_Auto_Function(Draw_Race_Selection_Screen, 2);
                             RACESEL::Set_Race_Select_Help();
                             custom_flag = 0;
