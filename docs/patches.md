@@ -137,7 +137,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8814` - `cybernetic advanced damage control`: fixed in `TECHINIT::Tech_Is_Legal_For_Player_()` by making Advanced Damage Control illegal for Cybernetic races, preventing the redundant racial benefit from occupying their technology tree; this replaces the 1.50 call-site helper with the existing centralized source-level eligibility rule.
 - [x] `asm.pl:8838` - `stasis area effects`: fixed in `CMBTFIR2::Fleet_Defensive_Bonus_()`, `CMBTFIR2::Fleet_Offensive_Bonus_()`, and `COMBAT1::Enemy_Dissipator_Exists_()` by excluding stasis-held ships from jammer, scout lab, satellite attack, and warp dissipator fleet effects; this replaces the 1.50 call-site wrappers with direct source-level eligibility checks.
 - [x] `asm.pl:8897` - `absorber cleanup`: fixed in `CMBTFIRE::Apply_Ship_Damage_()`, `CMBTFIRE::Is_Combat_Ship_Dead_()`, and `CMBTFIR2::Damage_From_Ship_Exploding_()` by saturating stored absorber charge at 32767, treating that cap as overload destruction, and applying the overload warning and 77x drive explosion; this replaces the 1.50 transient explosion-state byte with state derived directly from the combat ship.
-- [ ] `asm.pl:9091` - `monster bug`
+- [x] `asm.pl:9091` - `monster bug`: fixed in `COMBFIND::Do_Net_Combat_Update_()` by clearing pending combat participants only when both their attacker and star match the battle being processed; this replaces the 1.50 code-cave star checks with direct validation of the synchronized player records.
 - [ ] `asm.pl:9871` - `send leader to pool on capture`
 - [ ] `asm.pl:9900` - `system popup freeze`
 - [ ] `asm.pl:9995` - `stumble breakthrough research storage`

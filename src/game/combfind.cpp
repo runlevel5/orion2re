@@ -2587,7 +2587,8 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     if (target_sync_owner_id == -1) {
         NETMOX::_net.sync_phase_active_flag = 0;
         for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-            if ((uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id) {
+            if ((uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id &&
+                NETMOX::_net.player_net_info[j].combat_star_id == star_id) {
                 RUSS::Mox_Update_();
                 NETMOX::_net.player_net_info[j].combat_attacker_id = (undefined)0xff;
             }
@@ -2599,7 +2600,10 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
         NETMOX::_net.player_net_info[target_sync_owner_id].combat_target_player_id = NETMOX::_net.player_net_info[attacker_id].combat_target_player_id;
 
         for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-            if (j != attacker_id && j != target_sync_owner_id && (uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id) {
+            if (j != attacker_id &&
+                j != target_sync_owner_id &&
+                (uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id &&
+                NETMOX::_net.player_net_info[j].combat_star_id == star_id) {
                 RUSS::Mox_Update_();
                 NETMOX::_net.player_net_info[j].combat_attacker_id = (undefined)0xff;
             }
