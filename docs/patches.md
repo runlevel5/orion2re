@@ -139,7 +139,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8897` - `absorber cleanup`: fixed in `CMBTFIRE::Apply_Ship_Damage_()`, `CMBTFIRE::Is_Combat_Ship_Dead_()`, and `CMBTFIR2::Damage_From_Ship_Exploding_()` by saturating stored absorber charge at 32767, treating that cap as overload destruction, and applying the overload warning and 77x drive explosion; this replaces the 1.50 transient explosion-state byte with state derived directly from the combat ship.
 - [x] `asm.pl:9091` - `monster bug`: fixed in `COMBFIND::Do_Net_Combat_Update_()` by clearing pending combat participants only when both their attacker and star match the battle being processed; this replaces the 1.50 code-cave star checks with direct validation of the synchronized player records.
 - [x] `asm.pl:9871` - `send leader to pool on capture`: fixed in `CMBTFIR2::Capture_Ship_()` by handling the tactical officer and strategic ship leader independently and returning any remaining strategic leader through `OFFICER::Move_Officer_To_Pool_()`; this replaces the 1.50 branch retarget and code-cave helper with the existing source-level officer transition.
-- [ ] `asm.pl:9900` - `system popup freeze`
+- [x] `asm.pl:9900` - `system popup freeze`: fixed in `animate::Set_Animation_Frame_()` and `SYS::Draw_System_Display_Popup_()` by interpreting packed frame counts, requested indices, and the shared popup animation counter as unsigned at their use boundaries; this directly expresses the 1.50 signedness corrections without changing shared storage layouts.
 - [ ] `asm.pl:9995` - `stumble breakthrough research storage`
 - [ ] `asm.pl:10195` - `curship visuals`
 - [ ] `asm.pl:10260` - `fighter retargeting`

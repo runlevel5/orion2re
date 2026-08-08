@@ -679,7 +679,8 @@ namespace SYS {
     void __cdecl Draw_System_Display_Popup_(int16_t star_idx, int8_t draw_border, const char* title_text, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset) {
         char title_buffer[100];
 
-        MOX::_ship_frame = (short)((MOX::_ship_frame + 1) % 32000);
+        uint16_t ship_frame = MOX::_ship_frame;
+        MOX::_ship_frame = (ship_frame + 1) % 32000;
         if (MOX::_current_screen == SCREEN_MAIN) {
             graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
             video::Clip_On_();

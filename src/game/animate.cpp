@@ -63,8 +63,11 @@ namespace animate {
     }
 
     void __cdecl Set_Animation_Frame_(s_animation_header* anim, int32_t frame) {
-        if (frame >= anim->frame_count) {
-            frame = anim->frame_count - 1;
+        uint16_t frame_count = anim->frame_count;
+        uint32_t requested_frame = frame;
+
+        if (requested_frame >= frame_count) {
+            frame = frame_count - 1;
         }
         anim->current_frame = (int16_t)frame;
     }
