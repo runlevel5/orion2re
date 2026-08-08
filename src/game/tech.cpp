@@ -14,8 +14,6 @@ namespace {
 namespace TECH {
     char _hyper_field_name_buffer[64];
 
-    uint8_t _saved_hyper_advanced_tech[8];
-
     int32_t _tech_select_pos[8] = {
         0x001E00B0, 0x001F0193, 0x008700B0, 0x00870193,
         0x00F000B0, 0x00F00193, 0x015B00B0, 0x015B0193,
@@ -130,8 +128,6 @@ namespace TECH {
         video::Set_Refresh_Stencil_();
         MOX2::Get_Auto_Function_(&auto_func);
         allocate::Push_Block_(MOX::_screen_seg);
-        Save_Hyper_Tech_Values_(MOX::_PLAYER_NUM);
-        Promote_Hyper_Field_Values_(MOX::_PLAYER_NUM);
         fields::Disable_Cancel_();
 
         MOX::_cur_plyr_ptr = &MOX::_player[MOX::_PLAYER_NUM];
@@ -232,7 +228,6 @@ namespace TECH {
             allocate::Pop_Block_(MOX::_screen_seg);
             MOX2::Put_Auto_Function_(&auto_func);
             fields::Clear_Fields_();
-            Restore_Hyper_Tech_Values_(MOX::_PLAYER_NUM);
             fields::Deactivate_Help_List_();
             return;
         }
@@ -353,7 +348,6 @@ namespace TECH {
                         allocate::Pop_Block_(MOX::_screen_seg);
                         MOX2::Put_Auto_Function_(&auto_func);
                         fields::Clear_Fields_();
-                        Restore_Hyper_Tech_Values_(MOX::_PLAYER_NUM);
                         fields::Deactivate_Help_List_();
                         return;
                     }
@@ -377,7 +371,6 @@ namespace TECH {
                         allocate::Pop_Block_(MOX::_screen_seg);
                         MOX2::Put_Auto_Function_(&auto_func);
                         fields::Clear_Fields_();
-                        Restore_Hyper_Tech_Values_(MOX::_PLAYER_NUM);
                         fields::Deactivate_Help_List_();
                         return;
                     }
@@ -399,22 +392,6 @@ namespace TECH {
                 }
             }
         }
-    }
-
-    void __cdecl Restore_Hyper_Tech_Values_(int16_t player_idx) {
-        memcpy(
-            MOX::_player[player_idx].hyper_advanced_tech,
-            TECH::_saved_hyper_advanced_tech,
-            sizeof(MOX::_player[player_idx].hyper_advanced_tech)
-        );
-    }
-
-    void __cdecl Save_Hyper_Tech_Values_(int16_t player_idx) {
-        memcpy(
-            TECH::_saved_hyper_advanced_tech,
-            MOX::_player[player_idx].hyper_advanced_tech,
-            sizeof(TECH::_saved_hyper_advanced_tech)
-        );
     }
 
     void __cdecl Init_Entry_Positions_(s_list_item_research* research_list) {
@@ -1142,7 +1119,8 @@ namespace TECH {
             return TECHDATA::_technology_applications[tech_app_id].name;
         }
 
-        uint8_t hyper_tech = MOX::_player[player_idx].hyper_advanced_tech[tech_app_id - TECH_APP_BIOLOGY];
+        uint16_t hyper_tech =
+            static_cast<uint16_t>(MOX::_player[player_idx].hyper_advanced_tech[tech_app_id - TECH_APP_BIOLOGY]) + 1;
 
         strlcpy(MOX::_temp_string_buf, TECHDATA::_technology_applications[tech_app_id].name, sizeof(MOX::_temp_string_buf));
         strlcat(MOX::_temp_string_buf, " ", sizeof(MOX::_temp_string_buf));
@@ -1187,12 +1165,6 @@ namespace TECH {
             MOX::_player[MOX::_PLAYER_NUM].research_breakthrough = 0;
         }
         MOX::_current_screen = MOX::_return_screen;
-    }
-
-    void __cdecl Promote_Hyper_Field_Values_(int16_t player_idx) {
-        for (int i = 0; i < 8; ++i) {
-            MOX::_player[player_idx].hyper_advanced_tech[i]++;
-        }
     }
 
     void __cdecl Reset_Screen_() {

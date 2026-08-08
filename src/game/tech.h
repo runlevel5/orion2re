@@ -53,7 +53,6 @@ namespace TECH {
      */
     int32_t __cdecl New_Get_Tech_Cost_(int16_t id, uint8_t is_tech_app, int16_t player_idx);
 
-    extern uint8_t _saved_hyper_advanced_tech[8];
     extern int32_t _tech_select_pos[8];
     extern int32_t _tech_change_pos[8];
     extern int16_t _app_name_y[8];
@@ -76,8 +75,6 @@ namespace TECH {
     extern s_list_item* _g_selected_list_entry_p;
     extern char _tech_group_names[10][20];
 
-    /** Restores the saved hyper-advanced-tech levels for a player. */
-    void __cdecl Restore_Hyper_Tech_Values_(int16_t player_idx);
     /** Initializes the fixed on-screen positions for the eight research entries. */
     void __cdecl Init_Entry_Positions_(s_list_item_research* entries);
     /** Builds the visible research-entry data for the current player.
@@ -120,12 +117,6 @@ namespace TECH {
 
     /** Opens the change-research flow from the current screen. */
     void __cdecl Tech_Change_();
-
-    /** Saves the current hyper-advanced-tech levels for a player. */
-    void __cdecl Save_Hyper_Tech_Values_(int16_t player_idx);
-
-    /** Temporarily increments hyper-advanced-tech levels for display calculations. */
-    void __cdecl Promote_Hyper_Field_Values_(int16_t player_idx);
 
     /** Returns the display name for a technology application.
      * @param tech_app_id Technology application identifier.
