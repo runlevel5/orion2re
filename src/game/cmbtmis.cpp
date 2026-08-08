@@ -1395,6 +1395,8 @@ namespace CMBTMIS {
 
         if (TECHDATA::_weapons[weapon_idx].type == WEAPON_TYPE_FIGHTER) {
             bonus = CMBTFIR2::Get_Fleet_Pilot_Bonus_(player_idx);
+            int16_t fleet_base = 0;
+            bonus += CMBTFIR2::Fleet_Defensive_Bonus_(player_idx, 0, &fleet_base);
 
             // Add defense trait bonus if player is valid
             if (player_idx < MAX_PLAYERS && player_idx != -1) {

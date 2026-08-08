@@ -156,7 +156,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:12319` - `lander ships no best armor minus 1`: fixed in `INITSHIP::Load_Colony_Ship_Design_()`, `INITSHIP::Load_Outpost_Ship_Design_()`, and `INITSHIP::Load_Transport_Ship_Design_()` by assigning the best available armor directly to every generated lander design; this replaces the three 1.50 one-byte instruction suppressions with the equivalent source-level equipment invariant.
 - [ ] `asm.pl:12342` - `event conditions`
 - [x] `asm.pl:12386` - `leaders desynch`: fixed in `OFFICER::Deassign_Officer_()` and `NETMOX::Send_Game_Orders_()` by retaining deassigned leader records through the next game-order packet so the host receives their advanced XP before ownership is cleared; this replaces the 1.50 call-site wrappers with centralized transient event tracking.
-- [ ] `asm.pl:12470` - `fighters helmsman`
+- [x] `asm.pl:12470` - `fighters helmsman`: fixed in `CMBTMIS::Missile_Dcv_()` by adding the owning fleet's full Helmsman defensive bonus to fighter defense alongside the fighter-pilot and racial bonuses; this replaces the 1.50 diverted-call wrapper with direct reuse of the restored fleet-bonus helper.
 - [ ] `asm.pl:12492` - `crystal fleet`
 - [ ] `asm.pl:13063` - `ensure officer_star_displayed is set`
 - [ ] `asm.pl:13295` - `wrong missile bearing`

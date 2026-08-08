@@ -8,6 +8,10 @@ namespace {
     s_missile missiles[300];
     s_player players[MAX_PLAYERS];
     int16_t target_ranges[3];
+    int16_t fleet_pilot_bonus;
+    int16_t fleet_defensive_bonus;
+    int16_t fleet_defensive_player;
+    int16_t fleet_defensive_mode;
 }
 
 namespace TEST_FIGHTER_RETARGETING {
@@ -57,6 +61,40 @@ namespace CMBTAI {
     int16_t __cdecl Range_To_Missile_(int16_t unit_idx, int16_t) {
         return target_ranges[unit_idx];
     }
+}
+
+namespace INITSHIP {
+    int16_t __cdecl Best_Warp_Drive_(int16_t) {
+        return 1;
+    }
+}
+
+namespace CMBTFIR2 {
+    int16_t __cdecl Get_Fleet_Pilot_Bonus_(int16_t) {
+        return fleet_pilot_bonus;
+    }
+
+    int16_t __cdecl Fleet_Defensive_Bonus_(int16_t player_idx, int16_t mode, int16_t*) {
+        fleet_defensive_player = player_idx;
+        fleet_defensive_mode = mode;
+        return fleet_defensive_bonus;
+    }
+}
+
+DOCTEST_TEST_CASE("fighter defense includes the fleet helmsman bonus") {
+    memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+    memset(players, 0, sizeof(players));
+
+    TECHDATA::_weapons[WEAPON_INTERCEPTOR].type = WEAPON_TYPE_FIGHTER;
+    players[3].traits[TRAIT_SHIP_DEFENSE] = 7;
+    fleet_pilot_bonus = 10;
+    fleet_defensive_bonus = 15;
+    fleet_defensive_player = -1;
+    fleet_defensive_mode = -1;
+
+    DOCTEST_CHECK(CMBTMIS::Missile_Dcv_(WEAPON_INTERCEPTOR, 3) == 82);
+    DOCTEST_CHECK(fleet_defensive_player == 3);
+    DOCTEST_CHECK(fleet_defensive_mode == 0);
 }
 
 DOCTEST_TEST_CASE("missile defense percentage rolls include their threshold") {
