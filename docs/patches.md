@@ -173,7 +173,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:15470` - `msgbox overflow`: fixed in `TEXTBOX::Do_Text_Box_()` by capping formatted body height at 374 before sizing the frame, keeping oversized message boxes within supported screen geometry; this directly expresses the 1.50 call-site wrapper in source.
 - [x] `asm.pl:15618` - `fast mod removal from anti-matter torpedo`: fixed in `TECHDATA::_weapons` by removing the Fast capability from Anti-Matter Torpedo while retaining Enveloping, ECCM, and Overloaded; this directly expresses the 1.50 weapon-table correction in source.
 - [ ] `asm.pl:16269` - `hypertech bug`
-- [ ] `asm.pl:16341` - `dead on graphs`
+- [x] `asm.pl:16341` - `dead on graphs`: fixed in `INFO::History_Subscreen_()` by retaining eliminated opponents in the history graph player list, so their recorded population, production, fleet, and technology histories remain visible after elimination; this directly expresses the sole 1.50 call diversion through the existing source-level player-list abstraction.
 - [ ] `asm.pl:16430` - `usable orbit fix`
 - [ ] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`
 - [ ] `asm.pl:16567` - `true omni`

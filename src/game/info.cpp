@@ -1145,7 +1145,7 @@ namespace INFO {
         INFO::Set_Up_Player_Colors_(lbx_images);
         *MOX::_active_player = static_cast<int8_t>(MOX::_PLAYER_NUM);
 
-        BILL::Get_Players_Alive_Or_Omniscient_(1, 0);
+        BILL::Get_Players_Dead_Or_Alive_Or_Omniscient_(1, 0);
         INFO::Get_Plyr_Hist_Btns_(player_hist_buttons);
 
         // Ensure at least one graph is active
