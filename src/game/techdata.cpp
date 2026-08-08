@@ -486,7 +486,7 @@ s_tech_weapon_data _weapons[WEAPON_COUNT] = {
     { kEmptyName, kEmptyName, 15, 106, 1, 5, 0, 0, 0, 14, 14, 14, 14, 15872 },
     { kEmptyName, kEmptyName, 16, 149, 1, 5, 0, 0, 0, 20, 20, 20, 20, 15872 },
     { kEmptyName, kEmptyName, 17, 202, 1, 5, 0, 0, 0, 30, 30, 30, 30, 15872 },
-    { kEmptyName, kEmptyName, 18, 12, 2, 2, 20, 15, 0, 25, 25, 25, 25, 21760 },
+    { kEmptyName, kEmptyName, 18, 12, 2, 2, 20, 15, 0, 25, 25, 25, 25, 17664 },
     { kEmptyName, kEmptyName, 19, 146, 2, 2, 30, 20, 0, 40, 40, 40, 40, 17664 },
     { kEmptyName, kEmptyName, 20, 139, 2, 2, 40, 75, WEAPON_NATURAL_FLAG_AI_PLASMA_TORPEDO, 120, 120, 50, 50, 17696 },
     { kEmptyName, kEmptyName, 21, 119, 3, 10, 5, 3, 0, 3, 12, 3, 12, 0 },
