@@ -984,8 +984,11 @@ namespace EVENTS {
                     EVENTS::_event_data[event_type].player_idx = -1;
                 }
                 else {
-                    EVENTS::_event_data[event_type].amount = (int16_t)((MOX::_player[player_idx].bc * (game_random::Random_(21) + 29)) /
-                        100);
+                    int32_t amount = (MOX::_player[player_idx].bc * (game_random::Random_(21) + 29)) / 100;
+                    if (amount > INT16_MAX) {
+                        amount = INT16_MAX;
+                    }
+                    EVENTS::_event_data[event_type].amount = (int16_t)amount;
                 }
                 break;
             case 16:

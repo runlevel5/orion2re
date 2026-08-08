@@ -143,7 +143,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:9995` - `stumble breakthrough research storage`: fixed in `COLCALC::Resolve_Research_Completion_()` and the current-technology acquisition and selection paths by retaining configured excess research while keeping the completed field pending until replacement selection; this replaces the 1.50 code-cave wrappers with shared source-level accounting and the existing player breakthrough marker.
 - [x] `asm.pl:10195` - `curship visuals`: fixed in `COMBAT1::Seeking_Missiles_()`, `COMBINIT::Increment_Bhg_()`, and `COMBINIT::Plasma_Web_Damage_()` by selecting the affected ship before automatic missile, black-hole, and plasma-web visual or destruction processing; this replaces the 1.50 seeking wrapper and code-cave hooks with direct source-level assignments from authoritative target indices.
 - [ ] `asm.pl:10260` - `fighter retargeting`
-- [ ] `asm.pl:10315` - `pirate overflow`
+- [x] `asm.pl:10315` - `pirate overflow`: fixed in `EVENTS::Determine_Event_()` by capping pirate-raid losses at 32767 before storing them in the signed 16-bit event amount, preventing large treasuries from wrapping the loss negative and turning raids into credits; this replaces the 1.50 call-site helper with direct source-level saturation.
 - [ ] `asm.pl:10339` - `skan cleanup`
 - [ ] `asm.pl:10633` - `beam sfx crash`
 - [ ] `asm.pl:10675` - `getchar die`
