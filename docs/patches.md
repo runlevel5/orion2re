@@ -175,7 +175,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16269` - `hypertech bug`: fixed in `TECH::Technology_Applications_Name_()` and `TECHDATA::_technology_fields` by deriving the next displayed rank from the completed-rank counter and restoring the 25,000 RP base cost consumed by `COLCALC::Player_Research_Cost_()`; this removes the original binary's temporary save/increment/restore UI mutation.
 - [x] `asm.pl:16341` - `dead on graphs`: fixed in `INFO::History_Subscreen_()` by retaining eliminated opponents in the history graph player list, so their recorded population, production, fleet, and technology histories remain visible after elimination; this directly expresses the sole 1.50 call diversion through the existing source-level player-list abstraction.
 - [x] `asm.pl:16430` - `usable orbit fix`: already fixed in `HOMEGEN::Usable_Orbit_()` by checking the actual candidate orbit occupant through `p_idx` instead of indexing the next unused `_planet_count` slot; this directly expresses the invariant implemented by the 1.50 `CWDE` and jump byte patch.
-- [ ] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`
+- [x] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`: fixed in `COLCALC::Player_N_Turns_Until_Research_Complete_()` by applying each projected turn's research before accumulating that same turn's breakthrough chance, so the threshold-crossing turn is counted once; this directly expresses the 1.50 unconditional skip of the redundant pre-threshold loop.
 - [ ] `asm.pl:16567` - `true omni`
 - [ ] `asm.pl:16692` - `bombardment ammo fix`
 - [ ] `asm.pl:16729` - `bombardment fair armor`

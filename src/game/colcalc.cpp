@@ -438,13 +438,6 @@ namespace COLCALC {
 
         int16_t turns = 0;
 
-        if (accumulated <= cost) {
-            do {
-                turns++;
-                accumulated += produced;
-            } while (accumulated <= cost);
-        }
-
         int32_t total_chance = 0;
         do {
             turns++;
