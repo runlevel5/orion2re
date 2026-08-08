@@ -174,7 +174,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:15618` - `fast mod removal from anti-matter torpedo`: fixed in `TECHDATA::_weapons` by removing the Fast capability from Anti-Matter Torpedo while retaining Enveloping, ECCM, and Overloaded; this directly expresses the 1.50 weapon-table correction in source.
 - [ ] `asm.pl:16269` - `hypertech bug`
 - [x] `asm.pl:16341` - `dead on graphs`: fixed in `INFO::History_Subscreen_()` by retaining eliminated opponents in the history graph player list, so their recorded population, production, fleet, and technology histories remain visible after elimination; this directly expresses the sole 1.50 call diversion through the existing source-level player-list abstraction.
-- [ ] `asm.pl:16430` - `usable orbit fix`
+- [x] `asm.pl:16430` - `usable orbit fix`: already fixed in `HOMEGEN::Usable_Orbit_()` by checking the actual candidate orbit occupant through `p_idx` instead of indexing the next unused `_planet_count` slot; this directly expresses the invariant implemented by the 1.50 `CWDE` and jump byte patch.
 - [ ] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`
 - [ ] `asm.pl:16567` - `true omni`
 - [ ] `asm.pl:16692` - `bombardment ammo fix`
