@@ -307,6 +307,7 @@ namespace EVENTS {
                         int16_t star_idx = MOX::_planet[MOX::_colony[_event_data[i].target_id].planet].star_index;
                         _event_data[i].amount -= Ship_Size_Points_At_Star_(star_idx);
                         if (_event_data[i].amount <= 0) {
+                            _event_data[i].amount = 0;
                             _event_data[i].status = 5;
                         } else {
                             _event_data[i].turn_count--;
@@ -315,7 +316,8 @@ namespace EVENTS {
                                 _event_data[i].status = 5;
                             }
                         }
-                        if (game_random::Random_(20) == 1 && _event_data[i].amount != _event_data[i].max_amount) {
+                        if (game_random::Random_(20) == 1 && _event_data[i].status != 5 &&
+                            _event_data[i].amount != _event_data[i].max_amount) {
                             _event_data[i].status = 4;
                         }
                     }

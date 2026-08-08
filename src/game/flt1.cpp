@@ -959,8 +959,8 @@ namespace FLT1 {
     }
 
     /** Sums the BC value of all selected ships on the fleet screen. */
-    int16_t __cdecl Get_Scrap_Ship_Value_() {
-        int16_t total_value = 0;
+    int32_t __cdecl Get_Scrap_Ship_Value_() {
+        int32_t total_value = 0;
 
         if (MOX::_n_fltscrn_big_icons > 0) {
             for (int16_t i = 0; i < MOX::_n_fltscrn_big_icons; ++i) {
@@ -1531,7 +1531,7 @@ namespace FLT1 {
             }
         }
 
-        int16_t scrap_value = Get_Scrap_Ship_Value_();
+        int32_t scrap_value = Get_Scrap_Ship_Value_();
 
         if (interactive != 0 && scrap_value > 0) {
             int16_t msg_id = (num_ships == 1) ? 128 /* 0x80 */ : 129 /* 0x81 */;

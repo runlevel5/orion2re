@@ -165,9 +165,9 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:14103` - `AI selfdestruct`: fixed in `CMBTAI::Ai_Self_Destruct_Check_()` by excluding Black Hole Generator victims from capture-avoidance self-destruction when `combat board_in_black_hole` is disabled; this replaces the 1.50 flag-producing assembly wrapper with a direct source-level eligibility guard while preserving classic-enabled behavior.
 - [x] `asm.pl:14203` - `Loknar message`: fixed in `OFFICER::Give_Player_Loknar_Special_()` by appending technologies actually granted by Loknar to the Orion reward list and allowing the rescue message to display without technology rewards; this replaces the 1.50 global stash and popup-buffer wrappers with result-owned transient state.
 - [x] `asm.pl:14312` - `brown stars blank`: fixed in `MOVEBOX::Draw_Galaxy_Map_Box_()` by allowing brown stars to use the normal owner and visibility color selection, so colonized brown systems display their owner's color instead of the uninhabited marker; this directly expresses the 1.50 branch suppression in source.
-- [ ] `asm.pl:14445` - `comet event message`
+- [x] `asm.pl:14445` - `comet event message`: fixed in `EVENTS::Event_Twiddle_()` by clamping destroyed-comet strength to zero and preventing periodic progress status from replacing a terminal result, so destroyed comets report exactly 100 percent and colony impacts retain their finishing message; this replaces the 1.50 code-cave clamp and unconditional progress-report suppression with direct source-level state invariants.
 - [x] `asm.pl:14479` - `negative thrust`: fixed in `CMBTAI::Auto_Move_Ship_()` and both movement paths in `COMBAT1::Do_Combat_Turn_()` by clamping remaining movement to zero after subtracting the actual movement cost; this directly expresses the three 1.50 code-cave clamps in source.
-- [ ] `asm.pl:14529` - `scrap value cap`
+- [x] `asm.pl:14529` - `scrap value cap`: fixed in `FLT1::Get_Scrap_Ship_Value_()` and `FLT1::Scrap_Ships_()` by retaining the selected ships' aggregate scrap value as signed 32-bit through validation, confirmation formatting, and treasury credit; this directly expresses the 1.50 instruction-width corrections in source.
 - [ ] `asm.pl:14561` - `AI fleet strength assessment`
 - [ ] `asm.pl:15387` - `sound of crash`
 - [ ] `asm.pl:15470` - `msgbox overflow`

@@ -109,7 +109,7 @@ namespace FLT1 {
      */
     int8_t __cdecl Scrap_Ships_(int16_t player_idx, int16_t* ship_indices, int16_t num_ships, int8_t interactive);
 
-    int16_t __cdecl Get_Scrap_Ship_Value_();
+    int32_t __cdecl Get_Scrap_Ship_Value_();
 
     /** Attempts to award technology recovered from a scrapped ship.
      * @param ship Scrapped ship to inspect.
