@@ -453,10 +453,10 @@ orion2re_add_unit_test(test_fields
     SOURCES
         tests/unit/test_fields.cpp
     PRODUCTION_SOURCES
+        src/game/exitm.cpp
         src/game/fields.cpp
     FAKE_SOURCES
         tests/fakes/fake_animate.cpp
-        tests/fakes/fake_exitm.cpp
         tests/fakes/fake_fields_runtime.cpp
         tests/fakes/fake_input.cpp
         tests/fakes/fake_memory.cpp

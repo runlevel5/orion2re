@@ -402,7 +402,7 @@ namespace MOX2 {
 
         memcpy(MOX2::_leave_game_message, thanks_src, thanks_size);
 
-        exitm::Exit_With_Message(MOX2::_leave_game_message);
+        exitm::Exit_Normally(MOX2::_leave_game_message);
     }
 
     int SDLCALL thunk_main2_(void* unused) {
@@ -413,10 +413,10 @@ namespace MOX2 {
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "mox2: game thread exit requested message='%s'", platform::Exit_Message_());
         } catch (const std::exception& ex) {
             SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "mox2: unhandled game thread exception: %s", ex.what());
-            platform::Request_Exit_(ex.what());
+            platform::Request_Fatal_Exit_(ex.what());
         } catch (...) {
             SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "mox2: unknown game thread exception");
-            platform::Request_Exit_("unknown game thread exception");
+            platform::Request_Fatal_Exit_("unknown game thread exception");
         }
 
         sound::Destroy_Sound_();

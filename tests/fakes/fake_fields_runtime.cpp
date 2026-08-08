@@ -765,6 +765,7 @@ namespace platform {
 
     namespace {
         bool g_exit_requested = false;
+        int g_exit_status = EXIT_SUCCESS;
         bool g_thread_exited = false;
 
         void Copy_Exit_Message_(const char* message) {
@@ -788,6 +789,7 @@ namespace platform {
 
     void __cdecl Reset_Exit_() {
         g_exit_requested = false;
+        g_exit_status = EXIT_SUCCESS;
         g_thread_exited = false;
         g_exit_message[0] = '\0';
     }
@@ -801,12 +803,24 @@ namespace platform {
         }
     }
 
+    void __cdecl Request_Fatal_Exit_(const char* message) {
+        if (!g_exit_requested || (message != nullptr && message[0] != '\0')) {
+            Copy_Exit_Message_(message);
+        }
+        g_exit_status = EXIT_FAILURE;
+        g_exit_requested = true;
+    }
+
     bool __cdecl Exit_Requested_() {
         return g_exit_requested;
     }
 
     const char* __cdecl Exit_Message_() {
         return g_exit_message;
+    }
+
+    int __cdecl Exit_Status_() {
+        return g_exit_status;
     }
 
     void __cdecl Check_Exit_() {
