@@ -721,6 +721,9 @@ namespace COMBAT1 {
                                                 int16_t used_tp2 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
                                                 if (used_tp1 == used_tp2) {
                                                     MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;
+                                                    if (MOX::_combat_data[MOX::_cur_ship].movement_left < 0) {
+                                                        MOX::_combat_data[MOX::_cur_ship].movement_left = 0;
+                                                    }
                                                 }
                                                 Assign_Combat_Grids_(MOX::_cur_ship);
                                                 CMBTDRW1::Refresh_Combat_Screen_Full_();
@@ -902,6 +905,9 @@ namespace COMBAT1 {
                                                     int16_t used_tp2 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
                                                     if (used_tp1 == used_tp2) {
                                                         MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;
+                                                        if (MOX::_combat_data[MOX::_cur_ship].movement_left < 0) {
+                                                            MOX::_combat_data[MOX::_cur_ship].movement_left = 0;
+                                                        }
                                                     }
                                                     Assign_Combat_Grids_(MOX::_cur_ship);
                                                     CMBTDRW1::Refresh_Combat_Screen_Full_();

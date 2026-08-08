@@ -166,7 +166,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:14203` - `Loknar message`: fixed in `OFFICER::Give_Player_Loknar_Special_()` by appending technologies actually granted by Loknar to the Orion reward list and allowing the rescue message to display without technology rewards; this replaces the 1.50 global stash and popup-buffer wrappers with result-owned transient state.
 - [x] `asm.pl:14312` - `brown stars blank`: fixed in `MOVEBOX::Draw_Galaxy_Map_Box_()` by allowing brown stars to use the normal owner and visibility color selection, so colonized brown systems display their owner's color instead of the uninhabited marker; this directly expresses the 1.50 branch suppression in source.
 - [ ] `asm.pl:14445` - `comet event message`
-- [ ] `asm.pl:14479` - `negative thrust`
+- [x] `asm.pl:14479` - `negative thrust`: fixed in `CMBTAI::Auto_Move_Ship_()` and both movement paths in `COMBAT1::Do_Combat_Turn_()` by clamping remaining movement to zero after subtracting the actual movement cost; this directly expresses the three 1.50 code-cave clamps in source.
 - [ ] `asm.pl:14529` - `scrap value cap`
 - [ ] `asm.pl:14561` - `AI fleet strength assessment`
 - [ ] `asm.pl:15387` - `sound of crash`

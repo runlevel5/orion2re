@@ -1282,6 +1282,9 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
             if (movement_used > 0) {
                 moved = 1;
                 cur_ship->movement_left -= movement_used;
+                if (cur_ship->movement_left < 0) {
+                    cur_ship->movement_left = 0;
+                }
             }
         }
     }
