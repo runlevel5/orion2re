@@ -1065,14 +1065,14 @@ namespace OFFICER {
             }
 
             if (_officer_button_mode == -1 && !is_fleet) {
-                int16_t orbit_scanned, dummy_val1, dummy_val2, icon_scanned, ship_scanned;
-                int16_t sys_res = MAINSCR::Scan_System_Display_Fields_(scanned_id, input, MOX::_planet_buttons, &dummy_val1, &orbit_scanned, &dummy_val2, &icon_scanned, &ship_scanned);
-                MOX::_system_display_ship_scanned = ship_scanned;
-                if (icon_scanned > -1) {
-                    MOX::_system_icon_scanned = icon_scanned;
+                int16_t hovered_planet_idx, clicked_planet_idx, hovered_ship_idx, clicked_ship_idx, hovered_system_icon;
+                int16_t sys_res = MAINSCR::Scan_System_Display_Fields_(scanned_id, input, MOX::_planet_buttons, &hovered_planet_idx, &clicked_planet_idx, &hovered_ship_idx, &clicked_ship_idx, &hovered_system_icon);
+                MOX::_system_display_ship_scanned = hovered_ship_idx;
+                if (hovered_system_icon > -1) {
+                    MOX::_system_icon_scanned = hovered_system_icon;
                 }
-                if (sys_res == 0 && orbit_scanned > -1) {
-                    int16_t planet_idx = HAROLD::Planet_Index_(_officer_star_displayed, orbit_scanned);
+                if (sys_res == 0 && clicked_planet_idx > -1) {
+                    int16_t planet_idx = HAROLD::Planet_Index_(_officer_star_displayed, clicked_planet_idx);
                     if (MOX::_planet[planet_idx].colony_index > -1 && MOX::_planet[planet_idx].colony_index < MOX::_NUM_COLONIES && MAINSCR::_officer_screen_return_screen == 0x27) {
                         Officer_Screen_User_Box_(HAROLD::H_Message_(0x12E), 0);
                     }
