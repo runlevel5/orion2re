@@ -129,7 +129,10 @@ namespace CMBTFIRE {
         if (ship_idx != 0) {
             s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-            if (ship->structure_damage >= ship->structure_max) {
+            if (ship->reflected_damage_pool == INT16_MAX) {
+                result = 4;
+            }
+            else if (ship->structure_damage >= ship->structure_max) {
                 result = 1;
             }
             else if (ship->drive_current_hits == 0 && ship->owner <= 9 && ship->ftl_type > 0) {
@@ -652,7 +655,14 @@ namespace CMBTFIRE {
                 reflected = 1;
             }
             *dmg_out -= reflected;
-            MOX::_combat_data[target_ship_idx].reflected_damage_pool += reflected;
+            int32_t absorber_charge =
+                (int32_t)MOX::_combat_data[target_ship_idx].reflected_damage_pool +
+                reflected;
+            if (absorber_charge > INT16_MAX) {
+                absorber_charge = INT16_MAX;
+            }
+            MOX::_combat_data[target_ship_idx].reflected_damage_pool =
+                (int16_t)absorber_charge;
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 7 /* Hard Shields */)) {

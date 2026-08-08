@@ -1818,16 +1818,19 @@ namespace CMBTFIR2 {
     }
 
     int16_t __cdecl Damage_From_Ship_Exploding_(int16_t ship_idx) {
-        int16_t damage;
-        int16_t has_special;
-        int8_t size_class;
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+        int16_t damage = TECHDATA::_hull_data[ship->size_class].drive_hp * 5;
 
-        has_special = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_QUANTUM_DETONATOR);
-
-        size_class = MOX::_combat_data[ship_idx].size_class;
-        damage = TECHDATA::_hull_data[size_class].drive_hp * 5;
-
-        if (has_special) {
+        if (ship->reflected_damage_pool == INT16_MAX) {
+            if (MOX::_apply_damage_to_planet != 0) {
+                palette::Refresh_Palette_();
+                GENDRAW::Warning_Box_("Absorber Overloaded");
+                CMBTDRW1::Refresh_Combat_Screen_Full_();
+            }
+            damage *= 77;
+        }
+        else if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                     ship_idx, SPECIAL_QUANTUM_DETONATOR)) {
             damage *= 3;
         }
 

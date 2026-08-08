@@ -136,7 +136,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8762` - `nullifier missiles`: fixed in `CMBTMOV1::Rotate_Ship_()` and `CMBTMOV1::Rotate_Ship_Until_Impact_()` by preventing a working Inertial Nullifier's zero-time turns from advancing incoming missiles during actual and predicted rotation; this replaces the 1.50 code-cave branches and call wrapper with direct source-level guards.
 - [x] `asm.pl:8814` - `cybernetic advanced damage control`: fixed in `TECHINIT::Tech_Is_Legal_For_Player_()` by making Advanced Damage Control illegal for Cybernetic races, preventing the redundant racial benefit from occupying their technology tree; this replaces the 1.50 call-site helper with the existing centralized source-level eligibility rule.
 - [x] `asm.pl:8838` - `stasis area effects`: fixed in `CMBTFIR2::Fleet_Defensive_Bonus_()`, `CMBTFIR2::Fleet_Offensive_Bonus_()`, and `COMBAT1::Enemy_Dissipator_Exists_()` by excluding stasis-held ships from jammer, scout lab, satellite attack, and warp dissipator fleet effects; this replaces the 1.50 call-site wrappers with direct source-level eligibility checks.
-- [ ] `asm.pl:8897` - `absorber cleanup`
+- [x] `asm.pl:8897` - `absorber cleanup`: fixed in `CMBTFIRE::Apply_Ship_Damage_()`, `CMBTFIRE::Is_Combat_Ship_Dead_()`, and `CMBTFIR2::Damage_From_Ship_Exploding_()` by saturating stored absorber charge at 32767, treating that cap as overload destruction, and applying the overload warning and 77x drive explosion; this replaces the 1.50 transient explosion-state byte with state derived directly from the combat ship.
 - [ ] `asm.pl:9091` - `monster bug`
 - [ ] `asm.pl:9871` - `send leader to pool on capture`
 - [ ] `asm.pl:9900` - `system popup freeze`
