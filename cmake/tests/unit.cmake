@@ -93,6 +93,7 @@ orion2re_add_unit_test(test_config_decode
         src/game/colcalc_config.cpp
         src/game/design_config.cpp
         src/game/ericnet_config.cpp
+        src/game/events_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -109,6 +110,7 @@ orion2re_add_unit_test(test_config_bindings
         src/game/colcalc_config.cpp
         src/game/design_config.cpp
         src/game/ericnet_config.cpp
+        src/game/events_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -126,6 +128,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/game/colcalc_config.cpp
         src/game/design_config.cpp
         src/game/ericnet_config.cpp
+        src/game/events_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -146,6 +149,7 @@ orion2re_add_unit_test(test_config_loader
         src/game/colcalc_config.cpp
         src/game/design_config.cpp
         src/game/ericnet_config.cpp
+        src/game/events_config.cpp
         src/game/ship_config.cpp
         src/game/compat.cpp
         src/game/vfs.cpp

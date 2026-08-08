@@ -374,14 +374,14 @@ namespace antarans {
             INITSHIP::Load_Antaran_Ship_Design_(&design, size_idx);
 
             if (ship_count == 0) {
-                ship_idx = SHIPS::Set_Nonplayer_Ship_XY_(target_star, 8 /* Antarans */, &design, 1);
+                ship_idx = SHIPS::Set_Nonplayer_Ship_XY_(target_star, NONPLAYER_SHIP_TYPE_ANTARAN, &design, 1);
                 if (ship_idx == -1) {
                     return false;
                 }
                 x = MOX::_ship[ship_idx].x;
                 y = MOX::_ship[ship_idx].y;
             } else {
-                ship_idx = SHIPMOVE::Create_Nonplayer_Ship_(8 /* Antarans */, &design, x, y);
+                ship_idx = SHIPMOVE::Create_Nonplayer_Ship_(NONPLAYER_SHIP_TYPE_ANTARAN, &design, x, y);
             }
 
             if (ship_idx == -1) {

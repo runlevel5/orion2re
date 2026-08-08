@@ -123,6 +123,47 @@ typedef enum ECON {
     ECON_COUNT=4
 } ECON;
 
+typedef enum EVENT {
+    EVENT_DERELICT=0,
+    EVENT_CLIMATIC_CHANGE=1,
+    EVENT_COMET=2,
+    EVENT_COMPUTER_VIRUS=3,
+    EVENT_DIPLOMATIC_BLUNDER=4,
+    EVENT_DIPLOMATIC_MARRIAGE=5,
+    EVENT_DONATION=6,
+    EVENT_EARTHQUAKE=7,
+    EVENT_FREAK_ACCIDENT=8,
+    EVENT_HYPERSPACE_FLUX=9,
+    EVENT_INDUSTRIAL_ACCIDENT=10,
+    EVENT_MINERAL_DEPLETION=11,
+    EVENT_MINERAL_DEPOSIT=12,
+    EVENT_MUTINY=13,
+    EVENT_PIRATE_ACTIVITY=14,
+    EVENT_PIRATE_RAID=15,
+    EVENT_PLAGUE=16,
+    EVENT_POPULATION_BOOM=17,
+    EVENT_SERENDIPITY=18,
+    EVENT_SPACE_AMOEBA=19,
+    EVENT_SPACE_CRYSTAL=20,
+    EVENT_SPACE_DRAGON=21,
+    EVENT_SPACE_EEL=22,
+    EVENT_SPACE_HYDRA=23,
+    EVENT_SUPERNOVA=24,
+    EVENT_TIME_SPACE_ANOMALY=25,
+    EVENT_WARP_BEAST=26,
+    EVENT_WARP_FUNNEL=27,
+    EVENT_UNSTABLE_WORMHOLE=28,
+    EVENT_RANDOM_COUNT=29,
+    EVENT_EMPIRE_DESTROYED=29,
+    EVENT_EMPIRE_GROWN_IN_STRENGTH=30,
+    EVENT_EMPIRES_RANKING=31,
+    EVENT_ORION_VISITED=32,
+    EVENT_ANTARANS_DEFEATED=33,
+    EVENT_EMPIRE_SURRENDERS=34,
+    EVENT_REBEL_ASSIMILATION=35,
+    EVENT_COUNT=36
+} EVENT;
+
 typedef enum GAME_DIFFICULTY {
     GAME_DIFFICULTY_TUTOR=0,
     GAME_DIFFICULTY_EASY=1,
@@ -483,6 +524,16 @@ typedef enum SHIP_TYPE {
     SHIP_TYPE_OUTPOST=4,
     SHIP_TYPE_COUNT=5
 } SHIP_TYPE;
+
+typedef enum NONPLAYER_SHIP_TYPE {
+    NONPLAYER_SHIP_TYPE_ANTARAN=8,
+    NONPLAYER_SHIP_TYPE_GUARDIAN=9,
+    NONPLAYER_SHIP_TYPE_AMOEBA=10,
+    NONPLAYER_SHIP_TYPE_CRYSTAL=11,
+    NONPLAYER_SHIP_TYPE_DRAGON=12,
+    NONPLAYER_SHIP_TYPE_EEL=13,
+    NONPLAYER_SHIP_TYPE_HYDRA=14
+} NONPLAYER_SHIP_TYPE;
 
 typedef enum SPECIAL {
     SPECIAL_NO_SPECIAL=0,
@@ -1320,6 +1371,8 @@ typedef enum COLONY_JOB_BONUS {
 };
 
 static_assert(GAME_DIFFICULTY_COUNT == 5, "game difficulty values must remain save-compatible");
+static_assert(EVENT_RANDOM_COUNT == 29, "random event table extent must remain compatible");
+static_assert(EVENT_COUNT == 36, "event table extent must remain compatible");
 static_assert(GALAXY_AGE_COUNT == 3, "galaxy age values must remain save-compatible");
 static_assert(GALAXY_SIZE_COUNT == 5, "galaxy size values must remain save-compatible");
 static_assert(GOVERNMENT_COUNT == 8, "government values must remain save-compatible");
@@ -1343,3 +1396,4 @@ static_assert(WEAPON_FIRING_ARC_ALL_SECTORS == 0x0F, "tactical all-sector firing
 static_assert(WEAPON_FIRING_ARC_360 == 0x10, "design-screen 360-degree firing arc must remain compatible");
 static_assert((WEAPON_FIRING_ARC_ALL_SECTORS & WEAPON_FIRING_ARC_360) == 0, "firing arc encodings must remain distinct");
 static_assert(WEAPON_NATURAL_FLAG_AI_SPATIAL_COMPRESSOR == 0x1000, "natural weapon flag positions must remain compatible");
+static_assert(NONPLAYER_SHIP_TYPE_HYDRA == 14, "nonplayer ship type values must remain compatible");

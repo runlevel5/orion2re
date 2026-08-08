@@ -72,22 +72,22 @@ namespace SHIPS {
         s_ship_design design;
 
         switch (type) {
-        case 9 /* Guardian */:
+        case NONPLAYER_SHIP_TYPE_GUARDIAN:
             INITSHIP::Load_Guardian_Ship_Design_(&design);
             break;
-        case 10 /* Amoeba */:
+        case NONPLAYER_SHIP_TYPE_AMOEBA:
             INITSHIP::Load_Amoeba_Ship_Design_(&design, owner);
             break;
-        case 11 /* Crystal */:
+        case NONPLAYER_SHIP_TYPE_CRYSTAL:
             INITSHIP::Load_Crystal_Ship_Design_(&design, owner);
             break;
-        case 12 /* Dragon */:
+        case NONPLAYER_SHIP_TYPE_DRAGON:
             INITSHIP::Load_Dragon_Ship_Design_(&design, owner);
             break;
-        case 13 /* Eel */:
+        case NONPLAYER_SHIP_TYPE_EEL:
             INITSHIP::Load_Eel_Ship_Design_(&design, owner);
             break;
-        case 14 /* Hydra */:
+        case NONPLAYER_SHIP_TYPE_HYDRA:
             INITSHIP::Load_Hydra_Ship_Design_(&design, owner);
             break;
         default:

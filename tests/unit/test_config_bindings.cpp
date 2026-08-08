@@ -16,6 +16,7 @@
 #include "game/combat1.h"
 #include "game/design_config.h"
 #include "game/ericnet.h"
+#include "game/events.h"
 #include "game/mapgen.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
@@ -155,6 +156,39 @@ DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COLCALC::_keep_research_on_breakthrough == 1);
     DOCTEST_CHECK(COLCALC::_keep_research_on_finds == 1);
+}
+
+DOCTEST_TEST_CASE("event delays preserve 1.50 defaults and bind by event name") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const uint16_t expected[EVENT_RANDOM_COUNT] = {
+        0, 0, 200, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        100, 200, 300, 150, 250, 200, 0, 0, 0, 0,
+    };
+    DOCTEST_CHECK(std::memcmp(EVENTS::event_delay, expected, sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "event_delay comet = 150;"
+        "event_delay space_amoeba = 75;"
+        "event_delay mineral_depletion = 50;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(EVENTS::event_delay[EVENT_COMET] == 150);
+    DOCTEST_CHECK(EVENTS::event_delay[EVENT_SPACE_AMOEBA] == 75);
+    DOCTEST_CHECK(EVENTS::event_delay[EVENT_MINERAL_DEPLETION] == 50);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "event_delay comet = 65536;", &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "event_delay overworking = 50;", &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {

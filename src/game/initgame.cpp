@@ -536,7 +536,7 @@ namespace INITGAME {
             if (MOX::_star[i].system_special == SYSTEM_SPECIAL_ORION_STAR) {
                 orion_spawned = true;
                 MOX::_ship[MOX::_NUM_SHIPS].owner = 8;
-                SHIPS::Build_Nonplayer_Ship_(9, i, 0);
+                SHIPS::Build_Nonplayer_Ship_(NONPLAYER_SHIP_TYPE_GUARDIAN, i, 0);
             }
         }
     }

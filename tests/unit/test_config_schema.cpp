@@ -173,7 +173,7 @@ DOCTEST_TEST_CASE("main schema game-domain types are documented and match native
         CONFIG_MAIN_SCHEMA_PATH, &root, &diagnostic));
     const config::tool::s_json_value* types = Member_(&root, "types");
     DOCTEST_REQUIRE(types != nullptr);
-    DOCTEST_REQUIRE(types->member_names.size() == 31);
+    DOCTEST_REQUIRE(types->member_names.size() == 33);
 
     for (const config::tool::s_json_value& type : types->values) {
         for (const char* field : {"title", "description", "remarks"}) {
@@ -225,6 +225,46 @@ DOCTEST_TEST_CASE("main schema game-domain types are documented and match native
         const config::tool::s_json_value* symbol = Member_(collection, expected.symbol);
         DOCTEST_REQUIRE_MESSAGE(symbol != nullptr, expected.type, ".", expected.symbol);
         DOCTEST_CHECK(Integer_(symbol) == expected.value);
+    }
+
+    const s_expected_symbol random_events[] = {
+        {"random_event", "values", "derelict", EVENT_DERELICT},
+        {"random_event", "values", "climatic_change", EVENT_CLIMATIC_CHANGE},
+        {"random_event", "values", "comet", EVENT_COMET},
+        {"random_event", "values", "computer_virus", EVENT_COMPUTER_VIRUS},
+        {"random_event", "values", "diplomatic_blunder", EVENT_DIPLOMATIC_BLUNDER},
+        {"random_event", "values", "diplomatic_marriage", EVENT_DIPLOMATIC_MARRIAGE},
+        {"random_event", "values", "donation", EVENT_DONATION},
+        {"random_event", "values", "earthquake", EVENT_EARTHQUAKE},
+        {"random_event", "values", "freak_accident", EVENT_FREAK_ACCIDENT},
+        {"random_event", "values", "hyperspace_flux", EVENT_HYPERSPACE_FLUX},
+        {"random_event", "values", "industrial_accident", EVENT_INDUSTRIAL_ACCIDENT},
+        {"random_event", "values", "mineral_depletion", EVENT_MINERAL_DEPLETION},
+        {"random_event", "values", "mineral_deposit", EVENT_MINERAL_DEPOSIT},
+        {"random_event", "values", "mutiny", EVENT_MUTINY},
+        {"random_event", "values", "pirate_activity", EVENT_PIRATE_ACTIVITY},
+        {"random_event", "values", "pirate_raid", EVENT_PIRATE_RAID},
+        {"random_event", "values", "plague", EVENT_PLAGUE},
+        {"random_event", "values", "population_boom", EVENT_POPULATION_BOOM},
+        {"random_event", "values", "serendipity", EVENT_SERENDIPITY},
+        {"random_event", "values", "space_amoeba", EVENT_SPACE_AMOEBA},
+        {"random_event", "values", "space_crystal", EVENT_SPACE_CRYSTAL},
+        {"random_event", "values", "space_dragon", EVENT_SPACE_DRAGON},
+        {"random_event", "values", "space_eel", EVENT_SPACE_EEL},
+        {"random_event", "values", "space_hydra", EVENT_SPACE_HYDRA},
+        {"random_event", "values", "supernova", EVENT_SUPERNOVA},
+        {"random_event", "values", "time_space_anomaly", EVENT_TIME_SPACE_ANOMALY},
+        {"random_event", "values", "warp_beast", EVENT_WARP_BEAST},
+        {"random_event", "values", "warp_funnel", EVENT_WARP_FUNNEL},
+        {"random_event", "values", "unstable_wormhole", EVENT_UNSTABLE_WORMHOLE},
+    };
+    const config::tool::s_json_value* random_event_values =
+        Member_(Member_(types, "random_event"), "values");
+    DOCTEST_REQUIRE(random_event_values != nullptr);
+    DOCTEST_REQUIRE(random_event_values->member_names.size() == EVENT_RANDOM_COUNT);
+    for (size_t index = 0; index < EVENT_RANDOM_COUNT; ++index) {
+        DOCTEST_CHECK(random_event_values->member_names[index] == random_events[index].symbol);
+        DOCTEST_CHECK(Integer_(&random_event_values->values[index]) == random_events[index].value);
     }
 
     const char* described_symbols[][2] = {

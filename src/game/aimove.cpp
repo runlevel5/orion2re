@@ -954,7 +954,7 @@ namespace AIMOVE {
                         INITSHIP::Load_Eel_Ship_Design_(&eel_design, 1);
 
                         s_star_data* star = &MOX::_star[ship->location];
-                        int16_t new_ship_idx = SHIPMOVE::Create_Nonplayer_Ship_(13, &eel_design, star->x, star->y);
+                        int16_t new_ship_idx = SHIPMOVE::Create_Nonplayer_Ship_(NONPLAYER_SHIP_TYPE_EEL, &eel_design, star->x, star->y);
 
                         if (new_ship_idx != -1) {
                             s_MSG msg = {};
