@@ -1368,7 +1368,7 @@ typedef enum COLONY_JOB_BONUS {
     COLONY_JOB_RACIAL_BONUS_ANDROID = 8,
     COLONY_JOB_RACIAL_BONUS_NATIVE = 9,
     COLONY_JOB_RACIAL_BONUS_COUNT = 10,
-};
+} COLONY_JOB_BONUS;
 
 static_assert(GAME_DIFFICULTY_COUNT == 5, "game difficulty values must remain save-compatible");
 static_assert(EVENT_RANDOM_COUNT == 29, "random event table extent must remain compatible");

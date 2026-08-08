@@ -168,7 +168,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:14445` - `comet event message`: fixed in `EVENTS::Event_Twiddle_()` by clamping destroyed-comet strength to zero and preventing periodic progress status from replacing a terminal result, so destroyed comets report exactly 100 percent and colony impacts retain their finishing message; this replaces the 1.50 code-cave clamp and unconditional progress-report suppression with direct source-level state invariants.
 - [x] `asm.pl:14479` - `negative thrust`: fixed in `CMBTAI::Auto_Move_Ship_()` and both movement paths in `COMBAT1::Do_Combat_Turn_()` by clamping remaining movement to zero after subtracting the actual movement cost; this directly expresses the three 1.50 code-cave clamps in source.
 - [x] `asm.pl:14529` - `scrap value cap`: fixed in `FLT1::Get_Scrap_Ship_Value_()` and `FLT1::Scrap_Ships_()` by retaining the selected ships' aggregate scrap value as signed 32-bit through validation, confirmation formatting, and treasury credit; this directly expresses the 1.50 instruction-width corrections in source.
-- [ ] `asm.pl:14561` - `AI fleet strength assessment`
+- [x] `asm.pl:14561` - `AI fleet strength assessment`: fixed in `TECHDATA::_weapons` by clearing generic interceptor damage that is assessed through separate fighter handling and assigning the Black Hole Generator its intended 100-point strength; this directly expresses the two 1.50 weapon-table corrections while preserving their separate strategic-combat values.
 - [ ] `asm.pl:15387` - `sound of crash`
 - [ ] `asm.pl:15470` - `msgbox overflow`
 - [ ] `asm.pl:15618` - `fast mod removal from anti-matter torpedo`
