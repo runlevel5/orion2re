@@ -145,7 +145,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:10260` - `fighter retargeting`: fixed in `CMBTMIS::Retarget_Missile_()` by excluding a previous target only when the stored target identifies a ship; this replaces the 1.50 temporary `-1` target rewrite with the existing source-level target-domain predicate.
 - [x] `asm.pl:10315` - `pirate overflow`: fixed in `EVENTS::Determine_Event_()` by capping pirate-raid losses at 32767 before storing them in the signed 16-bit event amount, preventing large treasuries from wrapping the loss negative and turning raids into credits; this replaces the 1.50 call-site helper with direct source-level saturation.
 - [x] `asm.pl:10339` - `skan cleanup`: fixed in `COMBINIT::Load_Display_Combat_Ship_()` by clearing the shared temporary combat record before reconstructing each strategic ship, preventing stale capture and display state from selecting incorrect ship pictures; this moves the 1.50 call-site code-cave cleanup to the state owner.
-- [ ] `asm.pl:10633` - `beam sfx crash`
+- [x] `asm.pl:10633` - `beam sfx crash`: fixed in `BEAMS::Beam_SFX_()` by using inclusive, nonzero random bounds for ship/shield and slot-zero fighter target scatter, preventing `game_random::Random_()` from dividing by zero when fighter resolution collapses to a zero radius; this directly expresses the two 1.50 helper increments in source.
 - [ ] `asm.pl:10675` - `getchar die`
 - [ ] `asm.pl:11151` - `warlord woes`
 - [ ] `asm.pl:11345` - `raid message`
