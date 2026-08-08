@@ -330,7 +330,7 @@ struct s_battle_results_info {
     int16_t captured_tech_id;
     int16_t captured_tech_planet_id;
     int8_t planet_destroyed_flag;
-    int16_t orion_techs[4];
+    int16_t orion_techs[7];
     int16_t rescued_hero_id;
     char summary[100];
     char details[1000];

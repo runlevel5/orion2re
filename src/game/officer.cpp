@@ -1991,13 +1991,19 @@ namespace OFFICER {
         }
     }
 
-    void __cdecl Give_Leader_Specials_To_Player_(int16_t leader_idx, int16_t player_idx) {
+    static void Give_Leader_Specials_To_Player_Impl_(
+        int16_t leader_idx, int16_t player_idx,
+        int16_t* granted_tech_apps, int16_t* granted_tech_app_count) {
         if (leader_idx == 47) {
             int16_t gov_type = static_cast<int16_t>(Get_Advanced_Government_Type_(player_idx));
             int16_t tech_app = COLCALC::Get_Govt_Type_Tech_App_(gov_type);
 
             if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], tech_app)) {
                 COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], tech_app);
+                if (granted_tech_apps != nullptr && granted_tech_app_count != nullptr) {
+                    granted_tech_apps[*granted_tech_app_count] = tech_app;
+                    ++(*granted_tech_app_count);
+                }
             }
         } else {
             for (int i = 0; i < 3; ++i) {
@@ -2005,6 +2011,10 @@ namespace OFFICER {
                 if (tech_app != 0) {
                     if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], (int32_t)tech_app)) {
                         COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], (int16_t)tech_app);
+                        if (granted_tech_apps != nullptr && granted_tech_app_count != nullptr) {
+                            granted_tech_apps[*granted_tech_app_count] = tech_app;
+                            ++(*granted_tech_app_count);
+                        }
                     }
                 }
             }
@@ -2020,6 +2030,10 @@ namespace OFFICER {
                 MOX::_player[player_idx].has_galactic_lore = 1;
             }
         }
+    }
+
+    void __cdecl Give_Leader_Specials_To_Player_(int16_t leader_idx, int16_t player_idx) {
+        Give_Leader_Specials_To_Player_Impl_(leader_idx, player_idx, nullptr, nullptr);
     }
 
     void __cdecl Set_Officer_To_Player_(int16_t officer_idx, int16_t player_idx, uint8_t is_instant) {
@@ -3247,6 +3261,8 @@ int16_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
 }
 
 void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int16_t* num_techs) {
+    int16_t loknar_techs[3];
+    int16_t num_loknar_techs = 0;
     bool dont_assign = false;
     int16_t ship_idx = Assign_Loknar_Ship_To_Player_(player_idx);
 
@@ -3270,7 +3286,8 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int
             MOX::_leaders[0x41].location = ship_idx;
             MOX::_leaders[0x41].player_index = static_cast<int8_t>(player_idx);
             MOX::_leaders[0x41].status = 1;
-            Give_Leader_Specials_To_Player_(0x41, player_idx);
+            Give_Leader_Specials_To_Player_Impl_(
+                0x41, player_idx, loknar_techs, &num_loknar_techs);
         }
     }
 
@@ -3283,6 +3300,12 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int
     }
 
     Get_Random_Antaran_Tech_(player_idx, 3, techs, num_techs);
+
+    for (int16_t i = 0; i < num_loknar_techs; ++i) {
+        techs[*num_techs] = loknar_techs[i];
+        ++(*num_techs);
+    }
+
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
@@ -3310,11 +3333,9 @@ void __cdecl Rescued_Loknar_Popup_(int16_t unused, int16_t* tech_app_ids, int16_
     char buffer[500];
     (void)unused;
 
-    if (tech_app_count > 0) {
-        Make_Loknar_Message_(buffer, sizeof(buffer), tech_app_ids, tech_app_count);
-        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
-        MOX::_FULL_DRAW_SCREEN_FLAG = 1;
-    }
+    Make_Loknar_Message_(buffer, sizeof(buffer), tech_app_ids, tech_app_count);
+    HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
+    MOX::_FULL_DRAW_SCREEN_FLAG = 1;
 }
 
 void __cdecl Get_Random_Antaran_Tech_(int16_t player_idx, int16_t count, int16_t* tech_list, int16_t* num_techs) {
