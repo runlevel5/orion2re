@@ -162,7 +162,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:13295` - `wrong missile bearing`: fixed in `CMBTMOV1::Rotate_Ship_Until_Impact_()` and `CMBTMOV1::Test_Move_Until_Impact_()` by restoring missile facing together with the position and travel distance modified during impact prediction; this replaces the 1.50 global bearing stash and epilogue cleanup hooks with function-local source snapshots.
 - [x] `asm.pl:13430` - `no rifle no sound on invasion crash`: fixed in `COLGCBT::Play_Unit_Beam_Sound_()` by assigning the Pulse Rifle firing sound when a combatant has no rifle technology; this replaces the 1.50 branch-target correction with an explicit source-level fallback.
 - [x] `asm.pl:14094` - `wandering monster search range`: fixed in `AIMOVE::Npc_Dest_()` by extending eligible colony destinations from less than 15 to less than 20 parsecs, preventing mobile nonplayer monsters from being removed when a target exists 15 through 19 parsecs away; this directly expresses the 1.50 immediate correction in source.
-- [ ] `asm.pl:14103` - `AI selfdestruct`
+- [x] `asm.pl:14103` - `AI selfdestruct`: fixed in `CMBTAI::Ai_Self_Destruct_Check_()` by excluding Black Hole Generator victims from capture-avoidance self-destruction when `combat board_in_black_hole` is disabled; this replaces the 1.50 flag-producing assembly wrapper with a direct source-level eligibility guard while preserving classic-enabled behavior.
 - [ ] `asm.pl:14203` - `Loknar message`
 - [ ] `asm.pl:14312` - `brown stars blank`
 - [ ] `asm.pl:14445` - `comet event message`

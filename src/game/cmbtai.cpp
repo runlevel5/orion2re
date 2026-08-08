@@ -2339,7 +2339,11 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
 
     s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-    if (ship->owner > 8 || ship->ftl_type <= 0) return ret_val;
+    if (ship->owner > 8 || ship->ftl_type <= 0 ||
+        (BOARDING::_board_in_black_hole == 0 &&
+         CMBTMOV1::Ship_In_Black_Hole_(ship_idx))) {
+        return ret_val;
+    }
 
     int16_t player_id = MOX::_combat_attacker_player;
     if (ship->owner == MOX::_combat_attacker_player) {
