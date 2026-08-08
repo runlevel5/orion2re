@@ -15,6 +15,7 @@
 #include "game/combat.h"
 #include "game/combat1.h"
 #include "game/design_config.h"
+#include "game/ericnet.h"
 #include "game/mapgen.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
@@ -169,6 +170,44 @@ DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COMBINIT::_satellite_capture_enabled == 1);
+}
+
+DOCTEST_TEST_CASE("combat re-engagement buildings bind by building name") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const uint8_t expected[] = {
+        BUILDING_ARTEMIS_SYSTEM_NET,
+        BUILDING_BATTLESTATION,
+        BUILDING_MISSILE_BASE,
+        BUILDING_GROUND_BATTERIES,
+        BUILDING_STAR_BASE,
+        BUILDING_STAR_FORTRESS,
+        BUILDING_STELLAR_CONVERTER,
+        BUILDING_FIGHTER_GARRISON,
+        BUILDING_NO_BUILDING,
+    };
+    DOCTEST_CHECK(std::memcmp(ERICNET::_combat_reengage_buildings, expected,
+                              sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat reengage_buildings = radiation_shield none;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(ERICNET::_combat_reengage_buildings[0] == BUILDING_RADIATION_SHIELD);
+    DOCTEST_CHECK(ERICNET::_combat_reengage_buildings[1] == BUILDING_NO_BUILDING);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat reengage_buildings = unknown_building none;",
+        &writes, &diagnostic));
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
 }
 
 DOCTEST_TEST_CASE("Warlord combat settings preserve classic defaults") {

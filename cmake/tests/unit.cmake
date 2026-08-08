@@ -92,6 +92,7 @@ orion2re_add_unit_test(test_config_decode
         src/config/generated/config.cpp
         src/game/colcalc_config.cpp
         src/game/design_config.cpp
+        src/game/ericnet_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -107,6 +108,7 @@ orion2re_add_unit_test(test_config_bindings
         src/config/generated/config.cpp
         src/game/colcalc_config.cpp
         src/game/design_config.cpp
+        src/game/ericnet_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -123,6 +125,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/config/generated/config.cpp
         src/game/colcalc_config.cpp
         src/game/design_config.cpp
+        src/game/ericnet_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -142,6 +145,7 @@ orion2re_add_unit_test(test_config_loader
         src/config/generated/config.cpp
         src/game/colcalc_config.cpp
         src/game/design_config.cpp
+        src/game/ericnet_config.cpp
         src/game/ship_config.cpp
         src/game/compat.cpp
         src/game/vfs.cpp
@@ -200,6 +204,16 @@ orion2re_add_unit_test(test_colonize
         src/game/colonize.cpp
     FAKE_SOURCES
         tests/fakes/fake_colonize_runtime.cpp
+)
+
+orion2re_add_unit_test(test_ericnet
+    SOURCES
+        tests/unit/test_ericnet.cpp
+    PRODUCTION_SOURCES
+        src/game/ericnet.cpp
+        src/game/ericnet_config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_ericnet_runtime.cpp
 )
 
 orion2re_add_unit_test(test_missile_defense
@@ -264,7 +278,9 @@ orion2re_add_unit_test(test_stasis_area_effects
 
 if(MSVC)
     target_compile_options(test_animation_frame PRIVATE /Gy)
+    target_compile_options(test_ericnet PRIVATE /Gy)
     target_link_options(test_animation_frame PRIVATE /OPT:REF)
+    target_link_options(test_ericnet PRIVATE /OPT:REF)
     target_compile_options(test_missile_defense PRIVATE /Gy)
     target_link_options(test_missile_defense PRIVATE /OPT:REF)
     target_compile_options(test_absorber_cleanup PRIVATE /Gy)
@@ -277,6 +293,7 @@ if(MSVC)
     target_link_options(test_stasis_area_effects PRIVATE /OPT:REF)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_animation_frame PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_ericnet PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_missile_defense PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_absorber_cleanup PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_boarding PRIVATE -ffunction-sections -fdata-sections)
@@ -284,6 +301,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_stasis_area_effects PRIVATE -ffunction-sections -fdata-sections)
     if(APPLE)
         target_link_options(test_animation_frame PRIVATE -Wl,-dead_strip)
+        target_link_options(test_ericnet PRIVATE -Wl,-dead_strip)
         target_link_options(test_missile_defense PRIVATE -Wl,-dead_strip)
         target_link_options(test_absorber_cleanup PRIVATE -Wl,-dead_strip)
         target_link_options(test_boarding PRIVATE -Wl,-dead_strip)
@@ -291,6 +309,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_stasis_area_effects PRIVATE -Wl,-dead_strip)
     else()
         target_link_options(test_animation_frame PRIVATE -Wl,--gc-sections)
+        target_link_options(test_ericnet PRIVATE -Wl,--gc-sections)
         target_link_options(test_missile_defense PRIVATE -Wl,--gc-sections)
         target_link_options(test_absorber_cleanup PRIVATE -Wl,--gc-sections)
         target_link_options(test_boarding PRIVATE -Wl,--gc-sections)

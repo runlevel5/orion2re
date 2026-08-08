@@ -2,8 +2,11 @@
 #include <cstdint>
 
 namespace ERICNET {
+    constexpr int COMBAT_REENGAGE_BUILDING_CAPACITY = BUILDING_COUNT;
+
     extern int8_t _start_civ_level[3];
     extern int16_t _buildlist[44];
+    extern uint8_t _combat_reengage_buildings[COMBAT_REENGAGE_BUILDING_CAPACITY];
 
     /**
      * Adds a completed building to a colony and applies its side effects.
