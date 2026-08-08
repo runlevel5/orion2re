@@ -144,7 +144,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:10195` - `curship visuals`: fixed in `COMBAT1::Seeking_Missiles_()`, `COMBINIT::Increment_Bhg_()`, and `COMBINIT::Plasma_Web_Damage_()` by selecting the affected ship before automatic missile, black-hole, and plasma-web visual or destruction processing; this replaces the 1.50 seeking wrapper and code-cave hooks with direct source-level assignments from authoritative target indices.
 - [x] `asm.pl:10260` - `fighter retargeting`: fixed in `CMBTMIS::Retarget_Missile_()` by excluding a previous target only when the stored target identifies a ship; this replaces the 1.50 temporary `-1` target rewrite with the existing source-level target-domain predicate.
 - [x] `asm.pl:10315` - `pirate overflow`: fixed in `EVENTS::Determine_Event_()` by capping pirate-raid losses at 32767 before storing them in the signed 16-bit event amount, preventing large treasuries from wrapping the loss negative and turning raids into credits; this replaces the 1.50 call-site helper with direct source-level saturation.
-- [ ] `asm.pl:10339` - `skan cleanup`
+- [x] `asm.pl:10339` - `skan cleanup`: fixed in `COMBINIT::Load_Display_Combat_Ship_()` by clearing the shared temporary combat record before reconstructing each strategic ship, preventing stale capture and display state from selecting incorrect ship pictures; this moves the 1.50 call-site code-cave cleanup to the state owner.
 - [ ] `asm.pl:10633` - `beam sfx crash`
 - [ ] `asm.pl:10675` - `getchar die`
 - [ ] `asm.pl:11151` - `warlord woes`

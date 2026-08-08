@@ -31,6 +31,8 @@ int16_t __cdecl Take_Captured_Satellite_(int16_t colony_idx) {
 }
 
 void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
+    struct_::Clear_Structure_(&MOX::_global_combat_data, sizeof(MOX::_global_combat_data));
+
     if (MOX::_settings.strategic_combat_flag == 1) {
         INITSHIP::Update_Strategic_Ship_(ship_idx);
     }
