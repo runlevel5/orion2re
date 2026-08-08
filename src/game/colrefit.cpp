@@ -97,15 +97,27 @@ namespace COLREFIT {
         video::Set_Refresh_Stencil_();
         
         COLONY::_full_draw = 1;
-        
+
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+
         do {
-            selected_field_id = fields::Get_Input_();
+            // Enhancement: Esc presses the Cancel button like a click.
+            int16_t synth_input = 0;
+            if (enhanced) {
+                int32_t key = key::Read_Key_();
+                if (key == 0x011B) {
+                    synth_input = fields::Activate_Field_(_fields[3]);
+                } else if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+            }
+            selected_field_id = (synth_input != 0) ? synth_input : fields::Get_Input_();
             hovered_field_id = fields::Scan_Input_();
-            
+
             Draw_Refit_Popup_();
-            
+
             popup_result = Evaluate_Input_(&selected_field_id, &hovered_field_id);
-            
+
             RUSS::Mox_Sync_Update_();
         } while (_esc == 0);
         
