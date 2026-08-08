@@ -160,7 +160,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:12492` - `crystal fleet`: implemented in `COMBINIT`, `CMBTFIRE`, and `INITSHIP` by deriving builder-sensitive art and structure from `previous_owner`, invalidating effects when a destroyed Crystal releases captures, and retaining victorious Crystal captures only when `combat crystal_keep` is enabled; this replaces the 1.50 code-cave wrappers with direct source-level invariants while preserving the classic default.
 - [x] `asm.pl:13063` - `ensure officer_star_displayed is set`: fixed in `OFFICER::Officers_Screen_()` by resolving the initial colony-officer star once and assigning it to both the chosen and displayed state before initializing the system display; this replaces the 1.50 call-site wrapper with a direct source-level initialization invariant.
 - [ ] `asm.pl:13295` - `wrong missile bearing`
-- [ ] `asm.pl:13430` - `no rifle no sound on invasion crash`
+- [x] `asm.pl:13430` - `no rifle no sound on invasion crash`: fixed in `COLGCBT::Play_Unit_Beam_Sound_()` by assigning the Pulse Rifle firing sound when a combatant has no rifle technology; this replaces the 1.50 branch-target correction with an explicit source-level fallback.
 - [ ] `asm.pl:14094` - `wandering monster search range`
 - [ ] `asm.pl:14103` - `AI selfdestruct`
 - [ ] `asm.pl:14203` - `Loknar message`
