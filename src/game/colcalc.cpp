@@ -1906,33 +1906,33 @@ namespace COLCALC {
     }
 
     void __cdecl Produce_Ground_Military_(s_colony* colony) {
-        if (colony->buildings[BUILDING_MARINE_BARRACKS] != 0) {
-            if (invasion::Colony_Infantry_Barracks_Limit_(colony) > colony->military[0]) {
+        int16_t infantry_barracks_limit = invasion::Colony_Infantry_Barracks_Limit_(colony);
+        if (infantry_barracks_limit > colony->military[0]) {
+            if (colony->buildings[BUILDING_MARINE_BARRACKS] != 0) {
                 ++colony->infantry_roundoff;
                 if (colony->infantry_roundoff == 5) {
                     colony->infantry_roundoff = 0;
                     ++colony->military[0];
                 }
-            } else {
-                if (invasion::Colony_Infantry_Limit_(colony) < colony->military[0]) {
-                    --colony->military[0];
-                }
             }
+        } else if (infantry_barracks_limit < colony->military[0] &&
+                   invasion::Colony_Infantry_Limit_(colony) < colony->military[0]) {
+            --colony->military[0];
         }
 
-        if (colony->buildings[BUILDING_ARMOR_BARRACKS] != 0) {
-            if (invasion::Colony_Tank_Barracks_Limit_(colony) > colony->military[1]) {
+        int tank_barracks_limit = invasion::Colony_Tank_Barracks_Limit_(colony);
+        if (tank_barracks_limit > colony->military[1]) {
+            if (colony->buildings[BUILDING_ARMOR_BARRACKS] != 0) {
                 ++colony->tank_roundoff;
                 if (colony->tank_roundoff == 5) {
                     colony->tank_roundoff = 0;
                     ++colony->military[1];
                     return;
                 }
-            } else {
-                if (invasion::Colony_Tank_Limit_(colony) < colony->military[1]) {
-                    --colony->military[1];
-                }
             }
+        } else if (tank_barracks_limit < colony->military[1] &&
+                   invasion::Colony_Tank_Limit_(colony) < colony->military[1]) {
+            --colony->military[1];
         }
     }
 
