@@ -1280,6 +1280,21 @@
       default: false,
     },
 
+    crystal_keep: {
+      title: "Crystal keeps captured ships",
+      description: "Allows a victorious Crystal to retain ships it captured during tactical combat.",
+      remarks: "False preserves classic behavior, where ships captured by a Crystal disappear after combat.",
+      examples: ["combat crystal_keep = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::_crystal_keep",
+      },
+      default: false,
+    },
+
     reengage_buildings: {
       title: "Buildings that force combat re-engagement",
       description: "Selects colony buildings whose addition or removal invalidates existing decisions to ignore combat in the system.",

@@ -263,6 +263,7 @@ orion2re_add_unit_test(test_boarding
 
 orion2re_add_unit_test(test_stasis
     SOURCES
+        tests/unit/test_crystal_fleet.cpp
         tests/unit/test_stasis.cpp
     PRODUCTION_SOURCES
         src/game/cmbtfire.cpp

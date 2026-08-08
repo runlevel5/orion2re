@@ -220,6 +220,8 @@ namespace CMBTFIRE {
             for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[i].owner == 11 && i != ship_idx) {
                     MOX::_combat_data[i].owner = new_owner;
+                    MOX::_combat_data[i].ship_image_seg = nullptr;
+                    COMBAT1::Remove_Continuing_Effect_Specials_(i);
                 }
             }
         }

@@ -41,6 +41,10 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     MOX::_global_combat_data.owner = MOX::_ship[ship_idx].owner;
     MOX::_global_combat_data.previous_owner = MOX::_ship[ship_idx].d.previous_owner;
+    if (MOX::_global_combat_data.owner > MAX_PLAYERS) {
+        MOX::_global_combat_data.owner =
+            static_cast<int8_t>(MOX::_global_combat_data.previous_owner);
+    }
     MOX::_global_combat_data.ship_idx = ship_idx;
     MOX::_global_combat_data.shield_type = MOX::_ship[ship_idx].d.shield_type;
     MOX::_global_combat_data.computer_type = MOX::_ship[ship_idx].d.computer_type;
@@ -329,7 +333,8 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->structure_damage = combat->structure_max - 1;
     }
 
-    if (combat->size_class == SHIP_SIZE_DOOM_STAR && combat->owner < MAX_PLAYERS) {
+    if (combat->size_class == SHIP_SIZE_DOOM_STAR &&
+        combat->previous_owner < MAX_PLAYERS) {
         combat->picture_num = 43 /* 0x2b */;
     } else {
         combat->picture_num = ship->d.picture_num;
@@ -1114,13 +1119,13 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     End_Of_Combat_(star_idx, colony_pop, combat_winner);
 
     if (combat_winner == 1 || combat_winner == 0x29A) {
-        if (MOX::_combat_attacker_player < MAX_PLAYERS && MOX::_combat_defender_player >= 10 && MOX::_ship[plr2_ships[0]].d.ftl_type > 0) {
+        if (MOX::_combat_attacker_player < MAX_PLAYERS && MOX::_combat_defender_player >= 10 && MOX::_ship[plr2_ships[0]].d.speed > 0) {
             NETMOX::Russ_Event_Monster_Update_(MOX::_combat_defender_player, -1, MOX::_combat_attacker_player);
         }
     }
 
     if (combat_winner == -1 || combat_winner == 0x29A) {
-        if (MOX::_combat_defender_player < MAX_PLAYERS && MOX::_combat_attacker_player >= 10 && MOX::_ship[plr1_ships[0]].d.ftl_type > 0) {
+        if (MOX::_combat_defender_player < MAX_PLAYERS && MOX::_combat_attacker_player >= 10 && MOX::_ship[plr1_ships[0]].d.speed > 0) {
             NETMOX::Russ_Event_Monster_Update_(MOX::_combat_attacker_player, -1, MOX::_combat_defender_player);
         }
     }
@@ -2523,7 +2528,9 @@ void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx) {
 
             if ((uint8_t)ship->previous_owner < MAX_PLAYERS && ship->picture_num != 44) {
                 strlcpy(lbx_filename, "cmbtshp.lbx", sizeof(lbx_filename));
-                lbx_index = (int16_t)MOX::_player[player_idx].color * 45 + ship->picture_num;
+                const int16_t image_player_idx =
+                    player_idx > MAX_PLAYERS ? ship->previous_owner : player_idx;
+                lbx_index = (int16_t)MOX::_player[image_player_idx].color * 45 + ship->picture_num;
             }
             else {
                 strlcpy(lbx_filename, "monster.lbx", sizeof(lbx_filename));
@@ -2641,9 +2648,14 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
             continue;
         }
 
+        const bool discard_monster_capture =
+            ship->owner >= MAX_PLAYERS &&
+            ship->previous_owner != ship->owner &&
+            (_crystal_keep == 0 || ship->owner != 11 /* Crystal */);
+
         if ((ship->unit_status == 5 && ship->is_retreating != 2) ||
             (ship->is_captured != 0 && ship->owner != victor_player) ||
-            (ship->owner >= MAX_PLAYERS && ship->previous_owner != ship->owner)) {
+            discard_monster_capture) {
             
             ship->unit_status = 5;
 

@@ -540,12 +540,13 @@ namespace INITSHIP {
     int16_t __cdecl Get_Ship_Structure_(int16_t ship_idx) {
         int16_t result;
         s_ship_data* ship = &MOX::_ship[ship_idx];
+        const uint8_t builder = ship->d.previous_owner;
 
-        if (ship->owner <= 9) {
+        if (builder <= 9) {
             return Get_Design_Structure_(ship->d);
         }
 
-        switch (ship->owner) {
+        switch (builder) {
         case 10:
             result = 750;
             if (ship->d.ftl_type <= 0) {

@@ -1,6 +1,7 @@
 #pragma once
 
 namespace COMBINIT {
+    inline uint8_t _crystal_keep = 0;
     inline uint8_t _planet_damper_enabled = 0;
     inline uint8_t _satellite_capture_enabled = 0;
     inline uint8_t _satellite_warlord_bonus = 0;
