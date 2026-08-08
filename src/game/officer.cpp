@@ -909,12 +909,13 @@ namespace OFFICER {
                 FLT2::Set_Initial_Stack_Pointer_();
             }
         } else {
-            _officer_star_displayed = MOX::_temp_star_handle;
-            _officer_star_chosen = MOX::_temp_star_handle;
-            if (MOX::_temp_star_handle == -1) {
-                _officer_star_chosen = MOX::_planet[MOX::_player[MOX::_PLAYER_NUM].home_planet_id].star_index;
+            int16_t star_idx = MOX::_temp_star_handle;
+            if (star_idx == -1) {
+                star_idx = MOX::_planet[MOX::_player[MOX::_PLAYER_NUM].home_planet_id].star_index;
             }
-            SYS::Init_System_Display_(MOX::_temp_star_handle);
+            _officer_star_displayed = star_idx;
+            _officer_star_chosen = star_idx;
+            SYS::Init_System_Display_(star_idx);
         }
 
         MOX::_draw_officer_to_back = 1;

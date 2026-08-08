@@ -158,7 +158,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:12386` - `leaders desynch`: fixed in `OFFICER::Deassign_Officer_()` and `NETMOX::Send_Game_Orders_()` by retaining deassigned leader records through the next game-order packet so the host receives their advanced XP before ownership is cleared; this replaces the 1.50 call-site wrappers with centralized transient event tracking.
 - [x] `asm.pl:12470` - `fighters helmsman`: fixed in `CMBTMIS::Missile_Dcv_()` by adding the owning fleet's full Helmsman defensive bonus to fighter defense alongside the fighter-pilot and racial bonuses; this replaces the 1.50 diverted-call wrapper with direct reuse of the restored fleet-bonus helper.
 - [ ] `asm.pl:12492` - `crystal fleet`
-- [ ] `asm.pl:13063` - `ensure officer_star_displayed is set`
+- [x] `asm.pl:13063` - `ensure officer_star_displayed is set`: fixed in `OFFICER::Officers_Screen_()` by resolving the initial colony-officer star once and assigning it to both the chosen and displayed state before initializing the system display; this replaces the 1.50 call-site wrapper with a direct source-level initialization invariant.
 - [ ] `asm.pl:13295` - `wrong missile bearing`
 - [ ] `asm.pl:13430` - `no rifle no sound on invasion crash`
 - [ ] `asm.pl:14094` - `wandering monster search range`
