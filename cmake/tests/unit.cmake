@@ -237,6 +237,7 @@ orion2re_add_unit_test(test_boarding
     PRODUCTION_SOURCES
         src/game/boarding.cpp
         src/game/cmbtfir2.cpp
+        src/game/strbuild.cpp
         src/game/struct.cpp
     FAKE_SOURCES
         tests/fakes/fake_boarding_runtime.cpp

@@ -10,6 +10,8 @@ namespace TEST_BOARDING {
     void Reset_();
     int16_t Killed_Officer_();
     int16_t Pooled_Officer_();
+    void Prepare_Long_Raid_();
+    const char* Last_Raid_Message_();
 }
 
 DOCTEST_TEST_CASE("boarding rejects targets in stasis") {
@@ -147,4 +149,29 @@ DOCTEST_TEST_CASE("capture returns a strategic leader to the officer pool") {
 
     DOCTEST_CHECK(TEST_BOARDING::Killed_Officer_() == -1);
     DOCTEST_CHECK(TEST_BOARDING::Pooled_Officer_() == 3);
+}
+
+DOCTEST_TEST_CASE("raid reports retain all damaged systems and correct special status") {
+    TEST_BOARDING::Reset_();
+    TEST_BOARDING::Prepare_Long_Raid_();
+    int16_t raiders = 10;
+
+    CMBTFIR2::Resolve_Raid_(0, 1, &raiders);
+
+    const char* message = TEST_BOARDING::Last_Raid_Message_();
+    DOCTEST_CHECK(strlen(message) > 500);
+    DOCTEST_CHECK(strstr(message, "Special device seven final marker") != nullptr);
+    DOCTEST_CHECK(strstr(message, "1 Special device zero with a deliberately long raid report name damaged") != nullptr);
+    DOCTEST_CHECK(strstr(message, "3 Special device zero with a deliberately long raid report name") == nullptr);
+}
+
+DOCTEST_TEST_CASE("super-fast combat suppresses raid reports") {
+    TEST_BOARDING::Reset_();
+    TEST_BOARDING::Prepare_Long_Raid_();
+    MOX::_super_fast_flag = 1;
+    int16_t raiders = 10;
+
+    CMBTFIR2::Resolve_Raid_(0, 1, &raiders);
+
+    DOCTEST_CHECK(TEST_BOARDING::Last_Raid_Message_()[0] == '\0');
 }

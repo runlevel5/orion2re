@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "game/strbuild.h"
+
 namespace CMBTFIR2 {
     int16_t _artemis_net_chance[6] = { 20, 30, 40, 50, 80, 100 };
 
@@ -1387,33 +1389,33 @@ namespace CMBTFIR2 {
         }
 
         char title_str[80];
-        char body_str[500];
+        char body_str[3000];
         char temp_str[80];
-        char num_buf[12];
+        STRBUILD::s_builder body_builder = STRBUILD::Init(
+            MOX::_super_fast_flag == 0 ? body_str : nullptr,
+            MOX::_super_fast_flag == 0 ? sizeof(body_str) : 0);
 
         KEN::Ken_Get_Text_Message_(42, temp_str, sizeof(temp_str));
         strlcpy(title_str, temp_str, sizeof(title_str));
         strlcat(title_str, target->name, sizeof(title_str));
 
         KEN::Ken_Get_Text_Message_(92, temp_str, sizeof(temp_str));
-        strlcpy(body_str, temp_str, sizeof(body_str));
+        STRBUILD::Copy(&body_builder, temp_str);
 
-        snprintf(num_buf, sizeof(num_buf), "%i", attacker_strength);
-        strlcat(body_str, num_buf, sizeof(body_str));
+        STRBUILD::Sprintf(&body_builder, "%i", attacker_strength);
 
-        strlcat(body_str, "          ", sizeof(body_str));
+        STRBUILD::Cat(&body_builder, "          ");
 
         KEN::Ken_Get_Text_Message_(93, temp_str, sizeof(temp_str));
-        strlcat(body_str, temp_str, sizeof(body_str));
+        STRBUILD::Cat(&body_builder, temp_str);
 
-        snprintf(num_buf, sizeof(num_buf), "%i", target_strength);
-        strlcat(body_str, num_buf, sizeof(body_str));
+        STRBUILD::Sprintf(&body_builder, "%i", target_strength);
 
-        strlcat(body_str, "\n\n", sizeof(body_str));
+        STRBUILD::Cat(&body_builder, "\n\n");
 
         if (total_damage <= 0) {
             KEN::Ken_Get_Text_Message_(47, temp_str, sizeof(temp_str));
-            strlcat(body_str, temp_str, sizeof(body_str));
+            STRBUILD::Cat(&body_builder, temp_str);
         } else {
             int16_t is_dead = CMBTFIRE::Is_Combat_Ship_Dead_(target_idx);
             if (is_dead > 0) {
@@ -1422,96 +1424,88 @@ namespace CMBTFIR2 {
 
             if (raid_results[0] > 0) {
                 KEN::Ken_Get_Text_Message_(43, temp_str, sizeof(temp_str));
-                strlcat(body_str, temp_str, sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
             }
 
             if (raid_results[1] > 0) {
                 KEN::Ken_Get_Text_Message_(44, temp_str, sizeof(temp_str));
-                strlcat(body_str, temp_str, sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
 
                 if (target->shield_current_hits < 1) {
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
                 } else {
                     KEN::Ken_Get_Text_Message_(45, temp_str, sizeof(temp_str));
                 }
-                strlcat(body_str, temp_str, sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
             }
 
             if (raid_results[2] > 0) {
                 KEN::Ken_Get_Text_Message_(21, temp_str, sizeof(temp_str));
-                strlcat(body_str, temp_str, sizeof(body_str));
-                strlcat(body_str, " ", sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
+                STRBUILD::Cat(&body_builder, " ");
 
                 if (target->computer_current_hits < 1) {
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
                 } else {
                     KEN::Ken_Get_Text_Message_(45, temp_str, sizeof(temp_str));
                 }
-                strlcat(body_str, temp_str, sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
             }
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 3] > 0) {
-                    snprintf(num_buf, sizeof(num_buf), "%i", raid_results[k + 3]);
-                    strlcat(body_str, num_buf, sizeof(body_str));
-                    strlcat(body_str, " ", sizeof(body_str));
+                    STRBUILD::Sprintf(&body_builder, "%i ", raid_results[k + 3]);
 
                     if (raid_results[k + 3] < 2) {
-                        strlcat(body_str, TECHDATA::_weapons[target->weapons[k].weapon_id].name, sizeof(body_str));
+                        STRBUILD::Cat(&body_builder, TECHDATA::_weapons[target->weapons[k].weapon_id].name);
                     } else {
-                        strlcat(body_str, TECHDATA::_weapons[target->weapons[k].weapon_id].name_plural, sizeof(body_str));
+                        STRBUILD::Cat(&body_builder, TECHDATA::_weapons[target->weapons[k].weapon_id].name_plural);
                     }
-                    strlcat(body_str, " ", sizeof(body_str));
+                    STRBUILD::Cat(&body_builder, " ");
 
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
-                    strlcat(body_str, temp_str, sizeof(body_str));
+                    STRBUILD::Cat(&body_builder, temp_str);
                 }
             }
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 11] > 0) {
-                    snprintf(num_buf, sizeof(num_buf), "%i", raid_results[k + 11]);
-                    strlcat(body_str, num_buf, sizeof(body_str));
-                    strlcat(body_str, " ", sizeof(body_str));
+                    STRBUILD::Cat(&body_builder, "1 ");
 
                     int16_t special_id = Get_Combat_Ship_Special_Id_(target_idx, k);
-                    strlcat(body_str, TECHDATA::_specials[special_id].name, sizeof(body_str));
-                    strlcat(body_str, " ", sizeof(body_str));
+                    STRBUILD::Cat(&body_builder, TECHDATA::_specials[special_id].name);
+                    STRBUILD::Cat(&body_builder, " ");
 
-                    KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
-                    strlcat(body_str, temp_str, sizeof(body_str));
+                    KEN::Ken_Get_Text_Message_(target->special_hits[k] > 0 ? 45 : 46, temp_str, sizeof(temp_str));
+                    STRBUILD::Cat(&body_builder, temp_str);
                 }
             }
         }
 
         if (target_raiders < *raiders) {
             int16_t lost = *raiders - target_raiders;
-            snprintf(num_buf, sizeof(num_buf), "%i", lost);
-            strlcat(body_str, string::s_Newline, sizeof(body_str));
-            strlcat(body_str, num_buf, sizeof(body_str));
-            strlcat(body_str, " ", sizeof(body_str));
+            STRBUILD::Cat(&body_builder, string::s_Newline);
+            STRBUILD::Sprintf(&body_builder, "%i ", lost);
 
             if (lost < 2) {
                 KEN::Ken_Get_Text_Message_(94, temp_str, sizeof(temp_str));
             } else {
                 KEN::Ken_Get_Text_Message_(95, temp_str, sizeof(temp_str));
             }
-            strlcat(body_str, temp_str, sizeof(body_str));
+            STRBUILD::Cat(&body_builder, temp_str);
         }
 
         if (marines < (int16_t)(uint8_t)target->marine_count) {
             int16_t lost = (int16_t)(uint8_t)target->marine_count - marines;
-            snprintf(num_buf, sizeof(num_buf), "%i", lost);
-            strlcat(body_str, string::s_Newline, sizeof(body_str));
-            strlcat(body_str, num_buf, sizeof(body_str));
-            strlcat(body_str, " ", sizeof(body_str));
+            STRBUILD::Cat(&body_builder, string::s_Newline);
+            STRBUILD::Sprintf(&body_builder, "%i ", lost);
 
             if (lost < 2) {
                 KEN::Ken_Get_Text_Message_(96, temp_str, sizeof(temp_str));
             } else {
                 KEN::Ken_Get_Text_Message_(97, temp_str, sizeof(temp_str));
             }
-            strlcat(body_str, temp_str, sizeof(body_str));
+            STRBUILD::Cat(&body_builder, temp_str);
         }
 
         int sound_handle = ERICNET::Mox_Play_Sound_(67); // 0x43
@@ -1530,10 +1524,12 @@ namespace CMBTFIR2 {
             show_timed_box = false;
         }
 
-        if (show_timed_box) {
-            TEXTBOX::Timed_Text_Box_(title_str, body_str, 54);
-        } else {
-            TEXTBOX::Text_Box_(title_str, body_str);
+        if (MOX::_super_fast_flag == 0) {
+            if (show_timed_box) {
+                TEXTBOX::Timed_Text_Box_(title_str, body_str, 54);
+            } else {
+                TEXTBOX::Text_Box_(title_str, body_str);
+            }
         }
 
         sound::Fadeout_Sound_(sound_handle, 10);
