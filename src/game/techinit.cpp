@@ -142,6 +142,12 @@ void __cdecl Load_Tech_Names_() {
 int16_t __cdecl Tech_Is_Legal_For_Player_(int16_t player_idx, int16_t tech_id) {
     int16_t is_legal = 1;
 
+    if (MOX::_player[player_idx].traits[TRAIT_CYBERNETIC] != 0) {
+        if (tech_id == TECH_APP_ADVANCED_DAMAGE_CONTROL) {
+            is_legal = 0;
+        }
+    }
+
     if (MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_UNIFICATION) {
         if (tech_id == TECH_APP_HOLO_SIMULATOR ||
             tech_id == TECH_APP_VIRTUAL_REALITY_NETWORK ||
