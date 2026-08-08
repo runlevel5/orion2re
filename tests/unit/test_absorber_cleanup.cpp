@@ -49,3 +49,21 @@ DOCTEST_TEST_CASE("quantum detonator keeps its normal explosion multiplier") {
     DOCTEST_CHECK(
         CMBTFIR2::Damage_From_Ship_Exploding_(1) == 30 * 5 * 3);
 }
+
+DOCTEST_TEST_CASE("computerless ships have no damageable computer subsystem") {
+    TEST_ABSORBER_CLEANUP::Reset_();
+    s_combat_data* ship = &MOX::_combat_data[1];
+    TECHDATA::_hull_data[HULL_CRUISER].computer_hp = 5;
+
+    ship->computer_type = COMPUTER_NO_COMPUTER;
+    CMBTFIR2::Init_Internal_Space_(ship);
+
+    DOCTEST_CHECK(ship->computer_max_hits == 0);
+    DOCTEST_CHECK(ship->computer_current_hits == 0);
+
+    ship->computer_type = COMPUTER_ELECTRONIC_COMPUTER;
+    CMBTFIR2::Init_Internal_Space_(ship);
+
+    DOCTEST_CHECK(ship->computer_max_hits == 5);
+    DOCTEST_CHECK(ship->computer_current_hits == 5);
+}

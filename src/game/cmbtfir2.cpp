@@ -518,7 +518,9 @@ namespace CMBTFIR2 {
             ship->drive_max_hits *= 3;
         }
 
-        ship->computer_max_hits = TECHDATA::_hull_data[ship->size_class].computer_hp;
+        ship->computer_max_hits = ship->computer_type > COMPUTER_NO_COMPUTER
+            ? TECHDATA::_hull_data[ship->size_class].computer_hp
+            : 0;
 
         for (int i = 0; i < 8; ++i) {
             if (ship->weapons[i].weapon_id < 1) {

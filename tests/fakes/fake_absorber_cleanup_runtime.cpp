@@ -11,6 +11,7 @@ namespace TEST_ABSORBER_CLEANUP {
     void Reset_() {
         memset(combat_data, 0, sizeof(combat_data));
         memset(TECHDATA::_hull_data, 0, sizeof(TECHDATA::_hull_data));
+        memset(TECHDATA::_specials, 0, sizeof(TECHDATA::_specials));
         combat_data[1].structure_max = 100;
         combat_data[1].drive_current_hits = 1;
         combat_data[1].ftl_type = 1;
@@ -47,6 +48,21 @@ namespace MOX {
 
 namespace TECHDATA {
     s_tech_hull_data _hull_data[HULL_CLASS_COUNT];
+    s_tech_specials_data _specials[SPECIAL_COUNT];
+}
+
+namespace DESIGN {
+    int16_t __cdecl One_Weapon_Space_Without_M_Level_(
+        int16_t, int16_t, int16_t, int16_t) {
+        return 0;
+    }
+}
+
+namespace struct_ {
+    int16_t __cdecl Test_Bit_Field_(void* bit_field, uint16_t bit_index) {
+        const uint8_t* bytes = static_cast<const uint8_t*>(bit_field);
+        return (bytes[bit_index / 8] >> (bit_index % 8)) & 1;
+    }
 }
 
 namespace COMBINIT {
