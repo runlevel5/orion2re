@@ -1721,8 +1721,6 @@ namespace COLCALC {
                 }
             }
         }
-
-        SHIPMOVE::Unmark_Just_Built_AI_Ships_();
     }
 
     void __cdecl Do_Surrenders_() {
@@ -3498,10 +3496,13 @@ namespace COLCALC {
 
                 if (ship->status == 4) {
                     build_msg.u.colony.c.build.is_refit = 1;
-                } else if (colony->buildings[BUILDING_SPACE_ACADEMY] != 0) {
-                    ++ship->crew_quality;
-                    ship->crew_experience =
-                        static_cast<int16_t>(MOX::_crew_data[static_cast<int32_t>(ship->crew_quality)].experience);
+                } else {
+                    if (colony->buildings[BUILDING_SPACE_ACADEMY] != 0) {
+                        ++ship->crew_quality;
+                        ship->crew_experience =
+                            static_cast<int16_t>(MOX::_crew_data[static_cast<int32_t>(ship->crew_quality)].experience);
+                    }
+                    ERICNET::Calc_Ship_Level_(ship_idx);
                 }
             }
 

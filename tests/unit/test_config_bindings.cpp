@@ -12,6 +12,7 @@
 #include "game/cmbtfire.h"
 #include "game/combinit.h"
 #include "game/cmbtmis.h"
+#include "game/combat.h"
 #include "game/combat1.h"
 #include "game/design_config.h"
 #include "game/mapgen.h"
@@ -168,6 +169,25 @@ DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COMBINIT::_satellite_capture_enabled == 1);
+}
+
+DOCTEST_TEST_CASE("Warlord combat settings preserve classic defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_satellite_warlord_bonus == 0);
+    DOCTEST_CHECK(COMBAT::_strategic_xp_bonus == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "satellite_warlord_bonus = true;"
+        "strategic_xp_bonus = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_satellite_warlord_bonus == 1);
+    DOCTEST_CHECK(COMBAT::_strategic_xp_bonus == 1);
 }
 
 DOCTEST_TEST_CASE("planetary Damper Field setting preserves the classic default") {

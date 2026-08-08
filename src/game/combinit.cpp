@@ -1747,6 +1747,11 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
 
     MOX::_combat_data->structure_max = 0;
     MOX::_combat_data->crew_quality = CREW_QUALITY_REGULAR;
+    if (_satellite_warlord_bonus != 0 &&
+        (uint8_t)MOX::_combat_data->owner < MAX_PLAYERS &&
+        MOX::_player[MOX::_combat_data->owner].traits[TRAIT_WARLORD] != 0) {
+        ++MOX::_combat_data->crew_quality;
+    }
     MOX::_combat_data->officer_idx = -1;
     MOX::_combat_data->marine_count = 0;
     MOX::_combat_data->structure_damage = 0;
@@ -2026,6 +2031,11 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     }
 
     MOX::_combat_data[MOX::_combat_total_ship_count].crew_quality = CREW_QUALITY_REGULAR;
+    if (_satellite_warlord_bonus != 0 &&
+        (uint16_t)defender < MAX_PLAYERS &&
+        MOX::_player[defender].traits[TRAIT_WARLORD] != 0) {
+        ++MOX::_combat_data[MOX::_combat_total_ship_count].crew_quality;
+    }
     MOX::_combat_data[MOX::_combat_total_ship_count].officer_idx = -1;
     MOX::_combat_data[MOX::_combat_total_ship_count].marine_count = (uint8_t)TECHDATA::_hull_data[station_type].marines;
     MOX::_combat_data[MOX::_combat_total_ship_count].current_speed = 0;

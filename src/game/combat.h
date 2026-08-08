@@ -2,6 +2,8 @@
 #include <cstdint>
 
 namespace COMBAT {
+    inline uint8_t _strategic_xp_bonus = 0;
+
     /**
      * Resolve a strategic battle between two ship groups and fill the summary and details buffers.
      * @param plr1_ships Attacker ship index array.

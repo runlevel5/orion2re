@@ -123,6 +123,7 @@ void __cdecl Next_Turn_Calc_() {
     COMBFIND::Search_For_Battles_();
     aitech::Apply_Evolutionary_Upgrades_();
     EVENTS::Determine_Event_();
+    SHIPMOVE::Unmark_Just_Built_AI_Ships_();
     ERICNET::Do_All_Ships_XP_Check_();
     EVENTS::Event_Twiddle_();
     lostship::Lose_Out_Of_Range_Ships_();

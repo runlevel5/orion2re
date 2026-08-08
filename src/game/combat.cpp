@@ -1,5 +1,31 @@
 #include "pch.h"
 
+namespace {
+    void Apply_Strategic_Crew_Bonuses_() {
+        if (COMBAT::_strategic_xp_bonus == 0) {
+            return;
+        }
+
+        for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+            s_qship* combat_ship = &MOX::_qcombat_data[i];
+            const int16_t ship_idx = combat_ship->ship_design_idx;
+            if ((uint16_t)ship_idx >= MAX_SHIPS) {
+                continue;
+            }
+
+            const uint8_t crew_quality = (uint8_t)MOX::_ship[ship_idx].crew_quality;
+            if (crew_quality >= CREW_QUALITY_COUNT) {
+                continue;
+            }
+
+            const s_crew_data* crew = &MOX::_crew_data[crew_quality];
+            combat_ship->base_ocv += crew->attack;
+            combat_ship->beam_defense_bonus += crew->defense;
+            combat_ship->missile_defense_bonus += crew->defense / 2;
+        }
+    }
+}
+
 namespace COMBAT {
     constexpr size_t kQCombatDataShipCount = MAX_SHIPS + 1;
     constexpr size_t kQCombatDataSize = kQCombatDataShipCount * sizeof(s_qship);
@@ -98,6 +124,8 @@ namespace COMBAT {
                 Get_Leader_Combat_Bonuses_(plr2_ships, plr2_ship_count, &bonus1, &bonus2, &leader_combat_bonuses[MOX::_combat_defender_player], &bonus3, &bonus4);
                 Qload_Ships_(plr2_ships, plr2_ship_count, bonus1, bonus2, bonus3, bonus4);
             }
+
+            Apply_Strategic_Crew_Bonuses_();
 
             MOX::_combat_defender_count = MOX::_combat_total_ship_count - attacker_ship_count;
             if (MOX::_colony_defense_flags == 0) {

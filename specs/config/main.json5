@@ -1213,6 +1213,34 @@
       default: false,
     },
 
+    satellite_warlord_bonus: {
+      title: "Warlord bonus for planetary defenses",
+      description: "Raises tactical colony and orbital-defense crew quality by one level for Warlord owners.",
+      remarks: "False preserves classic behavior.",
+      examples: ["satellite_warlord_bonus = true;"],
+      group: "gameplay",
+      type: "bool",
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::_satellite_warlord_bonus",
+      },
+      default: false,
+    },
+
+    strategic_xp_bonus: {
+      title: "Crew experience in strategic combat",
+      description: "Applies ship crew attack and defense bonuses during strategic combat.",
+      remarks: "False preserves classic behavior.",
+      examples: ["strategic_xp_bonus = true;"],
+      group: "gameplay",
+      type: "bool",
+      bind_root: {
+        header: "game/combat.h",
+        symbol: "COMBAT::_strategic_xp_bonus",
+      },
+      default: false,
+    },
+
     planet_damper: {
       title: "Planetary Damper Field",
       description: "Equips planetary defensive installations with a Damper Field when the defender has researched the technology.",
