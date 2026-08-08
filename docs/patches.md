@@ -155,7 +155,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:12253` - `destroy building trigger engage`: fixed in `ERICNET::Add_Building_()` and `ERICNET::Remove_Building_()` by clearing system combat-ignore state when a building in the synchronized `combat reengage_buildings` list is added or removed; its default reproduces the eight 1.50 defense buildings while replacing binary branch rewrites and the destruction hook with one configurable source-level invariant.
 - [x] `asm.pl:12319` - `lander ships no best armor minus 1`: fixed in `INITSHIP::Load_Colony_Ship_Design_()`, `INITSHIP::Load_Outpost_Ship_Design_()`, and `INITSHIP::Load_Transport_Ship_Design_()` by assigning the best available armor directly to every generated lander design; this replaces the three 1.50 one-byte instruction suppressions with the equivalent source-level equipment invariant.
 - [ ] `asm.pl:12342` - `event conditions`
-- [ ] `asm.pl:12386` - `leaders desynch`
+- [x] `asm.pl:12386` - `leaders desynch`: fixed in `OFFICER::Deassign_Officer_()` and `NETMOX::Send_Game_Orders_()` by retaining deassigned leader records through the next game-order packet so the host receives their advanced XP before ownership is cleared; this replaces the 1.50 call-site wrappers with centralized transient event tracking.
 - [ ] `asm.pl:12470` - `fighters helmsman`
 - [ ] `asm.pl:12492` - `crystal fleet`
 - [ ] `asm.pl:13063` - `ensure officer_star_displayed is set`

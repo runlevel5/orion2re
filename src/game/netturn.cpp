@@ -114,6 +114,7 @@ namespace NETTURN {
             (int)MOX::_PLAYER_NUM,
             (unsigned int)MOX::_stardate,
             (int)NETMOX::_net.num_connected_players);
+        NETMOX::Clear_Leader_Deassignments_();
         NETMOX::_net.host_sync_counter = 0;
 
         if (MOX::_NUM_PLAYERS > 0) {

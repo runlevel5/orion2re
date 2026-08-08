@@ -84,6 +84,10 @@ namespace NETMOX {
 
     void __cdecl Ditch_Leader_(int32_t leader_idx);
 
+    void __cdecl Mark_Leader_Deassigned_(int16_t leader_idx);
+
+    void __cdecl Clear_Leader_Deassignments_();
+
     int32_t __cdecl Mox_Send_Message_(int16_t recipient_net_id, uint16_t msg_type, void* packet, uint32_t packet_len);
 
     void __cdecl Decode_Game_Orders_(void* data, uint32_t len);

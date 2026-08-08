@@ -160,8 +160,14 @@ namespace CMBTMOV1 {
 
 namespace netcode {
     void (*g_net_update_hook)() = nullptr;
+    void (*g_net_send_hook)(int32_t, int16_t, void*, uint32_t) = nullptr;
 
-    uint32_t __cdecl Net_Send_Message_(int32_t, int16_t, void*, uint32_t) { return 1; }
+    uint32_t __cdecl Net_Send_Message_(int32_t recipient, int16_t packet_id, void* packet, uint32_t packet_len) {
+        if (g_net_send_hook != nullptr) {
+            g_net_send_hook(recipient, packet_id, packet, packet_len);
+        }
+        return 1;
+    }
     void __cdecl Net_Update_() {
         if (g_net_update_hook != nullptr) {
             g_net_update_hook();

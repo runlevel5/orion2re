@@ -280,6 +280,7 @@ namespace OFFICER {
         s_leader_data& leader = MOX::_leaders[leader_idx];
         int16_t player_idx = (int16_t)leader.player_index;
 
+        NETMOX::Mark_Leader_Deassigned_(leader_idx);
         OFFICER::Increase_Officer_Level_By_One_(leader_idx);
 
         if (leader.type == LEADER_TYPE_COLONY) {

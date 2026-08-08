@@ -33,6 +33,7 @@ namespace NETMOX {
         uint32_t _suspended_net_update_depth;
         int8_t _net_debug_initialized;
         int8_t _net_debug_enabled;
+        uint8_t deassigned_leaders[MAX_LEADERS];
 
         struct Scoped_Net_Update_Suspension_ {
             Scoped_Net_Update_Suspension_() {
@@ -219,6 +220,18 @@ namespace NETMOX {
         MOX::_leaders[leader_idx].status = -1;
         MOX::_leaders[leader_idx].location = -1;
         MOX::_leaders[leader_idx].player_index = -1;
+    }
+
+    void __cdecl Mark_Leader_Deassigned_(int16_t leader_idx) {
+        if (_net.is_network_active != 0 &&
+            leader_idx >= 0 &&
+            leader_idx < MAX_LEADERS) {
+            deassigned_leaders[leader_idx] = 1;
+        }
+    }
+
+    void __cdecl Clear_Leader_Deassignments_() {
+        memset(deassigned_leaders, 0, sizeof(deassigned_leaders));
     }
 
     int32_t __cdecl Net_Diplomacy_With_() {
@@ -1149,13 +1162,15 @@ namespace NETMOX {
         RUSS::Mox_Update_();
 
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
-            if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM) {
+            if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM ||
+                deassigned_leaders[i] != 0) {
                 writer.Write_Int16_(i);
                 writer.Write_Bytes_(&MOX::_leaders[i], sizeof(s_leader_data));
             }
         }
 
         writer.Write_Int16_(-1);
+        Clear_Leader_Deassignments_();
 
         RUSS::Mox_Update_();
 
