@@ -97,7 +97,7 @@ namespace CMBTMIS {
                             ship.special_status_flag != 4 /* Stasis */ &&
                             !CMBTMOV1::Ship_Is_In_Stasis_(ship_idx) &&
                             ship.unit_status == 0 &&
-                            missile.target_unit_idx != ship_idx) {
+                            !Missile_Targets_Ship_(&missile, ship_idx)) {
 
                             int16_t range = CMBTAI::Range_To_Missile_(ship_idx, missile_idx);
                             if (range < min_range) {

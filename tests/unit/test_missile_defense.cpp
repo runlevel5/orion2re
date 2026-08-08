@@ -3,6 +3,62 @@
 #include "doctest/doctest.h"
 #include "game/cmbtmis.h"
 
+namespace {
+    s_combat_data combat_data[3];
+    s_missile missiles[300];
+    s_player players[MAX_PLAYERS];
+    int16_t target_ranges[3];
+}
+
+namespace TEST_FIGHTER_RETARGETING {
+    void Reset_() {
+        memset(combat_data, 0, sizeof(combat_data));
+        memset(missiles, 0, sizeof(missiles));
+        memset(players, 0, sizeof(players));
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        memset(target_ranges, 0, sizeof(target_ranges));
+    }
+
+    void Set_Range_(int16_t ship_idx, int16_t range) {
+        target_ranges[ship_idx] = range;
+    }
+}
+
+namespace MOX {
+    s_combat_data* _combat_data = combat_data;
+    s_missile* _missile = missiles;
+    s_player* _player = players;
+    int16_t _combat_total_ship_count;
+    int16_t _combat_attacker_player;
+    int16_t _combat_defender_player;
+}
+
+namespace TECHDATA {
+    s_tech_weapon_data _weapons[WEAPON_COUNT];
+}
+
+namespace CMBTFIRE {
+    int16_t __cdecl Does_Combat_Planet_Have_Defenses_() {
+        return 1;
+    }
+
+    int16_t __cdecl Target_Is_Legal_For_Weapon_(int16_t, uint16_t, int16_t, int16_t) {
+        return 1;
+    }
+}
+
+namespace CMBTMOV1 {
+    int8_t __cdecl Ship_Is_In_Stasis_(int16_t) {
+        return 0;
+    }
+}
+
+namespace CMBTAI {
+    int16_t __cdecl Range_To_Missile_(int16_t unit_idx, int16_t) {
+        return target_ranges[unit_idx];
+    }
+}
+
 DOCTEST_TEST_CASE("missile defense percentage rolls include their threshold") {
     DOCTEST_CHECK_FALSE(CMBTMIS::Missile_Defense_Roll_Succeeds_(1, 0));
 
@@ -57,4 +113,30 @@ DOCTEST_TEST_CASE("ship movement excludes flyers targeting another missile") {
     missile.is_anti_missile_rocket = 0;
     missile.type = WEAPON_NO_WEAPONS;
     DOCTEST_CHECK_FALSE(CMBTMIS::Missile_Targets_Ship_(&missile, 4));
+}
+
+DOCTEST_TEST_CASE("anti-missile fighter can retarget a ship sharing its missile target index") {
+    TEST_FIGHTER_RETARGETING::Reset_();
+
+    MOX::_combat_attacker_player = 0;
+    MOX::_combat_defender_player = 1;
+    MOX::_combat_total_ship_count = 3;
+    MOX::_combat_data[0].owner = 0;
+    MOX::_combat_data[1].owner = 1;
+    MOX::_combat_data[2].owner = 1;
+
+    TECHDATA::_weapons[WEAPON_INTERCEPTOR].type = WEAPON_TYPE_FIGHTER;
+    MOX::_missile[0].type = WEAPON_INTERCEPTOR;
+    MOX::_missile[0].source_unit_idx = 0;
+    MOX::_missile[0].target_unit_idx = 1;
+    MOX::_missile[0].is_anti_missile_rocket = 1;
+    MOX::_missile[0].is_active = 1;
+
+    TEST_FIGHTER_RETARGETING::Set_Range_(1, 5);
+    TEST_FIGHTER_RETARGETING::Set_Range_(2, 10);
+
+    CMBTMIS::Retarget_Missile_(0);
+
+    DOCTEST_CHECK(MOX::_missile[0].target_unit_idx == 1);
+    DOCTEST_CHECK(MOX::_missile[0].is_anti_missile_rocket == 0);
 }
