@@ -553,6 +553,7 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
         int16_t saved_missile_x[300];
         int16_t saved_missile_y[300];
         int16_t saved_missile_travel[300];
+        int8_t saved_missile_facing[300];
         int16_t sx, sy;
         int16_t rotation_step;
         int8_t current_facing;
@@ -593,6 +594,7 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
                             saved_missile_x[i] = missile->x;
                             saved_missile_y[i] = missile->y;
                             saved_missile_travel[i] = missile->travel_dist;
+                            saved_missile_facing[i] = missile->facing_dir;
                             missile_tracked[i] = 1;
                         }
 
@@ -620,6 +622,7 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
                 MOX::_missile[i].x = saved_missile_x[i];
                 MOX::_missile[i].y = saved_missile_y[i];
                 MOX::_missile[i].travel_dist = saved_missile_travel[i];
+                MOX::_missile[i].facing_dir = saved_missile_facing[i];
             }
         }
 
@@ -634,6 +637,7 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
     int16_t missile_x_saved[300];
     int16_t missile_y_saved[300];
     int16_t missile_travel_dist_saved[300];
+    int8_t missile_facing_saved[300];
 
     struct_::Clear_Structure_(missile_checked, sizeof(missile_checked));
 
@@ -701,6 +705,7 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
                         missile_x_saved[i] = missile->x;
                         missile_y_saved[i] = missile->y;
                         missile_travel_dist_saved[i] = missile->travel_dist;
+                        missile_facing_saved[i] = missile->facing_dir;
                         missile_checked[i] = 1;
                     }
 
@@ -748,6 +753,7 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
             missile->x = missile_x_saved[i];
             missile->y = missile_y_saved[i];
             missile->travel_dist = missile_travel_dist_saved[i];
+            missile->facing_dir = missile_facing_saved[i];
         }
     }
 
