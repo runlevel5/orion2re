@@ -62,19 +62,21 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
         ship->facing_dir = (int8_t)current_facing;
         moved_count = 0;
 
-        for (int16_t i = 0; i < 300; ++i) {
-            s_missile* missile = &MOX::_missile[i];
-            if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx)) {
-                int16_t move_speed = 5;
-                if (ship->current_speed != 0) {
-                    move_speed = (int16_t)((missile->speed * 5) / ship->current_speed);
-                }
-                if (move_speed < 2) {
-                    move_speed = 2;
-                }
+        if (!COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_INERTIAL_NULLIFIER)) {
+            for (int16_t i = 0; i < 300; ++i) {
+                s_missile* missile = &MOX::_missile[i];
+                if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx)) {
+                    int16_t move_speed = 5;
+                    if (ship->current_speed != 0) {
+                        move_speed = (int16_t)((missile->speed * 5) / ship->current_speed);
+                    }
+                    if (move_speed < 2) {
+                        move_speed = 2;
+                    }
 
-                if (CMBTMIS::Move_Missile_(i, center_x, center_y, move_speed) != 0) {
-                    moved_missiles[moved_count++] = i;
+                    if (CMBTMIS::Move_Missile_(i, center_x, center_y, move_speed) != 0) {
+                        moved_missiles[moved_count++] = i;
+                    }
                 }
             }
         }
@@ -542,6 +544,10 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
 }
 
     int16_t __cdecl Rotate_Ship_Until_Impact_(int16_t ship_idx, int16_t* target_facing) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_INERTIAL_NULLIFIER)) {
+            return 0;
+        }
+
         int16_t impact_detected = 0;
         uint8_t missile_tracked[300];
         int16_t saved_missile_x[300];

@@ -133,7 +133,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8662` - `cloak initialize`: fixed in `COMBINIT::Init_Special_Devices_()` by letting a working Phasing Cloak override an ordinary Cloaking Device and initialize the configurable `combat_bonus phasing_cloak_effective_turns` timeout; this replaces the 1.50 assembly diversion and C wrapper with a direct source-level cloak-state invariant.
 - [x] `asm.pl:8685` - `stasis cut`: fixed in `CMBTFIRE::Place_Ship_In_Stasis_()` by removing continuing effects associated with the ship as it enters stasis, with the firing path refreshing combat rendering afterward; this replaces the 1.50 call-site wrapper with the existing source-level stasis transition and cleanup abstractions.
 - [x] `asm.pl:8703` - `infantry and armor growth and death bug fixes`: fixed in `COLCALC::Produce_Ground_Military_()` by treating each barracks capacity as a three-way boundary before checking building-backed growth, so troops at capacity remain stable and unsupported over-cap troops decay; this replaces the 1.50 call-site diversion with direct source-level cap enforcement.
-- [ ] `asm.pl:8762` - `nullifier missiles`
+- [x] `asm.pl:8762` - `nullifier missiles`: fixed in `CMBTMOV1::Rotate_Ship_()` and `CMBTMOV1::Rotate_Ship_Until_Impact_()` by preventing a working Inertial Nullifier's zero-time turns from advancing incoming missiles during actual and predicted rotation; this replaces the 1.50 code-cave branches and call wrapper with direct source-level guards.
 - [ ] `asm.pl:8814` - `cybernetic advanced damage control`
 - [ ] `asm.pl:8838` - `stasis area effects`
 - [ ] `asm.pl:8897` - `absorber cleanup`
