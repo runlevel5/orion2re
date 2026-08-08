@@ -1385,6 +1385,7 @@ namespace CMBTFIRE {
                 if (target_idx != 0 && target_type == 0) {
                     CMBTSPEC::Draw_Stasis_Beam_(ship_idx, target_idx);
                     Place_Ship_In_Stasis_(target_idx, ship_idx);
+                    CMBTDRW1::Refresh_Combat_Screen_Full_();
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left--;
                 }
                 break;
@@ -1734,6 +1735,7 @@ namespace CMBTFIRE {
     void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int16_t source_idx) {
         MOX::_combat_data[ship_idx].stasis_source_idx = (uint8_t)source_idx;
         CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
+        COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
     }
 
     void __cdecl BHG_(int16_t source_idx, int16_t target_idx) {
