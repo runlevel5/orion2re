@@ -1868,7 +1868,7 @@ namespace COLCALC {
 
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
-        for (int i = 0; i < 83; ++i) {
+        for (int i = 0; i <= TECH_APP_ZORTRIUM_ARMOR; ++i) {
             if (surrender_plr->tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if (Player_May_Get_Tech_App_(receiver_plr, (int16_t)i)) {
                     Player_Gets_Tech_App_(receiver_plr, (int16_t)i);
