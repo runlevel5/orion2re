@@ -378,15 +378,15 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
     ship->field42_0x49 = 0;
     ship->plasma_web_damage = 0;
     ship->special_cooldown = 0xFF;
+    ship->special_status_flag = 0;
     ship->special_status_timer = 0;
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_CLOAKING_DEVICE)) {
         ship->special_status_flag = 1;
-    } else if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_PHASING_CLOAK)) {
-        ship->special_status_flag = 4;
-        ship->special_status_timer = 10;
-    } else {
-        ship->special_status_flag = 0;
+    }
+    if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_PHASING_CLOAK)) {
+        ship->special_status_timer = _phasing_cloak_effective_turns;
+        ship->special_status_flag = ship->special_status_timer != 0 ? 4 : 1;
     }
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_HYPER_X_CAPACITORS)) {

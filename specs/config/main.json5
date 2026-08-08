@@ -1184,6 +1184,21 @@
       default: "race_tech",
     },
 
+    phasing_cloak_effective_turns: {
+      title: "Initial Phasing Cloak duration",
+      description: "Sets the number of combat rounds a working Phasing Cloak starts in its phase-cloaked state.",
+      remarks: "Zero disables the initial phase-cloaked state and starts the ship in ordinary cloak state.",
+      examples: ["combat_bonus phasing_cloak_effective_turns = 10;"],
+      group: "gameplay",
+      namespace: "combat_bonus",
+      type: "uint8",
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::_phasing_cloak_effective_turns",
+      },
+      default: 10,
+    },
+
     satellite_capture: {
       title: "Captured satellites survive",
       description: "Keeps a captured Star Base, Battlestation, or Star Fortress when its colony is captured immediately after combat.",

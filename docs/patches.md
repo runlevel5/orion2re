@@ -130,7 +130,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8263` - `satellites plasma darkening`: fixed in `COMBINIT::Tactical_Combat_()` by checking every loaded combat unit for installed cloak capabilities after colony defenses are added and initializing the shared plasma-darkening resources when needed; this replaces the 1.50 unconditional load with a capability-based source invariant.
 - [x] `asm.pl:8272` - `shuttle hijack`: fixed in `COMBAT1::Do_Combat_Turn_()` by preserving the active ship's turn-order entry and reselecting control when assault-shuttle capture changes ownership during movement or rotation; this replaces the 1.50 movement skips, rotation wrappers, and strict-mode cursor hooks with a direct source-level ownership invariant.
 - [x] `asm.pl:8367` - `marines overload`: implemented in `CMBTFIR2::Resolve_Capture_()` and `BOARDING::Captured_Marine_Count_()` by optionally limiting surviving attackers to the captured ship or orbital base's hull capacity, doubled by working Troop Pods; this replaces the 1.50 call-site wrapper with a direct source-level capture invariant while preserving classic behavior by default.
-- [ ] `asm.pl:8662` - `cloak initialize`
+- [x] `asm.pl:8662` - `cloak initialize`: fixed in `COMBINIT::Init_Special_Devices_()` by letting a working Phasing Cloak override an ordinary Cloaking Device and initialize the configurable `combat_bonus phasing_cloak_effective_turns` timeout; this replaces the 1.50 assembly diversion and C wrapper with a direct source-level cloak-state invariant.
 - [ ] `asm.pl:8685` - `stasis cut`
 - [ ] `asm.pl:8703` - `infantry and armor growth and death bug fixes`
 - [ ] `asm.pl:8762` - `nullifier missiles`

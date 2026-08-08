@@ -615,7 +615,7 @@ struct s_combat_data {
     int16_t movement_left;
     int8_t target_type_flag;
     int8_t special_status_flag;
-    int8_t special_status_timer;
+    uint8_t special_status_timer;
     uint8_t special_cooldown;
     int16_t plasma_web_damage;
     int16_t reflected_damage_pool;

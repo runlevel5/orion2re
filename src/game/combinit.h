@@ -3,6 +3,7 @@
 namespace COMBINIT {
     inline uint8_t _planet_damper_enabled = 0;
     inline uint8_t _satellite_capture_enabled = 0;
+    inline uint8_t _phasing_cloak_effective_turns = 10;
 
     struct s_satellite_capture_state {
         int16_t colony_idx = -1;

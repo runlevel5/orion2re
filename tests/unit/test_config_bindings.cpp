@@ -245,8 +245,25 @@ DOCTEST_TEST_CASE("interactive combat stat settings preserve classic defaults") 
     DOCTEST_CHECK(COMBAT1::_rephase_cloak_next_turn == 1);
 }
 
+DOCTEST_TEST_CASE("Phasing Cloak duration preserves the 1.50 default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_phasing_cloak_effective_turns == 10);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat_bonus phasing_cloak_effective_turns = 12;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_phasing_cloak_effective_turns == 12);
+}
+
 DOCTEST_TEST_CASE("combat namespace settings resolve bidirectionally and commit defaults") {
     const char* paths[] = {
+        "combat_bonus.phasing_cloak_effective_turns",
         "combat.recloak_next_turn",
         "combat.rephase_cloak_next_turn",
         "combat.lightning_field_ratio",
