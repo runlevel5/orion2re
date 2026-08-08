@@ -114,7 +114,8 @@ namespace CMBTFIR2 {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 s_combat_data* ship = &MOX::_combat_data[i];
                 if ((int16_t)ship->owner == player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
-                    if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WIDE_AREA_JAMMER)) {
+                    if (!CMBTMOV1::Ship_Is_In_Stasis_(i) &&
+                        COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WIDE_AREA_JAMMER)) {
                         *bonus_val_ptr = 70 /* 0x46 */;
                     }
                     if (ship->officer_idx > -1) {
@@ -220,7 +221,7 @@ namespace CMBTFIR2 {
             s_combat_data* ship = &MOX::_combat_data[i];
 
             if (ship->owner == (int8_t)player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
-                if (ship->ftl_type == 0) {
+                if (ship->ftl_type == 0 && !CMBTMOV1::Ship_Is_In_Stasis_(i)) {
                     if (ship->size_class == 2) {
                         size_bonus = 0;
                     } else if (ship->size_class == 3) {
@@ -246,7 +247,8 @@ namespace CMBTFIR2 {
                 }
 
                 if (is_ancient == 1) {
-                    if (COMBINIT::Does_Combat_Ship_Have_Special_(i, 28 /* 0x1c */)) {
+                    if (!CMBTMOV1::Ship_Is_In_Stasis_(i) &&
+                        COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_SCOUT_LAB)) {
                         special_bonus = 20;
                     }
                 }

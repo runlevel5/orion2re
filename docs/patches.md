@@ -135,7 +135,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8703` - `infantry and armor growth and death bug fixes`: fixed in `COLCALC::Produce_Ground_Military_()` by treating each barracks capacity as a three-way boundary before checking building-backed growth, so troops at capacity remain stable and unsupported over-cap troops decay; this replaces the 1.50 call-site diversion with direct source-level cap enforcement.
 - [x] `asm.pl:8762` - `nullifier missiles`: fixed in `CMBTMOV1::Rotate_Ship_()` and `CMBTMOV1::Rotate_Ship_Until_Impact_()` by preventing a working Inertial Nullifier's zero-time turns from advancing incoming missiles during actual and predicted rotation; this replaces the 1.50 code-cave branches and call wrapper with direct source-level guards.
 - [ ] `asm.pl:8814` - `cybernetic advanced damage control`
-- [ ] `asm.pl:8838` - `stasis area effects`
+- [x] `asm.pl:8838` - `stasis area effects`: fixed in `CMBTFIR2::Fleet_Defensive_Bonus_()`, `CMBTFIR2::Fleet_Offensive_Bonus_()`, and `COMBAT1::Enemy_Dissipator_Exists_()` by excluding stasis-held ships from jammer, scout lab, satellite attack, and warp dissipator fleet effects; this replaces the 1.50 call-site wrappers with direct source-level eligibility checks.
 - [ ] `asm.pl:8897` - `absorber cleanup`
 - [ ] `asm.pl:9091` - `monster bug`
 - [ ] `asm.pl:9871` - `send leader to pool on capture`

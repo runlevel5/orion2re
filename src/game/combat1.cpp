@@ -1863,7 +1863,8 @@ namespace COMBAT1 {
         int16_t total_ships = MOX::_combat_total_ship_count;
 
         for (int16_t i = 0; i < total_ships; ++i) {
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WARP_DISSIPATOR) != 0) {
+            if (!CMBTMOV1::Ship_Is_In_Stasis_(i) &&
+                COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WARP_DISSIPATOR) != 0) {
                 s_combat_data* ship = &MOX::_combat_data[i];
 
                 if (ship->is_captured == 0 && ship->unit_status == 0 && ship->owner != player_idx) {

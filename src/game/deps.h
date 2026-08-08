@@ -196,6 +196,7 @@
 #include "spy.h"
 #include "lostship.h"
 #include "invasion.h"
+#include "boarding.h"
 #include "council.h"
 #include "global.h"
 #include "combat1.h"
