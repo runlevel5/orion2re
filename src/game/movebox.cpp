@@ -69,8 +69,6 @@ namespace MOVEBOX {
 
                 if (MOX::_star[i].spectral_class == STAR_CLASS_BLACK_HOLE) {
                     color_idx = COLONY::_using_colony_screen_palette ? 9 : 10;
-                } else if (MOX::_star[i].spectral_class == STAR_CLASS_DWARF) {
-                    color_idx = 8;
                 } else if (owner < 0 || owner >= MAX_PLAYERS) {
                     if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, i) || owner == -1 || owner == -2) {
                         color_idx = 8;
