@@ -97,8 +97,20 @@ namespace COLREFIT {
 
         COLONY::full_draw = 1;
 
+        const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+
         do {
-            selected_field_id = ::fields::Get_Input();
+            // Enhancement: Esc presses the Cancel button like a click.
+            int16_t synth_input = 0;
+            if (enhanced) {
+                int32_t key = key::Read_Key();
+                if (key == 0x011B) {
+                    synth_input = ::fields::Activate_Field_(fields[3]);
+                } else if (key != 0) {
+                    key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+                }
+            }
+            selected_field_id = (synth_input != 0) ? synth_input : ::fields::Get_Input();
             hovered_field_id = ::fields::Scan_Input();
 
             Draw_Refit_Popup();
