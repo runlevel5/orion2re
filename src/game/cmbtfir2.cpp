@@ -1645,7 +1645,10 @@ namespace CMBTFIR2 {
 
         int16_t result_msg_id;
         if (attacker_marines > 0) {
-            defender->marine_count = (int8_t)(attacker_marines - defender_marines_current);
+            int16_t captured_marines =
+                attacker_marines - defender_marines_current;
+            defender->marine_count = (int8_t)BOARDING::Captured_Marine_Count_(
+                defender_idx, captured_marines);
             Capture_Ship_(defender_idx, target_x, target_y);
             result_msg_id = (defender->unit_status == 0) ? 0x32 : 0x31;
         } else {

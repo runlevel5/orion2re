@@ -129,7 +129,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8169` - `damper planet`: implemented in `COMBINIT::Load_Tactical_Colony_()`, `CMBTFIRE::Apply_Damage_To_Planet_()`, and `CMBTFIRE::Destroy_Colony_Defense_()` with the optional `planet_damper` setting; eligible planetary defenses subtract planetary shield absorption before reducing remaining damage to one quarter, and Damper and Rangemaster protection ends when the last defense is destroyed, replacing the 1.50 wrappers and byte clears with direct source-level rules.
 - [x] `asm.pl:8263` - `satellites plasma darkening`: fixed in `COMBINIT::Tactical_Combat_()` by checking every loaded combat unit for installed cloak capabilities after colony defenses are added and initializing the shared plasma-darkening resources when needed; this replaces the 1.50 unconditional load with a capability-based source invariant.
 - [ ] `asm.pl:8272` - `shuttle hijack`
-- [ ] `asm.pl:8367` - `marines overload`
+- [x] `asm.pl:8367` - `marines overload`: implemented in `CMBTFIR2::Resolve_Capture_()` and `BOARDING::Captured_Marine_Count_()` by optionally limiting surviving attackers to the captured ship or orbital base's hull capacity, doubled by working Troop Pods; this replaces the 1.50 call-site wrapper with a direct source-level capture invariant while preserving classic behavior by default.
 - [ ] `asm.pl:8662` - `cloak initialize`
 - [ ] `asm.pl:8685` - `stasis cut`
 - [ ] `asm.pl:8703` - `infantry and armor growth and death bug fixes`

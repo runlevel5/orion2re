@@ -1212,6 +1212,20 @@
       default: false,
     },
 
+    kill_excess_marines_after_capture: {
+      title: "Kill excess marines after capture",
+      description: "Immediately removes surviving attackers above the captured ship or orbital base's marine capacity.",
+      remarks: "Working Troop Pods double ship capacity. When disabled, excess marines remain until combat cleanup, matching classic behavior.",
+      examples: ["kill_excess_marines_after_capture = true;"],
+      group: "gameplay",
+      type: "bool",
+      bind_root: {
+        header: "game/boarding.h",
+        symbol: "BOARDING::_kill_excess_marines_after_capture",
+      },
+      default: false,
+    },
+
     board_in_black_hole: {
       title: "Allow boarding in black holes",
       description: "Allows ships affected by a Black Hole Generator to board or be boarded.",

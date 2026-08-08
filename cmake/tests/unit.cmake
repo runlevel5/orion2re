@@ -212,6 +212,7 @@ orion2re_add_unit_test(test_boarding
         tests/unit/test_boarding.cpp
     PRODUCTION_SOURCES
         src/game/boarding.cpp
+        src/game/struct.cpp
     FAKE_SOURCES
         tests/fakes/fake_boarding_runtime.cpp
 )
