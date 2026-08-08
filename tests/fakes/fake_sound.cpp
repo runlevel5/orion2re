@@ -115,3 +115,9 @@ namespace sound {
     void __cdecl Init_Sound_() {
     }
 }
+
+namespace ERICNET {
+    int __cdecl Mox_Play_Sound_(int16_t sound_id) {
+        return sound::Play_Sound_(sound_id);
+    }
+}

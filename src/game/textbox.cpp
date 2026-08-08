@@ -195,6 +195,9 @@ namespace TEXTBOX {
         fonts::Set_Font_Style_(3, &primary_colors);
 
         uint16_t max_height = (uint16_t)FMTPARA::Get_Formatted_Paragraph_Max_Height_(339, text);
+        if (max_height > 374) {
+            max_height = 374;
+        }
 
         if (FMTPARA::Get_Last_Formatted_Paragraph_Max_Width_() < 339) {
             width = (uint16_t)FMTPARA::Get_Last_Formatted_Paragraph_Max_Width_();

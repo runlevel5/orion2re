@@ -472,6 +472,17 @@ DOCTEST_TEST_CASE("vfs fopen_lbx returns an entry-relative stream from a raw lbx
     DOCTEST_CHECK(vfs::fclose(file) == 0);
 }
 
+DOCTEST_TEST_CASE("vfs fopen_lbx rejects entries outside the raw archive directory") {
+    test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
+    test_dir.Write_Lbx_File("TEST.LBX", {"zero", "one"});
+
+    const std::string base_path = test_dir.root_path().string();
+    DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+
+    DOCTEST_CHECK(vfs::fopen_lbx("TEST.LBX", -1) == nullptr);
+    DOCTEST_CHECK(vfs::fopen_lbx("TEST.LBX", 2) == nullptr);
+}
+
 DOCTEST_TEST_CASE("vfs fopen_lbx prefers per-entry loose override over whole lbx replacement from zip") {
     test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
     test_dir.Write_Lbx_File("TEST.LBX", {"raw-zero", "raw-one"});

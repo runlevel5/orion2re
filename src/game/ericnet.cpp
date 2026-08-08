@@ -183,7 +183,7 @@ namespace ERICNET {
     }
 
     int __cdecl Mox_Play_Sound_(int16_t sound_id) {
-        if (MOX::_settings.sound_fx_on != 0) {
+        if (MOX::_settings.sound_fx_on != 0 && MOX::_super_fast_flag == 0) {
             return sound::Play_Sound_(sound_id);
         }
 

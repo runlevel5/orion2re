@@ -3,6 +3,10 @@
 #include "doctest/doctest.h"
 #include "game/ericnet.h"
 
+namespace test::fakes {
+    extern int32_t last_played_sound;
+}
+
 namespace {
     const int16_t default_reengage_buildings[] = {
         BUILDING_ARTEMIS_SYSTEM_NET,
@@ -40,6 +44,28 @@ namespace {
                 static_cast<uint8_t>(default_reengage_buildings[index]);
         }
     }
+}
+
+DOCTEST_TEST_CASE("gameplay sound playback follows settings and combat speed") {
+    MOX::_settings.sound_fx_on = 1;
+    MOX::_super_fast_flag = 0;
+
+    test::fakes::last_played_sound = -1;
+    DOCTEST_CHECK(ERICNET::Mox_Play_Sound_(68) == 68);
+    DOCTEST_CHECK(test::fakes::last_played_sound == 68);
+
+    test::fakes::last_played_sound = -1;
+    DOCTEST_CHECK(ERICNET::Mox_Play_Sound_(69) == 69);
+    DOCTEST_CHECK(test::fakes::last_played_sound == 69);
+
+    MOX::_super_fast_flag = 1;
+    DOCTEST_CHECK(ERICNET::Mox_Play_Sound_(33) == 0);
+    DOCTEST_CHECK(test::fakes::last_played_sound == 69);
+
+    MOX::_super_fast_flag = 0;
+    MOX::_settings.sound_fx_on = 0;
+    DOCTEST_CHECK(ERICNET::Mox_Play_Sound_(33) == 0);
+    DOCTEST_CHECK(test::fakes::last_played_sound == 69);
 }
 
 DOCTEST_TEST_SUITE("building combat re-engagement") {

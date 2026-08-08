@@ -169,8 +169,8 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:14479` - `negative thrust`: fixed in `CMBTAI::Auto_Move_Ship_()` and both movement paths in `COMBAT1::Do_Combat_Turn_()` by clamping remaining movement to zero after subtracting the actual movement cost; this directly expresses the three 1.50 code-cave clamps in source.
 - [x] `asm.pl:14529` - `scrap value cap`: fixed in `FLT1::Get_Scrap_Ship_Value_()` and `FLT1::Scrap_Ships_()` by retaining the selected ships' aggregate scrap value as signed 32-bit through validation, confirmation formatting, and treasury credit; this directly expresses the 1.50 instruction-width corrections in source.
 - [x] `asm.pl:14561` - `AI fleet strength assessment`: fixed in `TECHDATA::_weapons` by clearing generic interceptor damage that is assessed through separate fighter handling and assigning the Black Hole Generator its intended 100-point strength; this directly expresses the two 1.50 weapon-table corrections while preserving their separate strategic-combat values.
-- [ ] `asm.pl:15387` - `sound of crash`
-- [ ] `asm.pl:15470` - `msgbox overflow`
+- [x] `asm.pl:15387` - `sound of crash`: fixed in `ERICNET::Mox_Play_Sound_()`, `fields::Get_Input_()`, `LOADSAVE::Set_Sound_For_Game_Popup_()`, and `COMBINIT::Tactical_Combat_()` by routing gameplay effects through the shared sound-enabled and super-fast-mode gate and clearing fast mode during combat cleanup; the restored VFS validates resource ids against the effective `sound.lbx`, replacing the 1.50 fixed-id wrapper and call diversions with archive-driven source-level validation.
+- [x] `asm.pl:15470` - `msgbox overflow`: fixed in `TEXTBOX::Do_Text_Box_()` by capping formatted body height at 374 before sizing the frame, keeping oversized message boxes within supported screen geometry; this directly expresses the 1.50 call-site wrapper in source.
 - [ ] `asm.pl:15618` - `fast mod removal from anti-matter torpedo`
 - [ ] `asm.pl:16269` - `hypertech bug`
 - [ ] `asm.pl:16341` - `dead on graphs`

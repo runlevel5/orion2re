@@ -8,6 +8,10 @@ namespace {
     s_player players[MAX_PLAYERS];
 }
 
+namespace test::fakes {
+    int32_t last_played_sound = -1;
+}
+
 namespace MOX {
     int16_t _NUM_COLONIES = 1;
     s_colony* _colony = colonies;
@@ -15,9 +19,18 @@ namespace MOX {
     s_star_data* _star = stars;
     s_ship_data* _ship = ships;
     s_player* _player = players;
+    int16_t _super_fast_flag;
+    s_settings _settings = {};
     int8_t _food_per_farmer_table[PLANET_CLIMATE_COUNT];
     uint8_t _planet_max_farms[PLANET_SIZE_COUNT];
     int8_t _planet_max_population[PLANET_SIZE_COUNT];
+}
+
+namespace sound {
+    int32_t __cdecl Play_Sound_(int32_t resource_id) {
+        test::fakes::last_played_sound = resource_id;
+        return resource_id;
+    }
 }
 
 namespace TECHDATA {

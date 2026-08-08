@@ -1138,6 +1138,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         ERIC::Fast_Fade_Out_();
         palette::Set_Palette_Gradient_(160, 95, 0, 0, 0, 0, 0, 0);
         MOX2::Put_Auto_Function_(&auto_func);
+        MOX::_super_fast_flag = 0;
         sound::Fadeout_Sound_(-1, 30);
         JIM::Play_Background_Music_();
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
