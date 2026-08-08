@@ -141,7 +141,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:9871` - `send leader to pool on capture`: fixed in `CMBTFIR2::Capture_Ship_()` by handling the tactical officer and strategic ship leader independently and returning any remaining strategic leader through `OFFICER::Move_Officer_To_Pool_()`; this replaces the 1.50 branch retarget and code-cave helper with the existing source-level officer transition.
 - [x] `asm.pl:9900` - `system popup freeze`: fixed in `animate::Set_Animation_Frame_()` and `SYS::Draw_System_Display_Popup_()` by interpreting packed frame counts, requested indices, and the shared popup animation counter as unsigned at their use boundaries; this directly expresses the 1.50 signedness corrections without changing shared storage layouts.
 - [ ] `asm.pl:9995` - `stumble breakthrough research storage`
-- [ ] `asm.pl:10195` - `curship visuals`
+- [x] `asm.pl:10195` - `curship visuals`: fixed in `COMBAT1::Seeking_Missiles_()`, `COMBINIT::Increment_Bhg_()`, and `COMBINIT::Plasma_Web_Damage_()` by selecting the affected ship before automatic missile, black-hole, and plasma-web visual or destruction processing; this replaces the 1.50 seeking wrapper and code-cave hooks with direct source-level assignments from authoritative target indices.
 - [ ] `asm.pl:10260` - `fighter retargeting`
 - [ ] `asm.pl:10315` - `pirate overflow`
 - [ ] `asm.pl:10339` - `skan cleanup`

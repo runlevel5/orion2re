@@ -2309,6 +2309,7 @@ void __cdecl Increment_Bhg_(int16_t player_idx) {
                     if (ship.black_hole_flag == 3) {
                         int16_t x_pos = (int16_t)ship.x * 20;
                         int16_t y_pos = (int16_t)ship.y * 20;
+                        MOX::_cur_ship = i;
                         CMBTFIRE::Destroy_Ship_(i, x_pos, y_pos, 1);
                     }
                 }
@@ -2901,6 +2902,7 @@ void __cdecl Plasma_Web_Damage_(int16_t owner_idx) {
         }
 
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+            MOX::_cur_ship = i;
             if (CMBTDRW1::Ship_Completely_On_Screen_(i) == 0) {
                 COMBINIT::Snap_Center_Combat_Screen_(ship->x, ship->y);
             }

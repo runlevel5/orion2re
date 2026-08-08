@@ -2163,6 +2163,7 @@ namespace COMBAT1 {
                                 target_x = MOX::_missile[t_idx].x;
                                 target_y = MOX::_missile[t_idx].y;
                             }
+                            MOX::_cur_ship = t_idx;
                             CMBTMIS::Resolve_Missile_(m_idx, target_x, target_y);
                         } else {
                             CMBTMIS::Kill_Missile_(m_idx);
