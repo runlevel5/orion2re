@@ -641,9 +641,13 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     void __cdecl Set_Planet_Explored_Flags_() {
         Reset_Explored_Planets_();
 
+        bool has_omniscience_trait =
+            MOX::_player[MOX::_PLAYER_NUM].traits[TRAIT_OMNISCIENCE] != 0;
+
         for (int16_t i = 0; i < (int16_t)MOX::_planet_count; ++i) {
-            // Check if the current player can view the star system containing this planet
-            if (SYS::Ok_To_View_System_(MOX::_planet[i].star_index, MOX::_PLAYER_NUM)) {
+            int16_t star_idx = MOX::_planet[i].star_index;
+            if (has_omniscience_trait ||
+                HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
                 struct_::Set_Bit_Field_(PLNTSUM::_explored_bitmap, i);
             }
         }
@@ -993,7 +997,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             if (passes_filter) {
                 if (!Planet_Has_Been_Visited_(i)) {
                     passes_filter = false;
-                } else if (!struct_::Test_Bit_Field_(PLNTSUM::_explored_bitmap, i)) {
+                } else if (PLNTSUM::_filter_out_enemy_controlled_planets != 0 &&
+                           !struct_::Test_Bit_Field_(PLNTSUM::_explored_bitmap, i)) {
                     passes_filter = false;
                 }
             }

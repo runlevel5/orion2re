@@ -176,7 +176,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16341` - `dead on graphs`: fixed in `INFO::History_Subscreen_()` by retaining eliminated opponents in the history graph player list, so their recorded population, production, fleet, and technology histories remain visible after elimination; this directly expresses the sole 1.50 call diversion through the existing source-level player-list abstraction.
 - [x] `asm.pl:16430` - `usable orbit fix`: already fixed in `HOMEGEN::Usable_Orbit_()` by checking the actual candidate orbit occupant through `p_idx` instead of indexing the next unused `_planet_count` slot; this directly expresses the invariant implemented by the 1.50 `CWDE` and jump byte patch.
 - [x] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`: fixed in `COLCALC::Player_N_Turns_Until_Research_Complete_()` by applying each projected turn's research before accumulating that same turn's breakthrough chance, so the threshold-crossing turn is counted once; this directly expresses the 1.50 unconditional skip of the redundant pre-threshold loop.
-- [ ] `asm.pl:16567` - `true omni`
+- [x] `asm.pl:16567` - `true omni`: fixed in `PLNTSUM::Set_Planet_Explored_Flags_()` and `PLNTSUM::Filter_Explored_Planets_()` by distinguishing race-trait Omniscience from Galactic Lore when marking explored planets and applying that explored-world gate only while enemy-controlled planets are filtered; this replaces the 1.50 call diversion and branch trampoline with direct source-level visibility rules.
 - [ ] `asm.pl:16692` - `bombardment ammo fix`
 - [ ] `asm.pl:16729` - `bombardment fair armor`
 - [ ] `asm.pl:16814` - `wormhole to Orion fix`
