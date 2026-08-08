@@ -153,7 +153,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:12180` - `fighters return`: fixed in `CMBTMIS::Land_Returning_Fighters_()` and `COMBINIT::End_Of_Turn_Bookeeping_()` by rebuilding launched bay availability from surviving weapon hit points before distributing returning squadrons, and by restoring fighter-garrison bay counts as well as ammo on replacement turns; this replaces the 1.50 C helpers and binary diversions with direct tactical-state updates derived from authoritative slot data.
 - [x] `asm.pl:12231` - `no computer hp`: fixed in `CMBTFIR2::Init_Internal_Space_()` by assigning hull computer hit points only when a computer is installed, preventing computerless ships from gaining a phantom damageable subsystem; this replaces the 1.50 call-site helper with a direct source-level initialization invariant.
 - [ ] `asm.pl:12253` - `destroy building trigger engage`
-- [ ] `asm.pl:12319` - `lander ships no best armor minus 1`
+- [x] `asm.pl:12319` - `lander ships no best armor minus 1`: fixed in `INITSHIP::Load_Colony_Ship_Design_()`, `INITSHIP::Load_Outpost_Ship_Design_()`, and `INITSHIP::Load_Transport_Ship_Design_()` by assigning the best available armor directly to every generated lander design; this replaces the three 1.50 one-byte instruction suppressions with the equivalent source-level equipment invariant.
 - [ ] `asm.pl:12342` - `event conditions`
 - [ ] `asm.pl:12386` - `leaders desynch`
 - [ ] `asm.pl:12470` - `fighters helmsman`
