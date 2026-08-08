@@ -222,6 +222,7 @@ orion2re_add_unit_test(test_boarding
         tests/unit/test_boarding.cpp
     PRODUCTION_SOURCES
         src/game/boarding.cpp
+        src/game/cmbtfir2.cpp
         src/game/struct.cpp
     FAKE_SOURCES
         tests/fakes/fake_boarding_runtime.cpp
@@ -249,20 +250,25 @@ orion2re_add_unit_test(test_stasis_area_effects
 if(MSVC)
     target_compile_options(test_absorber_cleanup PRIVATE /Gy)
     target_link_options(test_absorber_cleanup PRIVATE /OPT:REF)
+    target_compile_options(test_boarding PRIVATE /Gy)
+    target_link_options(test_boarding PRIVATE /OPT:REF)
     target_compile_options(test_stasis PRIVATE /Gy)
     target_link_options(test_stasis PRIVATE /OPT:REF)
     target_compile_options(test_stasis_area_effects PRIVATE /Gy)
     target_link_options(test_stasis_area_effects PRIVATE /OPT:REF)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_absorber_cleanup PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_boarding PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_stasis PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_stasis_area_effects PRIVATE -ffunction-sections -fdata-sections)
     if(APPLE)
         target_link_options(test_absorber_cleanup PRIVATE -Wl,-dead_strip)
+        target_link_options(test_boarding PRIVATE -Wl,-dead_strip)
         target_link_options(test_stasis PRIVATE -Wl,-dead_strip)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,-dead_strip)
     else()
         target_link_options(test_absorber_cleanup PRIVATE -Wl,--gc-sections)
+        target_link_options(test_boarding PRIVATE -Wl,--gc-sections)
         target_link_options(test_stasis PRIVATE -Wl,--gc-sections)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,--gc-sections)
     endif()

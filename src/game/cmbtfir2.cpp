@@ -1777,8 +1777,12 @@ namespace CMBTFIR2 {
         if (combat_ship->officer_idx > -1) {
             OFFICER::Kill_Officer_(combat_ship->officer_idx);
             combat_ship->officer_idx = -1;
-            if (combat_ship->ship_idx != -1) {
-                MOX::_ship[combat_ship->ship_idx].officer_index = -1;
+        }
+
+        if (combat_ship->ship_idx != -1) {
+            int16_t officer_idx = MOX::_ship[combat_ship->ship_idx].officer_index;
+            if (officer_idx != -1) {
+                OFFICER::Move_Officer_To_Pool_(officer_idx);
             }
         }
 

@@ -2,11 +2,14 @@
 
 #include "doctest/doctest.h"
 #include "game/boarding.h"
+#include "game/cmbtfir2.h"
 #include "game/combat1.h"
 #include "game/techdata.h"
 
 namespace TEST_BOARDING {
     void Reset_();
+    int16_t Killed_Officer_();
+    int16_t Pooled_Officer_();
 }
 
 DOCTEST_TEST_CASE("boarding rejects targets in stasis") {
@@ -131,4 +134,17 @@ DOCTEST_TEST_CASE("captured ships cannot overflow a full turn order") {
 
     DOCTEST_CHECK(state.turn_order[209] == -10);
     DOCTEST_CHECK(state.canary == 0x1234);
+}
+
+DOCTEST_TEST_CASE("capture returns a strategic leader to the officer pool") {
+    TEST_BOARDING::Reset_();
+    MOX::_combat_data[1].owner = 0;
+    MOX::_combat_data[1].ship_idx = 1;
+    MOX::_combat_data[1].officer_idx = -1;
+    MOX::_ship[1].officer_index = 3;
+
+    CMBTFIR2::Capture_Ship_(1, 0, 0);
+
+    DOCTEST_CHECK(TEST_BOARDING::Killed_Officer_() == -1);
+    DOCTEST_CHECK(TEST_BOARDING::Pooled_Officer_() == 3);
 }
