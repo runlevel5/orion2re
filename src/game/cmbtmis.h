@@ -89,6 +89,10 @@ namespace CMBTMIS {
     /** Returns whether a missile currently lies inside the visible combat viewport. */
     int8_t __cdecl Missile_On_Combat_Screen_(int16_t missile_idx);
 
+    /** Distributes returning fighter-bay units among surviving weapon slots. */
+    void __cdecl Land_Returning_Fighters_(
+        s_combat_data* source, int16_t type, int16_t returned_count);
+
     /** Resolves a missile impact or fighter attack sequence at the target point. */
     int16_t __cdecl Resolve_Missile_(int16_t missile_idx, int16_t x, int16_t y);
 

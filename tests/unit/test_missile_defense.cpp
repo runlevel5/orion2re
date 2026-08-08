@@ -115,6 +115,40 @@ DOCTEST_TEST_CASE("ship movement excludes flyers targeting another missile") {
     DOCTEST_CHECK_FALSE(CMBTMIS::Missile_Targets_Ship_(&missile, 4));
 }
 
+DOCTEST_TEST_CASE("returning fighters refill surviving bays in slot order") {
+    TEST_FIGHTER_RETARGETING::Reset_();
+
+    s_combat_data* source = &MOX::_combat_data[1];
+    source->weapons[0].weapon_id = WEAPON_INTERCEPTOR;
+    source->weapons[0].count = 2;
+    source->weapons[0].ammo = 0;
+    source->weapons[0].shots_left = 2;
+    source->weapon_hits[0] = 13;
+    source->weapon_hits_per_unit[0] = 3;
+
+    source->weapons[1].weapon_id = WEAPON_INTERCEPTOR;
+    source->weapons[1].count = 4;
+    source->weapons[1].ammo = 0;
+    source->weapons[1].shots_left = 4;
+    source->weapon_hits[1] = 10;
+    source->weapon_hits_per_unit[1] = 3;
+
+    source->weapons[2].weapon_id = WEAPON_BOMBER;
+    source->weapons[2].count = 3;
+    source->weapons[2].ammo = 0;
+
+    CMBTMIS::Land_Returning_Fighters_(source, WEAPON_INTERCEPTOR, 6);
+
+    DOCTEST_CHECK(source->weapons[0].count == 5);
+    DOCTEST_CHECK(source->weapons[0].ammo == 1);
+    DOCTEST_CHECK(source->weapons[0].shots_left == 0);
+    DOCTEST_CHECK(source->weapons[1].count == 1);
+    DOCTEST_CHECK(source->weapons[1].ammo == 1);
+    DOCTEST_CHECK(source->weapons[1].shots_left == 0);
+    DOCTEST_CHECK(source->weapons[2].count == 3);
+    DOCTEST_CHECK(source->weapons[2].ammo == 0);
+}
+
 DOCTEST_TEST_CASE("anti-missile fighter can retarget a ship sharing its missile target index") {
     TEST_FIGHTER_RETARGETING::Reset_();
 

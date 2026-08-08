@@ -240,6 +240,36 @@ namespace CMBTMIS {
         );
     }
 
+    void __cdecl Land_Returning_Fighters_(
+        s_combat_data* source, int16_t type, int16_t returned_count) {
+        for (int16_t i = 0; i < 8 && returned_count > 0; ++i) {
+            s_combat_weapon_slot* slot = &source->weapons[i];
+            if (slot->weapon_id != type) {
+                continue;
+            }
+
+            int16_t capacity = COMBINIT::Surviving_Weapon_Count_From_Hits_(
+                source->weapon_hits[i],
+                source->weapon_hits_per_unit[i]);
+
+            if (slot->ammo == 0) {
+                slot->count = 0;
+            }
+
+            int16_t missing_count = capacity - slot->count;
+            if (missing_count <= 0) {
+                continue;
+            }
+
+            int16_t restored_count =
+                returned_count < missing_count ? returned_count : missing_count;
+            slot->count += (int8_t)restored_count;
+            returned_count -= restored_count;
+            slot->ammo = 1;
+            slot->shots_left = 0;
+        }
+    }
+
     int16_t __cdecl Resolve_Missile_(int16_t missile_idx, int16_t x, int16_t y) {
         int16_t owner = Missile_Owner_(missile_idx);
         MOX::_missile_warning = 0;
@@ -258,24 +288,8 @@ namespace CMBTMIS {
 
         if (target_unit_idx == source_unit_idx && is_anti_missile_rocket == 0) {
             int16_t reload_count = missile->quantity / 4;
-            if (reload_count != 0) {
-                for (int16_t i = 0; i < 8; ++i) {
-                    if (MOX::_combat_data[source_unit_idx].weapons[i].weapon_id == type &&
-                        MOX::_combat_data[source_unit_idx].weapons[i].ammo == 0) {
-                        
-                        MOX::_combat_data[source_unit_idx].weapons[i].ammo = 1;
-                        MOX::_combat_data[source_unit_idx].weapons[i].shots_left = 0;
-
-                        if (reload_count >= MOX::_combat_data[source_unit_idx].weapons[i].count) {
-                            reload_count -= MOX::_combat_data[source_unit_idx].weapons[i].count;
-                        } else {
-                            MOX::_combat_data[source_unit_idx].weapons[i].count = (int8_t)reload_count;
-                            reload_count = 0;
-                        }
-                    }
-                    if (reload_count == 0) break;
-                }
-            }
+            Land_Returning_Fighters_(
+                &MOX::_combat_data[source_unit_idx], type, reload_count);
             Kill_Missile_(missile_idx);
             return 0;
         }

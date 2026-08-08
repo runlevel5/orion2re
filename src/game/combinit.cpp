@@ -2342,6 +2342,9 @@ void __cdecl End_Of_Turn_Bookeeping_() {
             uint16_t weapon_id = slot->weapon_id;
 
             if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_FIGHTER) {
+                slot->count = Surviving_Weapon_Count_From_Hits_(
+                    MOX::_combat_data->weapon_total_hits[i],
+                    MOX::_combat_data->weapon_hits_per_unit[i]);
                 slot->ammo = 1;
             }
         }
