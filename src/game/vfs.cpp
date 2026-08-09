@@ -97,7 +97,8 @@ namespace vfs {
                                               directory_relative.c_str(), directory_candidate,
                                               sizeof(directory_candidate)) &&
             vfs_detail::Resolve_Candidate_Path_(directory_candidate, directory_path,
-                                                sizeof(directory_path));
+                                                sizeof(directory_path),
+                                                vfs_detail::VFS_CANDIDATE_DIRECTORY);
         const bool have_archive =
             vfs_detail::Build_Candidate_Path_(vfs_detail::g_vfs_state.base_path, "",
                                               archive_relative.c_str(), archive_candidate,

@@ -102,12 +102,21 @@ namespace vfs_detail {
         return true;
     }
 
-    bool Resolve_Candidate_Path_(const char* candidate_path, char* resolved_path, size_t resolved_path_size) {
+    bool Resolve_Candidate_Path_(const char* candidate_path, char* resolved_path,
+                                 size_t resolved_path_size,
+                                 e_vfs_candidate_kind candidate_kind) {
+        const auto path_matches = [candidate_kind](const char* path) {
+            SDL_PathInfo path_info;
+            return SDL_GetPathInfo(path, &path_info) &&
+                   path_info.type == (candidate_kind == VFS_CANDIDATE_DIRECTORY ?
+                                          SDL_PATHTYPE_DIRECTORY : SDL_PATHTYPE_FILE);
+        };
+
         if (Resolve_File_Path_Case_(candidate_path, resolved_path, resolved_path_size)) {
-            return true;
+            return path_matches(resolved_path);
         }
 
-        if (!::File_Exists_(candidate_path)) {
+        if (!path_matches(candidate_path)) {
             return false;
         }
 

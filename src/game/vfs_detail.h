@@ -21,6 +21,11 @@ namespace vfs_detail {
         VFS_BACKEND_SLICE,
     };
 
+    enum e_vfs_candidate_kind {
+        VFS_CANDIDATE_FILE,
+        VFS_CANDIDATE_DIRECTORY,
+    };
+
     struct s_vfs_zip_archive {
         mz_zip_archive archive;
         char archive_path[VFS_MAX_PATH];
@@ -90,7 +95,9 @@ namespace vfs_detail {
     bool Normalize_Asset_Path_(const char* path, char* output_path, size_t output_path_size);
     bool Build_Asset_Key_(const char* asset_path, char* output_key, size_t output_key_size);
     bool Build_Candidate_Path_(const char* base_path, const char* prefix, const char* asset_path, char* output_path, size_t output_path_size);
-    bool Resolve_Candidate_Path_(const char* candidate_path, char* resolved_path, size_t resolved_path_size);
+    bool Resolve_Candidate_Path_(const char* candidate_path, char* resolved_path,
+                                 size_t resolved_path_size,
+                                 e_vfs_candidate_kind candidate_kind = VFS_CANDIDATE_FILE);
     bool Resolve_Override_Asset_Path_(const char* asset_path, char* resolved_path, size_t resolved_path_size);
     bool Resolve_Data_Asset_Path_(const char* asset_path, char* resolved_path, size_t resolved_path_size);
     bool Resolve_Package_Asset_Path_(const char* asset_path, char* resolved_path, size_t resolved_path_size);

@@ -237,7 +237,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16395` - `runaway homeworlds`: fixed in `MAPGEN::Enforce_Planet_Max_()` by updating each moved colony's planet back-reference during planet-array compaction; the restored candidate-list selection already replaces the original out-of-bounds orbit lookup and preserves home systems directly.
 - [x] `asm.pl:16409` - `home systems min 3 planets default`: already implemented in `HOMEGEN::Enforce_3_Planet_Minimum_()` by directly ensuring each home system contains at least three real planets; the restored source has no legacy `/planets=` parser, so the 1.50 default and parser-byte edits reduce to this source-level invariant.
 - [ ] `asm.pl:16448` - `BH to real star planet generation`
-- [ ] `asm.pl:16621` - `orphans fix`
+- [x] `asm.pl:16621` - `orphans fix`: fixed in `HOMEGEN::Guarantee_A_Planet_At_Min_Dist_()` by preserving existing orbit records and reusing the shared add-or-convert operation until the target contains two real planets; this replaces the 1.50 cross-function flag and control-flow diversions with a file-local source invariant.
 - [ ] `asm.pl:17094` - `surrender maps`
 
 ### Behavior and balance review

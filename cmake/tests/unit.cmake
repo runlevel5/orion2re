@@ -319,15 +319,29 @@ orion2re_add_unit_test(test_geo
         tests/fakes/fake_geo_runtime.cpp
 )
 
+orion2re_add_unit_test(test_homegen
+    SOURCES
+        tests/unit/test_homegen.cpp
+    PRODUCTION_SOURCES
+        src/game/homegen.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_homegen_runtime.cpp
+)
+
 if(MSVC)
     target_compile_options(test_geo PRIVATE /Gy)
     target_link_options(test_geo PRIVATE /OPT:REF)
+    target_compile_options(test_homegen PRIVATE /Gy)
+    target_link_options(test_homegen PRIVATE /OPT:REF)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_geo PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_homegen PRIVATE -ffunction-sections -fdata-sections)
     if(APPLE)
         target_link_options(test_geo PRIVATE -Wl,-dead_strip)
+        target_link_options(test_homegen PRIVATE -Wl,-dead_strip)
     else()
         target_link_options(test_geo PRIVATE -Wl,--gc-sections)
+        target_link_options(test_homegen PRIVATE -Wl,--gc-sections)
     endif()
 endif()
 

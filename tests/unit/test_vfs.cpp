@@ -501,6 +501,27 @@ DOCTEST_TEST_CASE("vfs fopen_lbx loads the documented COLBLDG0 loose entry overr
     DOCTEST_CHECK(vfs::fclose(file) == 0);
 }
 
+DOCTEST_TEST_CASE("vfs fopen_lbx passes through entries without a loose override") {
+    test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
+    std::vector<std::string> entries(71, "unused");
+    entries[57] = "raw-entry-57";
+    entries[70] = "raw-entry-70";
+    test_dir.Write_Lbx_File("MAINPUPS.LBX", entries);
+    test_dir.Write_File(test_vfs_detail::fs::path("data") / "overrides" /
+                        "MAINPUPS.LBX" / "070", "override-entry-70");
+
+    const std::string base_path = test_dir.root_path().string();
+    DOCTEST_REQUIRE(vfs::Init(base_path.c_str()) == 1);
+
+    s_vfs_file* file = vfs::fopen_lbx("MAINPUPS.LBX", 57);
+    DOCTEST_REQUIRE(file != nullptr);
+
+    std::array<char, 16> buffer{};
+    DOCTEST_CHECK(vfs::fread(buffer.data(), 1, 12, file) == 12);
+    DOCTEST_CHECK(std::string(buffer.data(), 12) == "raw-entry-57");
+    DOCTEST_CHECK(vfs::fclose(file) == 0);
+}
+
 DOCTEST_TEST_CASE("vfs fopen_lbx prefers per-entry loose override over whole lbx replacement from zip") {
     test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
     test_dir.Write_Lbx_File("TEST.LBX", {"raw-zero", "raw-one"});

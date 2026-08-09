@@ -1,6 +1,27 @@
 #include "pch.h"
 
 namespace HOMEGEN {
+    static void Add_Planet_To_System_(int16_t star_idx) {
+        int16_t orbit = Usable_Orbit_(star_idx);
+        int16_t existing_planet_idx = MOX::_star[star_idx].planet_index[orbit];
+
+        if (existing_planet_idx == -1) {
+            int16_t new_planet_idx = MOX::_planet_count;
+            Make_One_Planet_(star_idx, new_planet_idx, orbit, 0);
+            MOX::_planet_count++;
+            return;
+        }
+
+        uint16_t saved_global_count = MOX::_planet_count;
+        MOX::_planet_count = (uint16_t)existing_planet_idx;
+
+        MOX::_planet[existing_planet_idx].orbit = (int8_t)orbit;
+        MOX::_planet[existing_planet_idx].planet_type = PLANET_TYPE_PLANET;
+        MAPGEN::Generate_Satellite_(star_idx, (int8_t)orbit, PLANET_TYPE_PLANET);
+
+        MOX::_planet_count = saved_global_count;
+    }
+
     const char s_Orion[8] = "Orion";
 
     int32_t _HOME_WORLD_GEN_MAX_CTR;
@@ -109,21 +130,9 @@ namespace HOMEGEN {
 
                 target_star->pict_type = (char)(game_random::Random_(3) - 1);
 
-                for (int j = 0; j < 5; ++j) {
-                    target_star->planet_index[j] = -1;
-                }
-
-                for (int j = 0; j < 2; ++j) {
-                    char orbit = MAPGEN::Generate_Orbit_(target_star_idx);
-                    int16_t new_planet_idx = MOX::_planet_count;
-                    target_star->planet_index[(uint8_t)orbit] = new_planet_idx;
-
-                    s_planet_data* new_planet = &MOX::_planet[new_planet_idx];
-                    new_planet->orbit = orbit;
-                    new_planet->planet_type = PLANET_TYPE_PLANET;
-
-                    MAPGEN::Generate_Satellite_(target_star_idx, orbit, PLANET_TYPE_PLANET);
-                    MOX::_planet_count++;
+                int32_t planets_to_add = 2 - (int32_t)HAROLD::N_Planets_In_System_(target_star_idx);
+                for (int32_t j = 0; j < planets_to_add; ++j) {
+                    Add_Planet_To_System_(target_star_idx);
                 }
             }
 
@@ -821,26 +830,7 @@ namespace HOMEGEN {
 
             int32_t planets_to_add = 3 - (int32_t)planets_in_system;
             for (int32_t i = 0; i < planets_to_add; ++i) {
-                int16_t orbit = Usable_Orbit_(star_idx);
-                int16_t existing_planet_idx = MOX::_star[star_idx].planet_index[orbit];
-
-                if (existing_planet_idx == -1) {
-                    // Create a brand new planet record
-                    int16_t new_planet_idx = MOX::_planet_count;
-                    Make_One_Planet_(star_idx, new_planet_idx, orbit, 0);
-                    MOX::_planet_count++;
-                } else {
-                    // Convert an existing non-planet object (e.g. asteroid belt) into a planet
-                    uint16_t saved_global_count = MOX::_planet_count;
-                    MOX::_planet_count = (uint16_t)existing_planet_idx; /* INDEX_NARROWING */
-
-                    MOX::_planet[existing_planet_idx].orbit = (int8_t)orbit;
-                    MOX::_planet[existing_planet_idx].planet_type = PLANET_TYPE_PLANET;
-
-                    MAPGEN::Generate_Satellite_(star_idx, (int8_t)orbit, PLANET_TYPE_PLANET);
-                    
-                    MOX::_planet_count = saved_global_count;
-                }
+                Add_Planet_To_System_(star_idx);
             }
         }
     }
