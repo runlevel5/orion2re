@@ -380,7 +380,9 @@ namespace COLONIZE {
         } else {
             colony->outpost_flag = 1;
             colony->n_pops = 0;
-            colony->climate = planet->climate;
+            colony->climate = planet->planet_type == PLANET_TYPE_PLANET
+                ? planet->climate
+                : PLANET_CLIMATE_BARREN;
         }
 
         colony->producing[0] = COLONY_PRODUCTION_NONE;

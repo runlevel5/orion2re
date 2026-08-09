@@ -192,7 +192,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17417` - `new leader window2 shown on tutor only`: fixed in `MAINPUPS::Random_New_Officer_Popup_()` by retaining and redrawing the accept or reject result window only for Tutor-level random leader reports, while officer-screen hiring and higher difficulties close immediately; this replaces the two 1.50 immediate-byte edits with one source-level UI invariant.
 - [x] `asm.pl:17828` - `AI zero field research`: fixed in `COLCALC::Advance_Player_Field_()` by treating the zero starting-technology field as no selected research and returning before field traversal; this replaces the 1.50 all-call wrapper with an owner-level source invariant.
 - [ ] `asm.pl:17871` - `food replicator no negative production`
-- [ ] `asm.pl:17981` - `artificial planet on outposts climate fix`
+- [x] `asm.pl:17981` - `artificial planet on outposts climate fix`: fixed in `COLONIZE::Make_New_Colony_Or_Outpost_()` by assigning Barren climate to outposts founded on asteroids or gas giants while preserving the real climate of normal planets; this directly expresses the 1.50 helper as a source-level creation invariant.
 - [ ] `asm.pl:18002` - `commando bonus`
 - [ ] `asm.pl:18437` - `net nested combat`
 - [ ] `asm.pl:18649` - `no homeworld`
