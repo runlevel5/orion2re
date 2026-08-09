@@ -2057,8 +2057,9 @@ namespace COLCALC {
                     static_cast<int16_t>(colony->pop_roundoff[race_idx] + colony->pop_growth[race_idx]);
 
             while (colony->pop_roundoff[race_idx] < 0) {
-                if (preserve_last_population &&
-                    static_cast<int32_t>(protected_race[race_idx]) >= race_counts[race_idx]) {
+                const int32_t protected_count = static_cast<int32_t>(protected_race[race_idx]);
+                if (protected_count > race_counts[race_idx] ||
+                    (preserve_last_population && protected_count == race_counts[race_idx])) {
                     colony->pop_roundoff[race_idx] = 0;
                 } else {
                     int16_t selected_special = -1;

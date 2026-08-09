@@ -83,6 +83,10 @@ namespace struct_ {
 }
 
 namespace INITSHIP {
+    int16_t __cdecl Best_Armor_(int16_t) {
+        return 0;
+    }
+
     int16_t __cdecl Best_Point_Defense_Weapon_(int16_t) {
         return kBestPointDefenseWeapon;
     }
@@ -134,6 +138,9 @@ namespace CMBTFIRE {
     int16_t __cdecl Fire_Ship_(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t) {
         return 0;
     }
+}
+
+void Legacy_Qsort_(void*, size_t, size_t, legacy_qsort_compare) {
 }
 
 DOCTEST_TEST_CASE("tactical bombardment advances only torpedo cooldown") {

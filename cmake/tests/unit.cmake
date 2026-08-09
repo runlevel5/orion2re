@@ -392,6 +392,7 @@ orion2re_add_unit_test(test_boarding
         src/game/struct.cpp
     FAKE_SOURCES
         tests/fakes/fake_boarding_runtime.cpp
+    LINK_SDL
 )
 
 orion2re_add_unit_test(test_stasis

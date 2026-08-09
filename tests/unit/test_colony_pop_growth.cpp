@@ -83,6 +83,7 @@ DOCTEST_TEST_CASE("classic starvation preserves the final population") {
 
 DOCTEST_TEST_CASE("configured extinction allows a human colony to starve out") {
     s_colony* colony = Prepare_Starving_Colony_();
+    colony->pop_growth[0] = -2000;
     MOX::_player[0].objectives = PLAYER_OBJECTIVE_HUMAN;
     COLCALC::_planet_extinction = 1;
 
