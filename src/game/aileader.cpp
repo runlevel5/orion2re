@@ -193,11 +193,12 @@ namespace aileader {
             if (ship->owner == player_index && ship->status <= 2 && ship->d.ship_type == SHIP_TYPE_COMBAT && ship->officer_index == -1) {
                 int16_t ship_index = (int16_t)(ship - MOX::_ship);
                 if (OFFICER::Ships_In_Same_Place_(ship_index, original_location)) {
-                    if (ship->d.size >= best_ship->d.size &&
-                        ship->d.shield_type >= best_ship->d.shield_type &&
-                        ship->d.armor_type >= best_ship->d.armor_type &&
-                        ship->d.computer_type >= best_ship->d.computer_type &&
-                        ship->crew_experience > best_ship->crew_experience)
+                    if ((best_ship == original_ship && original_ship->status == 7 /* Scrapped */) ||
+                        (ship->d.size >= best_ship->d.size &&
+                         ship->d.shield_type >= best_ship->d.shield_type &&
+                         ship->d.armor_type >= best_ship->d.armor_type &&
+                         ship->d.computer_type >= best_ship->d.computer_type &&
+                         ship->crew_experience > best_ship->crew_experience))
                     {
                         best_ship = ship;
                     }

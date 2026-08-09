@@ -231,7 +231,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:11479` - `scrap ships`: fixed in `FLT1::Get_Technology_From_Scrapped_Ship_()` by adding installed shields to scrap-plunder candidates, ignoring absent drive, computer, and armor entries, and granting each selected technology once; direct source list checks replace the 1.50 diversions and duplicate-scan wrapper.
 - [ ] `asm.pl:13245` - `fleet summary giveaways`
 - [ ] `asm.pl:13578` - `overmap speed recalc`
-- [ ] `asm.pl:14135` - `scrap stuff maintenance`
+- [x] `asm.pl:14135` - `scrap stuff maintenance`: fixed in `maintain::Kill_Ships_()` and `aileader::Reassign_Fleet_Officer_()` by marking forced-scrap ships inactive before maintenance recalculation and moving their officers to any eligible local replacement before falling back to the pool; authoritative ship status replaces the 1.50 temporary distress flag.
 - [ ] `asm.pl:15487` - `keep autocolonization`
 - [ ] `asm.pl:16349` - `design button behaviour`
 - [ ] `asm.pl:16395` - `runaway homeworlds`

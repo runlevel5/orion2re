@@ -181,7 +181,9 @@ orion2re_add_unit_test(test_aidudes
     SOURCES
         tests/unit/test_aidudes.cpp
     PRODUCTION_SOURCES
+        src/game/aileader.cpp
         src/game/aidudes.cpp
+        src/game/maintain.cpp
     FAKE_SOURCES
         tests/fakes/fake_aidudes_runtime.cpp
 )
