@@ -10,6 +10,7 @@ namespace TEST_BOARDING {
     void Reset_();
     int16_t Killed_Officer_();
     int16_t Pooled_Officer_();
+    void Set_Combat_Shield_Max_(int16_t value);
     void Prepare_Long_Raid_();
     const char* Last_Raid_Message_();
 }
@@ -184,6 +185,53 @@ DOCTEST_TEST_CASE("capture returns a strategic leader to the officer pool") {
 
     DOCTEST_CHECK(TEST_BOARDING::Killed_Officer_() == -1);
     DOCTEST_CHECK(TEST_BOARDING::Pooled_Officer_() == 3);
+}
+
+DOCTEST_TEST_CASE("shield generator damage refreshes stored shield capacity") {
+    TEST_BOARDING::Reset_();
+    TEST_BOARDING::Set_Combat_Shield_Max_(100);
+    s_combat_data& ship = MOX::_combat_data[1];
+    ship.shield_current_hits = 2;
+    ship.shield_arc_max = 150;
+    ship.shield_arc_current[0] = 150;
+    ship.shield_arc_current[1] = 120;
+    ship.shield_arc_current[2] = 100;
+    ship.shield_arc_current[3] = 80;
+    int16_t remaining_damage = 1;
+
+    CMBTFIR2::Apply_Internal_Damage_(1, &remaining_damage, 2, 0, 0);
+
+    DOCTEST_CHECK(ship.shield_arc_max == 100);
+    DOCTEST_CHECK(ship.shield_arc_current[0] == 100);
+    DOCTEST_CHECK(ship.shield_arc_current[1] == 100);
+    DOCTEST_CHECK(ship.shield_arc_current[2] == 100);
+    DOCTEST_CHECK(ship.shield_arc_current[3] == 80);
+}
+
+DOCTEST_TEST_CASE("destroyed multi-phased shields reduce shield capacity") {
+    TEST_BOARDING::Reset_();
+    TEST_BOARDING::Set_Combat_Shield_Max_(100);
+    s_combat_data& ship = MOX::_combat_data[1];
+    struct_::Set_Bit_Field_(
+        ship.special_device_flags, SPECIAL_MULTI_PHASED_SHIELDS);
+    ship.special_hits[0] = 10;
+    ship.shield_arc_max = 150;
+    ship.shield_arc_current[0] = 150;
+    ship.shield_arc_current[1] = 120;
+    ship.shield_arc_current[2] = 100;
+    ship.shield_arc_current[3] = 80;
+    int16_t remaining_damage = 10;
+
+    CMBTFIR2::Apply_Internal_Damage_(1, &remaining_damage, 9, 0, 0);
+
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        ship.special_device_damage_flags,
+        SPECIAL_MULTI_PHASED_SHIELDS) == 1);
+    DOCTEST_CHECK(ship.shield_arc_max == 100);
+    DOCTEST_CHECK(ship.shield_arc_current[0] == 100);
+    DOCTEST_CHECK(ship.shield_arc_current[1] == 100);
+    DOCTEST_CHECK(ship.shield_arc_current[2] == 100);
+    DOCTEST_CHECK(ship.shield_arc_current[3] == 80);
 }
 
 DOCTEST_TEST_CASE("raid reports retain all damaged systems and correct special status") {

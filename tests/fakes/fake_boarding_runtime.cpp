@@ -11,6 +11,7 @@ namespace {
     int16_t killed_officer;
     int16_t pooled_officer;
     int16_t raid_choice_idx;
+    int16_t combat_shield_max;
     char last_raid_message[3000];
     char weapon_names[8][80] = {
         "Weapon zero with a deliberately long raid report name",
@@ -76,6 +77,7 @@ namespace TEST_BOARDING {
         killed_officer = -1;
         pooled_officer = -1;
         raid_choice_idx = 0;
+        combat_shield_max = 0;
         last_raid_message[0] = '\0';
         BOARDING::_telepathic_multiple_capture = 0;
         BOARDING::_kill_excess_marines_after_capture = 0;
@@ -88,6 +90,10 @@ namespace TEST_BOARDING {
 
     int16_t Pooled_Officer_() {
         return pooled_officer;
+    }
+
+    void Set_Combat_Shield_Max_(int16_t value) {
+        combat_shield_max = value;
     }
 
     void Prepare_Long_Raid_() {
@@ -159,7 +165,7 @@ namespace COMBINIT {
     }
 
     int16_t __cdecl Calc_Combat_Shield_Max_(int16_t) {
-        return 0;
+        return combat_shield_max;
     }
 }
 

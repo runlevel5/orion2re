@@ -6,6 +6,18 @@ namespace CMBTFIR2 {
     namespace {
         uint32_t artemis_random_seed;
         bool has_artemis_random_seed;
+
+        void Refresh_Shield_Capacity_(int16_t ship_idx) {
+            s_combat_data* ship = &MOX::_combat_data[ship_idx];
+            int16_t max_shield = COMBINIT::Calc_Combat_Shield_Max_(ship_idx);
+            ship->shield_arc_max = max_shield;
+
+            for (int i = 0; i < 4; ++i) {
+                if (ship->shield_arc_current[i] > max_shield) {
+                    ship->shield_arc_current[i] = max_shield;
+                }
+            }
+        }
     }
 
     int16_t _artemis_net_chance[6] = { 20, 30, 40, 50, 80, 100 };
@@ -1164,12 +1176,7 @@ namespace CMBTFIR2 {
                     }
                     ship->shield_arc_max = 0;
                 } else {
-                    int16_t max_shield = COMBINIT::Calc_Combat_Shield_Max_(target_ship_idx);
-                    for (int i = 0; i < 4; ++i) {
-                        if (ship->shield_arc_current[i] > max_shield) {
-                            ship->shield_arc_current[i] = max_shield;
-                        }
-                    }
+                    Refresh_Shield_Capacity_(target_ship_idx);
                     *remaining_damage = 0;
                 }
             } else if (sys_index == 3) {
@@ -1280,6 +1287,9 @@ namespace CMBTFIR2 {
                                         COMBINIT::Does_Combat_Ship_Have_Special_(
                                             target_ship_idx,
                                             SPECIAL_PHASING_CLOAK) != 0);
+                                }
+                                if (i == SPECIAL_MULTI_PHASED_SHIELDS) {
+                                    Refresh_Shield_Capacity_(target_ship_idx);
                                 }
                                 if (i == 13 && MOX::_in_nebula_flag == 1) {
                                     for (int j = 0; j < 4; ++j) {

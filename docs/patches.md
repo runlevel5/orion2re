@@ -216,7 +216,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:19659` - `Loknar cannot give tech_0`: fixed in `INITGAME::Init_Leaders_()` by generating Loknar's first technology directly in the valid `1..101` range; this replaces the 1.50 immediate rewrite and removed decrement with the equivalent source-level initialization invariant.
 - [x] `asm.pl:19675` - `Leader #0, Ruola, shown in ship refit popup`: fixed in `COLBLDG::Build_Ship_Info_Formatted_Paragraph_()` by treating every nonnegative officer index as assigned, so valid leader index 0 reaches `OFFICER::Leader_Name_()`; this directly expresses the 1.50 signed branch-boundary correction in source.
 - [x] `asm.pl:19684` - `galactic lore does not see planet defenses`: fixed in `SYS::Do_Print_Planet_Info_()` by requiring race-trait Omniscience, rather than Galactic Lore's broader visibility predicate, before revealing colony defense buildings; this replaces the 1.50 call diversion with a direct source-level display gate.
-- [ ] `asm.pl:19702` - `destroying multi-phased shields`
+- [x] `asm.pl:19702` - `destroying multi-phased shields`: fixed in `CMBTFIR2::Apply_Internal_Damage_()` by recalculating and storing shield capacity when shield-generator damage or Multi-Phased Shields destruction invalidates it, then clamping every current arc; this replaces the 1.50 code-cave helpers with one file-local source invariant.
 
 ### Mixed topics requiring block-level review
 
