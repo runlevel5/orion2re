@@ -220,7 +220,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 
 ### Mixed topics requiring block-level review
 
-- [ ] `asm.pl:1158` - `mapgen`
+- [x] `asm.pl:1158` - `mapgen`: fixed in `HAROLD::N_Food_Planets_In_System_()`, `HOMEGEN::Ensure_At_Least_1_Food_Planet_()`, and `MAPGEN::Enforce_Planet_Max_()` by counting only real food planets, resetting candidates per colony, removing monster guards, and preserving selected food systems during trimming; restored new-game flow already autosaves after native map generation, so the 1.50 wrappers are unnecessary.
 - [x] `asm.pl:1973` - `refit`: fixed in `AIBUILD::Refit_Cost_()` and `COLBLDG::Add_Refited_Ship_To_Queue_()` by sharing the quarter-hull, government-adjusted refit formula across UI, AI, and queue charging, with synchronized `design alternative_refit` support; restored design-cost recalculation makes the 1.50 cache-branch patch unnecessary.
 - [x] `asm.pl:2387` - `town Zero`: fixed in `MAINPUPS::Add_Colony_Combat_Fields_()`, `BOMB::Resolve_Bomb_Hit_()`, and `COLCALC` by allowing valid actions against zero-population colonies with remaining buildings, making planetary defense buildings bombable, destroying a colony when its final eligible building is bombed, and restoring configurable human-colony starvation extinction; direct source predicates replace the 1.50 diversions and temporary state.
 - [x] `asm.pl:3545` - `ICS + weapon breakages`: completed in `COMBAT1::Init_Ship_For_Start_Of_Turn_()`, `COMBAT1::Recalculate_Combat_Ship_()`, `COMBAT1::Remove_Continuing_Effect_Specials_()`, and `CMBTFIR2::Apply_Internal_Damage_()` by keeping movement and combat statistics synchronized, releasing continuing effects when sustaining weapons break, using unsigned tractor targets, and reserving BHG shots for active targets when `combat continuous_bhg` is enabled; direct source transitions replace the 1.50 call-site wrappers.
@@ -324,6 +324,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 
 ### Follow-up topics
 
+- [ ] `asm.pl:1158` / `asm.pl:2344` / `asm.pl:4986` - `mapgen configurable postprocessor`: restore the excluded `proc_mapgen()` feature together with every `conf_mapgen` option, parser definition, default, command-line override, and synchronization path; the correctness-only `mapgen` backport above intentionally does not include this optional map-mod feature.
 - [ ] `asm.pl:29` - `meta`
 - [ ] `asm.pl:158` - `library`
 - [ ] `asm.pl:567` - `shortcuts`

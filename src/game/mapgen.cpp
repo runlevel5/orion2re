@@ -538,7 +538,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             int16_t removable_planet_count = 0;
             for (int16_t planet_idx = 0; planet_idx < original_planet_count; ++planet_idx) {
                 s_planet_data* backup_p = &_pl[planet_idx];
-                if (is_home_system[backup_p->star_index] == 0 && backup_p->planet_type != PLANET_TYPE_GAS_GIANT) {
+                if (is_home_system[backup_p->star_index] == 0 &&
+                    !HOMEGEN::Is_Added_Food_World_(backup_p->star_index) &&
+                    backup_p->planet_type != PLANET_TYPE_GAS_GIANT) {
                     removable_planets[removable_planet_count++] = planet_idx;
                 }
             }

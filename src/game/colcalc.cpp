@@ -239,6 +239,7 @@ namespace COLCALC {
 
                     MOX::_ship[MOX::_NUM_SHIPS].owner = (int8_t)i;
                     INITSHIP::Update_Player_Ship_Designs_((int16_t)i);
+                    COLBLDG::Create_Ship_((int16_t)i, (int16_t)max_design_idx, first_colony);
 
                     pool_remaining -= (max_design_idx + 1);
                 }

@@ -1087,7 +1087,6 @@ namespace HOMEGEN {
 
     uint8_t __cdecl Ensure_At_Least_1_Food_Planet_() {
         int16_t planet_buffer[MAX_PLANETS];
-        int16_t buffer_count = 0;
         uint8_t overall_success = 1;
 
         for (int i = 0; i < MAX_PLANETS; ++i) {
@@ -1100,6 +1099,7 @@ namespace HOMEGEN {
             int16_t planet_idx = colony.planet;
 
             if (planet_idx > -1 && MOX::_player[owner].traits[TRAIT_EATS_MINERALS] == 0) {
+                int16_t buffer_count = 0;
                 int16_t food_star = -1;
                 int16_t nearest_empty_star = -1;
                 int16_t nearest_star_in_range = -1;
@@ -1170,6 +1170,11 @@ namespace HOMEGEN {
                 }
 
                 _nearest_food_worlds[owner] = food_star;
+
+                if (food_star >= 0 &&
+                    MOX::_star[food_star].system_special == SYSTEM_SPECIAL_SPACE_MONSTER) {
+                    MOX::_star[food_star].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
+                }
 
                 if (food_star == -1 && MOX::_player[owner].traits[TRAIT_EATS_MINERALS] == 0) {
                     overall_success = 0;
