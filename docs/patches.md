@@ -194,7 +194,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17871` - `food replicator no negative production`: fixed in `COLCALC::Colony_Replicators_()` by capping replicated food to the amount affordable at the configured production cost before updating colony production; this replaces the 1.50 call-site wrapper with a direct source-level accounting invariant.
 - [x] `asm.pl:17981` - `artificial planet on outposts climate fix`: fixed in `COLONIZE::Make_New_Colony_Or_Outpost_()` by assigning Barren climate to outposts founded on asteroids or gas giants while preserving the real climate of normal planets; this directly expresses the 1.50 helper as a source-level creation invariant.
 - [x] `asm.pl:18002` - `commando bonus`: implemented in `invasion::Compute_Colony_Officer_Bonus_()` and `invasion::Compute_Attacker_Officer_Bonus_()` with synchronized `leaders ground_commando_defender_x5` and `leaders ground_commando_attacker_x2` settings; direct source-level formula selection replaces the 1.50 code-cave wrappers and immediate-byte edit while preserving classic defaults.
-- [ ] `asm.pl:18437` - `net nested combat`
+- [x] `asm.pl:18437` - `net nested combat`: fixed in `COMBFIND::Do_1_Combat_()` and `COMBFIND::Do_Net_Combat_Update_()` by rejecting direct combat reentry and deferring strategic network combat progression while another combat owns the shared combat state; this replaces the 1.50 all-call wrappers with a file-local source invariant while leaving normal network pumping active.
 - [ ] `asm.pl:18649` - `no homeworld`
 - [ ] `asm.pl:18679` - `outpost false button`
 - [ ] `asm.pl:18757` - `nebula check`

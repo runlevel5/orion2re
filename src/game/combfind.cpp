@@ -2,6 +2,10 @@
 
 namespace COMBFIND {
 
+namespace {
+    bool combat_in_progress;
+}
+
 uint8_t _messed_up_fleet_palette;
 uint8_t _in_net_update;
 s_combfind_target _target;
@@ -1415,6 +1419,11 @@ void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_id
 }
 
 int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_idx, int16_t planet_idx, s_battle_results* result, int8_t is_sneak_attack) {
+    if (combat_in_progress) {
+        exitm::Exit_With_Message("nested combat detected");
+    }
+    combat_in_progress = true;
+
     COMBINIT::Reset_Satellite_Capture_();
 
     int16_t colony_idx;
@@ -1549,6 +1558,7 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
 
     const int16_t combat_result = (int16_t)result->player_info.combat_result;
     COMBINIT::Reset_Satellite_Capture_();
+    combat_in_progress = false;
     return combat_result;
 }
 
@@ -2388,6 +2398,10 @@ int8_t __cdecl Player_Owns_Transports_(int player_idx) {
 }
 
 void __cdecl Do_Net_Combat_Update_(bool unused) {
+    if (combat_in_progress) {
+        return;
+    }
+
     (void)unused;
     RUSS::Mox_Update_();
 
