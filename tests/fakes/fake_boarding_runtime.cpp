@@ -77,6 +77,7 @@ namespace TEST_BOARDING {
         pooled_officer = -1;
         raid_choice_idx = 0;
         last_raid_message[0] = '\0';
+        BOARDING::_telepathic_multiple_capture = 0;
         BOARDING::_kill_excess_marines_after_capture = 0;
         BOARDING::_board_in_black_hole = 1;
     }

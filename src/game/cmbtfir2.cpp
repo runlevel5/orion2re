@@ -1806,6 +1806,8 @@ namespace CMBTFIR2 {
 
         if (new_owner >= MAX_PLAYERS || !MOX::_player[new_owner].traits[TRAIT_TELEPATHIC]) {
             combat_ship->is_captured = 1;
+        } else if (BOARDING::_telepathic_multiple_capture != 0) {
+            combat_ship->is_captured = 0;
         }
 
         combat_ship->is_retreating = 0;

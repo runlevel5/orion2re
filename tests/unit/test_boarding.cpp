@@ -86,6 +86,41 @@ DOCTEST_TEST_CASE("captured bases use orbital hull marine capacity") {
     DOCTEST_CHECK(BOARDING::Captured_Marine_Count_(1, 30) == 20);
 }
 
+DOCTEST_TEST_CASE("classic telepathic recapture retains captured state") {
+    TEST_BOARDING::Reset_();
+    MOX::_combat_data[1].owner = 1;
+    MOX::_combat_data[1].is_captured = 1;
+    MOX::_player[0].traits[TRAIT_TELEPATHIC] = 1;
+
+    CMBTFIR2::Capture_Ship_(1, 0, 0);
+
+    DOCTEST_CHECK(MOX::_combat_data[1].owner == 0);
+    DOCTEST_CHECK(MOX::_combat_data[1].is_captured == 1);
+}
+
+DOCTEST_TEST_CASE("enabled telepathic recapture clears captured state") {
+    TEST_BOARDING::Reset_();
+    BOARDING::_telepathic_multiple_capture = 1;
+    MOX::_combat_data[1].owner = 1;
+    MOX::_combat_data[1].is_captured = 1;
+    MOX::_player[0].traits[TRAIT_TELEPATHIC] = 1;
+
+    CMBTFIR2::Capture_Ship_(1, 0, 0);
+
+    DOCTEST_CHECK(MOX::_combat_data[1].owner == 0);
+    DOCTEST_CHECK(MOX::_combat_data[1].is_captured == 0);
+}
+
+DOCTEST_TEST_CASE("enabled non-telepathic capture sets captured state") {
+    TEST_BOARDING::Reset_();
+    BOARDING::_telepathic_multiple_capture = 1;
+    MOX::_combat_data[1].owner = 1;
+
+    CMBTFIR2::Capture_Ship_(1, 0, 0);
+
+    DOCTEST_CHECK(MOX::_combat_data[1].is_captured == 1);
+}
+
 DOCTEST_TEST_CASE("captured ships retain an existing turn-order entry") {
     int16_t turn_order[4] = { 3, 1, -10, -1 };
 

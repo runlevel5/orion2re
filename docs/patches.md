@@ -200,7 +200,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:18757` - `nebula check`
 - [x] `asm.pl:18774` - `zero colony loss`: implemented in `COLCALC::Ghost_Colony_Stuff_()` with the configurable `colony zero_colony_lost` rule; the owner-level condition replaces the 1.50 diversion and preserves the classic exception for inbound colonists by default.
 - [x] `asm.pl:18883` - `unload troops button wrong message`: fixed in `MAINSCR::Scan_Moveable_Box_Fields()` by displaying the dedicated no-transport-selected message when the Unload Troops button is clicked without a selected transport; this directly expresses the 1.50 message-id replacement with a named source constant.
-- [ ] `asm.pl:18925` - `telepatic capture`
+- [x] `asm.pl:18925` - `telepatic capture`: implemented in `CMBTFIR2::Capture_Ship_()` with the configurable `combat telepathic_multiple_capture` rule, clearing stale captured state when a Telepathic player recaptures a ship; this replaces the 1.50 comparison wrapper and code-cave clear with a direct source-level ownership invariant while preserving classic behavior by default.
 - [ ] `asm.pl:18959` - `autodesign considers x3 shot`
 - [ ] `asm.pl:18989` - `ship explosion leader says nooo`
 - [ ] `asm.pl:19157` - `dimensional portal icon in system display box displays race name instead of ruler name`

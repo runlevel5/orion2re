@@ -9,6 +9,7 @@ namespace BOARDING {
         attacker_in_black_hole,
     };
 
+    inline uint8_t _telepathic_multiple_capture = 0;
     inline uint8_t _kill_excess_marines_after_capture = 0;
     inline uint8_t _board_in_black_hole = 1;
 

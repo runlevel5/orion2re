@@ -446,6 +446,22 @@ DOCTEST_TEST_CASE("black-hole boarding setting preserves the classic default") {
     DOCTEST_CHECK(BOARDING::_board_in_black_hole == 0);
 }
 
+DOCTEST_TEST_CASE("telepathic multiple capture setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(BOARDING::_telepathic_multiple_capture == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat telepathic_multiple_capture = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(BOARDING::_telepathic_multiple_capture == 1);
+}
+
 DOCTEST_TEST_CASE("excess marine capture setting preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

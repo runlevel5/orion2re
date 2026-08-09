@@ -1398,6 +1398,21 @@
       default: false,
     },
 
+    telepathic_multiple_capture: {
+      title: "Telepathic control after recapture",
+      description: "Allows a Telepathic player to fully control a ship recaptured from a non-Telepathic opponent during the same tactical combat.",
+      remarks: "False preserves classic behavior, where the ship retains its earlier captured marker.",
+      examples: ["combat telepathic_multiple_capture = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/boarding.h",
+        symbol: "BOARDING::_telepathic_multiple_capture",
+      },
+      default: false,
+    },
+
     kill_excess_marines_after_capture: {
       title: "Kill excess marines after capture",
       description: "Immediately removes surviving attackers above the captured ship or orbital base's marine capacity.",
