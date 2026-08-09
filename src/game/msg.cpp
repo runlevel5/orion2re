@@ -463,7 +463,7 @@ namespace MSG_ {
                 if (attacking_player_idx == defending_player_idx) {
                     strlcpy(details_text, _msg_defensive_spy_fmt, sizeof(details_text));
                 } else {
-                    snprintf(details_text, sizeof(details_text), _msg_offensive_spy_fmt, MOX::_player[defending_player_idx].name);
+                    snprintf(details_text, sizeof(details_text), _msg_offensive_spy_fmt, MOX::_player[defending_player_idx].race_name);
                 }
                 if (assassination_msg.victim_id != MOX::_PLAYER_NUM) {
                     snprintf(out_text, out_text_size, _msg_spy_assassinated_fmt, details_text);
@@ -472,12 +472,12 @@ namespace MSG_ {
                 if (MOX::_settings.language == 4) {
                     snprintf(out_text, out_text_size, _msg_spy_assassinated_victim_fmt,
                                  &MOX::_leaders[(uint8_t)assassination_msg.leader_id], details_text,
-                                 MOX::_player[attacking_player_idx].name);
+                                 MOX::_player[attacking_player_idx].race_name);
                     return;
                 }
                 snprintf(out_text, out_text_size, _msg_spy_assassinated_victim_fmt,
                              &MOX::_leaders[(uint8_t)assassination_msg.leader_id],
-                             MOX::_player[attacking_player_idx].name, details_text);
+                             MOX::_player[attacking_player_idx].race_name, details_text);
                 return;
             }
             case MSG_TYPE_ANOMALY: {
