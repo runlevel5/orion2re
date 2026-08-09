@@ -551,7 +551,7 @@ namespace CMBTFIRE {
         // Calculate health for a single missile in the stack
         int16_t max_hits = CMBTMIS::Get_Missile_Hits_(
             missile->type,
-            (int16_t)MOX::_combat_data[missile->source_unit_idx].owner,
+            missile->owner,
             missile->specials
         );
 

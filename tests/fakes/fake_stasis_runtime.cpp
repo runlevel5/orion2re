@@ -9,6 +9,7 @@ namespace {
     s_missile missiles[300];
     int16_t cleanup_sources[4];
     int16_t cleanup_count;
+    int16_t last_missile_hits_owner;
     int16_t last_retargeted_missile;
 }
 
@@ -18,11 +19,16 @@ namespace TEST_STASIS {
         memset(missiles, 0, sizeof(missiles));
         memset(cleanup_sources, 0xff, sizeof(cleanup_sources));
         cleanup_count = 0;
+        last_missile_hits_owner = -1;
         last_retargeted_missile = -1;
     }
 
     int16_t Last_Cleanup_Source_() {
         return cleanup_count > 0 ? cleanup_sources[cleanup_count - 1] : -1;
+    }
+
+    int16_t Last_Missile_Hits_Owner_() {
+        return last_missile_hits_owner;
     }
 
     int16_t Last_Retargeted_Missile_() {
@@ -60,6 +66,11 @@ namespace MOX {
 }
 
 namespace CMBTMIS {
+    int16_t __cdecl Get_Missile_Hits_(int16_t, int16_t owner, uint16_t) {
+        last_missile_hits_owner = owner;
+        return 4;
+    }
+
     void __cdecl Retarget_Missile_(int16_t missile_idx) {
         last_retargeted_missile = missile_idx;
     }

@@ -211,7 +211,7 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                     case WEAPON_ANTI_MISSILE_ROCKET:
                         if (target_type != TARGET_TYPE_SHIP) {
                             s_missile* m = &MOX::_missile[target_idx];
-                            int hits = CMBTMIS::Get_Missile_Hits_(m->type, MOX::_combat_data[m->source_unit_idx].owner, m->specials);
+                            int hits = CMBTMIS::Get_Missile_Hits_(m->type, m->owner, m->specials);
                             expected_damage = hits * (((8 - range) * count * 5 + 25) * 2 / 100);
                         }
                         break;
@@ -2020,7 +2020,7 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     s_missile* missile = &MOX::_missile[m_idx];
     int16_t hits_to_kill = CMBTMIS::Get_Missile_Hits_(
         missile->type,
-        MOX::_combat_data[missile->source_unit_idx].owner,
+        missile->owner,
         missile->specials
     );
 
