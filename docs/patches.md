@@ -196,7 +196,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:18002` - `commando bonus`: implemented in `invasion::Compute_Colony_Officer_Bonus_()` and `invasion::Compute_Attacker_Officer_Bonus_()` with synchronized `leaders ground_commando_defender_x5` and `leaders ground_commando_attacker_x2` settings; direct source-level formula selection replaces the 1.50 code-cave wrappers and immediate-byte edit while preserving classic defaults.
 - [x] `asm.pl:18437` - `net nested combat`: fixed in `COMBFIND::Do_1_Combat_()` and `COMBFIND::Do_Net_Combat_Update_()` by rejecting direct combat reentry and deferring strategic network combat progression while another combat owns the shared combat state; this replaces the 1.50 all-call wrappers with a file-local source invariant while leaving normal network pumping active.
 - [ ] `asm.pl:18649` - `no homeworld`
-- [ ] `asm.pl:18679` - `outpost false button`
+- [x] `asm.pl:18679` - `outpost false button`: fixed in `FLEETPOP::Set_Build_Outpost_Button_Flag_()` by requiring the selected fleet to be directly located at a star before checking its outpost ships and eligible planets; this replaces the 1.50 branch rewrite with a source-level location invariant so an encoded in-transit destination cannot expose the Build Outpost button.
 - [ ] `asm.pl:18757` - `nebula check`
 - [ ] `asm.pl:18774` - `zero colony loss`
 - [ ] `asm.pl:18883` - `unload troops button wrong message`

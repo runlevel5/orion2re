@@ -245,6 +245,27 @@ orion2re_add_unit_test(test_colonize
         tests/fakes/fake_colonize_runtime.cpp
 )
 
+orion2re_add_unit_test(test_fleetpop
+    SOURCES
+        tests/unit/test_fleetpop.cpp
+    PRODUCTION_SOURCES
+        src/game/fleetpop.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_fleetpop_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_fleetpop PRIVATE /Gy)
+    target_link_options(test_fleetpop PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_fleetpop PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_fleetpop PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_fleetpop PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
 orion2re_add_unit_test(test_ground_commando
     SOURCES
         tests/unit/test_ground_commando.cpp
