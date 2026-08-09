@@ -53,6 +53,53 @@ namespace COLBLDG {
     int16_t _colony_auto_building;
     int16_t _fields[11];
     int16_t _build_queue_hotkeys[11];
+    // Enhancement: clickable < and > arrow buttons flanking the "Build List
+    // for" title, stepping to the previous/next colony like the vanilla
+    // hotkeys. The art is the Leaders screen's system cycle arrows; it
+    // indexes the officer palette, so it is remap-drawn through that
+    // palette against the build screen's own.
+    int16_t _prev_colony_click = -1000;
+    int16_t _next_colony_click = -1000;
+    s_animation_header* _prev_colony_anim;
+    s_animation_header* _next_colony_anim;
+    uint8_t* _arrow_palette;
+    s_palette_header _arrow_palette_span = {0, 256};
+
+    void Prepare_Arrow_Remap_() {
+        animate::_palette_header = &_arrow_palette_span;
+        remap::Create_Picture_Remap_Palette_(_arrow_palette, remap::_picture_remap_color_list);
+    }
+
+    void Draw_Colony_Arrows_() {
+        Prepare_Arrow_Remap_();
+        animate::Set_Animation_Frame_(_prev_colony_anim, 0);
+        animate::Remap_Draw_(218, 306, _prev_colony_anim);
+        animate::Set_Animation_Frame_(_next_colony_anim, 0);
+        animate::Remap_Draw_(411, 306, _next_colony_anim);
+    }
+
+    // Shows an arrow pressed and released with the click sound, remap-drawn
+    // on both flip pages (same idiom as the slider popup buttons).
+    void Animate_Colony_Arrow_Press_(s_animation_header* pic, int16_t x, int16_t y) {
+        sound::Play_Sound_(0x28);
+        Prepare_Arrow_Remap_();
+        for (int i = 0; i < 2; ++i) {
+            video::Set_Page_Off_();
+            animate::Set_Animation_Frame_(pic, 1);
+            animate::Remap_Draw_(x, y, pic);
+            RUSS::Mox_Sync_Update_();
+        }
+        timer::Mark_Time_();
+        timer::Release_Time_(2);
+        for (int i = 0; i < 2; ++i) {
+            video::Set_Page_Off_();
+            animate::Set_Animation_Frame_(pic, 0);
+            animate::Remap_Draw_(x, y, pic);
+            RUSS::Mox_Sync_Update_();
+        }
+        timer::Mark_Time_();
+        timer::Release_Time_(1);
+    }
     char _g_msg[800];
     s_animation_header* _colsum_pal_anim;
     s_animation_header* _bldg_bitm;
@@ -292,6 +339,12 @@ namespace COLBLDG {
             }
         }
 
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            _prev_colony_anim = (s_animation_header*)farload::Far_Reload_Next_("OFFICER.LBX", 7, MOX::_screen_seg);
+            _next_colony_anim = (s_animation_header*)farload::Far_Reload_Next_("OFFICER.LBX", 8, MOX::_screen_seg);
+            _arrow_palette = (uint8_t*)farload::Far_Reload_Next_(fonts::_font_name, 9, MOX::_screen_seg);
+        }
+
         _bldg_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1FA4);
         _colsum_pal_anim = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLSUM_LBX, 0x15, MOX::_screen_seg);
     }
@@ -343,15 +396,25 @@ namespace COLBLDG {
     void __cdecl Update_Fields_() {
         fields::Clear_Fields_();
 
+        // Enhancement: 'O' presses OK and 'A' toggles AUTO, like clicks.
+        const bool enhanced_keys = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+
         _fields[0] = fields::Add_Button_Field_(493, 447, ESTRINGS::E_Strings_(12), _anims[1], ESTRINGS::E_Strings_(12), 40);
-        _fields[3] = fields::Add_Button_Field_(560, 447, ESTRINGS::E_Strings_(12), _anims[3], ESTRINGS::E_Strings_(12), 40);
+        _fields[3] = fields::Add_Button_Field_(560, 447, ESTRINGS::E_Strings_(12), _anims[3], enhanced_keys ? "o" : ESTRINGS::E_Strings_(12), 40);
 
         _fields[1] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(135));
         _fields[8] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(139));
         _fields[9] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(140));
+        if (enhanced_keys) {
+            _prev_colony_click = fields::Add_Hidden_Field_(218, 306, 252, 326, "", 0);
+            _next_colony_click = fields::Add_Hidden_Field_(411, 306, 445, 326, "", 0);
+        } else {
+            _prev_colony_click = -1000;
+            _next_colony_click = -1000;
+        }
         _fields[10] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(193));
 
-        _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], (int16_t*)&_colony_auto_building, ESTRINGS::E_Strings_(12), 41);
+        _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], (int16_t*)&_colony_auto_building, enhanced_keys ? "a" : ESTRINGS::E_Strings_(12), 41);
 
         if (MOX::_settings.strategic_combat_flag != 0) {
             _fields[4] = -1000;
@@ -1014,7 +1077,12 @@ namespace COLBLDG {
             snprintf(buffer, sizeof(buffer), format, planet_name);
 
             fonts::Set_Font_Style_Shadow_Down_(3, &COLBLDG::_l_font_color_array);
-            BILL::Squeeze_Paragraph_Centered_(235, 309, 194, 17, buffer, 2);
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                BILL::Squeeze_Paragraph_Centered_(255, 309, 154, 17, buffer, 2);
+                COLBLDG::Draw_Colony_Arrows_();
+            } else {
+                BILL::Squeeze_Paragraph_Centered_(235, 309, 194, 17, buffer, 2);
+            }
 
             if (MOX::_previous_screen == SCREEN_COLONY_SUMMARY ||
                 COLBLDG::_colony_bldg_saved_screen == SCREEN_COLONY_SUMMARY)
@@ -1455,6 +1523,22 @@ namespace COLBLDG {
         }
 
         int16_t input_field = *selected_field_id;
+
+        // Enhancement: the title-bar arrows act as the < / > colony keys,
+        // and both the clicks and the keys animate the arrow press.
+        if (_prev_colony_click > 0 &&
+            (input_field == _prev_colony_click || input_field == _fields[8])) {
+            Animate_Colony_Arrow_Press_(_prev_colony_anim, 218, 306);
+            // The outer screen loop re-enters for the new colony only when
+            // it sees the < / > hot key id, so rewrite the caller's copy.
+            input_field = _fields[8];
+            *selected_field_id = _fields[8];
+        } else if (_next_colony_click > 0 &&
+                   (input_field == _next_colony_click || input_field == _fields[9])) {
+            Animate_Colony_Arrow_Press_(_next_colony_anim, 411, 306);
+            input_field = _fields[9];
+            *selected_field_id = _fields[9];
+        }
 
         if (Apply_Build_Queue_Hotkey_(input_field)) {
             *selected_field_id = 0;
