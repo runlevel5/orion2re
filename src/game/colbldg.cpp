@@ -110,6 +110,65 @@ namespace COLBLDG {
     // orion2re.cfg, Cancel/Esc discards.
     constexpr int PRESET_EDIT_SLOT = 0;
     constexpr int MAX_PRESET_ITEMS = BUILD_QUEUE::INSTRUCTION_CAPACITY - 2;
+
+    // Command instructions (modes, buy/clear/..., stop) are first-class
+    // rows in the editor, represented in the queue slots by sentinel
+    // products outside every vanilla product range.
+    constexpr int16_t PRESET_CMD_PRODUCT_BASE = -60;
+    constexpr uint8_t k_preset_commands[] = {
+        BUILD_QUEUE::INSTRUCTION_APPEND,
+        BUILD_QUEUE::INSTRUCTION_PREPEND,
+        BUILD_QUEUE::INSTRUCTION_MERGE,
+        BUILD_QUEUE::INSTRUCTION_BUY,
+        BUILD_QUEUE::INSTRUCTION_BUY10,
+        BUILD_QUEUE::INSTRUCTION_BUY50,
+        BUILD_QUEUE::INSTRUCTION_BUY75,
+        BUILD_QUEUE::INSTRUCTION_UNBUY,
+        BUILD_QUEUE::INSTRUCTION_CLEAR,
+        BUILD_QUEUE::INSTRUCTION_CLEAR_REFITS,
+        BUILD_QUEUE::INSTRUCTION_CLEAR_CONTINUOUS,
+        BUILD_QUEUE::INSTRUCTION_STOP,
+    };
+    constexpr int N_PRESET_COMMANDS =
+        (int)(sizeof(k_preset_commands) / sizeof(k_preset_commands[0]));
+    // Hover descriptions, following the original build list documentation.
+    constexpr const char* k_preset_command_descs[N_PRESET_COMMANDS] = {
+        "Items after this are added at the end of the queue. This is the default mode.",
+        "Items after this are inserted at the beginning of the queue.",
+        "Items after this already present in the queue are rearranged into list order; missing ones are inserted. Intended for inserting newly-researched buildings with proper priority.",
+        "Buy the current product regardless of build progress.",
+        "Buy the current product if it is at least 1/10 built.",
+        "Buy the current product if it is at least 1/2 built.",
+        "Buy the current product if it is at least 3/4 built.",
+        "Unbuy the current product if it is bought.",
+        "Clear the queue, apart from a bought product and ships being refitted.",
+        "Delete ships being refitted from the queue, except bought ones.",
+        "Delete Housing and Trade Goods from the queue.",
+        "Stop reading the list here and apply it, ignoring everything after.",
+    };
+
+    static const char* Preset_Command_Desc_(int16_t product) {
+        for (int i = 0; i < N_PRESET_COMMANDS; ++i) {
+            if ((int16_t)(PRESET_CMD_PRODUCT_BASE - k_preset_commands[i]) == product) {
+                return k_preset_command_descs[i];
+            }
+        }
+        return "";
+    }
+
+    static bool Is_Preset_Command_Instr_(uint8_t instr) {
+        return (instr >= BUILD_QUEUE::INSTRUCTION_APPEND &&
+                instr <= BUILD_QUEUE::INSTRUCTION_STOP) ||
+               instr == BUILD_QUEUE::INSTRUCTION_CLEAR_CONTINUOUS;
+    }
+
+    static bool Is_Preset_Command_Product_(int16_t product) {
+        if (product >= PRESET_CMD_PRODUCT_BASE ||
+            product < PRESET_CMD_PRODUCT_BASE - 29) {
+            return false;
+        }
+        return Is_Preset_Command_Instr_((uint8_t)(PRESET_CMD_PRODUCT_BASE - product));
+    }
     int16_t _preset_title_click = -1000;
     int16_t _preset_hotkey = -1000;
     int16_t _g_preset_edit_mode;
@@ -124,10 +183,56 @@ namespace COLBLDG {
     uint8_t _g_preset_items[BUILD_QUEUE::INSTRUCTION_CAPACITY];
     int16_t _g_preset_item_count;
     int16_t _g_preset_page;
+    // In the editor the left panel is the product source, cycling between
+    // Buildings and Ships via an arrow widget at its top; the right panel
+    // lists the command tokens.
+    int16_t _g_preset_left_category; // 0 Buildings, 1 Ships
+    int16_t _g_left_cat_prev_click = -1000;
+    int16_t _g_left_cat_next_click = -1000;
+
+    static bool Preset_Ship_Entry_Ok_(int16_t midx) {
+        // Custom design and doom star leave the screen or cannot be stored
+        // in a preset; separators are blank rows.
+        return midx != COLONY_PRODUCTION_CUSTOM_DESIGN &&
+               midx != COLONY_PRODUCTION_DOOM_STAR &&
+               midx != COLONY_PRODUCTION_SEPARATOR;
+    }
+
+    int16_t Preset_Left_Count_() {
+        if (_g_preset_left_category == 0) {
+            return _n_building_indexes;
+        }
+        int16_t n = 0;
+        for (int16_t i = 0; i < _n_military_indexes; ++i) {
+            if (Preset_Ship_Entry_Ok_(_military_indexes[i])) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    int16_t Preset_Left_Item_(int16_t idx) {
+        if (_g_preset_left_category == 0) {
+            return _building_indexes[idx];
+        }
+        int16_t n = 0;
+        for (int16_t i = 0; i < _n_military_indexes; ++i) {
+            if (Preset_Ship_Entry_Ok_(_military_indexes[i])) {
+                if (n == idx) {
+                    return _military_indexes[i];
+                }
+                n++;
+            }
+        }
+        return COLONY_PRODUCTION_NONE;
+    }
 
     // Maps a queue product to its build_queue instruction; 0 when the
     // product cannot be stored in a preset.
     static uint8_t Instruction_For_Product_(int16_t product) {
+        if (Is_Preset_Command_Product_(product)) {
+            return (uint8_t)(PRESET_CMD_PRODUCT_BASE - product);
+        }
         if (Colony_Production_Is_Building_(product)) {
             return (uint8_t)(BUILD_QUEUE::INSTRUCTION_BUILDING_BASE + product);
         }
@@ -168,6 +273,9 @@ namespace COLBLDG {
         if (instr > BUILD_QUEUE::INSTRUCTION_BUILDING_BASE &&
             instr <= BUILD_QUEUE::INSTRUCTION_BUILDING_BASE + BUILDING_COUNT - 1) {
             return (int16_t)(instr - BUILD_QUEUE::INSTRUCTION_BUILDING_BASE);
+        }
+        if (Is_Preset_Command_Instr_(instr)) {
+            return (int16_t)(PRESET_CMD_PRODUCT_BASE - instr);
         }
         switch (instr) {
         case BUILD_QUEUE::INSTRUCTION_HOUSING: return COLONY_PRODUCTION_HOUSING;
@@ -241,6 +349,38 @@ namespace COLBLDG {
         return nullptr;
     }
 
+    // Row label: command sentinels print their cfg token, products their
+    // vanilla selection name.
+    static char* Preset_Row_Name_(int16_t product) {
+        if (Is_Preset_Command_Product_(product)) {
+            const char* token =
+                Instruction_Token_((uint8_t)(PRESET_CMD_PRODUCT_BASE - product));
+            if (token == nullptr) {
+                token = "?";
+            }
+            // Same style as the vanilla "^ Repeat ^" special: carets (the
+            // game font's decorative glyph) around a title-cased name.
+            static char row_name[48];
+            char pretty[32];
+            size_t j = 0;
+            bool word_start = true;
+            for (size_t i = 0; token[i] != '\0' && j + 1 < sizeof(pretty); ++i) {
+                char c = token[i];
+                if (c == '_') {
+                    pretty[j++] = ' ';
+                    word_start = true;
+                } else {
+                    pretty[j++] = word_start ? (char)toupper((unsigned char)c) : c;
+                    word_start = false;
+                }
+            }
+            pretty[j] = '\0';
+            snprintf(row_name, sizeof(row_name), "^ %s ^", pretty);
+            return row_name;
+        }
+        return Selection_Name_(product);
+    }
+
     // Rewrites (or appends) the preset's build_queue statement in
     // orion2re.cfg so the edit survives restarts.
     static bool Write_Preset_To_Config_(int preset_idx) {
@@ -295,13 +435,15 @@ namespace COLBLDG {
         return written == text.size();
     }
 
-    // True when an instruction is a plain item the editor can display.
+    // True when an instruction is a row the editor can display — products
+    // and commands alike; only END is structural.
     static bool Preset_Instruction_Is_Item_(uint8_t instr) {
         if (instr > BUILD_QUEUE::INSTRUCTION_BUILDING_BASE &&
             instr <= BUILD_QUEUE::INSTRUCTION_BUILDING_BASE + BUILDING_COUNT - 1) {
             return true;
         }
-        return (instr >= BUILD_QUEUE::INSTRUCTION_HOUSING &&
+        return Is_Preset_Command_Instr_(instr) ||
+               (instr >= BUILD_QUEUE::INSTRUCTION_HOUSING &&
                 instr <= BUILD_QUEUE::INSTRUCTION_REPEAT) ||
                (instr >= BUILD_QUEUE::INSTRUCTION_COLONY_SHIP &&
                 instr <= BUILD_QUEUE::INSTRUCTION_DESIGN5);
@@ -430,12 +572,12 @@ namespace COLBLDG {
         }
         _g_preset_saved_auto = _colony_auto_building;
         _g_preset_edit_mode = 1;
+        _g_preset_left_category = 0;
 
         _g_preset_item_count = 0;
         for (int i = 0; i < BUILD_QUEUE::INSTRUCTION_CAPACITY; ++i) {
             uint8_t instr = BUILD_QUEUE::presets[PRESET_EDIT_SLOT][i];
-            if (instr == BUILD_QUEUE::INSTRUCTION_END ||
-                instr == BUILD_QUEUE::INSTRUCTION_STOP) {
+            if (instr == BUILD_QUEUE::INSTRUCTION_END) {
                 break;
             }
             if (Preset_Instruction_Is_Item_(instr) &&
@@ -451,7 +593,6 @@ namespace COLBLDG {
         if (save) {
             uint8_t* preset = BUILD_QUEUE::presets[PRESET_EDIT_SLOT];
             int n = 0;
-            preset[n++] = BUILD_QUEUE::INSTRUCTION_CLEAR;
             for (int i = 0; i < _g_preset_item_count; ++i) {
                 preset[n++] = _g_preset_items[i];
             }
@@ -501,10 +642,12 @@ namespace COLBLDG {
 
     static int16_t Kbd_Panel_Count_(int16_t panel) {
         if (panel == 0) {
-            return _n_building_indexes;
+            return (_g_preset_edit_mode != 0) ? Preset_Left_Count_()
+                                              : _n_building_indexes;
         }
         if (panel == 1) {
-            return _n_military_indexes;
+            return (_g_preset_edit_mode != 0) ? (int16_t)N_PRESET_COMMANDS
+                                              : _n_military_indexes;
         }
         if (panel == 2) {
             int16_t len = Get_Prod_Queue_Len_();
@@ -651,6 +794,26 @@ namespace COLBLDG {
                 COLONY::_full_draw = 1;
                 return field_id;
             }
+        }
+        if (_g_preset_edit_mode != 0 && _g_kbd_panel == 0 &&
+            (key == 0x4BE0 || key == 0x4DE0)) { // Left/Right cycle category
+            Animate_Colony_Arrow_Press_(
+                (key == 0x4BE0) ? _prev_colony_anim : _next_colony_anim,
+                (key == 0x4BE0) ? (int16_t)13 : (int16_t)149, 20);
+            _g_preset_left_category = (int16_t)(1 - _g_preset_left_category);
+            _g_kbd_index = 0;
+            Do_Draw_Build_Queue_();
+            return 0;
+        }
+        if (_g_preset_edit_mode != 0 && key > 0 && (key & 0xFF) == '0') {
+            // '0' clears the whole preset, all pages.
+            Remove_Ships_(0);
+            for (int i = 0; i < 7; ++i) {
+                _current_item[i] = COLONY_PRODUCTION_NONE;
+            }
+            _g_preset_item_count = 0;
+            Load_Preset_Page_(0);
+            return 0;
         }
         if (_g_preset_edit_mode != 0 &&
             (key == 0x47E0 || key == 0x4FE0)) { // Home/End jump pages
@@ -882,6 +1045,18 @@ namespace COLBLDG {
     }
 
     void __cdecl Add_Militarys_Fields_() {
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_preset_edit_mode != 0) {
+            COLDRAW::Calculate_Squish_Step_(13, 308, N_PRESET_COMMANDS, 19);
+            for (int16_t i = 0; i < N_PRESET_COMMANDS; ++i) {
+                int16_t step = (int16_t)(19 - COLONY::_step_squish);
+                _military_fields[i] = fields::Add_Hidden_Field_(
+                    485, (int16_t)(i * step + 20),
+                    623, (int16_t)((i + 1) * step + 19),
+                    ESTRINGS::E_Strings_(12), 41);
+            }
+            return;
+        }
+
         COLDRAW::Calculate_Squish_Step_(13, 308, _n_military_indexes, 19);
 
         for (int16_t i = 0; i < _n_military_indexes; ++i) {
@@ -921,6 +1096,19 @@ namespace COLBLDG {
     }
 
     void __cdecl Add_Buildings_Fields_() {
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_preset_edit_mode != 0) {
+            int16_t count = Preset_Left_Count_();
+            COLDRAW::Calculate_Squish_Step_(13, 443, count, 19);
+            for (int16_t i = 0; i < count; ++i) {
+                int16_t step_size = (int16_t)(19 - COLONY::_step_squish);
+                _building_fields[i] = fields::Add_Hidden_Field_(
+                    13, (int16_t)(i * step_size + 46),
+                    184, (int16_t)((i + 1) * step_size + 45),
+                    ESTRINGS::E_Strings_(12), 41);
+            }
+            return;
+        }
+
         COLDRAW::Calculate_Squish_Step_(13 /* 0x0D */, 469 /* 0x1D5 */, _n_building_indexes, 19 /* 0x13 */);
 
         if (_n_building_indexes > 0) {
@@ -987,11 +1175,21 @@ namespace COLBLDG {
             ? fields::Add_Hidden_Field_(253, 306, 409, 326, "", 0)
             : (int16_t)-1000;
         _preset_hotkey = fields::Add_Hot_Key_(enhanced_keys ? "p" : "");
+        if (enhanced_keys && _g_preset_edit_mode != 0) {
+            _g_left_cat_prev_click = fields::Add_Hidden_Field_(13, 20, 47, 41, "", 0);
+            _g_left_cat_next_click = fields::Add_Hidden_Field_(150, 20, 184, 41, "", 0);
+        } else {
+            _g_left_cat_prev_click = -1000;
+            _g_left_cat_next_click = -1000;
+        }
         _fields[10] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(193));
 
         _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], (int16_t*)&_colony_auto_building, enhanced_keys ? "a" : ESTRINGS::E_Strings_(12), 41);
 
-        if (MOX::_settings.strategic_combat_flag != 0) {
+        if (MOX::_settings.strategic_combat_flag != 0 ||
+            (enhanced_keys && _g_preset_edit_mode != 0)) {
+            // Refit is not expressible in a preset and Design is redundant
+            // there; the editor draws both buttons dimmed with no field.
             _fields[4] = -1000;
             _fields[5] = -1000;
         } else {
@@ -1279,6 +1477,18 @@ namespace COLBLDG {
     }
 
     void __cdecl Draw_Militarys_List_() {
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_preset_edit_mode != 0) {
+            COLDRAW::Calculate_Squish_Step_(13, 308, N_PRESET_COMMANDS, 19);
+            fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+            for (int16_t i = 0; i < N_PRESET_COMMANDS; ++i) {
+                char* name = Preset_Row_Name_(
+                    (int16_t)(PRESET_CMD_PRODUCT_BASE - k_preset_commands[i]));
+                int16_t y_pos = (int16_t)((19 - COLONY::_step_squish) * i + 20);
+                BILL::Squeeze_Print_(485, y_pos, name, 138);
+            }
+            return;
+        }
+
         int16_t font_offset;
 
         COLDRAW::Calculate_Squish_Step_(13, 308, _n_military_indexes, 19);
@@ -1333,6 +1543,18 @@ namespace COLBLDG {
     }
 
     void __cdecl Draw_Buildings_List_() {
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_preset_edit_mode != 0) {
+            int16_t count = Preset_Left_Count_();
+            COLDRAW::Calculate_Squish_Step_(13, 443, count, 19);
+            fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+            for (int16_t i = 0; i < count; ++i) {
+                char* name = Selection_Name_(Preset_Left_Item_(i));
+                int16_t y_pos = (int16_t)((19 - COLONY::_step_squish) * i + 46);
+                BILL::Squeeze_Print_(13, y_pos, name, 171);
+            }
+            return;
+        }
+
         COLDRAW::Calculate_Squish_Step_(13, 469, _n_building_indexes, 19);
 
         int16_t font_offset = Calc_Font_Off_();
@@ -1411,12 +1633,12 @@ namespace COLBLDG {
             const char* text_to_print;
             if (((show_delete && _scanned_field >= _queue_fields[0] && _scanned_field <= _queue_fields[6]) || _g_kbd_delete_confirm == i) && _current_item[i] != COLONY_PRODUCTION_NONE) {
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
-                char* item_name = Selection_Name_(_current_item[i]);
+                char* item_name = Preset_Row_Name_(_current_item[i]);
                 snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(ESTR_DELETE_S), item_name);
                 text_to_print = buffer;
             } else {
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
-                text_to_print = Selection_Name_(_current_item[i]);
+                text_to_print = Preset_Row_Name_(_current_item[i]);
             }
 
             BILL::Squeeze_Print_Centered_(332, y_pos, text_to_print, 251);
@@ -1493,6 +1715,21 @@ namespace COLBLDG {
         int16_t y_line_count = 0;
         char buffer[500];
         int16_t item_id = (_scanned_prod != -1) ? _scanned_prod : _current_item[0];
+
+        if (Is_Preset_Command_Product_(item_id)) {
+            fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+            BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Preset_Row_Name_(item_id), 156);
+            y_line_count += 2;
+            fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+            snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(0x54),
+                     ESTRINGS::E_Strings_(0xF3), ESTRINGS::E_Strings_(0x1EA));
+            fonts::Print_(306, (y_line_count * 13 + 21), buffer);
+            Print_Selection_Centered_("Command");
+            fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+            BILL::_Print_Paragraph_(209, 119, 248,
+                                    (char*)Preset_Command_Desc_(item_id), 2);
+            return;
+        }
 
         switch (item_id) {
             case COLONY_PRODUCTION_OUTPOST_SHIP: {
@@ -1695,6 +1932,28 @@ namespace COLBLDG {
             if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
                 BILL::Squeeze_Paragraph_Centered_(255, 309, 154, 17, buffer, 2);
                 COLBLDG::Draw_Colony_Arrows_();
+                if (COLBLDG::_g_preset_edit_mode != 0) {
+                    animate::Reset_Animation_Frame_(COLBLDG::_prev_colony_anim);
+                    animate::Remap_Draw_(13, 20, COLBLDG::_prev_colony_anim);
+                    animate::Reset_Animation_Frame_(COLBLDG::_next_colony_anim);
+                    animate::Remap_Draw_(149, 20, COLBLDG::_next_colony_anim);
+                    fonts::Set_Font_Style_Shadow_Down_(3, &COLBLDG::_l_font_color_array);
+                    fonts::Print_Centered_(98, 25,
+                        (COLBLDG::_g_preset_left_category == 0) ? "Buildings" : "Ships");
+                }
+                if (COLBLDG::_g_preset_edit_mode != 0 &&
+                    MOX::_settings.strategic_combat_flag == 0) {
+                    animate::Reset_Animation_Frame_(COLBLDG::_anims[4]);
+                    animate::Draw_(492, 379, COLBLDG::_anims[4]);
+                    graphics::Darken_Fill_(492, 379,
+                        (int16_t)(491 + animate::Get_Width_(COLBLDG::_anims[4])),
+                        (int16_t)(378 + animate::Get_Height_(COLBLDG::_anims[4])));
+                    animate::Reset_Animation_Frame_(COLBLDG::_anims[5]);
+                    animate::Draw_(561, 379, COLBLDG::_anims[5]);
+                    graphics::Darken_Fill_(561, 379,
+                        (int16_t)(560 + animate::Get_Width_(COLBLDG::_anims[5])),
+                        (int16_t)(378 + animate::Get_Height_(COLBLDG::_anims[5])));
+                }
             } else {
                 BILL::Squeeze_Paragraph_Centered_(235, 309, 194, 17, buffer, 2);
             }
@@ -2173,6 +2432,57 @@ namespace COLBLDG {
                 *selected_field_id = 0;
                 return;
             }
+            if (input_field == _g_left_cat_prev_click ||
+                input_field == _g_left_cat_next_click) {
+                Animate_Colony_Arrow_Press_(
+                    (input_field == _g_left_cat_prev_click) ? _prev_colony_anim
+                                                            : _next_colony_anim,
+                    (input_field == _g_left_cat_prev_click) ? (int16_t)13
+                                                            : (int16_t)149, 20);
+                _g_preset_left_category = (int16_t)(1 - _g_preset_left_category);
+                if (_g_kbd_panel == 0) {
+                    _g_kbd_index = 0;
+                }
+                Do_Draw_Build_Queue_();
+                *selected_field_id = 0;
+                return;
+            }
+            // The left panel serves the current category, the right panel
+            // the command tokens; hover feeds the details line, a click
+            // (or Enter) inserts — buildings toggle like vanilla.
+            int16_t left_count = Preset_Left_Count_();
+            for (int16_t i = 0; i < left_count; ++i) {
+                if (*scanned_field_id == _building_fields[i]) {
+                    _scanned_prod = Preset_Left_Item_(i);
+                }
+                if (input_field == _building_fields[i]) {
+                    int16_t product = Preset_Left_Item_(i);
+                    if (_g_preset_left_category == 0 && Has_Prod_In_Queue_(product)) {
+                        Delete_From_Queue_(First_Prod_Queue_Slot_(product));
+                        Do_Draw_Build_Queue_();
+                    } else if (Add_To_Queue_(product) == 0) {
+                        GENDRAW::Help_(ESTRINGS::E_Strings_(0x188));
+                        Do_Draw_Build_Queue_();
+                    }
+                    *selected_field_id = 0;
+                    return;
+                }
+            }
+            for (int16_t i = 0; i < N_PRESET_COMMANDS; ++i) {
+                int16_t cmd_product =
+                    (int16_t)(PRESET_CMD_PRODUCT_BASE - k_preset_commands[i]);
+                if (*scanned_field_id == _military_fields[i]) {
+                    _scanned_prod = cmd_product;
+                }
+                if (input_field == _military_fields[i]) {
+                    if (Add_To_Queue_(cmd_product) == 0) {
+                        GENDRAW::Help_(ESTRINGS::E_Strings_(0x188));
+                        Do_Draw_Build_Queue_();
+                    }
+                    *selected_field_id = 0;
+                    return;
+                }
+            }
             if (input_field == _preset_hotkey) {
                 Exit_Preset_Editor_(true);
                 *selected_field_id = 0;
@@ -2423,7 +2733,7 @@ namespace COLBLDG {
             }
         }
 
-        if (_field_mode != 1) {
+        if (_field_mode != 1 && _g_preset_edit_mode == 0) {
             for (int i = 0; i < _n_building_indexes; ++i) {
                 if (*scanned_field_id == _building_fields[i]) {
                     _scanned_prod = _building_indexes[i];
@@ -2455,7 +2765,7 @@ namespace COLBLDG {
             }
         }
 
-        for (int i = 0; i < _n_military_indexes; ++i) {
+        for (int i = 0; _g_preset_edit_mode == 0 && i < _n_military_indexes; ++i) {
             if (*scanned_field_id == _military_fields[i] && _military_indexes[i] != COLONY_PRODUCTION_SEPARATOR) {
                 _scanned_prod = _military_indexes[i];
             }
@@ -2608,7 +2918,7 @@ namespace COLBLDG {
                 mouse::Set_Mouse_List_(_mouse_list_to, 4);
             }
         } else {
-            for (int16_t i = 0; i < _n_building_indexes; ++i) {
+            for (int16_t i = 0; _g_preset_edit_mode == 0 && i < _n_building_indexes; ++i) {
                 if (_building_indexes[i] == active_idx) {
                     int16_t step = COLONY::_step_squish;
                     int16_t height = 18 - step;
@@ -2826,7 +3136,10 @@ namespace COLBLDG {
 
         bool add_to_queue = false;
 
-        if (COLBLDG::Colony_Production_Is_Building_(product_id) ||
+        if (COLBLDG::_g_preset_edit_mode != 0 &&
+            COLBLDG::Is_Preset_Command_Product_(product_id)) {
+            add_to_queue = true;
+        } else if (COLBLDG::Colony_Production_Is_Building_(product_id) ||
             product_id == COLONY_PRODUCTION_HOUSING ||
             product_id == COLONY_PRODUCTION_TRADE_GOODS ||
             product_id == COLONY_PRODUCTION_REPEAT ||
