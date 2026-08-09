@@ -599,6 +599,18 @@ namespace aidudes {
         Compute_Max_Min_R_I_Worthiness_(info);
     }
 
+    static void Assign_Blockaded_Non_Farmers_(s_colony* colony, s_aidudes_colony_info* colony_info) {
+        int16_t is_researching = EVENTS::Event_Check_Colony_Researching_(colony_info->colony_idx);
+        POP::e_prof prof = is_researching == 0 ? POP::PROF_WORKER : POP::PROF_SCIENTIST;
+
+        while ((uint8_t)colony_info->cur_pop_idx < (uint8_t)colony_info->pop_end_idx) {
+            uint32_t& pop = colony->pop[(uint8_t)colony_info->cur_pop_idx];
+            POP::Set_Prof(&pop, prof);
+            POP::Set_Assigned(&pop, true);
+            colony_info->cur_pop_idx++;
+        }
+    }
+
     void __cdecl Do_Blockaded_Colony_(s_aidudes_colony_info* colony_info) {
         s_colony* colony = &MOX::_colony[colony_info->colony_idx];
         Assign_Required_Colonists_(colony_info);
@@ -611,15 +623,7 @@ namespace aidudes {
               Sort_Pops_FI_);
 
         if (colony->food2_per_farmer == 0) {
-            int16_t is_researching = EVENTS::Event_Check_Colony_Researching_(colony_info->colony_idx);
-            POP::e_prof prof = (is_researching == 0) ? POP::PROF_WORKER : POP::PROF_SCIENTIST;
-
-            while ((uint8_t)colony_info->cur_pop_idx < (uint8_t)colony_info->pop_end_idx) {
-                uint32_t& pop = colony->pop[(uint8_t)colony_info->cur_pop_idx];
-                POP::Set_Prof(&pop, prof);
-                POP::Set_Assigned(&pop, true);
-                colony_info->cur_pop_idx++;
-            }
+            Assign_Blockaded_Non_Farmers_(colony, colony_info);
         } else {
             COLCALC::Pre_Import_Computing_(colony);
 
@@ -636,6 +640,9 @@ namespace aidudes {
                         POP::Set_Assigned(&pop, true);
                         colony_info->cur_pop_idx++;
                         colony_info->n_farmers++;
+                    } else if (colony->food2_per_farmer == 0) {
+                        Assign_Blockaded_Non_Farmers_(colony, colony_info);
+                        break;
                     }
                 } else {
                     colony_info->pop_end_idx--;
