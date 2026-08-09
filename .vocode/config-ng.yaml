@@ -15,7 +15,7 @@ variables:
   LLM_DIFF_FORMAT: v4a
 internal_http:
   port: 5050
-default_workflow: "decompiler"
+default_workflow: "agent"
 tools:
   - name: read_files
     auto_approve: true

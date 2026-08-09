@@ -228,7 +228,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:6957` - `free maintenance cash`: fixed in `COLCALC::Apply_Production_()` by removing obsolete building and spy maintenance credits, refunding half the actual spy cost when no spy can be added, and restoring the synchronized `colony freighters_cash_bonus` compatibility setting with a zero default; direct source accounting replaces the 1.50 NOPs and helper.
 - [x] `asm.pl:9343` - `unbuy and queue`: fixed in `BUILD_QUEUE::Unbuy_Product_()`, `COLONY::Tested_Colony_Buys_Outright_()`, and the `COLBLDG` queue mutation paths by refunding the stored purchase snapshot before cancellation and treating Repeat as part of its preceding product; direct source invariants replace the 1.50 wrappers and diversions.
 - [x] `asm.pl:10360` - `show arti tech`: implemented in `COMBFIND::Do_System_Discoveries_At_Star_()`, `REPORT::Has_Report_()`, and `SCIENCE::Show_Off_Artifact_Tech_()` by queuing every granted artifact technology with its source planet and presenting it through the report flow; direct source data replaces the 1.50 saved-star and temporary-planet globals, with `finds_presented_by_scientist` retaining the original default and presentation choice.
-- [ ] `asm.pl:11479` - `scrap ships`
+- [x] `asm.pl:11479` - `scrap ships`: fixed in `FLT1::Get_Technology_From_Scrapped_Ship_()` by adding installed shields to scrap-plunder candidates, ignoring absent drive, computer, and armor entries, and granting each selected technology once; direct source list checks replace the 1.50 diversions and duplicate-scan wrapper.
 - [ ] `asm.pl:13245` - `fleet summary giveaways`
 - [ ] `asm.pl:13578` - `overmap speed recalc`
 - [ ] `asm.pl:14135` - `scrap stuff maintenance`

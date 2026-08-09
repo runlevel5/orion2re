@@ -1340,19 +1340,32 @@ namespace FLT1 {
             }
         }
 
-        uint16_t drive_tech_id = TECHDATA::_drives[ship->d.ftl_type].tech_app_id;
-        if (!HACCESS::Player_Has_Tech_(drive_tech_id, player_id)) {
-            tech_apps[num_new_techs++] = drive_tech_id;
+        if (ship->d.shield_type > 0) {
+            uint16_t shield_tech_id = TECHDATA::_shields[ship->d.shield_type].tech_app_id;
+            if (!HACCESS::Player_Has_Tech_(shield_tech_id, player_id)) {
+                tech_apps[num_new_techs++] = shield_tech_id;
+            }
         }
 
-        uint16_t comp_tech_id = TECHDATA::_computers[ship->d.computer_type].tech_app_id;
-        if (!HACCESS::Player_Has_Tech_(comp_tech_id, player_id)) {
-            tech_apps[num_new_techs++] = comp_tech_id;
+        if (ship->d.ftl_type > 0) {
+            uint16_t drive_tech_id = TECHDATA::_drives[ship->d.ftl_type].tech_app_id;
+            if (!HACCESS::Player_Has_Tech_(drive_tech_id, player_id)) {
+                tech_apps[num_new_techs++] = drive_tech_id;
+            }
         }
 
-        uint16_t armor_tech_id = TECHDATA::_armor[ship->d.armor_type].tech_app_id;
-        if (!HACCESS::Player_Has_Tech_(armor_tech_id, player_id)) {
-            tech_apps[num_new_techs++] = armor_tech_id;
+        if (ship->d.computer_type > 0) {
+            uint16_t computer_tech_id = TECHDATA::_computers[ship->d.computer_type].tech_app_id;
+            if (!HACCESS::Player_Has_Tech_(computer_tech_id, player_id)) {
+                tech_apps[num_new_techs++] = computer_tech_id;
+            }
+        }
+
+        if (ship->d.armor_type > 0) {
+            uint16_t armor_tech_id = TECHDATA::_armor[ship->d.armor_type].tech_app_id;
+            if (!HACCESS::Player_Has_Tech_(armor_tech_id, player_id)) {
+                tech_apps[num_new_techs++] = armor_tech_id;
+            }
         }
 
         for (int i = 0; i < 8; i++) {
@@ -1396,7 +1409,15 @@ namespace FLT1 {
             /* fmtpara \x1A0 restores left alignment before each recovered-technology line. */
             for (int i = 0; i < num_acquired; i++) {
                 uint16_t tech_id = got_tech_apps[i];
-                if (tech_id != 0) {
+                bool already_selected = false;
+                for (int j = 0; j < i; j++) {
+                    if (got_tech_apps[j] == tech_id) {
+                        already_selected = true;
+                        break;
+                    }
+                }
+
+                if (tech_id != 0 && !already_selected) {
                     COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_id], tech_id);
 
                     strlcat(message, "\x1A" "0", sizeof(message));
