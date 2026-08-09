@@ -35,7 +35,7 @@ Treat connection information already supplied in the conversation as valid input
 ## Environment constraints
 
 - The Orion2 binary open in Ghidra is a slightly different 1.40 version, not the exact executable used as the MOO2 1.50 patch base. It should be very close to that base, but this expected version difference must be recorded rather than treated as exact equivalence.
-- Do not perform a full project build in WSL; WSL builds are too slow. CMake parser-code generation is a required exception when configuration variables are added. After implementation, generation, and static checks, ask the user to build the project in Visual Studio and report the result.
+- Compilation is allowed and required for validation. After implementation and any required parser-code generation, build the project and run the applicable tests using the repository's current build workflow.
 
 ## Scope
 
@@ -253,9 +253,8 @@ After approval:
 - retain existing project style and abstractions
 - avoid unrelated cleanup
 - add the approved regression tests
-- run formatting and static checks that do not build the project
-- do not run full builds or compiled tests in WSL; the required CMake parser-generation target is allowed
-- ask the user to build and run relevant tests in Visual Studio, and request the result
+- run formatting and static checks
+- build the project and run all applicable tests using the repository's current build workflow
 
 If implementation requires a material departure from the approved diffs, stop and obtain approval for the revised proposal before continuing.
 
@@ -286,8 +285,8 @@ Before finishing:
 - run `git diff --check`
 - confirm every configuration variable added by 1.50 for the topic was restored with the correct definition and use sites
 - when configuration variables changed, confirm CMake regenerated the C++ parser code and that the generated output is current
-- run applicable non-build static checks and formatting in WSL
-- ask the user to run the relevant build and tests in Visual Studio; do not build in WSL
+- run applicable static checks and formatting
+- build the project and run the relevant tests; tests are required validation and must not be deferred solely because they compile code
 - verify the catalog entry describes the implemented fix accurately
 - confirm no unrelated files changed
 
@@ -295,7 +294,7 @@ Report:
 
 - the actual bug and what the patch fixes, or the behavior or feature change when the topic is not a bug fix
 - the restored semantic fix
-- static checks run and the Visual Studio build/test result, or clearly state that user validation is pending
+- static checks, build, and tests run, including their results
 - catalog status update
 - any unresolved uncertainty or follow-up topic
 
@@ -332,5 +331,5 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Explicit user approval received.
 - [ ] Approved source and tests implemented.
 - [ ] If configuration variables were added, CMake used to regenerate the C++ parser code and generated changes reviewed.
-- [ ] WSL static checks and `git diff --check` passed; Visual Studio build and test results requested from the user.
+- [ ] Static checks, project build, applicable tests, and `git diff --check` passed.
 - [ ] Matching `docs/patches.md` item completed with a short semantic descriptor.
