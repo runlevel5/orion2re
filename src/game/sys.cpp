@@ -1362,7 +1362,7 @@ namespace SYS {
                 HAROLD::Player_Has_Colony_(
                         MOX::_PLAYER_NUM,
                         planet->star_index) ||
-                HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
+                MOX::_player[MOX::_PLAYER_NUM].traits[TRAIT_OMNISCIENCE] != 0;
 
         *max_width = 0;
         *total_height = 12;

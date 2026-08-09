@@ -1527,6 +1527,8 @@ namespace COLCALC {
         int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
             colony->production[ECON_INDUSTRY] = 0;
+            colony->pollution = 0;
+            colony->imports[ECON_FOOD] = 0;
             if (debug_out) {
                 STRBUILD::Copy(debug_out, _anomaly_msg);
             }

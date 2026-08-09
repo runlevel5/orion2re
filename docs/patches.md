@@ -212,10 +212,10 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:19362` - `non-zero missile hp`: fixed in `CMBTMIS::Get_Missile_Hits_()` by normalizing zero computed or fallback durability to one; this replaces the 1.50 all-call wrapper with a direct source-level return invariant.
 - [x] `asm.pl:19409` - `assassin message race_name instead of ruler_name`: fixed in `MSG_::sprintf_msg_()` by using the defending and attacking players' race names in all assassination-report language paths; this directly expresses the three 1.50 player-field substitutions in source.
 - [x] `asm.pl:19594` - `large fleet net freeze`: already fixed in `NETMOX::Send_Pick_Target_Info_()` and `NETMOX::Send_You_Are_Target_Info_()` by serializing combat state into the shared 8 MiB bounded payload workspace and sending one 32-bit-length framed message; 16-bit ship counts and ids preserve values above 127. This removes the DOS `0x7800` chunk threshold and per-chunk send wait rather than reproducing the 1.50 buffer and control-flow patches.
-- [ ] `asm.pl:19640` - `grain and barrels not shown during anomaly`
+- [x] `asm.pl:19640` - `grain and barrels not shown during anomaly`: fixed in `COLCALC::Colony_Industry_Production_()` by clearing industry production, pollution barrels, and food import/export state together when a colony is affected by a time-space anomaly; this directly expresses the 1.50 helper's three field resets in source.
 - [x] `asm.pl:19659` - `Loknar cannot give tech_0`: fixed in `INITGAME::Init_Leaders_()` by generating Loknar's first technology directly in the valid `1..101` range; this replaces the 1.50 immediate rewrite and removed decrement with the equivalent source-level initialization invariant.
 - [x] `asm.pl:19675` - `Leader #0, Ruola, shown in ship refit popup`: fixed in `COLBLDG::Build_Ship_Info_Formatted_Paragraph_()` by treating every nonnegative officer index as assigned, so valid leader index 0 reaches `OFFICER::Leader_Name_()`; this directly expresses the 1.50 signed branch-boundary correction in source.
-- [ ] `asm.pl:19684` - `galactic lore does not see planet defenses`
+- [x] `asm.pl:19684` - `galactic lore does not see planet defenses`: fixed in `SYS::Do_Print_Planet_Info_()` by requiring race-trait Omniscience, rather than Galactic Lore's broader visibility predicate, before revealing colony defense buildings; this replaces the 1.50 call diversion with a direct source-level display gate.
 - [ ] `asm.pl:19702` - `destroying multi-phased shields`
 
 ### Mixed topics requiring block-level review
