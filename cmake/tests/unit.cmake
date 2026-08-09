@@ -202,6 +202,16 @@ orion2re_add_unit_test(test_colony_production_helpers
         tests/fakes/fake_colcalc_base_runtime.cpp
 )
 
+orion2re_add_unit_test(test_colony_pop_growth
+    SOURCES
+        tests/unit/test_colony_pop_growth.cpp
+    PRODUCTION_SOURCES
+        src/game/colcalc.cpp
+        src/game/colcalc_config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colony_pop_growth_runtime.cpp
+)
+
 orion2re_add_unit_test(test_build_queue
     SOURCES
         tests/unit/test_build_queue.cpp
@@ -323,6 +333,8 @@ if(MSVC)
     target_link_options(test_stasis PRIVATE /OPT:REF)
     target_compile_options(test_stasis_area_effects PRIVATE /Gy)
     target_link_options(test_stasis_area_effects PRIVATE /OPT:REF)
+    target_compile_options(test_colony_pop_growth PRIVATE /Gy)
+    target_link_options(test_colony_pop_growth PRIVATE /OPT:REF)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_aidudes PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_colony_production_helpers PRIVATE -ffunction-sections -fdata-sections)
@@ -335,6 +347,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_combat_stats PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_stasis PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_stasis_area_effects PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_colony_pop_growth PRIVATE -ffunction-sections -fdata-sections)
     if(APPLE)
         target_link_options(test_aidudes PRIVATE -Wl,-dead_strip)
         target_link_options(test_colony_production_helpers PRIVATE -Wl,-dead_strip)
@@ -347,6 +360,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_combat_stats PRIVATE -Wl,-dead_strip)
         target_link_options(test_stasis PRIVATE -Wl,-dead_strip)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,-dead_strip)
+        target_link_options(test_colony_pop_growth PRIVATE -Wl,-dead_strip)
     else()
         target_link_options(test_aidudes PRIVATE -Wl,--gc-sections)
         target_link_options(test_colony_production_helpers PRIVATE -Wl,--gc-sections)
@@ -359,6 +373,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_combat_stats PRIVATE -Wl,--gc-sections)
         target_link_options(test_stasis PRIVATE -Wl,--gc-sections)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,--gc-sections)
+        target_link_options(test_colony_pop_growth PRIVATE -Wl,--gc-sections)
     endif()
 endif()
 

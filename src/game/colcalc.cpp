@@ -2156,7 +2156,9 @@ namespace COLCALC {
 
                 int32_t job_class = -1;
 
-                if (colony->food2_per_farmer != 0) {
+                if ((_housing_creates_no_farmers == 0 ||
+                     colony->producing[0] != COLONY_PRODUCTION_HOUSING) &&
+                    colony->food2_per_farmer != 0) {
                     const int32_t food_balance =
                             static_cast<uint8_t>(colony->food2_needed_for_our_empire) -
                             static_cast<int32_t>(colony->production[0]) * 2 +

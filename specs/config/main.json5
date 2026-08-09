@@ -1667,5 +1667,19 @@
         symbol: "EVENTS::event_delay",
       },
     },
+
+    housing_creates_no_farmers: {
+      title: "Housing creates no farmers",
+      description: "Prevents population grown while a colony produces Housing from being assigned to farming.",
+      remarks: "False preserves classic behavior and applies the normal new-population job selection rules.",
+      examples: ["housing_creates_no_farmers = true;"],
+      group: "gameplay",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_housing_creates_no_farmers",
+      },
+    },
   },
 }

@@ -187,7 +187,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17089` - `del_ships`: no source backport is required; the 1.50 topic only adds a cdecl-to-Watcom ABI wrapper used by the excluded Lua `del_ships` API, while the restored native scrap path calls `FLT1::Get_Technology_From_Scrapped_Ship_()` directly.
 - [x] `asm.pl:17144` - `no green system popup`: fixed in `COMBFIND::Get_Local_Human_Target_()` by invalidating the cached system display before combat target selection, forcing the next system popup to rebuild its reduced palette instead of reusing stale loaded state; this replaces the 1.50 all-call wrapper with direct source-level cache invalidation.
 - [x] `asm.pl:17265` - `planets screen: high-g race has -25% prod penalty on low-g planet`: fixed in `PLNTSUM::Productivity_Penalty_()` by reporting the same 25 percent Low-G-world penalty for High-G races that colony production applies; this directly expresses the two 1.50 branch corrections in source.
-- [ ] `asm.pl:17281` - `new pop not assigned to farming on housing colony`
+- [x] `asm.pl:17281` - `new pop not assigned to farming on housing colony`: implemented in `COLCALC::Apply_Colony_Pop_Growth_()` by bypassing farmer selection for population grown while Housing is active when `housing_creates_no_farmers` is enabled; this replaces the 1.50 binary diversion with a direct source-level guard while preserving classic behavior by default.
 - [ ] `asm.pl:17307` - `amoeba regeneration`
 - [ ] `asm.pl:17417` - `new leader window2 shown on tutor only`
 - [ ] `asm.pl:17828` - `AI zero field research`

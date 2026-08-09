@@ -3,6 +3,7 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    extern uint8_t _housing_creates_no_farmers;
     extern uint8_t _keep_research_on_breakthrough;
     extern uint8_t _keep_research_on_finds;
 

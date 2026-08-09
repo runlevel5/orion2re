@@ -187,6 +187,21 @@ DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     DOCTEST_CHECK(COLCALC::_keep_research_on_finds == 1);
 }
 
+DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::_housing_creates_no_farmers == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "housing_creates_no_farmers = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::_housing_creates_no_farmers == 1);
+}
+
 DOCTEST_TEST_CASE("event delays preserve 1.50 defaults and bind by event name") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
