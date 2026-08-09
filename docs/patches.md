@@ -191,7 +191,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17307` - `amoeba regeneration`: implemented in `COMBINIT::Repair_All_Combat_Ships_()` with the configurable `amoeba_regeneration` gate and `repair_rate` values, while both combat special displays include Regeneration only when enabled; this replaces the 1.50 diversion and branch patches with direct source-level repair and visibility rules while preserving classic behavior by default.
 - [x] `asm.pl:17417` - `new leader window2 shown on tutor only`: fixed in `MAINPUPS::Random_New_Officer_Popup_()` by retaining and redrawing the accept or reject result window only for Tutor-level random leader reports, while officer-screen hiring and higher difficulties close immediately; this replaces the two 1.50 immediate-byte edits with one source-level UI invariant.
 - [x] `asm.pl:17828` - `AI zero field research`: fixed in `COLCALC::Advance_Player_Field_()` by treating the zero starting-technology field as no selected research and returning before field traversal; this replaces the 1.50 all-call wrapper with an owner-level source invariant.
-- [ ] `asm.pl:17871` - `food replicator no negative production`
+- [x] `asm.pl:17871` - `food replicator no negative production`: fixed in `COLCALC::Colony_Replicators_()` by capping replicated food to the amount affordable at the configured production cost before updating colony production; this replaces the 1.50 call-site wrapper with a direct source-level accounting invariant.
 - [x] `asm.pl:17981` - `artificial planet on outposts climate fix`: fixed in `COLONIZE::Make_New_Colony_Or_Outpost_()` by assigning Barren climate to outposts founded on asteroids or gas giants while preserving the real climate of normal planets; this directly expresses the 1.50 helper as a source-level creation invariant.
 - [ ] `asm.pl:18002` - `commando bonus`
 - [ ] `asm.pl:18437` - `net nested combat`
@@ -411,7 +411,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:17625` - `draw race_extra info`
 - [ ] `asm.pl:17749` - `planet extra specials`
 - [ ] `asm.pl:17840` - `independent space scanner`
-- [ ] `asm.pl:17912` - `food replicator pp and bc cost`
+- [x] `asm.pl:17912` - `food replicator pp and bc cost`: implemented with synchronized `colony replicator_food_pp` and `colony replicator_food_bc` settings used by replication, industry breakdowns, and BC maintenance; source applies the BC surcharge after climate-adjusted building maintenance instead of reproducing the 1.50 binary hooks.
 - [ ] `asm.pl:18087` - `antaran ship designs`
 - [ ] `asm.pl:18178` - `system monster weapons`
 - [ ] `asm.pl:18326` - `build screen colors and ordering`

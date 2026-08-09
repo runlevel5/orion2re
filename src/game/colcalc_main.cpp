@@ -559,11 +559,22 @@ namespace COLCALC {
             }
         }
 
-        // Apply final changes. Replicator ratio is 2 Industry : 1 Food
         int16_t final_food_gain = industry_spent / 2;
+        int16_t final_industry_cost = 0;
+        if (_replicator_food_pp != 0) {
+            int16_t maximum_food_gain = colony->production[ECON_INDUSTRY] / _replicator_food_pp;
+            if (maximum_food_gain < 0) {
+                maximum_food_gain = 0;
+            }
+            if (final_food_gain > maximum_food_gain) {
+                final_food_gain = maximum_food_gain;
+            }
+            final_industry_cost = final_food_gain * _replicator_food_pp;
+        }
+
         colony->n_food_replicated = (int8_t)final_food_gain;
         colony->production[ECON_FOOD] += final_food_gain;
-        colony->production[ECON_INDUSTRY] -= industry_spent;
+        colony->production[ECON_INDUSTRY] -= final_industry_cost;
     }
 
     void __cdecl Update_Player_Stats_(s_player* plr) {
@@ -1695,9 +1706,10 @@ namespace COLCALC {
 
             if (colony->n_food_replicated != 0) {
                 char replicated_food_text[256];
+                int32_t replication_cost = (uint8_t)colony->n_food_replicated * _replicator_food_pp;
                 snprintf(replicated_food_text, sizeof(replicated_food_text), _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
-                STRBUILD::Sprintf(debug_out, "\t%d\t%s\r", (int32_t)(uint8_t)colony->n_food_replicated * -2, replicated_food_text);
-                colony->production[ECON_INDUSTRY] -= (uint16_t)(uint8_t)colony->n_food_replicated * 2;
+                STRBUILD::Sprintf(debug_out, "\t%d\t%s\r", -replication_cost, replicated_food_text);
+                colony->production[ECON_INDUSTRY] -= (int16_t)replication_cost;
             }
 
             if (colony->n_industry_taxed != 0) {

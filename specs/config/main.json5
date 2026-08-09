@@ -1705,6 +1705,40 @@
       },
     },
 
+    replicator_food_pp: {
+      title: "Food Replicator production cost",
+      description: "Sets the production points spent per unit of replicated food.",
+      remarks: "The default is the classic two production points per food. Zero makes replication free and disables the production cap, matching MOO2 1.50.",
+      examples: ["colony replicator_food_pp = 2;"],
+      units: "production points per food",
+      group: "gameplay",
+      namespace: "colony",
+      type: "uint8",
+      constraints: { max: 127 },
+      default: 2,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_replicator_food_pp",
+      },
+    },
+
+    replicator_food_bc: {
+      title: "Food Replicator BC cost",
+      description: "Sets the BC maintenance cost per unit of replicated food.",
+      remarks: "This surcharge is applied after climate-adjusted building maintenance, matching MOO2 1.50. Zero removes the BC cost.",
+      examples: ["colony replicator_food_bc = 1;"],
+      units: "BC per food",
+      group: "gameplay",
+      namespace: "colony",
+      type: "uint8",
+      constraints: { max: 127 },
+      default: 1,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_replicator_food_bc",
+      },
+    },
+
     amoeba_regeneration: {
       title: "Amoeba regeneration",
       description: "Enables the Regeneration special carried by Toxic Amoebae.",

@@ -202,6 +202,32 @@ DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic d
     DOCTEST_CHECK(COLCALC::_housing_creates_no_farmers == 1);
 }
 
+DOCTEST_TEST_CASE("Food Replicator costs preserve 1.50 defaults and validate their range") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::_replicator_food_pp == 2);
+    DOCTEST_CHECK(COLCALC::_replicator_food_bc == 1);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony replicator_food_pp = 0;"
+        "colony replicator_food_bc = 127;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::_replicator_food_pp == 0);
+    DOCTEST_CHECK(COLCALC::_replicator_food_bc == 127);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony replicator_food_pp = 128;", &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony replicator_food_bc = 128;", &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("event delays preserve 1.50 defaults and bind by event name") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
