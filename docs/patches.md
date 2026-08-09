@@ -204,7 +204,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:18959` - `autodesign considers x3 shot`: implemented with the synchronized `design missile_x3_shot` setting and shared `DESIGN` rack helpers, so UI selection, rack cost and space, and autodesign use the same x2/x3/x5/x10/x20 ladder; this replaces the 1.50 data patches and code-cave diversion with one source-level rule while preserving classic behavior by default.
 - [x] `asm.pl:18989` - `ship explosion leader says nooo`: implemented in `CMBTSPEC::Do_Spherical_SFX_()` and `CMBTSPEC::Destroy_Ship_FX_()` by deriving the leader death exclamation from the destroyed combat ship's officer; the optional `leaders leader_dies_with_no` setting extends it to regular and Quantum Detonator destruction, replacing the 1.50 call-site wrappers with direct source-level sound policy.
 - [x] `asm.pl:19157` - `dimensional portal icon in system display box displays race name instead of ruler name`: fixed in `SYS::Print_Gate_Info_()` by appending each dimensional-portal owner's race name instead of ruler name; this directly expresses the 1.50 player-field displacement correction in source.
-- [ ] `asm.pl:19225` - `energy absorber 21 squares range bug`
+- [x] `asm.pl:19225` - `energy absorber 21 squares range bug`: fixed in `CMBTFIRE::Pre_Weapon_Specials_()` by allowing the Energy Absorber counterattack at computed range 8; this directly expresses the 1.50 inclusive branch correction in source.
 - [ ] `asm.pl:19256` - `artemis desync`
 - [ ] `asm.pl:19295` - `food shortage anims also shown when colony has 0 food production and 0 food import`
 - [ ] `asm.pl:19304` - `scrap freighters wrong message`

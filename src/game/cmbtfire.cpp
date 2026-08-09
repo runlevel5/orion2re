@@ -1360,7 +1360,7 @@ namespace CMBTFIRE {
         special_idx = 0;
         for (bit_idx = 0; bit_idx < 39; ++bit_idx) {
             // Check for Energy Absorber (Bit 10)
-            if (bit_idx == SPECIAL_ENERGY_ABSORBER && target_type == 0 && range < 8) {
+            if (bit_idx == SPECIAL_ENERGY_ABSORBER && target_type == 0 && range <= 8) {
                 if (MOX::_combat_data[unit_idx].reflected_damage_pool > 0) {
                     if (CMBTFIRE::Special_Is_On_(unit_idx, special_idx)) {
                         CMBTFIRE::Energy_Absorber_Attack_(unit_idx, target_idx);
