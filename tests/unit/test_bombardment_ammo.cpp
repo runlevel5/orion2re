@@ -140,6 +140,7 @@ DOCTEST_TEST_CASE("tactical bombardment advances only torpedo cooldown") {
     TEST_BOMBARDMENT_AMMO::Reset_();
     int16_t ship_indices[] = {0};
     s_combat_bomb_result result = {};
+    result.attacker_idx = kAttacker;
 
     COMBAT::Tactical_Bombardment_(ship_indices, 1, &result);
 
@@ -154,9 +155,24 @@ DOCTEST_TEST_CASE("tactical bombardment refreshes attacker fighter weapons") {
     TEST_BOMBARDMENT_AMMO::Reset_();
     int16_t ship_indices[] = {0};
     s_combat_bomb_result result = {};
+    result.attacker_idx = kAttacker;
 
     COMBAT::Tactical_Bombardment_(ship_indices, 1, &result);
 
+    DOCTEST_CHECK(MOX::_fighter_beam_type[kAttacker] == kBestPointDefenseWeapon);
+    DOCTEST_CHECK(MOX::_fighter_bomb_type[kAttacker] == kBestBombWeapon);
+}
+
+DOCTEST_TEST_CASE("empty tactical bombardment uses the context attacker") {
+    TEST_BOMBARDMENT_AMMO::Reset_();
+    ships[0].owner = 3;
+    int16_t unused_ship_indices[] = {0};
+    s_combat_bomb_result result = {};
+    result.attacker_idx = kAttacker;
+
+    COMBAT::Tactical_Bombardment_(unused_ship_indices, 0, &result);
+
+    DOCTEST_CHECK(MOX::_combat_attacker_player == kAttacker);
     DOCTEST_CHECK(MOX::_fighter_beam_type[kAttacker] == kBestPointDefenseWeapon);
     DOCTEST_CHECK(MOX::_fighter_bomb_type[kAttacker] == kBestBombWeapon);
 }

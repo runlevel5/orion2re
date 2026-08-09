@@ -1408,7 +1408,7 @@ namespace COMBAT {
         MOX::_missile = (s_missile*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1E78);
         struct_::Clear_Structure_(MOX::_missile, 0x1E78);
 
-        MOX::_combat_attacker_player = MOX::_ship[ship_array[0]].owner;
+        MOX::_combat_attacker_player = bomb_result->attacker_idx;
         MOX::_combat_defender_player = MOX::_colony[MOX::_cmbt_colony_id].owner;
 
         if ((uint16_t)MOX::_combat_attacker_player <= MAX_PLAYERS) {
