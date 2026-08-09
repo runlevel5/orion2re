@@ -7,3 +7,7 @@ namespace MOX {
 namespace MAPGEN {
     int16_t _maximum_star_count = 99;
 }
+
+namespace CMBTSPEC {
+    uint8_t _leader_dies_with_no;
+}

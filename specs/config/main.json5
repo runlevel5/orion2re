@@ -1690,6 +1690,21 @@
       },
     },
 
+    leader_dies_with_no: {
+      title: "Leader death exclamation for every ship destruction",
+      description: "Plays the leader death exclamation when any ship carrying a leader is destroyed, including regular and Quantum Detonator explosions.",
+      remarks: "False limits the exclamation to drive explosions, matching the base MOO2 1.50 fix. Classic instead used an unrelated 10 percent chance during drive explosions.",
+      examples: ["leaders leader_dies_with_no = true;"],
+      group: "interface",
+      namespace: "leaders",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/cmbtspec.h",
+        symbol: "CMBTSPEC::_leader_dies_with_no",
+      },
+    },
+
     keep_research_on_breakthrough: {
       title: "Keep research after breakthroughs",
       description: "Retains research points above twice the completed field's cost after a research breakthrough.",

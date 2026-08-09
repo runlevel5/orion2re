@@ -3,7 +3,16 @@
 #include <cstddef>
 
 namespace CMBTSPEC {
+    namespace {
+        void Play_Leader_Death_SFX_(int16_t ship_idx) {
+            if (MOX::_combat_data[ship_idx].officer_idx >= 0) {
+                ERICNET::Mox_Play_Sound_(0x21);
+            }
+        }
+    }
+
     int32_t _g_engine_sfx_handle;
+    uint8_t _leader_dies_with_no;
 
     bool __cdecl Draw_Clipped_Tractor_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* bitmap) {
         if (line::Clip_Line_(&x1, &y1, &x2, &y2) != 0) {
@@ -1217,6 +1226,9 @@ namespace CMBTSPEC {
             }
 
             Play_Ship_Explosion_SFX_((int16_t)ship->size_class);
+            if (_leader_dies_with_no != 0) {
+                Play_Leader_Death_SFX_(ship_idx);
+            }
 
             int16_t half_frame = frame_count / 2;
 
@@ -1619,15 +1631,16 @@ namespace CMBTSPEC {
             draw_ships_collapsing_flag = false;
             ERICNET::Mox_Play_Sound_(0x2F);
             ERICNET::Mox_Play_Sound_(8);
-            if (game_random::Random_(10) == 1) {
-                ERICNET::Mox_Play_Sound_(0x21);
-            }
+            Play_Leader_Death_SFX_(source_ship_idx);
             break;
         case 4:
             remap_colors = MOX::_warp_core_remap_colors;
             draw_ships_collapsing_flag = false;
             ERICNET::Mox_Play_Sound_(0x19);
             ERICNET::Mox_Play_Sound_(8);
+            if (_leader_dies_with_no != 0) {
+                Play_Leader_Death_SFX_(source_ship_idx);
+            }
             break;
         }
 
