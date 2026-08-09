@@ -17,6 +17,7 @@
 #include "game/design_config.h"
 #include "game/ericnet.h"
 #include "game/events.h"
+#include "game/invasion.h"
 #include "game/mapgen.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
@@ -185,6 +186,25 @@ DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COLCALC::_keep_research_on_breakthrough == 1);
     DOCTEST_CHECK(COLCALC::_keep_research_on_finds == 1);
+}
+
+DOCTEST_TEST_CASE("ground Commando settings preserve classic defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(invasion::_ground_commando_defender_x5 == 0);
+    DOCTEST_CHECK(invasion::_ground_commando_attacker_x2 == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "leaders ground_commando_defender_x5 = true;"
+        "leaders ground_commando_attacker_x2 = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(invasion::_ground_commando_defender_x5 == 1);
+    DOCTEST_CHECK(invasion::_ground_commando_attacker_x2 == 1);
 }
 
 DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic default") {

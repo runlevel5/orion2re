@@ -193,7 +193,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17828` - `AI zero field research`: fixed in `COLCALC::Advance_Player_Field_()` by treating the zero starting-technology field as no selected research and returning before field traversal; this replaces the 1.50 all-call wrapper with an owner-level source invariant.
 - [x] `asm.pl:17871` - `food replicator no negative production`: fixed in `COLCALC::Colony_Replicators_()` by capping replicated food to the amount affordable at the configured production cost before updating colony production; this replaces the 1.50 call-site wrapper with a direct source-level accounting invariant.
 - [x] `asm.pl:17981` - `artificial planet on outposts climate fix`: fixed in `COLONIZE::Make_New_Colony_Or_Outpost_()` by assigning Barren climate to outposts founded on asteroids or gas giants while preserving the real climate of normal planets; this directly expresses the 1.50 helper as a source-level creation invariant.
-- [ ] `asm.pl:18002` - `commando bonus`
+- [x] `asm.pl:18002` - `commando bonus`: implemented in `invasion::Compute_Colony_Officer_Bonus_()` and `invasion::Compute_Attacker_Officer_Bonus_()` with synchronized `leaders ground_commando_defender_x5` and `leaders ground_commando_attacker_x2` settings; direct source-level formula selection replaces the 1.50 code-cave wrappers and immediate-byte edit while preserving classic defaults.
 - [ ] `asm.pl:18437` - `net nested combat`
 - [ ] `asm.pl:18649` - `no homeworld`
 - [ ] `asm.pl:18679` - `outpost false button`

@@ -1630,6 +1630,36 @@
       ],
     },
 
+    ground_commando_defender_x5: {
+      title: "Higher defending Commando bonus",
+      description: "Uses 5x and 7.5x officer-level multipliers for defending ground troops instead of the classic 2x and 3x multipliers.",
+      remarks: "False preserves classic behavior. The improved 7.5x result retains the original 1.50 downward rounding.",
+      examples: ["leaders ground_commando_defender_x5 = true;"],
+      group: "gameplay",
+      namespace: "leaders",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/invasion.h",
+        symbol: "invasion::_ground_commando_defender_x5",
+      },
+    },
+
+    ground_commando_attacker_x2: {
+      title: "Lower attacking Commando bonus",
+      description: "Uses 2x and 3x officer-level multipliers for attacking ground troops instead of the classic 5x and 7.5x multipliers.",
+      remarks: "False preserves classic behavior, including upward rounding of the improved 7.5x result.",
+      examples: ["leaders ground_commando_attacker_x2 = true;"],
+      group: "gameplay",
+      namespace: "leaders",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/invasion.h",
+        symbol: "invasion::_ground_commando_attacker_x2",
+      },
+    },
+
     keep_research_on_breakthrough: {
       title: "Keep research after breakthroughs",
       description: "Retains research points above twice the completed field's cost after a research breakthrough.",

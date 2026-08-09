@@ -94,6 +94,7 @@ orion2re_add_unit_test(test_config_decode
         src/game/design_config.cpp
         src/game/ericnet_config.cpp
         src/game/events_config.cpp
+        src/game/invasion_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -111,6 +112,7 @@ orion2re_add_unit_test(test_config_bindings
         src/game/design_config.cpp
         src/game/ericnet_config.cpp
         src/game/events_config.cpp
+        src/game/invasion_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -129,6 +131,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/game/design_config.cpp
         src/game/ericnet_config.cpp
         src/game/events_config.cpp
+        src/game/invasion_config.cpp
         src/game/ship_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
@@ -150,6 +153,7 @@ orion2re_add_unit_test(test_config_loader
         src/game/design_config.cpp
         src/game/ericnet_config.cpp
         src/game/events_config.cpp
+        src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/compat.cpp
         src/game/vfs.cpp
@@ -239,6 +243,16 @@ orion2re_add_unit_test(test_colonize
         src/game/colonize.cpp
     FAKE_SOURCES
         tests/fakes/fake_colonize_runtime.cpp
+)
+
+orion2re_add_unit_test(test_ground_commando
+    SOURCES
+        tests/unit/test_ground_commando.cpp
+    PRODUCTION_SOURCES
+        src/game/invasion.cpp
+        src/game/invasion_config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_ground_commando_runtime.cpp
 )
 
 orion2re_add_unit_test(test_ericnet
@@ -349,6 +363,8 @@ if(MSVC)
     target_link_options(test_boarding PRIVATE /OPT:REF)
     target_compile_options(test_combat_stats PRIVATE /Gy)
     target_link_options(test_combat_stats PRIVATE /OPT:REF)
+    target_compile_options(test_ground_commando PRIVATE /Gy)
+    target_link_options(test_ground_commando PRIVATE /OPT:REF)
     target_compile_options(test_combat_repair PRIVATE /Gy)
     target_link_options(test_combat_repair PRIVATE /OPT:REF)
     target_compile_options(test_stasis PRIVATE /Gy)
@@ -369,6 +385,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_absorber_cleanup PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_boarding PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_combat_stats PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_ground_commando PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_combat_repair PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_stasis PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_stasis_area_effects PRIVATE -ffunction-sections -fdata-sections)
@@ -384,6 +401,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_absorber_cleanup PRIVATE -Wl,-dead_strip)
         target_link_options(test_boarding PRIVATE -Wl,-dead_strip)
         target_link_options(test_combat_stats PRIVATE -Wl,-dead_strip)
+        target_link_options(test_ground_commando PRIVATE -Wl,-dead_strip)
         target_link_options(test_combat_repair PRIVATE -Wl,-dead_strip)
         target_link_options(test_stasis PRIVATE -Wl,-dead_strip)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,-dead_strip)
@@ -399,6 +417,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_absorber_cleanup PRIVATE -Wl,--gc-sections)
         target_link_options(test_boarding PRIVATE -Wl,--gc-sections)
         target_link_options(test_combat_stats PRIVATE -Wl,--gc-sections)
+        target_link_options(test_ground_commando PRIVATE -Wl,--gc-sections)
         target_link_options(test_combat_repair PRIVATE -Wl,--gc-sections)
         target_link_options(test_stasis PRIVATE -Wl,--gc-sections)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,--gc-sections)
