@@ -116,6 +116,9 @@ namespace COLBLDG {
     uint32_t _g_last_title_click_ms;
     int16_t _g_preset_saved_queue[7];
     int16_t _g_preset_saved_auto;
+    // Queue slot armed for deletion by the Delete key (-1 none): the row
+    // shows "delete <item>", then Delete/Enter confirm and Esc backs out.
+    int16_t _g_kbd_delete_confirm = -1;
     // The preset's full item list; the 7 queue slots window one page of it,
     // materialized (draft ships and all) only while that page is visible.
     uint8_t _g_preset_items[BUILD_QUEUE::INSTRUCTION_CAPACITY];
@@ -318,6 +321,7 @@ namespace COLBLDG {
     // Materializes one page of the item buffer into the queue slots.
     void Load_Preset_Page_(int16_t page) {
         _g_preset_page = page;
+        _g_kbd_delete_confirm = -1;
         int slot = 0;
         for (int i = page * 7; i < _g_preset_item_count && slot < 7; ++i) {
             int16_t product = Product_For_Preset_Instruction_(_g_preset_items[i]);
@@ -371,6 +375,53 @@ namespace COLBLDG {
         memcpy(_g_preset_items, merged, (size_t)n);
         _g_preset_item_count = (int16_t)n;
         Remove_Ships_(0);
+    }
+
+    int16_t Preset_Items_Outside_Page_() {
+        int start = _g_preset_page * 7;
+        if (start > _g_preset_item_count) {
+            start = _g_preset_item_count;
+        }
+        int end = start + 7;
+        if (end > _g_preset_item_count) {
+            end = _g_preset_item_count;
+        }
+        return (int16_t)(_g_preset_item_count - (end - start));
+    }
+
+    // After a deletion the visible page holds fewer items than its stored
+    // window — re-splice and reload so following pages pull forward and the
+    // page total shrinks right away (an emptied page collapses instead of
+    // lingering). Skipped mid-carry and in the pick-a-target modes.
+    void Normalize_Preset_Page_() {
+        if (_g_preset_edit_mode == 0 || _active_prod[0] != -1 || _field_mode != 0) {
+            return;
+        }
+        int start = _g_preset_page * 7;
+        if (start > _g_preset_item_count) {
+            start = _g_preset_item_count;
+        }
+        int end = start + 7;
+        if (end > _g_preset_item_count) {
+            end = _g_preset_item_count;
+        }
+        int16_t page_items = 0;
+        for (int i = 0; i < 7; ++i) {
+            if (_current_item[i] != COLONY_PRODUCTION_NONE) {
+                page_items++;
+            }
+        }
+        if (page_items >= end - start) {
+            return;
+        }
+        Store_Preset_Page_();
+        int16_t target = (_g_preset_item_count <= 0)
+            ? (int16_t)0
+            : (int16_t)((_g_preset_item_count - 1) / 7);
+        if (target > _g_preset_page) {
+            target = _g_preset_page;
+        }
+        Load_Preset_Page_(target);
     }
 
     void Enter_Preset_Editor_() {
@@ -440,6 +491,184 @@ namespace COLBLDG {
                                         direction < 0 ? (int16_t)218 : (int16_t)411, 306);
         }
         Load_Preset_Page_(page);
+    }
+
+    // Enhancement: keyboard navigation over the three panels — Tab cycles
+    // left list -> right list -> queue, Up/Down move a pulsating selection
+    // within the panel, Enter acts as a click on the selected row.
+    int16_t _g_kbd_panel = -1; // -1 none, 0 left list, 1 right list, 2 queue
+    int16_t _g_kbd_index;
+
+    static int16_t Kbd_Panel_Count_(int16_t panel) {
+        if (panel == 0) {
+            return _n_building_indexes;
+        }
+        if (panel == 1) {
+            return _n_military_indexes;
+        }
+        if (panel == 2) {
+            int16_t len = Get_Prod_Queue_Len_();
+            return len == -1 ? 7 : len;
+        }
+        return 0;
+    }
+
+    static int16_t Kbd_Selected_Field_() {
+        if (_g_kbd_panel < 0) {
+            return 0;
+        }
+        int16_t count = Kbd_Panel_Count_(_g_kbd_panel);
+        if (count <= 0) {
+            return 0;
+        }
+        if (_g_kbd_index >= count) {
+            _g_kbd_index = (int16_t)(count - 1);
+        }
+        if (_g_kbd_panel == 0) {
+            return _building_fields[_g_kbd_index];
+        }
+        if (_g_kbd_panel == 1) {
+            return _military_fields[_g_kbd_index];
+        }
+        return _queue_fields[_g_kbd_index];
+    }
+
+    void Kbd_Delete_Queue_Item_() {
+        int16_t slot = _g_kbd_index;
+        _g_kbd_delete_confirm = -1;
+        if (_g_preset_edit_mode == 0 && slot == 0 &&
+            MOX::_colony[COLONY::_colony_handle].bought_outright != 0) {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(0x23a));
+            Do_Draw_Build_Queue_();
+            return;
+        }
+        Delete_From_Queue_(slot);
+        Do_Draw_Build_Queue_();
+        COLONY::_full_draw = 1;
+    }
+
+    void Draw_Kbd_Selection_Pulse_() {
+        int16_t field_id = Kbd_Selected_Field_();
+        if (field_id <= 0) {
+            return;
+        }
+        if (_g_kbd_panel == 2 && _g_kbd_delete_confirm == _g_kbd_index) {
+            // An armed deletion shows the click version's red box, repeat
+            // companion rows included.
+            int16_t base_y = (int16_t)(_g_kbd_index * 20 + 2);
+            graphics::Box_(207, base_y + 332, 252, 16, 1, 239);
+            if (_g_kbd_index != 0 &&
+                _current_item[_g_kbd_index] == COLONY_PRODUCTION_REPEAT) {
+                graphics::Box_(207, base_y + 312, 252, 16, 1, 239);
+            }
+            if (_g_kbd_index < 6 &&
+                _current_item[_g_kbd_index + 1] == COLONY_PRODUCTION_REPEAT) {
+                graphics::Box_(207, base_y + 352, 252, 16, 1, 239);
+            }
+            return;
+        }
+        if (_g_kbd_panel == 2) {
+            // The queue selection uses the same row geometry as the red
+            // delete box, so the two highlights line up exactly.
+            ERIC::Pulsing_Box_(207, (int16_t)(_g_kbd_index * 20 + 334),
+                               252, 16, 1, 1, 2);
+            return;
+        }
+        const s_field& field = fields::_fields[field_id];
+        ERIC::Pulsing_Box_(field.x, (int16_t)(field.y - 2),
+                           (int16_t)(field.x_end - field.x),
+                           (int16_t)(field.y_end - field.y), 1, 1, 2);
+    }
+
+    // Returns the selected row's field for Enter, else 0; Tab and Up/Down
+    // update the selection (the full redraw erases the old pulse box).
+    int16_t Read_Build_Kbd_Keys_() {
+        int32_t key = key::Read_Key_();
+        if (key == 0) {
+            return 0;
+        }
+        if (key == 0x10000) { // Delete
+            if (_g_kbd_panel == 2 && Kbd_Selected_Field_() > 0) {
+                if (_g_kbd_delete_confirm == _g_kbd_index) {
+                    Kbd_Delete_Queue_Item_();
+                } else {
+                    _g_kbd_delete_confirm = _g_kbd_index;
+                    COLONY::_full_draw = 1;
+                }
+            }
+            return 0;
+        }
+        if (key == 0x011B && _g_kbd_delete_confirm != -1) { // Esc backs out
+            _g_kbd_delete_confirm = -1;
+            COLONY::_full_draw = 1;
+            return 0;
+        }
+        if (key == 0x0F09) { // Tab: left -> right -> queue, skipping empties
+            _g_kbd_delete_confirm = -1;
+            for (int16_t step = 0; step < 3; ++step) {
+                _g_kbd_panel = (_g_kbd_panel == 0) ? (int16_t)1
+                             : (_g_kbd_panel == 1) ? (int16_t)2 : (int16_t)0;
+                if (Kbd_Panel_Count_(_g_kbd_panel) > 0) {
+                    break;
+                }
+            }
+            _g_kbd_index = 0;
+            COLONY::_full_draw = 1;
+            return 0;
+        }
+        if ((key == 0x48E0 || key == 0x50E0) && _g_kbd_panel >= 0) { // Up/Down
+            _g_kbd_delete_confirm = -1;
+            int16_t count = Kbd_Panel_Count_(_g_kbd_panel);
+            if (count > 0) {
+                if (_g_kbd_index >= count) {
+                    _g_kbd_index = (int16_t)(count - 1);
+                }
+                _g_kbd_index = (key == 0x48E0)
+                    ? (int16_t)((_g_kbd_index + count - 1) % count)
+                    : (int16_t)((_g_kbd_index + 1) % count);
+                COLONY::_full_draw = 1;
+            }
+            return 0;
+        }
+        if (key == 0x1C0D) { // Enter clicks the selected row
+            if (_g_kbd_panel == 2 && _g_kbd_delete_confirm == _g_kbd_index &&
+                Kbd_Selected_Field_() > 0) {
+                Kbd_Delete_Queue_Item_(); // Enter confirms an armed deletion
+                return 0;
+            }
+            if (_g_kbd_panel == 2 && _active_prod[0] >= BUILDING_COUNT &&
+                (_active_prod[0] - BUILDING_COUNT) == _g_kbd_index) {
+                // Enter on the already-grabbed slot releases it instead of
+                // clicking through to the vanilla same-slot delete —
+                // deletion is the Delete key's job.
+                _active_prod[0] = -1;
+                COLONY::Reset_Mouse_Picture_();
+                COLONY::_full_draw = 1;
+                return 0;
+            }
+            int16_t field_id = Kbd_Selected_Field_();
+            if (field_id > 0) {
+                COLONY::_full_draw = 1;
+                return field_id;
+            }
+        }
+        if (_g_preset_edit_mode != 0 &&
+            (key == 0x47E0 || key == 0x4FE0)) { // Home/End jump pages
+            Store_Preset_Page_();
+            int16_t last_page = (_g_preset_item_count <= 0)
+                ? (int16_t)0
+                : (int16_t)((_g_preset_item_count - 1) / 7);
+            int16_t target = (key == 0x47E0) ? (int16_t)0 : last_page;
+            if (target != _g_preset_page) {
+                Animate_Colony_Arrow_Press_(
+                    (key == 0x47E0) ? _prev_colony_anim : _next_colony_anim,
+                    (key == 0x47E0) ? (int16_t)218 : (int16_t)411, 306);
+            }
+            Load_Preset_Page_(target);
+            return 0;
+        }
+        key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+        return 0;
     }
 
     char _g_msg[800];
@@ -947,14 +1176,26 @@ namespace COLBLDG {
         }
         video::Set_Refresh_Stencil_();
 
+        const bool enhanced_kbd = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
+        COLBLDG::_g_kbd_panel = -1;
+        COLBLDG::_g_kbd_index = 0;
+        COLBLDG::_g_kbd_delete_confirm = -1;
+
         int16_t field_id;
         int16_t scan_code;
         do {
             COLBLDG::Draw_Build_Queue_Popup_();
+            if (enhanced_kbd) {
+                COLBLDG::Draw_Kbd_Selection_Pulse_();
+            }
             RUSS::Mox_Sync_Update_();
-            field_id = fields::Get_Input_();
+            int16_t kbd_field = enhanced_kbd ? COLBLDG::Read_Build_Kbd_Keys_() : (int16_t)0;
+            field_id = (kbd_field != 0) ? kbd_field : fields::Get_Input_();
             scan_code = fields::Scan_Input_();
             COLBLDG::Evaluate_Input_(&field_id, &scan_code);
+            if (enhanced_kbd) {
+                COLBLDG::Normalize_Preset_Page_();
+            }
 
             if (field_id == COLBLDG::_fields[3] ||
                 field_id == COLBLDG::_fields[0] ||
@@ -1168,7 +1409,7 @@ namespace COLBLDG {
             }
 
             const char* text_to_print;
-            if (show_delete && _scanned_field >= _queue_fields[0] && _scanned_field <= _queue_fields[6] && _current_item[i] != COLONY_PRODUCTION_NONE) {
+            if (((show_delete && _scanned_field >= _queue_fields[0] && _scanned_field <= _queue_fields[6]) || _g_kbd_delete_confirm == i) && _current_item[i] != COLONY_PRODUCTION_NONE) {
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
                 char* item_name = Selection_Name_(_current_item[i]);
                 snprintf(buffer, sizeof(buffer), ESTRINGS::E_Strings_(ESTR_DELETE_S), item_name);
@@ -1908,6 +2149,16 @@ namespace COLBLDG {
                 return;
             }
             if (input_field == _fields[0] || input_field == _fields[1]) {
+                if (_field_mode != 0 || _active_prod[0] != -1) {
+                    // With a grabbed item or an active pick mode, Cancel and
+                    // Esc only back out of that (like vanilla) — they do not
+                    // leave the preset editor.
+                    _field_mode = 0;
+                    _active_prod[0] = -1;
+                    COLONY::Reset_Mouse_Picture_();
+                    *selected_field_id = 0;
+                    return;
+                }
                 Exit_Preset_Editor_(false);
                 *selected_field_id = 0;
                 return;
@@ -2541,15 +2792,25 @@ namespace COLBLDG {
 
     int8_t __cdecl Add_To_Queue_(int16_t product_id) {
         int16_t q_len = COLBLDG::Get_Prod_Queue_Len_();
-        // Enhancement: in the preset editor a full page jumps straight to
-        // the page with free space (pages are kept dense, so that is always
-        // the last one — or a fresh tail page), in a single transition.
-        if (q_len == -1 && COLBLDG::_g_preset_edit_mode != 0) {
-            COLBLDG::Store_Preset_Page_();
-            if (COLBLDG::_g_preset_item_count >= COLBLDG::MAX_PRESET_ITEMS) {
-                GENDRAW::Help_((char*)"The preset is full; no more items can be added.");
-                COLBLDG::Load_Preset_Page_(COLBLDG::_g_preset_page);
-            } else {
+        // Enhancement: the preset editor caps the total item count at the
+        // format limit — refused up front (the callers show "no room in
+        // queue"), so a stored page is never silently truncated. A full
+        // page below the cap jumps straight to the page with free space
+        // (pages are kept dense, so that is always the last one — or a
+        // fresh tail page), in a single transition.
+        if (COLBLDG::_g_preset_edit_mode != 0) {
+            int16_t page_items = 0;
+            for (int i = 0; i < 7; ++i) {
+                if (COLBLDG::_current_item[i] != COLONY_PRODUCTION_NONE) {
+                    page_items++;
+                }
+            }
+            if (COLBLDG::Preset_Items_Outside_Page_() + page_items >=
+                COLBLDG::MAX_PRESET_ITEMS) {
+                return 0;
+            }
+            if (q_len == -1) {
+                COLBLDG::Store_Preset_Page_();
                 COLBLDG::Animate_Colony_Arrow_Press_(COLBLDG::_next_colony_anim, 411, 306);
                 COLBLDG::Load_Preset_Page_((int16_t)(COLBLDG::_g_preset_item_count / 7));
                 q_len = COLBLDG::Get_Prod_Queue_Len_();
