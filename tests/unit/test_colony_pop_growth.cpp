@@ -26,6 +26,18 @@ namespace {
         return colony;
     }
 
+    s_colony* Prepare_Starving_Colony_() {
+        TEST_COLONY_POP_GROWTH::Reset_();
+
+        s_colony* colony = &MOX::_colony[0];
+        colony->owner = 0;
+        colony->planet = 0;
+        colony->occupation_policy = 4;
+        colony->n_pops = 1;
+        colony->pop_growth[0] = -1000;
+        return colony;
+    }
+
     uint32_t New_Colonist_Job_(const s_colony* colony) {
         return (colony->pop[1] & 0x180u) >> 7;
     }
@@ -59,6 +71,33 @@ DOCTEST_TEST_CASE("configured Housing growth bypasses farmer assignment") {
 
     DOCTEST_REQUIRE(colony->n_pops == 2);
     DOCTEST_CHECK(New_Colonist_Job_(colony) == 1);
+}
+
+DOCTEST_TEST_CASE("classic starvation preserves the final population") {
+    s_colony* colony = Prepare_Starving_Colony_();
+
+    COLCALC::Apply_Colony_Pop_Growth_(colony);
+
+    DOCTEST_CHECK(colony->n_pops == 1);
+}
+
+DOCTEST_TEST_CASE("configured extinction allows a human colony to starve out") {
+    s_colony* colony = Prepare_Starving_Colony_();
+    MOX::_player[0].objectives = PLAYER_OBJECTIVE_HUMAN;
+    COLCALC::_planet_extinction = 1;
+
+    COLCALC::Apply_Colony_Pop_Growth_(colony);
+
+    DOCTEST_CHECK(colony->n_pops == 0);
+}
+
+DOCTEST_TEST_CASE("configured extinction preserves the final AI population") {
+    s_colony* colony = Prepare_Starving_Colony_();
+    COLCALC::_planet_extinction = 1;
+
+    COLCALC::Apply_Colony_Pop_Growth_(colony);
+
+    DOCTEST_CHECK(colony->n_pops == 1);
 }
 
 DOCTEST_TEST_CASE("classic zero colony survives while settlers are inbound") {

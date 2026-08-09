@@ -356,6 +356,15 @@ orion2re_add_unit_test(test_bombardment_ammo
         src/game/combat.cpp
 )
 
+orion2re_add_unit_test(test_town_zero
+    SOURCES
+        tests/unit/test_town_zero.cpp
+    PRODUCTION_SOURCES
+        src/game/bomb.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_town_zero_runtime.cpp
+)
+
 orion2re_add_unit_test(test_animation_frame
     SOURCES
         tests/unit/test_animation_frame.cpp
@@ -417,6 +426,8 @@ if(MSVC)
     target_link_options(test_colony_production_draw PRIVATE /OPT:REF)
     target_compile_options(test_bombardment_ammo PRIVATE /Gy)
     target_link_options(test_bombardment_ammo PRIVATE /OPT:REF)
+    target_compile_options(test_town_zero PRIVATE /Gy)
+    target_link_options(test_town_zero PRIVATE /OPT:REF)
     target_compile_options(test_animation_frame PRIVATE /Gy)
     target_compile_options(test_ericnet PRIVATE /Gy)
     target_link_options(test_animation_frame PRIVATE /OPT:REF)
@@ -447,6 +458,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_colony_production_helpers PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_colony_production_draw PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_bombardment_ammo PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_town_zero PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_animation_frame PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_ericnet PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_missile_defense PRIVATE -ffunction-sections -fdata-sections)
@@ -465,6 +477,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_colony_production_helpers PRIVATE -Wl,-dead_strip)
         target_link_options(test_colony_production_draw PRIVATE -Wl,-dead_strip)
         target_link_options(test_bombardment_ammo PRIVATE -Wl,-dead_strip)
+        target_link_options(test_town_zero PRIVATE -Wl,-dead_strip)
         target_link_options(test_animation_frame PRIVATE -Wl,-dead_strip)
         target_link_options(test_ericnet PRIVATE -Wl,-dead_strip)
         target_link_options(test_missile_defense PRIVATE -Wl,-dead_strip)
@@ -483,6 +496,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_colony_production_helpers PRIVATE -Wl,--gc-sections)
         target_link_options(test_colony_production_draw PRIVATE -Wl,--gc-sections)
         target_link_options(test_bombardment_ammo PRIVATE -Wl,--gc-sections)
+        target_link_options(test_town_zero PRIVATE -Wl,--gc-sections)
         target_link_options(test_animation_frame PRIVATE -Wl,--gc-sections)
         target_link_options(test_ericnet PRIVATE -Wl,--gc-sections)
         target_link_options(test_missile_defense PRIVATE -Wl,--gc-sections)

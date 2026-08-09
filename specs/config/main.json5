@@ -1795,6 +1795,21 @@
       },
     },
 
+    planet_extinction: {
+      title: "Population extinction from starvation",
+      description: "Allows starvation to remove the final population unit from human-controlled colonies.",
+      remarks: "False preserves classic final-population protection. AI colonies remain protected when enabled.",
+      examples: ["colony planet_extinction = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_planet_extinction",
+      },
+    },
+
     zero_colony_lost: {
       title: "Zero-population colony loss",
       description: "Always destroys a colony with no population and no surviving buildings, even when colonists are inbound.",

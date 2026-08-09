@@ -2008,6 +2008,8 @@ namespace COLCALC {
 
         const int32_t owner_idx = static_cast<int8_t>(colony->owner);
         s_player* const owner_player = &MOX::_player[owner_idx];
+        const bool preserve_last_population =
+                _planet_extinction == 0 || owner_player->objectives != PLAYER_OBJECTIVE_HUMAN;
         int16_t race_counts[10] = {};
         uint8_t protected_race[10] = {};
         bool had_negative_growth = false;
@@ -2055,7 +2057,8 @@ namespace COLCALC {
                     static_cast<int16_t>(colony->pop_roundoff[race_idx] + colony->pop_growth[race_idx]);
 
             while (colony->pop_roundoff[race_idx] < 0) {
-                if (static_cast<int32_t>(protected_race[race_idx]) >= race_counts[race_idx]) {
+                if (preserve_last_population &&
+                    static_cast<int32_t>(protected_race[race_idx]) >= race_counts[race_idx]) {
                     colony->pop_roundoff[race_idx] = 0;
                 } else {
                     int16_t selected_special = -1;
