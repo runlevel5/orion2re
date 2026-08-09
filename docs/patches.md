@@ -184,7 +184,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:16869` - `empty bombardment`
 - [ ] `asm.pl:17018` - `blockaded freeze`
 - [ ] `asm.pl:17027` - `no assault shuttles shots`
-- [ ] `asm.pl:17089` - `del_ships`
+- [x] `asm.pl:17089` - `del_ships`: no source backport is required; the 1.50 topic only adds a cdecl-to-Watcom ABI wrapper used by the excluded Lua `del_ships` API, while the restored native scrap path calls `FLT1::Get_Technology_From_Scrapped_Ship_()` directly.
 - [ ] `asm.pl:17144` - `no green system popup`
 - [ ] `asm.pl:17265` - `planets screen: high-g race has -25% prod penalty on low-g planet`
 - [ ] `asm.pl:17281` - `new pop not assigned to farming on housing colony`
