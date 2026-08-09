@@ -179,7 +179,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16567` - `true omni`: fixed in `PLNTSUM::Set_Planet_Explored_Flags_()` and `PLNTSUM::Filter_Explored_Planets_()` by distinguishing race-trait Omniscience from Galactic Lore when marking explored planets and applying that explored-world gate only while enemy-controlled planets are filtered; this replaces the 1.50 call diversion and branch trampoline with direct source-level visibility rules.
 - [ ] `asm.pl:16692` - `bombardment ammo fix`
 - [x] `asm.pl:16729` - `bombardment fair armor`: implemented in `CMBTFIRE::Apply_Damage_To_Planet_()` and `COMBAT::Tactical_Bombardment_()` with the configurable `civilian_armor` table, using the defender's best armor consistently for civilian damage thresholds, processed-hit accounting, and tactical bombardment results; this replaces the 1.50 code-cave wrappers with direct source-level calculations and rejects the unsafe zero divisor.
-- [ ] `asm.pl:16814` - `wormhole to Orion fix`
+- [x] `asm.pl:16814` - `wormhole to Orion fix`: fixed in `HAROLD::Set_Wormhole_Id_()` by retaining the no-link sentinel when no eligible wormhole partner exists, preventing the failed pairing fallback from creating a one-way link to Orion; this directly expresses the 1.50 immediate-byte correction in source.
 - [ ] `asm.pl:16823` - `planet screen arti`
 - [ ] `asm.pl:16869` - `empty bombardment`
 - [ ] `asm.pl:17018` - `blockaded freeze`

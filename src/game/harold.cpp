@@ -286,7 +286,7 @@ namespace HAROLD {
             }
         }
 
-        MOX::_star[star_idx].wormhole_star_id = 0;
+        MOX::_star[star_idx].wormhole_star_id = -1;
     }
 
     /**
