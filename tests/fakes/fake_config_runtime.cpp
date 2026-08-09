@@ -11,3 +11,7 @@ namespace MAPGEN {
 namespace CMBTSPEC {
     uint8_t _leader_dies_with_no;
 }
+
+namespace SCIENCE {
+    uint8_t _finds_presented_by_scientist;
+}

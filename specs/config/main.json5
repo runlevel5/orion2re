@@ -1921,5 +1921,18 @@
       },
       default: { cyber: 10, aru: 20, regen: 20 },
     },
+
+    finds_presented_by_scientist: {
+      title: "Artifact technology presenter",
+      description: "Uses the scientist instead of the trooper when presenting technologies found on Ancient Artifacts planets.",
+      examples: ["finds_presented_by_scientist = true;"],
+      group: "interface",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/science.h",
+        symbol: "SCIENCE::_finds_presented_by_scientist",
+      },
+    },
   },
 }

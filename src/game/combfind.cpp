@@ -4,6 +4,10 @@ namespace COMBFIND {
 
 namespace {
     bool combat_in_progress;
+
+    bool __cdecl Planet_Has_Ancient_Artifacts_(s_planet_data* planet) {
+        return planet->planet_special == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS;
+    }
 }
 
 uint8_t _messed_up_fleet_palette;
@@ -834,6 +838,8 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
 
                     star->system_special = player_idx + 90;
                     star->artifacts_gave_app = 1;
+                    planet_idx = Find_Planet_At_Star_Satisfying_(
+                        star, Planet_Has_Ancient_Artifacts_);
 
                     msg.msg_type = MSG_TYPE_ARTIFACTS;
                     msg.u.artifacts.star_idx = star_idx;
@@ -857,7 +863,15 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                             }
                         }
                         if (total_valid_techs != 0) {
-                            COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], picked_tech_ids[remaining - 1]);
+                            const int16_t tech_app_id = picked_tech_ids[remaining - 1];
+                            COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], tech_app_id);
+
+                            s_report report = {};
+                            report.type = 3;
+                            report.player_idx = player_idx;
+                            report.d.artifacts.planet_idx = planet_idx;
+                            report.d.artifacts.tech_app_id = tech_app_id;
+                            REPORT::Add_Report_(&report);
                         }
                     }
 

@@ -2410,6 +2410,13 @@ typedef struct s_report_enemy_steal s_report_enemy_steal, *Ps_report_enemy_steal
 
 typedef struct s_report_enemy_sabotage s_report_enemy_sabotage, *Ps_report_enemy_sabotage;
 
+typedef struct s_report_artifacts s_report_artifacts, *Ps_report_artifacts;
+
+struct s_report_artifacts {
+    int16_t planet_idx;
+    int16_t tech_app_id;
+};
+
 struct s_report_enemy_sabotage {
     int16_t enemy_player_idx;
     int16_t planet_idx;
@@ -2439,6 +2446,7 @@ union s_report_data {
     struct s_report_sabotage sabotage;
     struct s_report_enemy_steal enemy_steal;
     struct s_report_enemy_sabotage enemy_sabotage;
+    struct s_report_artifacts artifacts;
 };
 
 struct s_report {

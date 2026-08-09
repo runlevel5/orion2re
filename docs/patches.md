@@ -227,7 +227,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:5757` - `antaran fixup for starbasi`: fixed in `COMBAT1::Calc_Current_Speed_()`, `BOARDING::Captured_Marine_Count_()`, and `COMBINIT::End_Of_Combat_()` by distinguishing mobile generated Antaran ships from driveless bases and accounting Antaran losses by immutable previous ownership; source retains one nonpersistent-ship sentinel instead of the 1.50 `-257` sentinel and widened binary guards.
 - [x] `asm.pl:6957` - `free maintenance cash`: fixed in `COLCALC::Apply_Production_()` by removing obsolete building and spy maintenance credits, refunding half the actual spy cost when no spy can be added, and restoring the synchronized `colony freighters_cash_bonus` compatibility setting with a zero default; direct source accounting replaces the 1.50 NOPs and helper.
 - [ ] `asm.pl:9343` - `unbuy and queue`
-- [ ] `asm.pl:10360` - `show arti tech`
+- [x] `asm.pl:10360` - `show arti tech`: implemented in `COMBFIND::Do_System_Discoveries_At_Star_()`, `REPORT::Has_Report_()`, and `SCIENCE::Show_Off_Artifact_Tech_()` by queuing every granted artifact technology with its source planet and presenting it through the report flow; direct source data replaces the 1.50 saved-star and temporary-planet globals, with `finds_presented_by_scientist` retaining the original default and presentation choice.
 - [ ] `asm.pl:11479` - `scrap ships`
 - [ ] `asm.pl:13245` - `fleet summary giveaways`
 - [ ] `asm.pl:13578` - `overmap speed recalc`

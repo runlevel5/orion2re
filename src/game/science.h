@@ -1,6 +1,8 @@
 #pragma once
 
 namespace SCIENCE {
+    extern uint8_t _finds_presented_by_scientist;
+
     extern const char* _spy_anim_fmt;
     extern const char* _trooper_anim_fmt;
     extern const char* _spy_anim_find_pat;
@@ -25,6 +27,9 @@ namespace SCIENCE {
      * other_player_idx: Other player referenced by the decoded message.
      */
     void __cdecl Show_Off_Stolen_Tech_(uint16_t tech_idx, int16_t other_player_idx);
+
+    /* Presents a technology found on an Ancient Artifacts planet. */
+    void __cdecl Show_Off_Artifact_Tech_(uint16_t tech_idx, int16_t planet_idx);
 
     /* Draws the current science-room animation layers for the active frame.
      * unused_arg: Unused legacy callback-style argument.
