@@ -282,7 +282,6 @@ namespace DESBOX {
         fields::Clear_Fields_();
     }
     void __cdecl Add_Replacement_Weapon_Fields_(int16_t* cancel_btn_field, int16_t* screen_field) {
-        int16_t rack_quantities[5] = {2, 5, 10, 15, 20};
         int16_t mod_fields[WEAPON_MOD_COUNT] = {0};
         int16_t mod_xs[WEAPON_MOD_COUNT] = {0};
         int16_t mod_ys[WEAPON_MOD_COUNT] = {0};
@@ -423,7 +422,7 @@ namespace DESBOX {
                 int16_t needs_racks = DESIGN::Weapon_Needs_Racks_(weapon_idx);
 
                 if (needs_racks) {
-                    DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, _weapon_replacement_arcs, rack_quantities[i], _weapon_replacement_mods);
+                    DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, _weapon_replacement_arcs, DESIGN::Missile_Rack_Quantity_(i), _weapon_replacement_mods);
                     int16_t rx = _replacement_box_base_x + 0x77;
                     int16_t ry = _replacement_box_base_y + rack_y_offset + 0x54;
                     MOX::_weapon_rack_field[i] = fields::Add_Hidden_Field_(
@@ -590,7 +589,6 @@ namespace DESBOX {
     }
 
     void __cdecl Update_Weapon_Replacement_(int16_t* exit_flag, int16_t weapon_choice, int16_t slot_idx) {
-        int16_t rack_quantities[5] = { 2, 5, 10, 15, 20 };
         char msg_buffer[80];
 
         if (weapon_choice == 0) {
@@ -624,7 +622,7 @@ namespace DESBOX {
             DESIGN::Weapon_Type_(DESBOX::Weapon_Index_(weapon_choice));
 
             if (DESIGN::Weapon_Needs_Racks_(MOX::_design->weapon_type[slot_idx])) {
-                MOX::_design->weapon_ammo[slot_idx] = (int8_t)rack_quantities[DESBOX::_weapon_replacement_rack];
+                MOX::_design->weapon_ammo[slot_idx] = (int8_t)DESIGN::Missile_Rack_Quantity_(DESBOX::_weapon_replacement_rack);
             } else {
                 MOX::_design->weapon_ammo[slot_idx] = 0;
             }
@@ -1326,8 +1324,6 @@ namespace DESBOX {
         char incompatible_weapon_format[200];
         char tech_application_description[1332];
 
-        uint8_t racks[5] = { 2, 5, 10, 15, 20 };
-
         strlcpy(front_arc_text, HAROLD::H_Message_(0x46), sizeof(front_arc_text));
         strlcpy(rear_arc_text, HAROLD::H_Message_(0x47), sizeof(rear_arc_text));
         strlcpy(beam_arc_text, HAROLD::H_Message_(0x48), sizeof(beam_arc_text));
@@ -1427,7 +1423,7 @@ namespace DESBOX {
                     } else if ((weap_type == 1 || weap_type == 2) && MOX::_weapon_rack_field[i] == input) {
                         if (_valid_arcs_racks[i] == 0) {
                             MISC::Get_LBX_Message_(0x4C, invalid_rack_format);
-                            snprintf(message_box_text, sizeof(message_box_text), invalid_rack_format, racks[i]);
+                            snprintf(message_box_text, sizeof(message_box_text), invalid_rack_format, DESIGN::Missile_Rack_Quantity_(i));
                             GENDRAW::Message_Box_(message_box_text);
                         } else {
                             _weapon_replacement_arcs = WEAPON_FIRING_ARC_360;
@@ -1880,8 +1876,6 @@ namespace DESBOX {
     }
 
     void __cdecl Set_Up_Weapon_Display_(int16_t weapon_index) {
-        int16_t racks_list[5] = {2, 5, 10, 15, 20};
-
         memset(MOX::_weapon_mod_field_status, 0, sizeof(MOX::_weapon_mod_field_status));
 
         _weapon_replacement_arcs = WEAPON_FIRING_ARC_NONE;
@@ -1910,11 +1904,8 @@ namespace DESBOX {
             }
 
             if (DESIGN::Weapon_Needs_Racks_(MOX::_design->weapon_type[weapon_index]) != 0) {
-                _weapon_replacement_rack = ERIC::Get_Sint_Index_From_List_(
-                    MOX::_design->weapon_ammo[weapon_index],
-                    racks_list,
-                    5
-                );
+                _weapon_replacement_rack = DESIGN::Missile_Rack_Index_(
+                    MOX::_design->weapon_ammo[weapon_index]);
             } else {
                 _weapon_replacement_rack = 1;
             }
@@ -2191,8 +2182,6 @@ namespace DESBOX {
     }
 
     void __cdecl Print_Main_Weapon_Box_(int16_t x, int16_t y) {
-        int16_t rack_sizes[5] = { 2, 5, 10, 15, 20 };
-
         s_colors base_colors = *MISC::Font_Colors2_(3, 0x55, 0x5B);
         fonts::Set_Font_Style_(3, &base_colors);
 
@@ -2216,14 +2205,16 @@ namespace DESBOX {
             if (row_idx > 0) {
                 if (_field_item_chosen <= -1 || (weapon_idx > 0 && _field_item_chosen != row_idx)) {
                     if (weapon_idx > 0) {
-                        int16_t rack_ammo = (DESIGN::Weapon_Needs_Racks_(weapon_idx) != 0) ? 5 : 0;
+                        int16_t rack_ammo = (DESIGN::Weapon_Needs_Racks_(weapon_idx) != 0)
+                            ? DESIGN::Missile_Rack_Quantity_(1)
+                            : 0;
                         weapon_cost = DESIGN::Weapon_Cost_(weapon_idx, 1, WEAPON_FIRING_ARC_FORWARD, rack_ammo, 0);
                         weapon_space = DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, WEAPON_FIRING_ARC_FORWARD, rack_ammo, 0);
                     }
                 } else if (weapon_idx > 0 && _field_item_chosen == row_idx) {
                     int16_t rack_ammo = 0;
                     if (DESIGN::Weapon_Needs_Racks_(weapon_idx) != 0) {
-                        rack_ammo = rack_sizes[_weapon_replacement_rack];
+                        rack_ammo = DESIGN::Missile_Rack_Quantity_(_weapon_replacement_rack);
                     }
                     weapon_cost = DESIGN::Weapon_Cost_(weapon_idx, 1, _weapon_replacement_arcs, rack_ammo, _weapon_replacement_mods);
                     weapon_space = DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, _weapon_replacement_arcs, rack_ammo, _weapon_replacement_mods);

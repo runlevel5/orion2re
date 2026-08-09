@@ -640,6 +640,36 @@ DOCTEST_TEST_CASE("miniaturization curves and categories bind by normalized name
         "design tech_mini reinforced_hull = group4;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("x3 missile racks preserve classic defaults and bind autodesign behavior") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const int16_t classic[DESIGN::MISSILE_RACK_COUNT] = { 2, 5, 10, 15, 20 };
+    for (int16_t i = 0; i < DESIGN::MISSILE_RACK_COUNT; ++i) {
+        DOCTEST_CHECK(DESIGN::Missile_Rack_Quantity_(i) == classic[i]);
+    }
+    DOCTEST_CHECK_FALSE(DESIGN::Should_Autodesign_Use_X3_Rack_(5, 3, 3));
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "design missile_x3_shot = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const int16_t x3[DESIGN::MISSILE_RACK_COUNT] = { 2, 3, 5, 10, 20 };
+    for (int16_t i = 0; i < DESIGN::MISSILE_RACK_COUNT; ++i) {
+        DOCTEST_CHECK(DESIGN::Missile_Rack_Quantity_(i) == x3[i]);
+    }
+    DOCTEST_CHECK(DESIGN::Missile_Rack_Size_(3) == 20);
+    DOCTEST_CHECK(DESIGN::Missile_Rack_Size_(5) == 30);
+    DOCTEST_CHECK(DESIGN::Missile_Rack_Size_(15) == 0);
+    DOCTEST_CHECK(DESIGN::Should_Autodesign_Use_X3_Rack_(5, 3, 3));
+    DOCTEST_CHECK(DESIGN::Should_Autodesign_Use_X3_Rack_(5, 2, 3));
+    DOCTEST_CHECK_FALSE(DESIGN::Should_Autodesign_Use_X3_Rack_(5, 4, 3));
+}
+
 DOCTEST_TEST_CASE("maximum galaxy star count binds and validates its storage range") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

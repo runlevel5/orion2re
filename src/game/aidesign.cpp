@@ -1321,15 +1321,26 @@ namespace aidesign {
 
         uint16_t mods = *out_weapon_mods;
         int32_t space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, *out_weapon_count, mods);
+        int16_t minimum_weapon_count = _min_weapon_count_table[weapon_count_table_idx];
+        int16_t fitting_weapon_count = (int16_t)(available_space / space);
 
-        if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
+        if (fitting_weapon_count < minimum_weapon_count ||
+            (DESIGN::_missile_x3_shot != 0 && fitting_weapon_count == minimum_weapon_count)) {
             if (*out_weapon_count > 5) {
                 *out_weapon_count = 5;
             }
 
             space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, *out_weapon_count, mods);
+            fitting_weapon_count = (int16_t)(available_space / space);
 
-            if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
+            if (DESIGN::Should_Autodesign_Use_X3_Rack_(
+                    *out_weapon_count, fitting_weapon_count, minimum_weapon_count)) {
+                *out_weapon_count = DESIGN::Missile_Rack_Quantity_(1);
+                space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, WEAPON_FIRING_ARC_FORWARD, *out_weapon_count, mods);
+                fitting_weapon_count = (int16_t)(available_space / space);
+            }
+
+            if (fitting_weapon_count < minimum_weapon_count) {
                 if (mods & WEAPON_MOD_FLAG_HEAVILY_ARMORED) {
                     mods ^= WEAPON_MOD_FLAG_HEAVILY_ARMORED;
                     *out_weapon_mods = mods;

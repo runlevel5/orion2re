@@ -1608,6 +1608,21 @@
       },
     },
 
+    missile_x3_shot: {
+      title: "Replace x15 missiles with x3 missiles",
+      description: "Replaces the x15 missile rack with an x3 rack and allows autodesign to use it.",
+      remarks: "False preserves the classic x2, x5, x10, x15, and x20 rack sequence. True uses x2, x3, x5, x10, and x20.",
+      examples: ["design missile_x3_shot = true;"],
+      group: "gameplay",
+      namespace: "design",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_missile_x3_shot",
+      },
+    },
+
     tech_mini: {
       title: "Technology miniaturization categories",
       description: "Assigns each technology application to the group 1, group 2, or non-miniaturizing group 3 space curve.",

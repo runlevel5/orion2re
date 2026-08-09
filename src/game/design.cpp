@@ -594,20 +594,7 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Weapon_Rack_Size_(int16_t count) {
-        switch (count) {
-            case 2:
-                return 10;
-            case 5:
-                return 20;
-            case 10:
-                return 30;
-            case 15: // 0x0F
-                return 35; // 0x23
-            case 20: // 0x14
-                return 40; // 0x28
-            default:
-                return 0;
-        }
+        return Missile_Rack_Size_(count);
     }
 
     int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
