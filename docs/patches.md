@@ -180,7 +180,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16692` - `bombardment ammo fix`: fixed in `COMBAT::Tactical_Bombardment_()` by advancing only torpedo cooldown during bombardment turns and refreshing the attacker's fighter beam and bomb weapon types before combat; this replaces the 1.50 instruction patch and wrapper with direct source-level initialization and ammo invariants.
 - [x] `asm.pl:16729` - `bombardment fair armor`: implemented in `CMBTFIRE::Apply_Damage_To_Planet_()` and `COMBAT::Tactical_Bombardment_()` with the configurable `civilian_armor` table, using the defender's best armor consistently for civilian damage thresholds, processed-hit accounting, and tactical bombardment results; this replaces the 1.50 code-cave wrappers with direct source-level calculations and rejects the unsafe zero divisor.
 - [x] `asm.pl:16814` - `wormhole to Orion fix`: fixed in `HAROLD::Set_Wormhole_Id_()` by retaining the no-link sentinel when no eligible wormhole partner exists, preventing the failed pairing fallback from creating a one-way link to Orion; this directly expresses the 1.50 immediate-byte correction in source.
-- [ ] `asm.pl:16823` - `planet screen arti`
+- [x] `asm.pl:16823` - `planet screen arti`: fixed in `PLNTSUM::Summary_Screen_Print_Data_()` by deriving Ancient Artifacts display status from the selected planet's persistent special when the star-level discovery status no longer carries it; this replaces the 1.50 call-site wrapper with a direct local display invariant.
 - [ ] `asm.pl:16869` - `empty bombardment`
 - [ ] `asm.pl:17018` - `blockaded freeze`
 - [ ] `asm.pl:17027` - `no assault shuttles shots`

@@ -88,6 +88,9 @@ void __cdecl Summary_Screen_Print_Data_(void) {
             if (system_special > SYSTEM_SPECIAL_NO_SPECIAL && system_special != SYSTEM_SPECIAL_ORION_STAR) {
                 special_id = static_cast<int16_t>(system_special);
             }
+            if (planet->planet_special == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
+                special_id = SYSTEM_SPECIAL_ANCIENT_ARTIFACTS;
+            }
 
             if (special_id > SYSTEM_SPECIAL_NO_SPECIAL && HACCESS::Special_Is_Planet_Special_(special_id)) {
                 char* special_str = nullptr;
