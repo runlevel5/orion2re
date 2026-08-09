@@ -15,12 +15,8 @@ Use the `grpc` skill for all Ghidra access and follow its read-only and assembly
 
 ## Helper-agent delegation
 
-Do not adopt a subagent result directly. Treat every subagent claim as an unverified lead until the parent
-agent independently reproduces or confirms it from authoritative files, Ghidra bytes and disassembly, build output,
-or test results. Do not use an unverified subagent claim in a proposed change, stop-condition decision, approval
-request, or final conclusion.
-
-Use `agent-helper` throughout this workflow for bounded, read-only investigation. Delegate independent tasks when practical, especially:
+Use of `agent-helper` is optional. Delegate bounded, read-only evidence collection only when it reduces parent-agent
+work; there is no requirement to invoke it in any phase or at every affected location. Suitable tasks include:
 
 - locating and inventorying the selected topic in `docs/patches.md`, `asm.pl`, `patch.c`, symbols, and history
 - calculating candidate file-offset-to-address mappings from patcher section metadata
@@ -28,17 +24,24 @@ Use `agent-helper` throughout this workflow for bounded, read-only investigation
 - locating semantic equivalents, style requirements, configuration definitions, generated-code workflows, and tests
 - comparing evidence or triaging build and test failures
 
+Every delegation must request one directly scoped evidence-collection task. State the exact files, line ranges,
+symbols, addresses, or supplied output the helper may inspect; the specific evidence it must return; what it must not
+inspect or decide; and the condition at which it must stop. Do not delegate the patch topic as a whole, combine
+dependent workflow phases, issue overlapping requests, or ask the helper to choose its own investigation scope.
+Complete and validate prerequisite phases in the parent before delegating later-phase evidence collection.
+
 For Ghidra tasks, give the helper the RPC host, port, bearer token, exact addresses or symbols, and the evidence to
 return. Require it to follow the `grpc` skill, keep every `/exec` request at `write=false`, and validate decompiler
 claims against disassembly. The helper may use shell `curl` to reach Ghidra and may inspect the MOO2150 files
 outside the current repository, but it must not modify files, mutate the Ghidra program, or call `/shutdown`.
 
 Keep each delegation narrow and request file paths, line numbers, addresses, bytes or instructions, uncertainties,
-and unresolved mismatches in the report. Treat every helper report as a lead: independently verify evidence used
-for offset mapping, semantic conclusions, proposed changes, or stop-condition decisions. The parent agent remains
-responsible for reading complete files before proposing diffs, reconciling all evidence, obtaining approval,
-applying changes, and validating the result. If `agent-helper` is unavailable, perform the same work directly and
-note that delegation could not be used.
+and unresolved mismatches in the report. Factual evidence returned within the delegated scope may be trusted without
+repeating the same collection. The parent agent must still reconcile conflicting or incomplete evidence and remains
+solely responsible for understanding and validating the complete 1.50 change, drawing semantic conclusions, deciding
+stop conditions, reading complete files before proposing diffs, selecting the implementation, obtaining approval,
+applying changes, and validating the result. Never adopt a helper's interpretation, design choice, or final decision
+without parent-agent validation.
 
 ## Required inputs
 
@@ -144,17 +147,11 @@ Use the `grpc` skill to:
 
 Default every Ghidra request to `write=false`.
 
-Delegate the initial status, program-metadata, and helper-discovery checks to `agent-helper` when available, then
-independently confirm the returned identity and metadata before relying on them.
-
 The known 1.40-versus-1.50-base version difference is expected and is not by itself a stop condition. If the program is missing, is not the expected Orion2 1.40 variant, or the server cannot be reached, stop and report the exact issue. Do not continue by assuming addresses or bytes.
 
 ### 2. Locate the authoritative patch topic
 
 Search `docs/patches.md` and `C:\Projects\MOO2150\src\asm.pl` for the requested change.
-
-Delegate the initial topic and history inventory to `agent-helper`, including inspection of the external MOO2150
-tree. Verify its reported patch boundaries and references before treating the inventory as complete.
 
 Record:
 
@@ -183,9 +180,6 @@ For every affected original location:
 - use decompilation only alongside disassembly
 - verify operand width, signedness, packed offsets, and branch conditions
 
-Use `agent-helper` for bounded evidence collection at each affected location, but independently verify all affected
-bytes or instructions, control-flow conclusions, and offset mappings before reconstructing the change.
-
 If `cchunk` contains assembly rather than literal bytes, compare the expected instructions and effects rather than pretending it is a byte string.
 
 If original bytes or instructions do not match:
@@ -198,6 +192,10 @@ If original bytes or instructions do not match:
 Never silently analyze a near match. Document any version-related differences, and proceed only when the affected sequence and surrounding control flow can still be mapped with evidence sufficient to reconstruct the same behavior.
 
 ### 4. Reconstruct the complete semantic change
+
+The parent agent must personally understand or validate the complete 1.50 change before using it to determine
+migration status, recommend an implementation, invoke a stop condition, or present conclusions. Helper-collected
+facts may support this validation, but a helper's semantic reconstruction or recommendation is not a substitute for it.
 
 Explain:
 
@@ -217,9 +215,6 @@ Distinguish facts proven by assembly from interpretations inferred from comments
 ### 5. Analyze the restored source tree
 
 Locate the semantic equivalent of the original functions and data in the current project.
-
-Delegate repository discovery, candidate semantic paths, style-document summaries, and test-location research to
-`agent-helper`. Verify candidates against complete current files before selecting or proposing an implementation.
 
 Before designing or proposing source changes, read the repository's style documentation under `docs/`, including `docs/styleguide.md` when present. Treat those conventions as implementation requirements for source, tests, generated-code handling, naming, visibility, and organization.
 
@@ -363,7 +358,7 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Every patch block in the topic inventoried.
 - [ ] Original locations and bytes/instructions verified.
 - [ ] Patched behavior reconstructed, including C implementation refinements.
-- [ ] Every subagent claim used in the proposal or final conclusion independently verified against authoritative evidence.
+- [ ] The parent agent understood or validated the complete 1.50 semantic change before drawing conclusions.
 - [ ] Every configuration variable introduced by 1.50 for the selected topic inventoried and restored with its proven name, type, default, parser metadata, and use sites.
 - [ ] Current semantic source path analyzed.
 - [ ] Existing migration status determined.
