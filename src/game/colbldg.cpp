@@ -1306,7 +1306,7 @@ namespace COLBLDG {
     }
 
     void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, STRBUILD::s_builder* builder) {
-        if (ship->officer_index <= 0) {
+        if (ship->officer_index < 0) {
             STRBUILD::Sprintf(
                 builder,
                 ESTRINGS::E_Strings_(79),

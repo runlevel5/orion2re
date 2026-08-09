@@ -474,7 +474,7 @@ namespace INITGAME {
             }
             else if (i == 65) {
                 // Special randomized tech application for leader at index 65
-                MOX::_leaders[i].tech_application[0] = (uint8_t)game_random::Random_(102) - 1;
+                MOX::_leaders[i].tech_application[0] = (uint8_t)game_random::Random_(101);
                 MOX::_leaders[i].tech_application[1] = (uint8_t)game_random::Random_(102) + 101;
             }
 
