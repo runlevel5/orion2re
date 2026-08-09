@@ -38,6 +38,7 @@ namespace MOX {
 }
 
 namespace TECHDATA {
+    s_tech_armor_data _armor[ARMOR_COUNT];
     s_tech_weapon_data _weapons[WEAPON_COUNT];
 }
 
@@ -64,6 +65,10 @@ namespace CMBTAI {
 }
 
 namespace INITSHIP {
+    int16_t __cdecl Best_Armor_(int16_t) {
+        return ARMOR_NO_ARMOR;
+    }
+
     int16_t __cdecl Best_Warp_Drive_(int16_t) {
         return 1;
     }
@@ -107,6 +112,27 @@ DOCTEST_TEST_CASE("missile defense percentage rolls include their threshold") {
     DOCTEST_CHECK(CMBTMIS::Missile_Defense_Roll_Succeeds_(49, 50));
     DOCTEST_CHECK(CMBTMIS::Missile_Defense_Roll_Succeeds_(50, 50));
     DOCTEST_CHECK_FALSE(CMBTMIS::Missile_Defense_Roll_Succeeds_(51, 50));
+}
+
+DOCTEST_TEST_CASE("missile hit points never fall to zero") {
+    memset(TECHDATA::_armor, 0, sizeof(TECHDATA::_armor));
+    TECHDATA::_armor[ARMOR_NO_ARMOR].ships_bonus = -100;
+
+    const int16_t fighter_types[] = {
+        WEAPON_ASSAULT_SHUTTLE,
+        WEAPON_HEAVY_FIGHTER,
+        WEAPON_BOMBER,
+        WEAPON_INTERCEPTOR,
+    };
+
+    for (int16_t fighter_type : fighter_types) {
+        DOCTEST_CHECK(CMBTMIS::Get_Missile_Hits_(fighter_type, 0, 0) == 1);
+    }
+
+    DOCTEST_CHECK(CMBTMIS::Get_Missile_Hits_(WEAPON_NO_WEAPONS, 0, 0) == 1);
+    DOCTEST_CHECK(CMBTMIS::Get_Missile_Hits_(WEAPON_NO_WEAPONS, 0, WEAPON_MOD_FLAG_HEAVILY_ARMORED) == 1);
+    DOCTEST_CHECK(CMBTMIS::Get_Missile_Hits_(WEAPON_NUCLEAR_MISSILE, 0, 0) == 4);
+    DOCTEST_CHECK(CMBTMIS::Get_Missile_Hits_(WEAPON_NUCLEAR_MISSILE, 0, WEAPON_MOD_FLAG_HEAVILY_ARMORED) == 8);
 }
 
 DOCTEST_TEST_CASE("expected missile damage applies only the active cloak defense mode") {

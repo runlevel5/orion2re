@@ -1259,8 +1259,7 @@ namespace CMBTMIS {
     }
 
     int16_t __cdecl Get_Missile_Hits_(int16_t missile_id, int16_t ship_idx, uint16_t flags) {
-        // Unmapped or out-of-range missile IDs fall back to returning the original missile_id.
-        int16_t hits = missile_id;
+        int16_t hits = 0;
         int16_t armor_idx;
         int16_t absorption;
 
@@ -1318,6 +1317,10 @@ namespace CMBTMIS {
 
         if (flags & WEAPON_MOD_FLAG_HEAVILY_ARMORED) {
             hits *= 2;
+        }
+
+        if (hits == 0) {
+            hits = 1;
         }
 
         return hits;
