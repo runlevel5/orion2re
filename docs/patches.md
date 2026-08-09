@@ -199,7 +199,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:18679` - `outpost false button`: fixed in `FLEETPOP::Set_Build_Outpost_Button_Flag_()` by requiring the selected fleet to be directly located at a star before checking its outpost ships and eligible planets; this replaces the 1.50 branch rewrite with a source-level location invariant so an encoded in-transit destination cannot expose the Build Outpost button.
 - [ ] `asm.pl:18757` - `nebula check`
 - [x] `asm.pl:18774` - `zero colony loss`: implemented in `COLCALC::Ghost_Colony_Stuff_()` with the configurable `colony zero_colony_lost` rule; the owner-level condition replaces the 1.50 diversion and preserves the classic exception for inbound colonists by default.
-- [ ] `asm.pl:18883` - `unload troops button wrong message`
+- [x] `asm.pl:18883` - `unload troops button wrong message`: fixed in `MAINSCR::Scan_Moveable_Box_Fields()` by displaying the dedicated no-transport-selected message when the Unload Troops button is clicked without a selected transport; this directly expresses the 1.50 message-id replacement with a named source constant.
 - [ ] `asm.pl:18925` - `telepatic capture`
 - [ ] `asm.pl:18959` - `autodesign considers x3 shot`
 - [ ] `asm.pl:18989` - `ship explosion leader says nooo`

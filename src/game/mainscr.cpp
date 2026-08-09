@@ -3451,9 +3451,9 @@ namespace MAINSCR {
                         MOX::_return_screen = SCREEN_MAIN;
                         *out_exit_flag = 1;
                     } else {
-                        char disabled_during_message[200];
-                        strlcpy(disabled_during_message, HAROLD::H_Message_(0x20 /* HESTR_020_OPTION_DISABLED_DURING */), sizeof(disabled_during_message));
-                        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, disabled_during_message, 0);
+                        char no_transport_ships_message[200];
+                        strlcpy(no_transport_ships_message, HAROLD::H_Message_(HESTR_0E3_NO_TRANSPORT_SHIPS_SEL), sizeof(no_transport_ships_message));
+                        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, no_transport_ships_message, 0);
                     }
                     continue;
                 }
