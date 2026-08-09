@@ -66,6 +66,9 @@ namespace COLBLDG {
     // palette against the build screen's own.
     int16_t _prev_colony_click = -1000;
     int16_t _next_colony_click = -1000;
+    // Set when < / > leave the screen so the re-entry for the new colony
+    // swaps palette and frame in one present instead of fading out and in.
+    int16_t _g_instant_colony_switch;
     s_animation_header* _prev_colony_anim;
     s_animation_header* _next_colony_anim;
     uint8_t* _arrow_palette;
@@ -656,8 +659,18 @@ namespace COLBLDG {
 
         COLONY::Make_Bldg_Array_For_Colony(COLONY::colony_handle, 0);
 
+        const bool instant_switch =
+            (ENHANCED_UX::enhanced_ux_settings.enabled != 0) &&
+            COLBLDG::_g_instant_colony_switch != 0;
+        COLBLDG::_g_instant_colony_switch = 0;
+
         if (ERIC::Fast_Fade_Out_Needed_For_Colony_Palette()) {
-            ERIC::Fast_Fade_Out();
+            // Enhancement: colony-to-colony switches swap the palette with
+            // the first frame of the new colony instead of fading out and
+            // back in, so cycling colonies is instant.
+            if (!instant_switch) {
+                ERIC::Fast_Fade_Out();
+            }
             COLONY::Update_Colony_Palette();
         }
 
@@ -667,7 +680,15 @@ namespace COLBLDG {
         ERICHELP::Set_Building_Queue_Screen_Help_List();
         palette::Clear_Palette_Changes(0, 0xFF);
         COLBLDG::Draw_Build_Queue_Popup();
-        ERIC::Fast_Fade_In();
+        if (instant_switch) {
+            video::Set_Refresh_Full();
+            palstore::Darken_Palette(0);
+            video::Submit_Palette();
+            RUSS::Mox_Update();
+            video::Set_Refresh_Stencil();
+        } else {
+            ERIC::Fast_Fade_In();
+        }
         video::Set_Refresh_Stencil();
 
         int16_t field_id;
@@ -1842,6 +1863,7 @@ namespace COLBLDG {
                 ::fields::Clear_Mouse_Buffer();
                 ::fields::Set_Input_Delay(3);
             } else if (fields[8] == input_field) {
+                _g_instant_colony_switch = 1;
                 Handle_Queue_Blockers();
                 int16_t next_colony = COLONY::Get_Next_Colony(COLONY::colony_handle, 0);
                 field_mode = 0;
@@ -1853,6 +1875,7 @@ namespace COLBLDG {
                 }
                 COLONY::full_draw = 1;
             } else if (fields[9] == input_field) {
+                _g_instant_colony_switch = 1;
                 Handle_Queue_Blockers();
                 int16_t next_colony = COLONY::Get_Next_Colony(COLONY::colony_handle, 1);
                 if (next_colony != COLONY::colony_handle) {
