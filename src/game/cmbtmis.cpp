@@ -383,7 +383,7 @@ namespace CMBTMIS {
             missile->is_active = 0;
             if (type == WEAPON_ASSAULT_SHUTTLE) {
                 CMBTFIR2::Resolve_Capture_(missile->source_unit_idx, target_unit_idx, missile->quantity, x, y);
-                missile->fighter_count--;
+                missile->fighter_count = 0;
             } else {
                 if (type != WEAPON_BOMBER) {
                     int16_t dmg_out = 0;

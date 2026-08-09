@@ -183,7 +183,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16823` - `planet screen arti`: fixed in `PLNTSUM::Summary_Screen_Print_Data_()` by deriving Ancient Artifacts display status from the selected planet's persistent special when the star-level discovery status no longer carries it; this replaces the 1.50 call-site wrapper with a direct local display invariant.
 - [ ] `asm.pl:16869` - `empty bombardment`
 - [ ] `asm.pl:17018` - `blockaded freeze`
-- [ ] `asm.pl:17027` - `no assault shuttles shots`
+- [x] `asm.pl:17027` - `no assault shuttles shots`: fixed in `CMBTMIS::Resolve_Missile_()` by consuming the assault-shuttle attack counter completely after boarding, so shuttles cannot retain additional fighter shots or return; this replaces the 1.50 call-site helper with a direct source-level state transition.
 - [x] `asm.pl:17089` - `del_ships`: no source backport is required; the 1.50 topic only adds a cdecl-to-Watcom ABI wrapper used by the excluded Lua `del_ships` API, while the restored native scrap path calls `FLT1::Get_Technology_From_Scrapped_Ship_()` directly.
 - [ ] `asm.pl:17144` - `no green system popup`
 - [ ] `asm.pl:17265` - `planets screen: high-g race has -25% prod penalty on low-g planet`
