@@ -3517,7 +3517,6 @@ namespace COLCALC {
 
             if (COLBLDG::Colony_Production_Is_Building_(current_product)) {
                 ERICNET::Add_Building_(colony_idx, current_product);
-                player.bc += static_cast<int32_t>(TECHDATA::_buildings[current_product].maintenance);
 
                 if (colony->producing[1] == COLONY_PRODUCTION_REPEAT) {
                     COLCALC::Colony_Calculation_(colony_idx);
@@ -3576,15 +3575,14 @@ namespace COLCALC {
                     switch (current_product) {
                     case COLONY_PRODUCTION_FREIGHTERS:
                         player.n_freighters = static_cast<int16_t>(player.n_freighters + 5);
-                        player.bc += 5;
+                        player.bc += _freighters_cash_bonus;
                         break;
 
                     case COLONY_PRODUCTION_SPY:
                         if (BILL::Add_Their_Spy_(static_cast<int16_t>(owner_player_idx), static_cast<int16_t>(owner_player_idx)) == 0) {
-                            player.bc += 100;
+                            player.bc += product_cost / 2;
                             COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, COLONY_PRODUCTION_SPY);
                         }
-                        ++player.bc;
                         break;
 
                     case COLONY_PRODUCTION_SCIENTIST:

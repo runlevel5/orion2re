@@ -10,6 +10,7 @@ namespace COLCALC {
     extern uint8_t _keep_research_on_finds;
     extern uint8_t _replicator_food_pp;
     extern uint8_t _replicator_food_bc;
+    extern uint8_t _freighters_cash_bonus;
 
     typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, int16_t player_idx, s_colony_job_production* out);
 

@@ -7,6 +7,8 @@ namespace {
     s_star_data stars[1];
     s_ship_data ships[1];
     int32_t destroy_colony_reason;
+    int16_t add_spy_result;
+    int16_t deleted_product;
 }
 
 namespace TEST_COLONY_POP_GROWTH {
@@ -21,13 +23,24 @@ namespace TEST_COLONY_POP_GROWTH {
         colonies[1].buildings[BUILDING_CAPITOL] = 1;
         TECHDATA::_buildings[BUILDING_CAPITOL].tech_app = TECH_APP_CAPITOL;
         destroy_colony_reason = -1;
+        add_spy_result = 1;
+        deleted_product = COLONY_PRODUCTION_NONE;
         COLCALC::_housing_creates_no_farmers = 0;
         COLCALC::_planet_extinction = 0;
         COLCALC::_zero_colony_lost = 0;
+        COLCALC::_freighters_cash_bonus = 0;
     }
 
     int32_t Destroy_Colony_Reason_() {
         return destroy_colony_reason;
+    }
+
+    void Set_Add_Spy_Result_(int16_t result) {
+        add_spy_result = result;
+    }
+
+    int16_t Deleted_Product_() {
+        return deleted_product;
     }
 }
 
@@ -39,6 +52,7 @@ namespace MOX {
     s_player* _player = players;
     s_star_data* _star = stars;
     s_ship_data* _ship = ships;
+    s_crew_data _crew_data[CREW_QUALITY_COUNT] = {};
     int8_t _planet_max_population[PLANET_SIZE_COUNT] = {5, 10, 15, 20, 25};
 }
 
@@ -78,7 +92,52 @@ namespace BOMB {
 }
 
 namespace ERICNET {
+    void __cdecl Add_Building_(int16_t colony_idx, int16_t building_idx) {
+        MOX::_colony[colony_idx].buildings[building_idx] = 1;
+    }
+
+    void __cdecl Calc_Ship_Level_(int16_t) {
+    }
+
     void __cdecl Remove_Building_(int16_t, int16_t) {
+    }
+}
+
+namespace AIBUILD {
+    void __cdecl Player_Colony_Autobuild_(s_colony*) {
+    }
+}
+
+namespace BILL {
+    int16_t __cdecl Add_Their_Spy_(int16_t, int16_t) {
+        return add_spy_result;
+    }
+}
+
+namespace BUILD_QUEUE {
+    bool Apply_Custom_Autobuild_(int16_t) {
+        return false;
+    }
+}
+
+namespace COLBLDG {
+    int16_t __cdecl Create_Ship_(int16_t, int16_t, int16_t) {
+        return -1;
+    }
+
+    void __cdecl Delete_Prod_From_Colony_Queue_(int16_t, int16_t product) {
+        deleted_product = product;
+    }
+}
+
+namespace DESIGN {
+    int16_t __cdecl Cost_Of_Design_(int16_t, s_ship_design*) {
+        return 0;
+    }
+}
+
+namespace COLONY {
+    void __cdecl Fix_Colony_Queue_(int16_t) {
     }
 }
 

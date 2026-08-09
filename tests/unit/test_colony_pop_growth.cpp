@@ -5,6 +5,8 @@
 namespace TEST_COLONY_POP_GROWTH {
     void Reset_();
     int32_t Destroy_Colony_Reason_();
+    void Set_Add_Spy_Result_(int16_t result);
+    int16_t Deleted_Product_();
 }
 
 namespace {
@@ -50,6 +52,19 @@ namespace {
         colony->planet = 0;
         SETTLER::Set_Dest_Planet(&MOX::_player[0].settlers[0].val, colony->planet);
         MOX::_player[0].settlers_freighted = 1;
+        return colony;
+    }
+
+    s_colony* Prepare_Completed_Product_(int16_t product, int16_t cost) {
+        TEST_COLONY_POP_GROWTH::Reset_();
+
+        s_colony* colony = &MOX::_colony[0];
+        colony->owner = 0;
+        colony->planet = 0;
+        colony->n_pops = 1;
+        colony->producing[0] = product;
+        colony->producing[1] = COLONY_PRODUCTION_NONE;
+        colony->production_spent = cost;
         return colony;
     }
 }
@@ -140,4 +155,53 @@ DOCTEST_TEST_CASE("Capitol can be built when the player has no homeworld") {
     player->tech_applications[TECH_APP_CAPITOL] = TECH_RESEARCH_STATUS_RESEARCHED;
 
     DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(colony, BUILDING_CAPITOL) == 1);
+}
+
+DOCTEST_TEST_CASE("completed building grants no maintenance cash") {
+    s_colony* colony = Prepare_Completed_Product_(BUILDING_MARINE_BARRACKS, 60);
+    TECHDATA::_buildings[BUILDING_MARINE_BARRACKS].cost = 60;
+    TECHDATA::_buildings[BUILDING_MARINE_BARRACKS].maintenance = 3;
+    MOX::_player[0].bc = 20;
+
+    COLCALC::Apply_Production_(colony);
+
+    DOCTEST_CHECK(MOX::_player[0].bc == 20);
+}
+
+DOCTEST_TEST_CASE("freighter completion uses configured cash bonus") {
+    s_colony* colony = Prepare_Completed_Product_(COLONY_PRODUCTION_FREIGHTERS, 50);
+    MOX::_player[0].bc = 20;
+
+    COLCALC::Apply_Production_(colony);
+
+    DOCTEST_CHECK(MOX::_player[0].bc == 20);
+
+    colony = Prepare_Completed_Product_(COLONY_PRODUCTION_FREIGHTERS, 50);
+    COLCALC::_freighters_cash_bonus = 5;
+    MOX::_player[0].bc = 20;
+
+    COLCALC::Apply_Production_(colony);
+
+    DOCTEST_CHECK(MOX::_player[0].bc == 25);
+}
+
+DOCTEST_TEST_CASE("successful spy completion grants no maintenance cash") {
+    s_colony* colony = Prepare_Completed_Product_(COLONY_PRODUCTION_SPY, 100);
+    TEST_COLONY_POP_GROWTH::Set_Add_Spy_Result_(1);
+    MOX::_player[0].bc = 20;
+
+    COLCALC::Apply_Production_(colony);
+
+    DOCTEST_CHECK(MOX::_player[0].bc == 20);
+}
+
+DOCTEST_TEST_CASE("failed spy completion refunds half its production cost") {
+    s_colony* colony = Prepare_Completed_Product_(COLONY_PRODUCTION_SPY, 100);
+    TEST_COLONY_POP_GROWTH::Set_Add_Spy_Result_(0);
+    MOX::_player[0].bc = 20;
+
+    COLCALC::Apply_Production_(colony);
+
+    DOCTEST_CHECK(MOX::_player[0].bc == 70);
+    DOCTEST_CHECK(TEST_COLONY_POP_GROWTH::Deleted_Product_() == COLONY_PRODUCTION_SPY);
 }

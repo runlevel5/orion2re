@@ -8,4 +8,5 @@ namespace COLCALC {
     uint8_t _keep_research_on_finds = 0;
     uint8_t _replicator_food_pp = 2;
     uint8_t _replicator_food_bc = 1;
+    uint8_t _freighters_cash_bonus = 0;
 }

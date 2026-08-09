@@ -63,6 +63,7 @@ DOCTEST_TEST_CASE("enabled capture limits account for working troop pods") {
     TEST_BOARDING::Reset_();
     BOARDING::_kill_excess_marines_after_capture = 1;
     MOX::_combat_data[1].ship_idx = 1;
+    MOX::_combat_data[1].ftl_type = DRIVE_HYPER_DRIVE;
     MOX::_combat_data[1].size_class = HULL_CRUISER;
     TECHDATA::_hull_data[HULL_CRUISER].marines = 12;
 

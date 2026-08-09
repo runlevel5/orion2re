@@ -1841,6 +1841,22 @@
       },
     },
 
+    freighters_cash_bonus: {
+      title: "Freighter completion cash bonus",
+      description: "Adds BC to the treasury when a freighter fleet is completed.",
+      remarks: "The zero default matches MOO2 1.50. Set this to 5 to restore the MOO2 1.40 free-cash behavior.",
+      examples: ["colony freighters_cash_bonus = 0;"],
+      units: "BC per completed freighter fleet",
+      group: "gameplay",
+      namespace: "colony",
+      type: "uint8",
+      default: 0,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_freighters_cash_bonus",
+      },
+    },
+
     replicator_food_pp: {
       title: "Food Replicator production cost",
       description: "Sets the production points spent per unit of replicated food.",
