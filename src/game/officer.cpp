@@ -2082,10 +2082,7 @@ namespace OFFICER {
     void __cdecl Print_Galmap_Scanned_Ship_(int16_t icon_idx) {
         int16_t ship_stack_head_node_idx = MOX::_ship_icon[icon_idx].node_idx;
         int16_t ship_idx = MOX::_ship_node[ship_stack_head_node_idx].ship_idx;
-        s_ship_data* ship = &MOX::_ship[ship_idx];
-        int16_t ship_x = ship->x;
-        int16_t ship_y = ship->y;
-        int16_t owner = (int16_t)ship->owner;
+        int16_t owner = static_cast<int16_t>(MOX::_ship[ship_idx].owner);
 
         fonts::Set_Outline_Color_(0, 0);
 
@@ -2124,7 +2121,7 @@ namespace OFFICER {
             int16_t n_unknown, n_colony_ships, n_outposts, n_transports;
             int16_t hull_counts[6];
 
-            SYS::N_Ships_By_Type_At_Location_(ship_x, ship_y, owner, &n_unknown, &n_colony_ships, &n_outposts, &n_transports, hull_counts);
+            SYS::N_Ships_By_Type_In_Stack_(ship_stack_head_node_idx, &n_unknown, &n_colony_ships, &n_outposts, &n_transports, hull_counts);
 
             uint8_t player_palette_color = 0x49; // 'I'
             if (owner < MAX_PLAYERS) {

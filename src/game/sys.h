@@ -52,7 +52,11 @@ namespace SYS {
 
     bool __cdecl Ok_To_View_System_(int16_t star_idx, int16_t player_idx);
 
-    void __cdecl N_Ships_By_Type_At_Location_(int16_t x, int16_t y, int16_t target_owner, int16_t *total_count, int16_t *bases_count, int16_t *colony_ships_count, int16_t *transports_count, int16_t *ship_sizes);
+    /**
+     * Counts ships reachable from a fleet's stack-head node.
+     * @param ship_node_idx First node in the visible ship stack.
+     */
+    void __cdecl N_Ships_By_Type_In_Stack_(int16_t ship_node_idx, int16_t* total_count, int16_t* colony_ships_count, int16_t* outposts_count, int16_t* transports_count, int16_t* ship_sizes);
 
     /**
      * Fills the system-display area when the current system should be hidden.

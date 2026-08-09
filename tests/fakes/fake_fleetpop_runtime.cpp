@@ -1,7 +1,7 @@
 #include "pch.h"
 
 namespace {
-    s_ship_data ships[1];
+    s_ship_data ships[3];
     s_star_data stars[2];
     s_planet_data planets[1];
 }

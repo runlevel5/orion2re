@@ -145,18 +145,14 @@ int16_t __cdecl Get_Filter_Button_Status_()
     return -1;
 }
 
-int16_t __cdecl Fltscrn_Ships_To_Be_Displayed_(int16_t ship_stack_idx) {
-    int16_t x = HACCESS::Ship_Stack_X_(ship_stack_idx);
-    int16_t y = HACCESS::Ship_Stack_Y_(ship_stack_idx);
-    int16_t owner = HACCESS::Ship_Stack_Owner_(ship_stack_idx);
-
+int16_t __cdecl Fltscrn_Ships_To_Be_Displayed_(int16_t ship_stack_head_node_idx) {
     int16_t total_ships;
-    int16_t bases_count;
     int16_t colony_ships_count;
+    int16_t outposts_count;
     int16_t transports_count;
     int16_t ship_sizes[6];
 
-    SYS::N_Ships_By_Type_At_Location_(x, y, owner, &total_ships, &bases_count, &colony_ships_count, &transports_count, ship_sizes);
+    SYS::N_Ships_By_Type_In_Stack_(ship_stack_head_node_idx, &total_ships, &colony_ships_count, &outposts_count, &transports_count, ship_sizes);
 
     int16_t filter_status = FLT2::Get_Filter_Button_Status_();
 
@@ -165,11 +161,11 @@ int16_t __cdecl Fltscrn_Ships_To_Be_Displayed_(int16_t ship_stack_idx) {
     }
 
     if (filter_status == 1) {
-        return bases_count + colony_ships_count + transports_count;
+        return colony_ships_count + outposts_count + transports_count;
     }
 
     if (filter_status == 2) {
-        return total_ships - (bases_count + colony_ships_count + transports_count);
+        return total_ships - (colony_ships_count + outposts_count + transports_count);
     }
 
     return 0;

@@ -856,31 +856,16 @@ namespace SYS {
         }
     }
 
-    void __cdecl N_Ships_By_Type_At_Location_(int16_t x, int16_t y, int16_t target_owner, int16_t *total_count, int16_t *bases_count, int16_t *colony_ships_count, int16_t *transports_count, int16_t *ship_sizes) {
+    void __cdecl N_Ships_By_Type_In_Stack_(int16_t ship_node_idx, int16_t* total_count, int16_t* colony_ships_count, int16_t* outposts_count, int16_t* transports_count, int16_t* ship_sizes) {
         *total_count = 0;
-        *bases_count = 0;
         *colony_ships_count = 0;
+        *outposts_count = 0;
         *transports_count = 0;
         memset(ship_sizes, 0, (SHIP_SIZE_DOOM_STAR + 1) * sizeof(int16_t));
 
-        if (MOX::_NUM_SHIPS <= 0) {
-            return;
-        }
-
-        for (int16_t ship_idx = 0; ship_idx < MOX::_NUM_SHIPS; ++ship_idx) {
-            if (HACCESS::Ship_Owner_(ship_idx) != target_owner) {
-                continue;
-            }
-
-            s_ship_data* ship = &MOX::_ship[ship_idx];
-
-            if (ship->status >= 3) {
-                continue;
-            }
-
-            if (ship->x != x || ship->y != y) {
-                continue;
-            }
+        while (ship_node_idx != -1) {
+            const int16_t ship_idx = MOX::_ship_node[ship_node_idx].ship_idx;
+            s_ship_data* const ship = &MOX::_ship[ship_idx];
 
             int16_t size = (int16_t)ship->d.size;
             if (size > SHIP_SIZE_DOOM_STAR) {
@@ -891,20 +876,21 @@ namespace SYS {
                 case SHIP_TYPE_COMBAT:
                     ship_sizes[size]++;
                     break;
-                case 1:
-                    (*bases_count)++;
+                case SHIP_TYPE_COLONY:
+                    (*colony_ships_count)++;
                     break;
                 case SHIP_TYPE_TRANSPORT:
                     (*transports_count)++;
                     break;
-                case 4:
-                    (*colony_ships_count)++;
+                case SHIP_TYPE_OUTPOST:
+                    (*outposts_count)++;
                     break;
                 default:
                     break;
             }
 
             (*total_count)++;
+            ship_node_idx = MOX::_ship_node[ship_node_idx].next_node;
         }
     }
 
@@ -1195,7 +1181,6 @@ namespace SYS {
         owner = HACCESS::Ship_Owner_(ship_idx);
 
         {
-            s_ship_data* const ship = &MOX::_ship[ship_idx];
             s_player* const player = &MOX::_player[owner];
             const uint8_t palette_color =
                 MOX::_main_palette_player_colors[static_cast<uint8_t>(player->color)];
@@ -1207,10 +1192,8 @@ namespace SYS {
             const int8_t line_step =
                 static_cast<int8_t>(static_cast<uint8_t>(fonts::Get_Font_Height_()) + 1);
 
-            SYS::N_Ships_By_Type_At_Location_(
-                ship->x,
-                ship->y,
-                owner,
+            SYS::N_Ships_By_Type_In_Stack_(
+                ship_node_num,
                 &unknown_count,
                 &group_a_count,
                 &group_b_count,

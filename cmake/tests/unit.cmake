@@ -271,6 +271,7 @@ orion2re_add_unit_test(test_fleetpop
         tests/unit/test_fleetpop.cpp
     PRODUCTION_SOURCES
         src/game/fleetpop.cpp
+        src/game/sys.cpp
     FAKE_SOURCES
         tests/fakes/fake_fleetpop_runtime.cpp
 )
