@@ -207,7 +207,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:19225` - `energy absorber 21 squares range bug`: fixed in `CMBTFIRE::Pre_Weapon_Specials_()` by allowing the Energy Absorber counterattack at computed range 8; this directly expresses the 1.50 inclusive branch correction in source.
 - [ ] `asm.pl:19256` - `artemis desync`
 - [x] `asm.pl:19295` - `food shortage anims also shown when colony has 0 food production and 0 food import`: fixed in `COLDRAW::Draw_Colony_Prod_Both_()` by treating zero food imports as eligible for the existing shortage-animation path; this directly expresses the 1.50 signed branch-boundary correction in source.
-- [ ] `asm.pl:19304` - `scrap freighters wrong message`
+- [x] `asm.pl:19304` - `scrap freighters wrong message`: fixed in `MAINSCR2::Scrap_Freighters_()` by displaying the dedicated all-freighters-in-use message when no freighters are available to scrap; this directly expresses the 1.50 message-id correction with a named source constant.
 - [ ] `asm.pl:19313` - `captured ship's missile's armor's owner`
 - [ ] `asm.pl:19362` - `non-zero missile hp`
 - [ ] `asm.pl:19409` - `assassin message race_name instead of ruler_name`
