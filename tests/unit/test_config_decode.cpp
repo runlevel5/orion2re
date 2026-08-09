@@ -411,7 +411,7 @@ DOCTEST_TEST_CASE("resolution and decode failures retain no partial writes") {
         {"audio music_volume = -;",
          "an assignment containing only skips has no effect", 22},
         {"audio music_volume = 25 50;",
-         "value 2 exceeds scalar parameter 'audio.music_volume'", 25},
+         "value 2 exceeds selected configuration object 'audio.music_volume'", 25},
     };
 
     for (const s_case& test_case : cases) {

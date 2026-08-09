@@ -134,6 +134,35 @@ namespace DESIGN {
     int16_t __cdecl Cost_Of_Design_(int16_t, s_ship_design*) {
         return 0;
     }
+
+    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t, int32_t*) {
+    }
+}
+
+namespace COLCALC {
+    void __cdecl Colony_Morale_(s_colony*, STRBUILD::s_builder*) {
+    }
+
+    void __cdecl Colony_Industry_Production_(s_colony*, STRBUILD::s_builder*) {
+    }
+
+    void __cdecl Colony_Food_Production_(s_colony*, STRBUILD::s_builder*) {
+    }
+
+    void __cdecl Colony_Replicators_(s_colony*) {
+    }
+
+    void __cdecl Colony_Research_Production_(s_colony*, STRBUILD::s_builder*) {
+    }
+
+    void __cdecl Colony_BC_Production_(s_colony*, STRBUILD::s_builder*) {
+    }
+
+    void __cdecl Pass_Out_Imports_(int16_t, s_colony*) {
+    }
+
+    void __cdecl Update_Player_Stats_(s_player*) {
+    }
 }
 
 namespace COLONY {

@@ -585,6 +585,29 @@ DOCTEST_TEST_CASE("alternative refit formula preserves the classic default") {
     DOCTEST_CHECK(DESIGN::_alternative_refit == 1);
 }
 
+DOCTEST_TEST_CASE("DESIGN button component behavior preserves classic defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(DESIGN::_design_button_computer == DESIGN::DESIGN_BUTTON_BEHAVIOR_UPDATE);
+    DOCTEST_CHECK(DESIGN::_design_button_shield == DESIGN::DESIGN_BUTTON_BEHAVIOR_UPDATE);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "design design_button_computer = intact;"
+        "design design_button_shield = intact;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(DESIGN::_design_button_computer == DESIGN::DESIGN_BUTTON_BEHAVIOR_INTACT);
+    DOCTEST_CHECK(DESIGN::_design_button_shield == DESIGN::DESIGN_BUTTON_BEHAVIOR_INTACT);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "design design_button_computer = clear;", &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("miniaturization curves and categories preserve 1.50 defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

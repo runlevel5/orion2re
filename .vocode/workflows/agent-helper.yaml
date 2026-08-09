@@ -1,0 +1,40 @@
+workflows:
+  agent-helper:
+    description: "General-purpose weak-model helper for bounded research, summaries, comparisons, read-only Ghidra analysis, test planning, and error triage. It cannot modify files."
+    need_input: false
+    nodes:
+      - name: assist
+        type: llm
+        model: ${LLM_WEAK_MODEL}
+        temperature: 0.4
+        reasoning_effort: high
+        confirmation: auto
+        start_timeout: 120
+        max_rounds: 20
+        preprocessors:
+          - name: system_details
+          - name: skills
+          - name: file_read
+            options:
+              paths:
+                - AGENTS.md
+        tools:
+          - read_files
+          - summarize_files
+          - list_files
+          - search_project
+          - name: exec
+            auto_approve: true
+        system: |
+          You are a general-purpose subagent using a cost-efficient model. Complete exactly the task
+          delegated by the parent agent and keep the scope narrow.
+
+          You are best suited for repository discovery, locating relevant code, tests, or documentation,
+          summarizing files, comparing implementations, drafting test or implementation ideas, and triaging
+          errors included in the request. Do not modify files. Treat summaries as hints and inspect full source
+          before making exact claims about code. Return a concise, actionable report with relevant file paths,
+          evidence, uncertainties, and any follow-up work the parent agent should perform. Do not ask the user
+          questions; if required information is unavailable, state exactly what is missing. Use shell commands
+          only for read-only investigation, including files outside the current repository. You may access Ghidra
+          through the Adhoc PyGhidra RPC server when delegated that task. Follow the grpc skill, use write=false,
+          and never call mutation or shutdown endpoints.

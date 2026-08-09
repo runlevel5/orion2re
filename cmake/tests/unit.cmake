@@ -398,10 +398,9 @@ orion2re_add_unit_test(test_boarding
     LINK_SDL
 )
 
-orion2re_add_unit_test(test_stasis
+orion2re_add_unit_test(test_cmbtfire
     SOURCES
-        tests/unit/test_crystal_fleet.cpp
-        tests/unit/test_stasis.cpp
+        tests/unit/test_cmbtfire.cpp
     PRODUCTION_SOURCES
         src/game/cmbtfire.cpp
     FAKE_SOURCES
@@ -448,8 +447,8 @@ if(MSVC)
     target_link_options(test_ground_commando PRIVATE /OPT:REF)
     target_compile_options(test_combat_repair PRIVATE /Gy)
     target_link_options(test_combat_repair PRIVATE /OPT:REF)
-    target_compile_options(test_stasis PRIVATE /Gy)
-    target_link_options(test_stasis PRIVATE /OPT:REF)
+    target_compile_options(test_cmbtfire PRIVATE /Gy)
+    target_link_options(test_cmbtfire PRIVATE /OPT:REF)
     target_compile_options(test_stasis_area_effects PRIVATE /Gy)
     target_link_options(test_stasis_area_effects PRIVATE /OPT:REF)
     target_compile_options(test_colony_pop_growth PRIVATE /Gy)
@@ -471,7 +470,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_combat_stats PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_ground_commando PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_combat_repair PRIVATE -ffunction-sections -fdata-sections)
-    target_compile_options(test_stasis PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_cmbtfire PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_stasis_area_effects PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_colony_pop_growth PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_colony_replicators PRIVATE -ffunction-sections -fdata-sections)
@@ -490,7 +489,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_combat_stats PRIVATE -Wl,-dead_strip)
         target_link_options(test_ground_commando PRIVATE -Wl,-dead_strip)
         target_link_options(test_combat_repair PRIVATE -Wl,-dead_strip)
-        target_link_options(test_stasis PRIVATE -Wl,-dead_strip)
+        target_link_options(test_cmbtfire PRIVATE -Wl,-dead_strip)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,-dead_strip)
         target_link_options(test_colony_pop_growth PRIVATE -Wl,-dead_strip)
         target_link_options(test_colony_replicators PRIVATE -Wl,-dead_strip)
@@ -509,7 +508,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_combat_stats PRIVATE -Wl,--gc-sections)
         target_link_options(test_ground_commando PRIVATE -Wl,--gc-sections)
         target_link_options(test_combat_repair PRIVATE -Wl,--gc-sections)
-        target_link_options(test_stasis PRIVATE -Wl,--gc-sections)
+        target_link_options(test_cmbtfire PRIVATE -Wl,--gc-sections)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,--gc-sections)
         target_link_options(test_colony_pop_growth PRIVATE -Wl,--gc-sections)
         target_link_options(test_colony_replicators PRIVATE -Wl,--gc-sections)

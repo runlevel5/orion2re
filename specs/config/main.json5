@@ -229,6 +229,14 @@
       reject_unknown_numeric: true,
       values: { group1: 0, group2: 1, group3: 2 },
     },
+    design_button_behavior: {
+      title: "DESIGN button component behavior",
+      description: "Controls whether the construction-orders DESIGN button updates a component or preserves the saved design selection.",
+      remarks: "Complete MOO2 1.50 interface domain. Update is the classic behavior.",
+      kind: "enum",
+      base_type: "uint8",
+      values: { update: 0, intact: 1 },
+    },
     planet_environment_group: {
       title: "Planet environmental group",
       description: "Groups planet climates for map-generation environment tables.",
@@ -1654,6 +1662,34 @@
       },
     },
 
+    design_button_computer: {
+      title: "DESIGN button computer behavior",
+      description: "Controls whether the construction-orders DESIGN button selects the best available computer or preserves the saved design's computer.",
+      examples: ["design design_button_computer = intact;"],
+      group: "interface",
+      namespace: "design",
+      type: "design_button_behavior",
+      default: "update",
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_design_button_computer",
+      },
+    },
+
+    design_button_shield: {
+      title: "DESIGN button shield behavior",
+      description: "Controls whether the construction-orders DESIGN button selects the best available shield or preserves the saved design's shield.",
+      examples: ["design design_button_shield = intact;"],
+      group: "interface",
+      namespace: "design",
+      type: "design_button_behavior",
+      default: "update",
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_design_button_shield",
+      },
+    },
+
     tech_mini: {
       title: "Technology miniaturization categories",
       description: "Assigns each technology application to the group 1, group 2, or non-miniaturizing group 3 space curve.",
@@ -1925,8 +1961,9 @@
     finds_presented_by_scientist: {
       title: "Artifact technology presenter",
       description: "Uses the scientist instead of the trooper when presenting technologies found on Ancient Artifacts planets.",
-      examples: ["finds_presented_by_scientist = true;"],
+      examples: ["research finds_presented_by_scientist = true;"],
       group: "interface",
+      namespace: "research",
       type: "bool",
       default: false,
       bind_root: {

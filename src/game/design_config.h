@@ -3,6 +3,11 @@
 #include <cstdint>
 
 namespace DESIGN {
+    enum {
+        DESIGN_BUTTON_BEHAVIOR_UPDATE,
+        DESIGN_BUTTON_BEHAVIOR_INTACT,
+    };
+
     enum e_miniaturization_category : uint8_t {
         MINIATURIZATION_CATEGORY_GROUP_1 = 0,
         MINIATURIZATION_CATEGORY_GROUP_2 = 1,
@@ -23,6 +28,8 @@ namespace DESIGN {
     extern uint8_t miniaturization_categories[MINIATURIZATION_TECHNOLOGY_COUNT];
     extern uint8_t _missile_x3_shot;
     extern uint8_t _alternative_refit;
+    extern uint8_t _design_button_computer;
+    extern uint8_t _design_button_shield;
 
     uint16_t Miniaturization_Cost_Multiplier_(int16_t level);
     uint16_t Miniaturization_Space_Multiplier_(int16_t level, int8_t category);

@@ -5,6 +5,8 @@ namespace DESIGN {
 
     uint8_t _missile_x3_shot = 0;
     uint8_t _alternative_refit = 0;
+    uint8_t _design_button_computer = DESIGN_BUTTON_BEHAVIOR_UPDATE;
+    uint8_t _design_button_shield = DESIGN_BUTTON_BEHAVIOR_UPDATE;
 
     static const int16_t missile_rack_quantities[2][MISSILE_RACK_COUNT] = {
         { 2, 5, 10, 15, 20 },

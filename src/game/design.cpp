@@ -21,6 +21,7 @@ namespace DESIGN {
 
     void __cdecl Build_Initial_Design_Template_(int16_t player_idx, int16_t design_idx) {
         s_current_design* d = MOX::_design;
+        s_ship_design* saved_design = &MOX::_player[player_idx].ship_designs[design_idx];
 
         struct_::Clear_Structure_(d, sizeof(*d));
 
@@ -31,11 +32,15 @@ namespace DESIGN {
         d->drive_speed = TECHDATA::_drives[d->ftl_type].warp_speed;
         d->ship_size = static_cast<int16_t>(static_cast<int8_t>(Current_Design_Size_(player_idx, design_idx)));
         d->hull_space = DESIGN::Total_Design_Space_();
-        d->computer_type = INITSHIP::Best_Computer_(player_idx);
+        d->computer_type = _design_button_computer == DESIGN_BUTTON_BEHAVIOR_INTACT
+            ? (uint8_t)saved_design->computer_type
+            : INITSHIP::Best_Computer_(player_idx);
         d->picture_type = static_cast<int16_t>(static_cast<int8_t>(HACCESS::Design_Picture_Num_(player_idx, design_idx)));
         d->armor_type = INITSHIP::Best_Armor_(player_idx);
         d->fuel_type = INITSHIP::Best_Ship_Fuel_(player_idx);
-        d->shield = INITSHIP::Best_Ship_Shield_(MOX::_PLAYER_NUM);
+        d->shield = _design_button_shield == DESIGN_BUTTON_BEHAVIOR_INTACT
+            ? (uint8_t)saved_design->shield_type
+            : INITSHIP::Best_Ship_Shield_(MOX::_PLAYER_NUM);
 
         for (int i = 0; i < 8; ++i) {
             d->weapon_space[i] = 0;
