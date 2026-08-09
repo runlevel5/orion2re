@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "config/config_runtime.h"
 
 #include "build_queue.h"
 #include "strbuild.h"
@@ -103,6 +104,344 @@ namespace COLBLDG {
         timer::Mark_Time_();
         timer::Release_Time_(1);
     }
+    // Enhancement: double-clicking the "Build List for" title opens a
+    // preset editor — the same screen editing build preset 0 (the 'q'
+    // preset) instead of the colony's queue. OK saves the preset back to
+    // orion2re.cfg, Cancel/Esc discards.
+    constexpr int PRESET_EDIT_SLOT = 0;
+    constexpr int MAX_PRESET_ITEMS = BUILD_QUEUE::INSTRUCTION_CAPACITY - 2;
+    int16_t _preset_title_click = -1000;
+    int16_t _preset_hotkey = -1000;
+    int16_t _g_preset_edit_mode;
+    uint32_t _g_last_title_click_ms;
+    int16_t _g_preset_saved_queue[7];
+    int16_t _g_preset_saved_auto;
+    // The preset's full item list; the 7 queue slots window one page of it,
+    // materialized (draft ships and all) only while that page is visible.
+    uint8_t _g_preset_items[BUILD_QUEUE::INSTRUCTION_CAPACITY];
+    int16_t _g_preset_item_count;
+    int16_t _g_preset_page;
+
+    // Maps a queue product to its build_queue instruction; 0 when the
+    // product cannot be stored in a preset.
+    static uint8_t Instruction_For_Product_(int16_t product) {
+        if (Colony_Production_Is_Building_(product)) {
+            return (uint8_t)(BUILD_QUEUE::INSTRUCTION_BUILDING_BASE + product);
+        }
+        switch (product) {
+        case COLONY_PRODUCTION_HOUSING: return BUILD_QUEUE::INSTRUCTION_HOUSING;
+        case COLONY_PRODUCTION_TRADE_GOODS: return BUILD_QUEUE::INSTRUCTION_TRADE_GOODS;
+        case COLONY_PRODUCTION_FREIGHTERS: return BUILD_QUEUE::INSTRUCTION_FREIGHTER_FLEET;
+        case COLONY_PRODUCTION_SPY: return BUILD_QUEUE::INSTRUCTION_SPY;
+        case COLONY_PRODUCTION_FARMER: return BUILD_QUEUE::INSTRUCTION_ANDROID_FARMER;
+        case COLONY_PRODUCTION_WORKER: return BUILD_QUEUE::INSTRUCTION_ANDROID_WORKER;
+        case COLONY_PRODUCTION_SCIENTIST: return BUILD_QUEUE::INSTRUCTION_ANDROID_SCIENTIST;
+        case COLONY_PRODUCTION_REPEAT: return BUILD_QUEUE::INSTRUCTION_REPEAT;
+        default: break;
+        }
+        if (!Colony_Production_Is_Queued_Ship_(product)) {
+            return 0;
+        }
+        const s_ship_data& ship = MOX::_ship[Colony_Production_Ship_Index_(product)];
+        if (ship.d.ship_type == SHIP_TYPE_COLONY) return BUILD_QUEUE::INSTRUCTION_COLONY_SHIP;
+        if (ship.d.ship_type == SHIP_TYPE_OUTPOST) return BUILD_QUEUE::INSTRUCTION_OUTPOST_SHIP;
+        if (ship.d.ship_type == SHIP_TYPE_TRANSPORT) return BUILD_QUEUE::INSTRUCTION_TRANSPORT;
+        if (ship.d.ship_type == SHIP_TYPE_COMBAT) {
+            const s_ship_design* designs = MOX::_player[ship.owner].ship_designs;
+            for (int slot = 0; slot < 5; ++slot) {
+                if (designs[slot].size == ship.d.size &&
+                    strncmp(designs[slot].name, ship.d.name, strlen(designs[slot].name)) == 0) {
+                    return (uint8_t)(BUILD_QUEUE::INSTRUCTION_DESIGN1 + slot);
+                }
+            }
+        }
+        return 0;
+    }
+
+    // Maps a preset instruction to a displayable queue product, creating a
+    // draft ship for ship instructions; COLONY_PRODUCTION_NONE when the
+    // instruction has no queue representation (modes, buy, clear, ...).
+    static int16_t Product_For_Preset_Instruction_(uint8_t instr) {
+        if (instr > BUILD_QUEUE::INSTRUCTION_BUILDING_BASE &&
+            instr <= BUILD_QUEUE::INSTRUCTION_BUILDING_BASE + BUILDING_COUNT - 1) {
+            return (int16_t)(instr - BUILD_QUEUE::INSTRUCTION_BUILDING_BASE);
+        }
+        switch (instr) {
+        case BUILD_QUEUE::INSTRUCTION_HOUSING: return COLONY_PRODUCTION_HOUSING;
+        case BUILD_QUEUE::INSTRUCTION_TRADE_GOODS: return COLONY_PRODUCTION_TRADE_GOODS;
+        case BUILD_QUEUE::INSTRUCTION_FREIGHTER_FLEET: return COLONY_PRODUCTION_FREIGHTERS;
+        case BUILD_QUEUE::INSTRUCTION_SPY: return COLONY_PRODUCTION_SPY;
+        case BUILD_QUEUE::INSTRUCTION_ANDROID_FARMER: return COLONY_PRODUCTION_FARMER;
+        case BUILD_QUEUE::INSTRUCTION_ANDROID_WORKER: return COLONY_PRODUCTION_WORKER;
+        case BUILD_QUEUE::INSTRUCTION_ANDROID_SCIENTIST: return COLONY_PRODUCTION_SCIENTIST;
+        case BUILD_QUEUE::INSTRUCTION_REPEAT: return COLONY_PRODUCTION_REPEAT;
+        default: break;
+        }
+        int16_t design_slot = -1;
+        int16_t owner = MOX::_colony[COLONY::_colony_handle].owner;
+        if (instr == BUILD_QUEUE::INSTRUCTION_COLONY_SHIP) {
+            design_slot = 5;
+            INITSHIP::Load_Colony_Ship_Design_(owner, &MOX::_player[owner].ship_designs[5]);
+        } else if (instr == BUILD_QUEUE::INSTRUCTION_OUTPOST_SHIP) {
+            design_slot = 5;
+            INITSHIP::Load_Outpost_Ship_Design_(owner, &MOX::_player[owner].ship_designs[5]);
+        } else if (instr == BUILD_QUEUE::INSTRUCTION_TRANSPORT) {
+            design_slot = 5;
+            INITSHIP::Load_Transport_Ship_Design_(owner, &MOX::_player[owner].ship_designs[5]);
+        } else if (instr >= BUILD_QUEUE::INSTRUCTION_DESIGN1 &&
+                   instr <= BUILD_QUEUE::INSTRUCTION_DESIGN5) {
+            design_slot = (int16_t)(instr - BUILD_QUEUE::INSTRUCTION_DESIGN1);
+        }
+        if (design_slot < 0) {
+            return COLONY_PRODUCTION_NONE;
+        }
+        int16_t ship_idx = Colbldg_Create_Ship_(design_slot);
+        if (ship_idx == -1) {
+            return COLONY_PRODUCTION_NONE;
+        }
+        return Colony_Production_From_Ship_Index_(ship_idx);
+    }
+
+    // Resolves an instruction value to its orion2re.cfg token via the
+    // config schema, so the writer never duplicates the name table.
+    static const char* Instruction_Token_(uint8_t value) {
+        // The build_queue node is an array (not a scalar variable), so it
+        // is found by name and descended to its element scalar's enum type.
+        static const config::s_type_descriptor* type = nullptr;
+        if (type == nullptr) {
+            const config::s_runtime_schema* schema = config::Get_Runtime_Schema();
+            if (schema == nullptr) {
+                return nullptr;
+            }
+            const config::s_schema_node_descriptor* node = nullptr;
+            for (size_t i = 0; i < schema->node_count; ++i) {
+                if (schema->nodes[i].id != nullptr &&
+                    strcmp(schema->nodes[i].id, "build_queue") == 0) {
+                    node = &schema->nodes[i];
+                    break;
+                }
+            }
+            while (node != nullptr && node->type == nullptr &&
+                   node->first_child != config::CONFIG_NO_NODE) {
+                node = &schema->nodes[node->first_child];
+            }
+            if (node == nullptr || node->type == nullptr) {
+                return nullptr;
+            }
+            type = node->type;
+        }
+        for (size_t i = 0; i < type->value_count; ++i) {
+            if (type->values[i].value == (int64_t)value) {
+                return type->values[i].name;
+            }
+        }
+        return nullptr;
+    }
+
+    // Rewrites (or appends) the preset's build_queue statement in
+    // orion2re.cfg so the edit survives restarts.
+    static bool Write_Preset_To_Config_(int preset_idx) {
+        std::string statement = "build_queue " + std::to_string(preset_idx) + " =";
+        for (int i = 0; i < BUILD_QUEUE::INSTRUCTION_CAPACITY; ++i) {
+            uint8_t instr = BUILD_QUEUE::presets[preset_idx][i];
+            const char* token = Instruction_Token_(instr);
+            if (token == nullptr) {
+                return false;
+            }
+            statement += " ";
+            statement += token;
+            if (instr == BUILD_QUEUE::INSTRUCTION_END) {
+                break;
+            }
+        }
+        statement += ";";
+
+        std::string text;
+        if (FILE* f = fopen_case("orion2re.cfg", "rb")) {
+            char chunk[4096];
+            size_t got;
+            while ((got = fread(chunk, 1, sizeof(chunk), f)) > 0) {
+                text.append(chunk, got);
+            }
+            fclose(f);
+        }
+
+        char pattern[32];
+        snprintf(pattern, sizeof(pattern), "build_queue %d", preset_idx);
+        size_t start = text.find(pattern);
+        if (start != std::string::npos) {
+            size_t end = text.find(';', start);
+            if (end == std::string::npos) {
+                return false;
+            }
+            text.replace(start, end - start + 1, statement);
+        } else {
+            if (!text.empty() && text.back() != '\n') {
+                text += "\n";
+            }
+            text += statement;
+            text += "\n";
+        }
+
+        FILE* f = fopen("orion2re.cfg", "wb");
+        if (f == nullptr) {
+            return false;
+        }
+        size_t written = fwrite(text.data(), 1, text.size(), f);
+        fclose(f);
+        return written == text.size();
+    }
+
+    // True when an instruction is a plain item the editor can display.
+    static bool Preset_Instruction_Is_Item_(uint8_t instr) {
+        if (instr > BUILD_QUEUE::INSTRUCTION_BUILDING_BASE &&
+            instr <= BUILD_QUEUE::INSTRUCTION_BUILDING_BASE + BUILDING_COUNT - 1) {
+            return true;
+        }
+        return (instr >= BUILD_QUEUE::INSTRUCTION_HOUSING &&
+                instr <= BUILD_QUEUE::INSTRUCTION_REPEAT) ||
+               (instr >= BUILD_QUEUE::INSTRUCTION_COLONY_SHIP &&
+                instr <= BUILD_QUEUE::INSTRUCTION_DESIGN5);
+    }
+
+    int16_t Total_Preset_Pages_() {
+        int16_t pages = (int16_t)((_g_preset_item_count + 6) / 7);
+        if (pages < 1) {
+            pages = 1;
+        }
+        if (_g_preset_page + 1 > pages) {
+            pages = (int16_t)(_g_preset_page + 1); // empty tail page
+        }
+        return pages;
+    }
+
+    // Materializes one page of the item buffer into the queue slots.
+    void Load_Preset_Page_(int16_t page) {
+        _g_preset_page = page;
+        int slot = 0;
+        for (int i = page * 7; i < _g_preset_item_count && slot < 7; ++i) {
+            int16_t product = Product_For_Preset_Instruction_(_g_preset_items[i]);
+            if (product != COLONY_PRODUCTION_NONE) {
+                _current_item[slot++] = product;
+            }
+        }
+        while (slot < 7) {
+            _current_item[slot++] = COLONY_PRODUCTION_NONE;
+        }
+        _active_prod[0] = -1;
+        _field_mode = 0;
+        Do_Draw_Build_Queue_();
+    }
+
+    // Encodes the visible page back into the item buffer (splicing, since
+    // edits can shrink or grow the page) and deletes its draft ships.
+    void Store_Preset_Page_() {
+        uint8_t page_items[7];
+        int page_count = 0;
+        for (int i = 0; i < 7; ++i) {
+            uint8_t instr = Instruction_For_Product_(_current_item[i]);
+            if (instr != 0) {
+                page_items[page_count++] = instr;
+            }
+        }
+        int start = _g_preset_page * 7;
+        if (start > _g_preset_item_count) {
+            start = _g_preset_item_count;
+        }
+        int end = start + 7;
+        if (end > _g_preset_item_count) {
+            end = _g_preset_item_count;
+        }
+        int tail = _g_preset_item_count - end;
+        int new_count = start + page_count + tail;
+        if (new_count > MAX_PRESET_ITEMS) {
+            new_count = MAX_PRESET_ITEMS;
+        }
+        uint8_t merged[BUILD_QUEUE::INSTRUCTION_CAPACITY];
+        int n = 0;
+        for (int i = 0; i < start; ++i) {
+            merged[n++] = _g_preset_items[i];
+        }
+        for (int i = 0; i < page_count && n < new_count; ++i) {
+            merged[n++] = page_items[i];
+        }
+        for (int i = end; i < end + tail && n < new_count; ++i) {
+            merged[n++] = _g_preset_items[i];
+        }
+        memcpy(_g_preset_items, merged, (size_t)n);
+        _g_preset_item_count = (int16_t)n;
+        Remove_Ships_(0);
+    }
+
+    void Enter_Preset_Editor_() {
+        for (int i = 0; i < 7; ++i) {
+            _g_preset_saved_queue[i] = _current_item[i];
+        }
+        _g_preset_saved_auto = _colony_auto_building;
+        _g_preset_edit_mode = 1;
+
+        _g_preset_item_count = 0;
+        for (int i = 0; i < BUILD_QUEUE::INSTRUCTION_CAPACITY; ++i) {
+            uint8_t instr = BUILD_QUEUE::presets[PRESET_EDIT_SLOT][i];
+            if (instr == BUILD_QUEUE::INSTRUCTION_END ||
+                instr == BUILD_QUEUE::INSTRUCTION_STOP) {
+                break;
+            }
+            if (Preset_Instruction_Is_Item_(instr) &&
+                _g_preset_item_count < MAX_PRESET_ITEMS) {
+                _g_preset_items[_g_preset_item_count++] = instr;
+            }
+        }
+        Load_Preset_Page_(0);
+    }
+
+    void Exit_Preset_Editor_(bool save) {
+        Store_Preset_Page_();
+        if (save) {
+            uint8_t* preset = BUILD_QUEUE::presets[PRESET_EDIT_SLOT];
+            int n = 0;
+            preset[n++] = BUILD_QUEUE::INSTRUCTION_CLEAR;
+            for (int i = 0; i < _g_preset_item_count; ++i) {
+                preset[n++] = _g_preset_items[i];
+            }
+            preset[n] = BUILD_QUEUE::INSTRUCTION_END;
+            if (!Write_Preset_To_Config_(PRESET_EDIT_SLOT)) {
+                GENDRAW::Help_((char*)"Could not write the preset to orion2re.cfg.");
+            }
+        }
+        for (int i = 0; i < 7; ++i) {
+            _current_item[i] = _g_preset_saved_queue[i];
+        }
+        _colony_auto_building = _g_preset_saved_auto;
+        _g_preset_edit_mode = 0;
+        _active_prod[0] = -1;
+        _field_mode = 0;
+        COLONY::Reset_Mouse_Picture_();
+        Do_Draw_Build_Queue_();
+    }
+
+    // Flips the preset editor page with the arrow press animation;
+    // direction -1 = previous, 1 = next (a full last page grows a new one).
+    void Flip_Preset_Page_(int16_t direction) {
+        Store_Preset_Page_();
+        int16_t page = _g_preset_page;
+        if (direction < 0 && page > 0) {
+            page--;
+        } else if (direction > 0) {
+            bool more_items = (page + 1) * 7 < _g_preset_item_count;
+            bool full_tail = _g_preset_item_count == (page + 1) * 7 &&
+                             _g_preset_item_count < MAX_PRESET_ITEMS;
+            if (more_items || full_tail) {
+                page++;
+            }
+        }
+        if (page != _g_preset_page) {
+            Animate_Colony_Arrow_Press_(direction < 0 ? _prev_colony_anim : _next_colony_anim,
+                                        direction < 0 ? (int16_t)218 : (int16_t)411, 306);
+        }
+        Load_Preset_Page_(page);
+    }
+
     char _g_msg[800];
     s_animation_header* _colsum_pal_anim;
     s_animation_header* _bldg_bitm;
@@ -415,6 +754,10 @@ namespace COLBLDG {
             _prev_colony_click = -1000;
             _next_colony_click = -1000;
         }
+        _preset_title_click = enhanced_keys
+            ? fields::Add_Hidden_Field_(253, 306, 409, 326, "", 0)
+            : (int16_t)-1000;
+        _preset_hotkey = fields::Add_Hot_Key_(enhanced_keys ? "p" : "");
         _fields[10] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(193));
 
         _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], (int16_t*)&_colony_auto_building, enhanced_keys ? "a" : ESTRINGS::E_Strings_(12), 41);
@@ -430,12 +773,15 @@ namespace COLBLDG {
         _fields[6] = fields::Add_Button_Field_(503, 411, ESTRINGS::E_Strings_(12), _anims[6], (char*)"e", 40);
         _fields[7] = -1000;
 
-        _build_queue_hotkeys[0] = fields::Add_Hot_Key_("q");
+        // The preset editor disables the preset-apply keys entirely (the
+        // empty hot keys keep the field ids stable).
+        const bool preset_mode = _g_preset_edit_mode != 0;
+        _build_queue_hotkeys[0] = fields::Add_Hot_Key_(preset_mode ? "" : "q");
         for (int preset = 1; preset <= 9; ++preset) {
-            const char hotkey[2] = {static_cast<char>('0' + preset), '\0'};
+            const char hotkey[2] = {preset_mode ? '\0' : static_cast<char>('0' + preset), '\0'};
             _build_queue_hotkeys[preset] = fields::Add_Hot_Key_(hotkey);
         }
-        _build_queue_hotkeys[10] = fields::Add_Hot_Key_("0");
+        _build_queue_hotkeys[10] = fields::Add_Hot_Key_(preset_mode ? "" : "0");
 
         Add_Build_Queue_Fields_();
         Add_Buildings_Fields_();
@@ -1095,7 +1441,14 @@ namespace COLBLDG {
 
             char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[COLONY::_colony_handle].planet);
             char* format = ESTRINGS::E_Strings_(ESTR_BUILD_LIST_FOR_S);
-            snprintf(buffer, sizeof(buffer), format, planet_name);
+            if (COLBLDG::_g_preset_edit_mode != 0) {
+                char preset_label[32];
+                snprintf(preset_label, sizeof(preset_label), "Preset (%d/%d)",
+                         COLBLDG::_g_preset_page + 1, COLBLDG::Total_Preset_Pages_());
+                snprintf(buffer, sizeof(buffer), format, preset_label);
+            } else {
+                snprintf(buffer, sizeof(buffer), format, planet_name);
+            }
 
             fonts::Set_Font_Style_Shadow_Down_(3, &COLBLDG::_l_font_color_array);
             if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
@@ -1544,6 +1897,75 @@ namespace COLBLDG {
         }
 
         int16_t input_field = *selected_field_id;
+
+        // Enhancement: the preset editor repurposes OK and Cancel and
+        // swallows every colony-level action; a double click on the title
+        // opens it.
+        if (_g_preset_edit_mode != 0) {
+            if (input_field == _fields[3]) {
+                Exit_Preset_Editor_(true);
+                *selected_field_id = 0;
+                return;
+            }
+            if (input_field == _fields[0] || input_field == _fields[1]) {
+                Exit_Preset_Editor_(false);
+                *selected_field_id = 0;
+                return;
+            }
+            if (input_field == _fields[8] || input_field == _prev_colony_click) {
+                Flip_Preset_Page_(-1);
+                *selected_field_id = 0;
+                return;
+            }
+            if (input_field == _fields[9] || input_field == _next_colony_click) {
+                Flip_Preset_Page_(1);
+                *selected_field_id = 0;
+                return;
+            }
+            if (input_field == _preset_hotkey) {
+                Exit_Preset_Editor_(true);
+                *selected_field_id = 0;
+                return;
+            }
+            if (_preset_title_click > 0 && input_field == _preset_title_click) {
+                // A second double click on the title leaves the editor,
+                // keeping the edits like OK does.
+                uint32_t now_ms = (uint32_t)SDL_GetTicks();
+                if (_g_last_title_click_ms != 0 &&
+                    now_ms - _g_last_title_click_ms <= 400) {
+                    Exit_Preset_Editor_(true);
+                    _g_last_title_click_ms = 0; // disarm against a stray third click
+                } else {
+                    _g_last_title_click_ms = now_ms;
+                }
+                *selected_field_id = 0;
+                return;
+            }
+            bool swallowed = input_field == _fields[4] || input_field == _fields[5] ||
+                             input_field == _fields[10];
+            for (int preset = 0; !swallowed && preset < BUILD_QUEUE::PRESET_COUNT; ++preset) {
+                swallowed = input_field == _build_queue_hotkeys[preset];
+            }
+            if (swallowed) {
+                *selected_field_id = 0;
+                return;
+            }
+        } else if (_preset_hotkey > 0 && input_field == _preset_hotkey) {
+            Enter_Preset_Editor_();
+            *selected_field_id = 0;
+            return;
+        } else if (_preset_title_click > 0 && input_field == _preset_title_click) {
+            uint32_t now_ms = (uint32_t)SDL_GetTicks();
+            if (_g_last_title_click_ms != 0 &&
+                now_ms - _g_last_title_click_ms <= 400) {
+                Enter_Preset_Editor_();
+                _g_last_title_click_ms = 0; // disarm against a stray third click
+            } else {
+                _g_last_title_click_ms = now_ms;
+            }
+            *selected_field_id = 0;
+            return;
+        }
 
         // Enhancement: the title-bar arrows act as the < / > colony keys,
         // and both the clicks and the keys animate the arrow press.
@@ -2119,6 +2541,20 @@ namespace COLBLDG {
 
     int8_t __cdecl Add_To_Queue_(int16_t product_id) {
         int16_t q_len = COLBLDG::Get_Prod_Queue_Len_();
+        // Enhancement: in the preset editor a full page jumps straight to
+        // the page with free space (pages are kept dense, so that is always
+        // the last one — or a fresh tail page), in a single transition.
+        if (q_len == -1 && COLBLDG::_g_preset_edit_mode != 0) {
+            COLBLDG::Store_Preset_Page_();
+            if (COLBLDG::_g_preset_item_count >= COLBLDG::MAX_PRESET_ITEMS) {
+                GENDRAW::Help_((char*)"The preset is full; no more items can be added.");
+                COLBLDG::Load_Preset_Page_(COLBLDG::_g_preset_page);
+            } else {
+                COLBLDG::Animate_Colony_Arrow_Press_(COLBLDG::_next_colony_anim, 411, 306);
+                COLBLDG::Load_Preset_Page_((int16_t)(COLBLDG::_g_preset_item_count / 7));
+                q_len = COLBLDG::Get_Prod_Queue_Len_();
+            }
+        }
         if (q_len == -1) {
             if (COLBLDG::_field_mode != 0) {
                 COLBLDG::_field_mode = 0;
