@@ -548,7 +548,9 @@ namespace CMBTDRW1 {
 
         graphics::Interlaced_Fill_(0x72, 0x17a, 0x107, 0x1d2, 0, 0xc7 /* 199 */);
 
-        for (int16_t bit = 0; bit < 39; ++bit) {
+        const int16_t special_count =
+            COMBINIT::_amoeba_regeneration != 0 ? SPECIAL_COUNT : SPECIAL_REGENERATION;
+        for (int16_t bit = 0; bit < special_count; ++bit) {
             s_combat_data *ship = &MOX::_combat_data[MOX::_cur_ship];
             if (struct_::Test_Bit_Field_(ship->special_device_flags, bit)) {
                 s_colors *current_color;
@@ -3767,7 +3769,9 @@ skip_cursor:
         int16_t special_row_y = row_y;
         int16_t displayed_specials = 0;
 
-        for (int32_t special_index = 0; special_index < 0x27; ++special_index) {
+        const int32_t special_count =
+            COMBINIT::_amoeba_regeneration != 0 ? SPECIAL_COUNT : SPECIAL_REGENERATION;
+        for (int32_t special_index = 0; special_index < special_count; ++special_index) {
             if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, special_index) != 0) {
                 const s_colors* active_colors =
                     (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, special_index) == 0)

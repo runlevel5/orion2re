@@ -153,9 +153,9 @@ DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor 
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "civilian_armor no_armor = 90;"
-        "civilian_armor tritanium = 120;"
-        "civilian_armor xentronium = 200;",
+        "combat civilian_armor no_armor = 90;"
+        "combat civilian_armor tritanium = 120;"
+        "combat civilian_armor xentronium = 200;",
         &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
@@ -165,7 +165,7 @@ DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor 
 
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
-        "civilian_armor titanium = 0;", &writes, &diagnostic));
+        "combat civilian_armor titanium = 0;", &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
@@ -196,7 +196,7 @@ DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic d
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "housing_creates_no_farmers = true;", &writes, &diagnostic));
+        "colony housing_creates_no_farmers = true;", &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COLCALC::_housing_creates_no_farmers == 1);
@@ -217,9 +217,9 @@ DOCTEST_TEST_CASE("event delays preserve 1.50 defaults and bind by event name") 
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "event_delay comet = 150;"
-        "event_delay space_amoeba = 75;"
-        "event_delay mineral_depletion = 50;",
+        "events event_delay comet = 150;"
+        "events event_delay space_amoeba = 75;"
+        "events event_delay mineral_depletion = 50;",
         &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
@@ -229,10 +229,10 @@ DOCTEST_TEST_CASE("event delays preserve 1.50 defaults and bind by event name") 
 
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
-        "event_delay comet = 65536;", &writes, &diagnostic));
+        "events event_delay comet = 65536;", &writes, &diagnostic));
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
-        "event_delay overworking = 50;", &writes, &diagnostic));
+        "events event_delay overworking = 50;", &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {
@@ -263,6 +263,31 @@ DOCTEST_TEST_CASE("Crystal fleet retention preserves the classic default") {
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COMBINIT::_crystal_keep == 1);
+}
+
+DOCTEST_TEST_CASE("Amoeba regeneration settings preserve classic defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_amoeba_regeneration == 0);
+    DOCTEST_CHECK(COMBINIT::repair_rate.cyber == 10);
+    DOCTEST_CHECK(COMBINIT::repair_rate.aru == 20);
+    DOCTEST_CHECK(COMBINIT::repair_rate.regen == 20);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat amoeba_regeneration = true;"
+        "combat repair_rate cyber = 7;"
+        "combat repair_rate aru = 11;"
+        "combat repair_rate regen = 13;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COMBINIT::_amoeba_regeneration == 1);
+    DOCTEST_CHECK(COMBINIT::repair_rate.cyber == 7);
+    DOCTEST_CHECK(COMBINIT::repair_rate.aru == 11);
+    DOCTEST_CHECK(COMBINIT::repair_rate.regen == 13);
 }
 
 DOCTEST_TEST_CASE("combat re-engagement buildings bind by building name") {
@@ -313,8 +338,8 @@ DOCTEST_TEST_CASE("Warlord combat settings preserve classic defaults") {
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "satellite_warlord_bonus = true;"
-        "strategic_xp_bonus = true;",
+        "combat satellite_warlord_bonus = true;"
+        "combat strategic_xp_bonus = true;",
         &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
@@ -331,7 +356,7 @@ DOCTEST_TEST_CASE("planetary Damper Field setting preserves the classic default"
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "planet_damper = true;", &writes, &diagnostic));
+        "combat planet_damper = true;", &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COMBINIT::_planet_damper_enabled == 1);
@@ -384,7 +409,7 @@ DOCTEST_TEST_CASE("excess marine capture setting preserves the classic default")
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "kill_excess_marines_after_capture = true;",
+        "combat kill_excess_marines_after_capture = true;",
         &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
@@ -529,11 +554,11 @@ DOCTEST_TEST_CASE("miniaturization curves and categories bind by normalized name
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "miniaturization cost = 100 75 60 40 30 25;"
-        "miniaturization space group1 = 1000 800 675 500 350 250;"
-        "miniaturization space group3 = 1000 1000 900 800 700 600;"
-        "tech_mini anti_matter_torpedo = group1;"
-        "tech_mini reinforced_hull = group2;",
+        "design miniaturization cost = 100 75 60 40 30 25;"
+        "design miniaturization space group1 = 1000 800 675 500 350 250;"
+        "design miniaturization space group3 = 1000 1000 900 800 700 600;"
+        "design tech_mini anti_matter_torpedo = group1;"
+        "design tech_mini reinforced_hull = group2;",
         &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
@@ -550,7 +575,7 @@ DOCTEST_TEST_CASE("miniaturization curves and categories bind by normalized name
 
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
-        "tech_mini reinforced_hull = group4;", &writes, &diagnostic));
+        "design tech_mini reinforced_hull = group4;", &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("maximum galaxy star count binds and validates its storage range") {
@@ -667,12 +692,12 @@ DOCTEST_TEST_CASE("shorter build queue assignments replace execution through an 
     config::s_cfg_diagnostic diagnostic;
 
     DOCTEST_REQUIRE(Append_Decoded_(
-        "build_queue 1 = prepend design1 design2 design3 end;",
+        "colony build_queue 1 = prepend design1 design2 design3 end;",
         &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     writes.writes.clear();
     DOCTEST_REQUIRE(Append_Decoded_(
-        "build_queue 1 = housing end;", &writes, &diagnostic));
+        "colony build_queue 1 = housing end;", &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
 
@@ -686,7 +711,7 @@ DOCTEST_TEST_CASE("shared build queue layouts validate every row terminator") {
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
     config::t_variable_id first = config::CONFIG_NO_VARIABLE;
     DOCTEST_REQUIRE(config::Find_Variable(
-        "build_queue.10.0", std::strlen("build_queue.10.0"), &first));
+        "colony.build_queue.10.0", std::strlen("colony.build_queue.10.0"), &first));
     for (int instruction = 0; instruction < BUILD_QUEUE::INSTRUCTION_CAPACITY;
          ++instruction) {
         state.values[first + instruction].integer_value = BUILD_QUEUE::INSTRUCTION_CLEAR;
@@ -803,7 +828,8 @@ DOCTEST_TEST_CASE("write sets apply to temporary state before explicit commit") 
     config::s_config_write_set write_set;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "music_enabled = false; music_volume = 75; sound_effects_volume = 25;",
+        "audio music_enabled = false; audio music_volume = 75;"
+        "audio sound_effects_volume = 25;",
         &write_set, &diagnostic));
 
     config::s_config_state base_state;
@@ -835,7 +861,8 @@ DOCTEST_TEST_CASE("transaction commits complete write sets and later writes win"
     config::s_config_write_set write_set;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "music_volume = 10; music_volume = 90; sound_effects_enabled = true;",
+        "audio music_volume = 10; audio music_volume = 90;"
+        "audio sound_effects_enabled = true;",
         &write_set, &diagnostic));
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Read_Current_State(&state));
@@ -866,7 +893,8 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
 
     config::s_config_write_set write_set;
     config::s_cfg_diagnostic diagnostic;
-    DOCTEST_REQUIRE(Append_Decoded_("music_volume = 80;", &write_set, &diagnostic));
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "audio music_volume = 80;", &write_set, &diagnostic));
     write_set.writes.push_back(Invalid_Write_(
         3, config::CONFIG_VALUE_INT8, 101));
 
@@ -874,7 +902,7 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
         &write_set, &candidate_state, &diagnostic));
     DOCTEST_CHECK(States_Equal_(candidate_state, original_candidate));
     DOCTEST_CHECK(diagnostic.message ==
-                  "typed write range error for sound_effects_volume");
+                  "typed write range error for audio.sound_effects_volume");
     DOCTEST_CHECK(diagnostic.location.source == "forged.cfg");
 
     DOCTEST_CHECK(MOX::_settings.music_on == 1);
@@ -887,7 +915,7 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
     DOCTEST_CHECK_FALSE(config::Apply_Write_Set(
         &write_set, &candidate_state, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
-                  "typed write mismatch for sound_effects_volume");
+                  "typed write mismatch for audio.sound_effects_volume");
     DOCTEST_CHECK(MOX::_settings.music_level == 40);
 }
 

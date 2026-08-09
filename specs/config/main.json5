@@ -852,6 +852,15 @@
         { id: "specials", title: "Special systems", description: "Special systems installed in the design.", type: "ship_specials", bind: ["special_device_flags"] },
       ],
     },
+    repair_rate: {
+      title: "Tactical repair rates",
+      description: "Controls end-of-round armor, structure, and internal-system repair percentages.",
+      fields: [
+        { id: "cyber", title: "Cybernetic", description: "Repair percentage supplied by the Cybernetic racial trait.", type: "uint8", bind: ["cyber"] },
+        { id: "aru", title: "Automated Repair Unit", description: "Repair percentage supplied by a working Automated Repair Unit.", type: "uint8", bind: ["aru"] },
+        { id: "regen", title: "Regeneration", description: "Repair percentage supplied by a working Regeneration special when Amoeba regeneration is enabled.", type: "uint8", bind: ["regen"] },
+      ],
+    },
   },
 
   parameters: {
@@ -860,10 +869,11 @@
       description: "Defines the eleven build lists applied by Q and the digit hotkeys.",
       remarks: "Q selects list 0; keys 1 through 9 select matching list numbers; key 0 selects list 10. Shift plus a digit applies that list to every owned colony from the colony summary. clear_continuous removes Housing and Trade Goods from the editable queue while preserving a purchased front item.",
       examples: [
-        "build_queue 1 = prepend design1 end;",
-        "build_queue 9 = housing end;",
+        "colony build_queue 1 = prepend design1 end;",
+        "colony build_queue 9 = housing end;",
       ],
       group: "gameplay",
+      namespace: "colony",
       bind_root: { header: "game/build_queue.h", symbol: "BUILD_QUEUE::presets" },
       type: {
         kind: "array", count: 11, index_base: 0,
@@ -1149,8 +1159,9 @@
     music_enabled: {
       title: "Music enabled",
       description: "Controls whether game music is played.",
-      examples: ["music_enabled = true;", "music_enabled = false;"],
+      examples: ["audio music_enabled = true;", "audio music_enabled = false;"],
       group: "interface",
+      namespace: "audio",
       type: "bool",
       default: true,
       bind_root: {
@@ -1163,9 +1174,10 @@
     music_volume: {
       title: "Music volume",
       description: "Sets music playback volume as a percentage.",
-      examples: ["music_volume = 75;"],
+      examples: ["audio music_volume = 75;"],
       units: "percent",
       group: "interface",
+      namespace: "audio",
       type: "int8",
       constraints: {
         min: 0,
@@ -1182,8 +1194,9 @@
     sound_effects_enabled: {
       title: "Sound effects enabled",
       description: "Controls whether game sound effects are played.",
-      examples: ["sound_effects_enabled = true;"],
+      examples: ["audio sound_effects_enabled = true;"],
       group: "interface",
+      namespace: "audio",
       type: "bool",
       default: true,
       bind_root: {
@@ -1196,9 +1209,10 @@
     sound_effects_volume: {
       title: "Sound effects volume",
       description: "Sets sound-effect playback volume as a percentage.",
-      examples: ["sound_effects_volume = 60;"],
+      examples: ["audio sound_effects_volume = 60;"],
       units: "percent",
       group: "interface",
+      namespace: "audio",
       type: "int8",
       constraints: {
         min: 0,
@@ -1343,8 +1357,9 @@
       title: "Warlord bonus for planetary defenses",
       description: "Raises tactical colony and orbital-defense crew quality by one level for Warlord owners.",
       remarks: "False preserves classic behavior.",
-      examples: ["satellite_warlord_bonus = true;"],
+      examples: ["combat satellite_warlord_bonus = true;"],
       group: "gameplay",
+      namespace: "combat",
       type: "bool",
       bind_root: {
         header: "game/combinit.h",
@@ -1357,8 +1372,9 @@
       title: "Crew experience in strategic combat",
       description: "Applies ship crew attack and defense bonuses during strategic combat.",
       remarks: "False preserves classic behavior.",
-      examples: ["strategic_xp_bonus = true;"],
+      examples: ["combat strategic_xp_bonus = true;"],
       group: "gameplay",
+      namespace: "combat",
       type: "bool",
       bind_root: {
         header: "game/combat.h",
@@ -1371,8 +1387,9 @@
       title: "Planetary Damper Field",
       description: "Equips planetary defensive installations with a Damper Field when the defender has researched the technology.",
       remarks: "Planetary shield absorption is applied before Damper Field reduction, and the protection ends when the last defensive installation is destroyed.",
-      examples: ["planet_damper = true;"],
+      examples: ["combat planet_damper = true;"],
       group: "gameplay",
+      namespace: "combat",
       type: "bool",
       bind_root: {
         header: "game/combinit.h",
@@ -1385,8 +1402,9 @@
       title: "Kill excess marines after capture",
       description: "Immediately removes surviving attackers above the captured ship or orbital base's marine capacity.",
       remarks: "Working Troop Pods double ship capacity. When disabled, excess marines remain until combat cleanup, matching classic behavior.",
-      examples: ["kill_excess_marines_after_capture = true;"],
+      examples: ["combat kill_excess_marines_after_capture = true;"],
       group: "gameplay",
+      namespace: "combat",
       type: "bool",
       bind_root: {
         header: "game/boarding.h",
@@ -1469,8 +1487,9 @@
       title: "Civilian armor hit points",
       description: "Sets the bombardment hit points of civilian structures and population for each defending armor technology.",
       remarks: "The all-100 default preserves classic behavior. Zero is rejected because this value is used as a divisor.",
-      examples: ["civilian_armor tritanium = 120;"],
+      examples: ["combat civilian_armor tritanium = 120;"],
       group: "gameplay",
+      namespace: "combat",
       bind_root: {
         header: "game/cmbtfire.h",
         symbol: "CMBTFIRE::_civilian_armor",
@@ -1555,12 +1574,13 @@
       description: "Configures ship-component cost percentages and category-specific space multipliers for miniaturization levels 0 through 5.",
       remarks: "Conversion note for MOO2 1.50 CFG files: level_0_cost through level_5_cost become cost positions 0 through 5. level_0_size_groups_1_and_2 becomes position 0 of both group1 and group2; level_1_size_groups_1_and_2 becomes position 1 of both curves; level_2_size_group_1 becomes group1 position 2; level_3_grp_1_and_level_4_grp_2 becomes group1 position 3 and group2 position 4; level_4_size_group_1 and level_5_size_group_1 become group1 positions 4 and 5; level_2_size_group_2, level_3_size_group_2, and level_5_size_group_2 become group2 positions 2, 3, and 5. Group3 was implicit in 1.50 and its equivalent non-miniaturizing curve is 1000 1000 1000 1000 1000 1000. Curve positions are levels 0 through 5, and position 5 also applies above level 5. Cost values are percentages and space values are per-thousand multipliers. tech_mini assignments retain their 1.50 syntax and names.",
       examples: [
-        "miniaturization cost = 100 75 55 40 30 25;",
-        "miniaturization space group1 = 1000 800 650 500 350 250;",
-        "miniaturization space group2 = 1000 800 700 600 500 400;",
-        "miniaturization space group3 = 1000 1000 1000 1000 1000 1000;",
+        "design miniaturization cost = 100 75 55 40 30 25;",
+        "design miniaturization space group1 = 1000 800 650 500 350 250;",
+        "design miniaturization space group2 = 1000 800 700 600 500 400;",
+        "design miniaturization space group3 = 1000 1000 1000 1000 1000 1000;",
       ],
       group: "gameplay",
+      namespace: "design",
       type: "miniaturization_settings",
       bind_root: { header: "game/design_config.h", symbol: "DESIGN::miniaturization" },
       default: {
@@ -1578,10 +1598,11 @@
       description: "Assigns each technology application to the group 1, group 2, or non-miniaturizing group 3 space curve.",
       remarks: "The parameter and technology names preserve MOO2 1.50 CFG compatibility. Category zero is group1, category one is group2, and category two is group3.",
       examples: [
-        "tech_mini anti_matter_torpedo = group2;",
-        "tech_mini reinforced_hull = group3;",
+        "design tech_mini anti_matter_torpedo = group2;",
+        "design tech_mini reinforced_hull = group3;",
       ],
       group: "gameplay",
+      namespace: "design",
       bind_root: { header: "game/design_config.h", symbol: "DESIGN::miniaturization_categories" },
       type: {
         kind: "array", count: 212, index_base: 0, index_type: "technology_application",
@@ -1644,12 +1665,13 @@
       description: "Sets the per-event minimum game turn for random-event selection.",
       remarks: "The generator's global turn-50 gate still applies, so values below 50 do not permit earlier selection. Hyperspace flux additionally blocks comet and space-monster events. Mutiny and Warp Funnel retain their native table positions even though the original event generator does not complete them. Unlike MOO2 1.50 CFG files, use mineral_depletion instead of overworking for event 11.",
       examples: [
-        "event_delay comet = 200;",
-        "event_delay mineral_depletion = 0;",
-        "event_delay space_amoeba = 100;",
+        "events event_delay comet = 200;",
+        "events event_delay mineral_depletion = 0;",
+        "events event_delay space_amoeba = 100;",
       ],
       units: "turns",
       group: "gameplay",
+      namespace: "events",
       type: {
         kind: "array",
         count: 29,
@@ -1672,14 +1694,46 @@
       title: "Housing creates no farmers",
       description: "Prevents population grown while a colony produces Housing from being assigned to farming.",
       remarks: "False preserves classic behavior and applies the normal new-population job selection rules.",
-      examples: ["housing_creates_no_farmers = true;"],
+      examples: ["colony housing_creates_no_farmers = true;"],
       group: "gameplay",
+      namespace: "colony",
       type: "bool",
       default: false,
       bind_root: {
         header: "game/colcalc.h",
         symbol: "COLCALC::_housing_creates_no_farmers",
       },
+    },
+
+    amoeba_regeneration: {
+      title: "Amoeba regeneration",
+      description: "Enables the Regeneration special carried by Toxic Amoebae.",
+      remarks: "False preserves classic behavior. When enabled, working Regeneration repairs at the configured repair_rate regen percentage and is shown in combat special displays.",
+      examples: ["combat amoeba_regeneration = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::_amoeba_regeneration",
+      },
+      default: false,
+    },
+
+    repair_rate: {
+      title: "Tactical repair rates",
+      description: "Configures Cybernetic, Automated Repair Unit, and Regeneration repair percentages.",
+      remarks: "Internal systems use the existing repair routine's derived percentage. The defaults match MOO2 1.50 and classic Cybernetic and Automated Repair Unit behavior.",
+      examples: ["combat repair_rate regen = 20;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "repair_rate",
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::repair_rate",
+      },
+      default: { cyber: 10, aru: 20, regen: 20 },
     },
   },
 }

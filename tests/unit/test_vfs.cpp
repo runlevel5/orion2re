@@ -215,7 +215,7 @@ DOCTEST_TEST_CASE("staged ZIP package exposes private root and public data proje
     test_vfs_detail::Scoped_Vfs_Test_Directory test_dir;
     test_dir.Write_Zip_File(test_vfs_detail::fs::path("data") / "mods" / "archive.zip", {
         {"mod.json5", "manifest"},
-        {"config/main.cfg", "music_volume = 60;"},
+        {"config/main.cfg", "audio music_volume = 60;"},
         {"data/voices/alert.dat", "archive-alert"},
     });
 

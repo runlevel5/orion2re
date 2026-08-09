@@ -2571,13 +2571,13 @@ void __cdecl Repair_All_Combat_Ships_() {
 
     if (MOX::_combat_attacker_player < MAX_PLAYERS) {
         if (MOX::_player[MOX::_combat_attacker_player].traits[TRAIT_CYBERNETIC] != 0) {
-            attacker_bonus += 10;
+            attacker_bonus += repair_rate.cyber;
         }
     }
 
     if (MOX::_combat_defender_player < MAX_PLAYERS) {
         if (MOX::_player[MOX::_combat_defender_player].traits[TRAIT_CYBERNETIC] != 0) {
-            defender_bonus += 10;
+            defender_bonus += repair_rate.cyber;
         }
     }
 
@@ -2589,7 +2589,12 @@ void __cdecl Repair_All_Combat_Ships_() {
             !CMBTMOV1::Ship_Is_In_Stasis_(i))
         {
             if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_AUTOMATED_REPAIR_UNIT) != 0) {
-                repair_amount = 20;
+                repair_amount = repair_rate.aru;
+            }
+
+            if (_amoeba_regeneration != 0 &&
+                COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_REGENERATION) != 0) {
+                repair_amount += repair_rate.regen;
             }
 
             if (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) {

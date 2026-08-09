@@ -118,14 +118,14 @@ DOCTEST_TEST_SUITE("configuration include loader") {
 DOCTEST_TEST_CASE("nested includes resolve relative paths in statement order") {
     s_config_test_directory files;
     files.Write("config/main.cfg",
-        "music_volume = 60;\n"
+        "audio music_volume = 60;\n"
         "include balance/first.cfg;\n"
-        "music_enabled = false;\n");
+        "audio music_enabled = false;\n");
     files.Write("config/balance/first.cfg",
-        "sound_effects_volume = 25;\n"
+        "audio sound_effects_volume = 25;\n"
         "include ../shared.cfg;\n"
-        "music_volume = 80;\n");
-    files.Write("config/shared.cfg", "music_volume = 70;\n");
+        "audio music_volume = 80;\n");
+    files.Write("config/shared.cfg", "audio music_volume = 70;\n");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
     config::s_effective_config effective;
@@ -141,7 +141,7 @@ DOCTEST_TEST_CASE("nested includes resolve relative paths in statement order") {
 
     config::t_variable_id music_index = 0;
     DOCTEST_REQUIRE(config::Find_Variable(
-        "music_volume", std::strlen("music_volume"), &music_index));
+        "audio.music_volume", std::strlen("audio.music_volume"), &music_index));
     DOCTEST_CHECK(effective.provenance[music_index].location.source ==
                   "config/balance/first.cfg");
     DOCTEST_CHECK(effective.provenance[music_index].location.line == 3);
@@ -156,11 +156,11 @@ DOCTEST_TEST_CASE("stop ends only the included file") {
     s_config_test_directory files;
     files.Write("main.cfg",
         "include child.cfg;\n"
-        "music_volume = 75;\n");
+        "audio music_volume = 75;\n");
     files.Write("child.cfg",
-        "sound_effects_volume = 30;\n"
+        "audio sound_effects_volume = 30;\n"
         "stop;\n"
-        "sound_effects_volume = 99;\n");
+        "audio sound_effects_volume = 99;\n");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
     config::s_effective_config effective;
@@ -193,12 +193,12 @@ DOCTEST_TEST_CASE("include cycles report the normalized include chain") {
 DOCTEST_TEST_CASE("missing and malformed includes are distinct and roll back") {
     s_config_test_directory files;
     files.Write("missing-main.cfg",
-        "music_volume = 80;\n"
+        "audio music_volume = 80;\n"
         "include absent.cfg;\n");
     files.Write("malformed-main.cfg",
-        "music_volume = 80;\n"
+        "audio music_volume = 80;\n"
         "include malformed.cfg;\n");
-    files.Write("malformed.cfg", "sound_effects_volume = 0x;\n");
+    files.Write("malformed.cfg", "audio sound_effects_volume = 0x;\n");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
     config::s_effective_config effective;
@@ -242,7 +242,7 @@ DOCTEST_TEST_CASE("invalid include paths cannot escape the VFS root") {
 DOCTEST_TEST_CASE("missing enabled package is an error and rolls back configuration") {
     s_config_test_directory files;
     files.Write("main.cfg",
-        "music_volume = 80;\n"
+        "audio music_volume = 80;\n"
         "enable balance_mod;\n");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
@@ -263,13 +263,13 @@ DOCTEST_TEST_CASE("first enable wins configuration and VFS resource precedence")
     files.Write(fs::path("data") / "mods" / "first" / "mod.json5",
                 Manifest_("first"));
     files.Write(fs::path("data") / "mods" / "first" / "config" / "main.cfg",
-                "music_volume = 81;\n");
+                "audio music_volume = 81;\n");
     files.Write(fs::path("data") / "mods" / "first" / "data" / "priority.dat",
                 "first");
     files.Write(fs::path("data") / "mods" / "second" / "mod.json5",
                 Manifest_("second"));
     files.Write(fs::path("data") / "mods" / "second" / "config" / "main.cfg",
-                "music_volume = 62;\n");
+                "audio music_volume = 62;\n");
     files.Write(fs::path("data") / "mods" / "second" / "data" / "priority.dat",
                 "second");
     files.Initialize_Vfs();
@@ -292,7 +292,7 @@ DOCTEST_TEST_CASE("supported community patch package ID can be enabled") {
     files.Write(fs::path("data") / "mods" / "ver150" / "mod.json5",
                 Manifest_("ver150"));
     files.Write(fs::path("data") / "mods" / "ver150" / "config" / "main.cfg",
-                "music_volume = 76;\n");
+                "audio music_volume = 76;\n");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
     config::s_effective_config effective;
@@ -312,11 +312,11 @@ DOCTEST_TEST_CASE("direct dependency is loaded once below its package") {
                 Manifest_("parent",
                     "  dependencies: [{ id: \"shared\", version: \">=1.0.0\" }],\n"));
     files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg",
-                "music_volume = 77;\n");
+                "audio music_volume = 77;\n");
     files.Write(fs::path("data") / "mods" / "shared" / "mod.json5",
                 Manifest_("shared"));
     files.Write(fs::path("data") / "mods" / "shared" / "config" / "main.cfg",
-                "music_volume = 55;\nsound_effects_volume = 42;\n");
+                "audio music_volume = 55;\naudio sound_effects_volume = 42;\n");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
     config::s_effective_config effective;
@@ -338,17 +338,17 @@ DOCTEST_TEST_CASE("later explicit enable outranks dependencies of an earlier pac
                 Manifest_("parent",
                     "  dependencies: [{ id: \"dependency\", version: \"1.0.0\" }],\n"));
     files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg",
-                "music_enabled = false;\n");
+                "audio music_enabled = false;\n");
     files.Write(fs::path("data") / "mods" / "dependency" / "mod.json5",
                 Manifest_("dependency"));
     files.Write(fs::path("data") / "mods" / "dependency" / "config" / "main.cfg",
-                "music_volume = 51;\n");
+                "audio music_volume = 51;\n");
     files.Write(fs::path("data") / "mods" / "dependency" / "data" / "priority.dat",
                 "dependency");
     files.Write(fs::path("data") / "mods" / "explicit_mod" / "mod.json5",
                 Manifest_("explicit_mod"));
     files.Write(fs::path("data") / "mods" / "explicit_mod" / "config" / "main.cfg",
-                "music_volume = 69;\n");
+                "audio music_volume = 69;\n");
     files.Write(fs::path("data") / "mods" / "explicit_mod" / "data" / "priority.dat",
                 "explicit");
     files.Initialize_Vfs();
@@ -370,11 +370,11 @@ DOCTEST_TEST_CASE("nested enable resolves a package and preserves parent priorit
     files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
                 Manifest_("parent"));
     files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg",
-                "enable nested;\nmusic_volume = 79;\n");
+                "enable nested;\naudio music_volume = 79;\n");
     files.Write(fs::path("data") / "mods" / "nested" / "mod.json5",
                 Manifest_("nested"));
     files.Write(fs::path("data") / "mods" / "nested" / "config" / "main.cfg",
-                "music_volume = 58;\n");
+                "audio music_volume = 58;\n");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
     config::s_effective_config effective;
@@ -391,7 +391,7 @@ DOCTEST_TEST_CASE("ZIP package manifest config and data use projected virtual pa
     files.Write("main.cfg", "enable zipped;\n");
     files.Write_Zip(fs::path("data") / "mods" / "zipped.zip", {
         {"mod.json5", Manifest_("zipped")},
-        {"config/main.cfg", "music_volume = 73;\n"},
+        {"config/main.cfg", "audio music_volume = 73;\n"},
         {"data/zipped.dat", "zip-resource"},
     });
     files.Initialize_Vfs();
@@ -426,7 +426,7 @@ DOCTEST_TEST_CASE("incompatible engine manifest fails with semantic version diag
 
 DOCTEST_TEST_CASE("dependency cycle fails without committing configuration or resources") {
     s_config_test_directory files;
-    files.Write("main.cfg", "music_volume = 88;\nenable alpha;\n");
+    files.Write("main.cfg", "audio music_volume = 88;\nenable alpha;\n");
     files.Write(fs::path("data") / "mods" / "alpha" / "mod.json5",
                 Manifest_("alpha",
                     "  dependencies: [{ id: \"beta\", version: \"1.0.0\" }],\n"));
@@ -477,7 +477,7 @@ DOCTEST_TEST_CASE("optional missing dependency is skipped but an installed one i
                 Manifest_("parent",
                     "  optional_dependencies: [{ id: \"optional\", version: \">=2.0.0\" }],\n"));
     files.Write(fs::path("data") / "mods" / "parent" / "config" / "main.cfg",
-                "music_volume = 64;\n");
+                "audio music_volume = 64;\n");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
     config::s_effective_config effective;
@@ -573,12 +573,12 @@ DOCTEST_TEST_CASE("failed reload preserves previously committed package layers a
     files.Write(fs::path("data") / "mods" / "stable" / "mod.json5",
                 Manifest_("stable"));
     files.Write(fs::path("data") / "mods" / "stable" / "config" / "main.cfg",
-                "music_volume = 74;\n");
+                "audio music_volume = 74;\n");
     files.Write(fs::path("data") / "mods" / "stable" / "data" / "stable.dat", "stable");
     files.Write(fs::path("data") / "mods" / "broken" / "mod.json5",
                 Manifest_("broken"));
     files.Write(fs::path("data") / "mods" / "broken" / "config" / "main.cfg",
-                "music_volume = 101;\n");
+                "audio music_volume = 101;\n");
     files.Write(fs::path("data") / "mods" / "broken" / "data" / "broken.dat", "broken");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
@@ -599,11 +599,11 @@ DOCTEST_TEST_CASE("failed reload preserves previously committed package layers a
 DOCTEST_TEST_CASE("successful reload rebuilds configuration and package layers from defaults") {
     s_config_test_directory files;
     files.Write("modded.cfg", "enable stable;\n");
-    files.Write("plain.cfg", "sound_effects_volume = 31;\n");
+    files.Write("plain.cfg", "audio sound_effects_volume = 31;\n");
     files.Write(fs::path("data") / "mods" / "stable" / "mod.json5",
                 Manifest_("stable"));
     files.Write(fs::path("data") / "mods" / "stable" / "config" / "main.cfg",
-                "music_volume = 74;\n");
+                "audio music_volume = 74;\n");
     files.Write(fs::path("data") / "mods" / "stable" / "data" / "stable.dat", "stable");
     files.Initialize_Vfs();
     Set_Native_Defaults_();
@@ -675,8 +675,8 @@ DOCTEST_TEST_CASE("startup config uses defaults when absent") {
 DOCTEST_TEST_CASE("invalid startup config preserves native state") {
     s_config_test_directory files;
     files.Write("orion2re.cfg",
-        "music_volume = 80;\n"
-        "sound_effects_volume = 101;\n");
+        "audio music_volume = 80;\n"
+        "audio sound_effects_volume = 101;\n");
     files.Initialize_Vfs();
     MOX::_settings.music_on = 0;
     MOX::_settings.music_level = 7;
@@ -699,7 +699,7 @@ DOCTEST_TEST_CASE("invalid startup config preserves native state") {
 
 DOCTEST_TEST_CASE("valid startup config commits defaults and overrides together") {
     s_config_test_directory files;
-    files.Write("orion2re.cfg", "music_volume = 75;\n");
+    files.Write("orion2re.cfg", "audio music_volume = 75;\n");
     files.Initialize_Vfs();
     MOX::_settings.music_on = 0;
     MOX::_settings.music_level = 7;

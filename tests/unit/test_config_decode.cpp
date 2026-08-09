@@ -242,12 +242,23 @@ DOCTEST_TEST_CASE("configuration namespaces group paths without becoming assigna
     DOCTEST_CHECK(writes.writes.empty());
 }
 
+DOCTEST_TEST_CASE("all top-level configuration parameters belong to namespaces") {
+    const config::s_runtime_schema* schema = config::Get_Runtime_Schema();
+    DOCTEST_REQUIRE(schema != nullptr);
+
+    for (size_t index = 0; index < schema->node_count; ++index) {
+        if (schema->nodes[index].parent == config::CONFIG_NO_NODE) {
+            DOCTEST_CHECK(schema->nodes[index].kind == config::CONFIG_NODE_NAMESPACE);
+        }
+    }
+}
+
 DOCTEST_TEST_SUITE("configuration assignment decode") {
 
 DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     config::t_variable_id music_id = 99;
     DOCTEST_REQUIRE(config::Find_Variable(
-        "music_volume", std::strlen("music_volume"), &music_id));
+        "audio.music_volume", std::strlen("audio.music_volume"), &music_id));
     DOCTEST_CHECK(music_id == 1);
     const config::s_type_descriptor* music = config::Get_Variable_Type(music_id);
     DOCTEST_REQUIRE(music != nullptr);
@@ -258,13 +269,13 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     DOCTEST_CHECK(config::Get_Variable_Type(1) == config::Get_Variable_Type(3));
     std::string music_name;
     DOCTEST_REQUIRE(config::Get_Variable_Name(music_id, &music_name));
-    DOCTEST_CHECK(music_name == "music_volume");
+    DOCTEST_CHECK(music_name == "audio.music_volume");
     config::t_variable_id queue_id = config::CONFIG_NO_VARIABLE;
     DOCTEST_REQUIRE(config::Find_Variable(
-        "build_queue.1.199", std::strlen("build_queue.1.199"), &queue_id));
+        "colony.build_queue.1.199", std::strlen("colony.build_queue.1.199"), &queue_id));
     std::string queue_name;
     DOCTEST_REQUIRE(config::Get_Variable_Name(queue_id, &queue_name));
-    DOCTEST_CHECK(queue_name == "build_queue.1.199");
+    DOCTEST_CHECK(queue_name == "colony.build_queue.1.199");
     const config::s_schema_node_descriptor* queue_leaf =
         config::Get_Variable_Node(config::Get_Runtime_Schema(), queue_id);
     DOCTEST_REQUIRE(queue_leaf != nullptr);
@@ -275,11 +286,21 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     DOCTEST_CHECK(queue_leaf->variable_id + queue_location.variable_offset == queue_id);
     DOCTEST_CHECK(queue_leaf->type == config::Get_Variable_Type(queue_id));
     const config::s_runtime_schema* schema = config::Get_Runtime_Schema();
-    const config::s_schema_node_descriptor* build_queue = nullptr;
+    const config::s_schema_node_descriptor* colony = nullptr;
     for (size_t index = 0; index < schema->node_count; ++index) {
         if (schema->nodes[index].parent == config::CONFIG_NO_NODE &&
-            std::strcmp(schema->nodes[index].id, "build_queue") == 0) {
-            build_queue = &schema->nodes[index];
+            std::strcmp(schema->nodes[index].id, "colony") == 0) {
+            colony = &schema->nodes[index];
+            break;
+        }
+    }
+    DOCTEST_REQUIRE(colony != nullptr);
+    const config::s_schema_node_descriptor* build_queue = nullptr;
+    for (uint32_t child = colony->first_child;
+         child != config::CONFIG_NO_NODE;
+         child = schema->nodes[child].next_sibling) {
+        if (std::strcmp(schema->nodes[child].id, "build_queue") == 0) {
+            build_queue = &schema->nodes[child];
             break;
         }
     }
@@ -300,10 +321,10 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
     DOCTEST_CHECK(build_queue->array_element_variable_count ==
                   BUILD_QUEUE::INSTRUCTION_CAPACITY);
     DOCTEST_CHECK(template_count == 1);
-    DOCTEST_CHECK_FALSE(config::Find_Variable("music", 5, &music_id));
-    DOCTEST_CHECK_FALSE(config::Find_Variable("MUSIC_VOLUME", 12, &music_id));
+    DOCTEST_CHECK_FALSE(config::Find_Variable("audio.music", 11, &music_id));
+    DOCTEST_CHECK_FALSE(config::Find_Variable("audio.MUSIC_VOLUME", 18, &music_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable(
-        "build_queue.01.199", std::strlen("build_queue.01.199"), &queue_id));
+        "colony.build_queue.01.199", std::strlen("colony.build_queue.01.199"), &queue_id));
     DOCTEST_CHECK_FALSE(config::Find_Variable(nullptr, 0, &music_id));
     DOCTEST_CHECK(config::Get_Variable_Type(config::variable_count) == nullptr);
 }
@@ -311,7 +332,7 @@ DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
 DOCTEST_TEST_CASE("stable path writes resolve for replay in the current build") {
     config::s_config_write write;
     write.variable_id = 99;
-    write.canonical_path = "sound_effects_volume";
+    write.canonical_path = "audio.sound_effects_volume";
     write.value.type = config::CONFIG_VALUE_INT8;
     write.value.integer_value = 35;
     write.provenance.source = "savegame";
@@ -334,10 +355,10 @@ DOCTEST_TEST_CASE("bool and integer assignments produce typed atomic writes") {
         int64_t expected;
     };
     const s_integer_case integers[] = {
-        {"music_volume = 75;", 1, 75},
-        {"music_volume = 0x32;", 1, 50},
-        {"sound_effects_volume = 0b110010;", 3, 50},
-        {"sound_effects_volume = 25;", 3, 25},
+        {"audio music_volume = 75;", 1, 75},
+        {"audio music_volume = 0x32;", 1, 50},
+        {"audio sound_effects_volume = 0b110010;", 3, 50},
+        {"audio sound_effects_volume = 25;", 3, 25},
     };
 
     for (const s_integer_case& test_case : integers) {
@@ -354,14 +375,15 @@ DOCTEST_TEST_CASE("bool and integer assignments produce typed atomic writes") {
 
     config::s_config_write_set enabled;
     config::s_cfg_diagnostic diagnostic;
-    DOCTEST_REQUIRE(Decode_("music_enabled = true;", &enabled, &diagnostic));
+    DOCTEST_REQUIRE(Decode_("audio music_enabled = true;", &enabled, &diagnostic));
     DOCTEST_REQUIRE(enabled.writes.size() == 1);
     DOCTEST_CHECK(enabled.writes[0].value.type == config::CONFIG_VALUE_BOOL);
     DOCTEST_CHECK(enabled.writes[0].value.bool_value);
-    DOCTEST_CHECK(enabled.writes[0].canonical_path == "music_enabled");
+    DOCTEST_CHECK(enabled.writes[0].canonical_path == "audio.music_enabled");
 
     config::s_config_write_set disabled;
-    DOCTEST_REQUIRE(Decode_("sound_effects_enabled = false;", &disabled, &diagnostic));
+    DOCTEST_REQUIRE(Decode_(
+        "audio sound_effects_enabled = false;", &disabled, &diagnostic));
     DOCTEST_REQUIRE(disabled.writes.size() == 1);
     DOCTEST_CHECK_FALSE(disabled.writes[0].value.bool_value);
 }
@@ -374,22 +396,22 @@ DOCTEST_TEST_CASE("resolution and decode failures retain no partial writes") {
     };
     const s_case cases[] = {
         {"unknown_setting = 1;", "unknown configuration variable 'unknown_setting'", 1},
-        {"music_volume extra = 50;",
-         "unknown configuration variable 'music_volume.extra'", 1},
-        {"music_volume = 101;",
-         "invalid value '101' for 'music_volume'; expected int8 in range 0..100", 16},
-        {"music_volume = -1;",
-         "invalid value '-1' for 'music_volume'; expected int8 in range 0..100", 16},
-        {"music_volume = true;",
-         "invalid value 'true' for 'music_volume'; expected int8", 16},
-        {"music_enabled = 1;",
-         "invalid value '1' for 'music_enabled'; expected bool", 17},
-        {"music_enabled = TRUE;",
-         "invalid value 'TRUE' for 'music_enabled'; expected bool", 17},
-        {"music_volume = -;",
-         "an assignment containing only skips has no effect", 16},
-        {"music_volume = 25 50;",
-         "value 2 exceeds scalar parameter 'music_volume'", 19},
+        {"audio music_volume extra = 50;",
+         "unknown configuration variable 'audio.music_volume.extra'", 1},
+        {"audio music_volume = 101;",
+         "invalid value '101' for 'audio.music_volume'; expected int8 in range 0..100", 22},
+        {"audio music_volume = -1;",
+         "invalid value '-1' for 'audio.music_volume'; expected int8 in range 0..100", 22},
+        {"audio music_volume = true;",
+         "invalid value 'true' for 'audio.music_volume'; expected int8", 22},
+        {"audio music_enabled = 1;",
+         "invalid value '1' for 'audio.music_enabled'; expected bool", 23},
+        {"audio music_enabled = TRUE;",
+         "invalid value 'TRUE' for 'audio.music_enabled'; expected bool", 23},
+        {"audio music_volume = -;",
+         "an assignment containing only skips has no effect", 22},
+        {"audio music_volume = 25 50;",
+         "value 2 exceeds scalar parameter 'audio.music_volume'", 25},
     };
 
     for (const s_case& test_case : cases) {
@@ -446,36 +468,36 @@ DOCTEST_TEST_CASE("build queue lists decode comments multiline values and requir
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Decode_(
-        "build_queue 1 = prepend # put ships first\n"
+        "colony build_queue 1 = prepend # put ships first\n"
         "  design1\n"
         "  buy10 end;",
         &writes, &diagnostic));
     DOCTEST_REQUIRE(writes.writes.size() == 4);
-    DOCTEST_CHECK(writes.writes[0].canonical_path == "build_queue.1.0");
+    DOCTEST_CHECK(writes.writes[0].canonical_path == "colony.build_queue.1.0");
     DOCTEST_CHECK(writes.writes[0].value.integer_value == BUILD_QUEUE::INSTRUCTION_PREPEND);
     DOCTEST_CHECK(writes.writes[1].value.integer_value == BUILD_QUEUE::INSTRUCTION_DESIGN1);
     DOCTEST_CHECK(writes.writes[2].value.integer_value == BUILD_QUEUE::INSTRUCTION_BUY10);
     DOCTEST_CHECK(writes.writes[3].value.integer_value == BUILD_QUEUE::INSTRUCTION_END);
 
     DOCTEST_REQUIRE(Decode_(
-        "build_queue 1 199 = end;", &writes, &diagnostic));
+        "colony build_queue 1 199 = end;", &writes, &diagnostic));
     DOCTEST_REQUIRE(writes.writes.size() == 1);
-    DOCTEST_CHECK(writes.writes[0].canonical_path == "build_queue.1.199");
+    DOCTEST_CHECK(writes.writes[0].canonical_path == "colony.build_queue.1.199");
     DOCTEST_CHECK(writes.writes[0].value.integer_value == BUILD_QUEUE::INSTRUCTION_END);
 
     DOCTEST_CHECK_FALSE(Decode_(
-        "build_queue 1 = prepend design1;", &writes, &diagnostic));
+        "colony build_queue 1 = prepend design1;", &writes, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
-                  "assignment to 'build_queue.1' requires its terminator value");
+                  "assignment to 'colony.build_queue.1' requires its terminator value");
 
     DOCTEST_CHECK_FALSE(Decode_(
-        "build_queue 11 = end;", &writes, &diagnostic));
+        "colony build_queue 11 = end;", &writes, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
-                  "unknown configuration variable 'build_queue.11'");
+                  "unknown configuration variable 'colony.build_queue.11'");
 }
 
 DOCTEST_TEST_CASE("build queue list capacity includes its end marker") {
-    std::string source = "build_queue 2 = ";
+    std::string source = "colony build_queue 2 = ";
     for (int index = 0; index < BUILD_QUEUE::INSTRUCTION_CAPACITY - 1; ++index) {
         source += "append ";
     }
@@ -489,7 +511,7 @@ DOCTEST_TEST_CASE("build queue list capacity includes its end marker") {
     source.insert(source.size() - 4, "append ");
     DOCTEST_CHECK_FALSE(Decode_(source.c_str(), &writes, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
-                  "value 201 exceeds selected configuration object 'build_queue.2'");
+                  "value 201 exceeds selected configuration object 'colony.build_queue.2'");
 }
 
 DOCTEST_TEST_CASE("enum-backed array aliases resolve to numeric canonical paths") {
