@@ -144,12 +144,6 @@ namespace SHIPS {
     void __cdecl Clear_Auto_Colonization_Flag_(s_ship_data* ship);
 
     /**
-     * Clears the auto-colonization marker for every ship in a -1-terminated list.
-     * @param ship_list Ship-index list terminated by -1.
-     */
-    void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list);
-
-    /**
      * Checks whether an enemy ship stack is moving toward one of the player's colonies or outposts.
      * @param node_idx Ship-node index for the stack being inspected.
      */

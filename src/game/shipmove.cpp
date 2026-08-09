@@ -459,7 +459,6 @@ namespace SHIPMOVE {
      */
     void __cdecl Make_Ships_Move_To_(int16_t* ship_list, int16_t destination_star_idx, s_ship_move_info* move_info) {
         int8_t move_status;
-        bool colony_flag_needed = false;
         int i = 0;
         int16_t destination_location = destination_star_idx;
 
@@ -482,23 +481,21 @@ namespace SHIPMOVE {
         while ((ship_idx = ship_list[i]) != -1) {
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
-            if (!colony_flag_needed) {
-                if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
-                    colony_flag_needed = true;
-                }
-            }
-
             ship->location = destination_location;
             ship->turns_left = move_info->turns_left;
             ship->group_has_navigator = move_info->has_navigator;
             ship->travelling_speed = move_info->traveling_speed;
             ship->status = move_status;
 
-            i++;
-        }
+            if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
+                int16_t planet_idx = ship->d.ship_weapon[0].type;
+                if (planet_idx == PLANET_INDEX_NONE ||
+                    MOX::_planet[planet_idx].star_index != destination_star_idx) {
+                    SHIPS::Clear_Auto_Colonization_Flag_(ship);
+                }
+            }
 
-        if (colony_flag_needed) {
-            SHIPS::Clear_All_Ships_Auto_Colonization_Flag_(ship_list);
+            i++;
         }
     }
 

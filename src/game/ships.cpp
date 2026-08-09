@@ -11,19 +11,6 @@ namespace SHIPS {
         }
     }
 
-    void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list) {
-        if (*ship_list == -1) {
-            return;
-        }
-
-        int i = 0;
-        do {
-            int16_t ship_idx = ship_list[i];
-            i++;
-            SHIPS::Clear_Auto_Colonization_Flag_(&MOX::_ship[ship_idx]);
-        } while (ship_list[i] != -1);
-    }
-
     void __cdecl Kill_Ship_(int16_t ship_idx) {
         HACCESS::Ship_Owner_(ship_idx);
 
