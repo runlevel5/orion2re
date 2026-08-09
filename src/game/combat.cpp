@@ -1411,6 +1411,12 @@ namespace COMBAT {
         MOX::_combat_attacker_player = MOX::_ship[ship_array[0]].owner;
         MOX::_combat_defender_player = MOX::_colony[MOX::_cmbt_colony_id].owner;
 
+        if ((uint16_t)MOX::_combat_attacker_player <= MAX_PLAYERS) {
+            const int16_t attacker = MOX::_combat_attacker_player;
+            MOX::_fighter_beam_type[attacker] = INITSHIP::Best_Point_Defense_Weapon_(attacker);
+            MOX::_fighter_bomb_type[attacker] = INITSHIP::Best_Bomb_Weapon_(attacker);
+        }
+
         qsort(ship_array, (size_t)ship_count, sizeof(*ship_array), qsort_ship_array_by_size_);
 
         if (ship_count > 0) {
@@ -1447,12 +1453,11 @@ namespace COMBAT {
                         MOX::_combat_data[i].weapons[j].shots_left = MOX::_combat_data[i].weapons[j].count;
                         MOX::_combat_data[i].weapons[j].active = 1;
 
-                        if (MOX::_combat_data[i].weapons[j].weapon_id > 0) {
-                            if (TECHDATA::_weapons[MOX::_combat_data[i].weapons[j].weapon_id].type != 1) {
-                                if (MOX::_combat_data[i].weapons[j].ammo > 0) {
-                                    MOX::_combat_data[i].weapons[j].ammo--;
-                                }
-                            }
+                        const int16_t weapon_id = MOX::_combat_data[i].weapons[j].weapon_id;
+                        if (weapon_id > 0 &&
+                            TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_TORPEDO &&
+                            MOX::_combat_data[i].weapons[j].ammo > 0) {
+                            MOX::_combat_data[i].weapons[j].ammo--;
                         }
                     }
                 }
