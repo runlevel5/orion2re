@@ -48,3 +48,14 @@ DOCTEST_TEST_CASE("configured Housing growth bypasses farmer assignment") {
     DOCTEST_REQUIRE(colony->n_pops == 2);
     DOCTEST_CHECK(New_Colonist_Job_(colony) == 1);
 }
+
+DOCTEST_TEST_CASE("zero research field is not advanced") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_player player = {};
+    player.tech_fields[TECH_FIELD_STARTING_TECH] = 2;
+
+    COLCALC::Advance_Player_Field_(&player, TECH_FIELD_STARTING_TECH, false);
+
+    DOCTEST_CHECK(player.tech_fields[TECH_FIELD_STARTING_TECH] == 2);
+}

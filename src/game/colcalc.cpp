@@ -1529,6 +1529,10 @@ namespace COLCALC {
     }
 
     void __cdecl Advance_Player_Field_(s_player* player, int field_idx, bool skip_first_advance) {
+        if (field_idx == TECH_FIELD_STARTING_TECH) {
+            return;
+        }
+
         int loop_count = 0;
         int techs_known = 0;
 

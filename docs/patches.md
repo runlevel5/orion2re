@@ -190,7 +190,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17281` - `new pop not assigned to farming on housing colony`: implemented in `COLCALC::Apply_Colony_Pop_Growth_()` by bypassing farmer selection for population grown while Housing is active when `housing_creates_no_farmers` is enabled; this replaces the 1.50 binary diversion with a direct source-level guard while preserving classic behavior by default.
 - [x] `asm.pl:17307` - `amoeba regeneration`: implemented in `COMBINIT::Repair_All_Combat_Ships_()` with the configurable `amoeba_regeneration` gate and `repair_rate` values, while both combat special displays include Regeneration only when enabled; this replaces the 1.50 diversion and branch patches with direct source-level repair and visibility rules while preserving classic behavior by default.
 - [x] `asm.pl:17417` - `new leader window2 shown on tutor only`: fixed in `MAINPUPS::Random_New_Officer_Popup_()` by retaining and redrawing the accept or reject result window only for Tutor-level random leader reports, while officer-screen hiring and higher difficulties close immediately; this replaces the two 1.50 immediate-byte edits with one source-level UI invariant.
-- [ ] `asm.pl:17828` - `AI zero field research`
+- [x] `asm.pl:17828` - `AI zero field research`: fixed in `COLCALC::Advance_Player_Field_()` by treating the zero starting-technology field as no selected research and returning before field traversal; this replaces the 1.50 all-call wrapper with an owner-level source invariant.
 - [ ] `asm.pl:17871` - `food replicator no negative production`
 - [ ] `asm.pl:17981` - `artificial planet on outposts climate fix`
 - [ ] `asm.pl:18002` - `commando bonus`

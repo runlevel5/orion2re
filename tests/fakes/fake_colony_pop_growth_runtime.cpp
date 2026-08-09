@@ -24,6 +24,10 @@ namespace MOX {
     int8_t _planet_max_population[PLANET_SIZE_COUNT] = {5, 10, 15, 20, 25};
 }
 
+namespace TECHDATA {
+    s_tech_field_data _technology_fields[TECH_FIELD_COUNT] = {};
+}
+
 namespace EVENTS {
     int16_t __cdecl Event_Check_Space_Anomaly_(int16_t) {
         return 0;
