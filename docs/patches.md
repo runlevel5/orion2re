@@ -234,7 +234,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:14135` - `scrap stuff maintenance`: fixed in `maintain::Kill_Ships_()` and `aileader::Reassign_Fleet_Officer_()` by marking forced-scrap ships inactive before maintenance recalculation and moving their officers to any eligible local replacement before falling back to the pool; authoritative ship status replaces the 1.50 temporary distress flag.
 - [ ] `asm.pl:15487` - `keep autocolonization`
 - [x] `asm.pl:16349` - `design button behaviour`: implemented in `DESIGN::Build_Initial_Design_Template_()` with local `design design_button_computer` and `design design_button_shield` settings that either select the best available component or preserve the saved design choice; direct source selection replaces the 1.50 call-site wrappers.
-- [ ] `asm.pl:16395` - `runaway homeworlds`
+- [x] `asm.pl:16395` - `runaway homeworlds`: fixed in `MAPGEN::Enforce_Planet_Max_()` by updating each moved colony's planet back-reference during planet-array compaction; the restored candidate-list selection already replaces the original out-of-bounds orbit lookup and preserves home systems directly.
 - [ ] `asm.pl:16409` - `home systems min 3 planets default`
 - [ ] `asm.pl:16448` - `BH to real star planet generation`
 - [ ] `asm.pl:16621` - `orphans fix`

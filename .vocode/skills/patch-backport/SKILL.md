@@ -15,14 +15,12 @@ Use the `grpc` skill for all Ghidra access and follow its read-only and assembly
 
 ## Helper-agent delegation
 
-Never trust or adopt a subagent result directly. Treat every subagent claim as an unverified lead until the parent
+Do not adopt a subagent result directly. Treat every subagent claim as an unverified lead until the parent
 agent independently reproduces or confirms it from authoritative files, Ghidra bytes and disassembly, build output,
 or test results. Do not use an unverified subagent claim in a proposed change, stop-condition decision, approval
-request, or final conclusion. If independent verification is impossible or conflicts with the report, state the
-uncertainty and stop for user input rather than choosing the subagent's result.
+request, or final conclusion.
 
-Use `agent-helper` throughout this workflow for bounded, read-only investigation. Delegate independent tasks in
-parallel when practical, especially:
+Use `agent-helper` throughout this workflow for bounded, read-only investigation. Delegate independent tasks when practical, especially:
 
 - locating and inventorying the selected topic in `docs/patches.md`, `asm.pl`, `patch.c`, symbols, and history
 - calculating candidate file-offset-to-address mappings from patcher section metadata

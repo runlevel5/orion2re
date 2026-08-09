@@ -568,6 +568,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     RUSS::PFMT_(0, 10, "Moving planet %d to planet %d", old_idx, new_idx);
 
                     MOX::_planet[new_idx] = _pl[old_idx];
+                    int16_t colony_idx = MOX::_planet[new_idx].colony_index;
+                    if (colony_idx >= 0) {
+                        MOX::_colony[colony_idx].planet = new_idx;
+                    }
                     MOX::_star[MOX::_planet[new_idx].star_index].planet_index[(uint8_t)MOX::_planet[new_idx].orbit] = new_idx;
 
                     new_idx++;
