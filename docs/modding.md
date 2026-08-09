@@ -75,7 +75,7 @@ Directory and ZIP packages have the same internal layout:
     COLBLDG0.LBX/000
 ```
 
-The ZIP must contain `mod.json5`, `config/`, and `data/` at its root. Do not wrap them in another `<id>/` directory inside the archive.
+The ZIP must contain `mod.json5` at its root and must contain the CFG file named by the manifest's `config` property. The `config/` directory name is only a recommendation. The `data/` name is fixed: omit that directory for an asset-free package, but place every public asset override below `data/`. Do not wrap the package contents in another `<id>/` directory inside the archive.
 
 Only files below the package's `data/` directory become public game assets. The manifest and CFG files remain private package files. An asset placed next to `mod.json5` will not override a game asset.
 
@@ -144,7 +144,7 @@ A complete manifest can also declare package relationships:
 - `dependencies` are required. Missing packages and version mismatches are fatal.
 - `optional_dependencies` are ignored only when they are not installed. If an optional package exists, its manifest, version, dependencies, and configuration must be valid.
 - `conflicts` rejects the load when the named package is also active.
-- `load_after` is an ordering assertion, not an automatic sorter or dependency. If both packages are active, put the declaring package earlier in `orion2re.cfg` so it has higher priority.
+- `load_after` is an ordering assertion, not an automatic sorter or dependency. If package `patch` declares `load_after: ["overhaul"]`, list `patch` earlier than `overhaul` in `orion2re.cfg`. This gives `patch` higher VFS priority and causes its CFG to be applied later, after `overhaul`.
 
 Dependency entries may contain only `id` and `version`. Dependency cycles are rejected, and a shared dependency is loaded once.
 
@@ -164,7 +164,7 @@ The first enabled package has the highest priority. This one ordering controls c
 - For an asset collision, the first enabled package supplies the file.
 - Package CFG files are applied from lowest to highest priority, so the first enabled package writes last and wins a configuration collision.
 - Package configuration overrides assignments in the base `data/orion2re.cfg`.
-- Explicitly enabled packages have priority over packages pulled in only as dependencies.
+- Explicit `enable` statements are prioritized in their written order. Packages pulled in only as dependencies follow the explicitly requested packages.
 - A dependency used by several packages is loaded once.
 
 In the example, `my_compatibility_patch` can override both `total_conversion` and `shared_rules`. Package priority is intentionally "first wins," not "last wins."
@@ -239,9 +239,9 @@ Include paths resolve relative to the CFG file containing the statement. Include
 
 ### Finding available fields and values
 
-Open `docs/config-reference.html` from your orion2re installation. It lists public paths, types, valid enum and mask names, constraints, defaults, and examples. You do not need the game's source code to author CFG overrides.
+Use the `config-reference.html` matching your orion2re release, if it is included with your installation or documentation download. It lists public paths, types, valid enum and mask names, constraints, defaults, and examples. Configuration fields can change between engine releases, so do not rely on a reference from a different version.
 
-For the complete CFG traversal model and schema design, see [Configuration and mod system design](config.md).
+You do not need the game's source code to author CFG overrides. If your release does not provide a configuration reference, ask the release distributor for the matching documentation bundle rather than guessing field names or numeric ranges.
 
 ## VFS asset overrides
 
@@ -297,7 +297,7 @@ When entry 12 is requested, the VFS checks `COLBLDG0.LBX/012` through the normal
 
 If both an entry override and a complete LBX replacement are visible, the entry override wins for that entry. Other entries continue to come from the highest-priority complete LBX file.
 
-See [Virtual file system](vfs.md) for the lower-level asset-loading reference.
+See [Virtual file system](vfs.md), when included in the same documentation bundle, for the lower-level asset-loading reference.
 
 ## Packaging a mod
 
@@ -323,11 +323,11 @@ Before distributing it, verify that:
 Open the completed archive before distributing it. Its top level should look like this:
 
 ```text
-my_balance_mod.zip
+archive root/
   mod.json5
   config/
     main.cfg
-  data/
+  data/                 Optional; include it when overriding assets
 ```
 
 ## Failure behavior and troubleshooting
