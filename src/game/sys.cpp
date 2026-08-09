@@ -1650,7 +1650,7 @@ namespace SYS {
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
                     if (HAROLD::Player_Has_Dimensional_Portal_(&MOX::_player[player_idx], &MOX::_star[star_idx])) {
-                        strlcat(info_text, MOX::_player[player_idx].name, sizeof(info_text));
+                        strlcat(info_text, MOX::_player[player_idx].race_name, sizeof(info_text));
                         strlcat(info_text, ", ", sizeof(info_text));
                     }
                 }
