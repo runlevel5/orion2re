@@ -1320,8 +1320,6 @@ namespace COLCALC {
     }
 
     int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent) {
-        int32_t buy_cost = 0;
-
         switch (product) {
             case COLONY_PRODUCTION_AI_UNASSIGNED:
             case COLONY_PRODUCTION_AI_TRADE_GOODS:
@@ -1329,35 +1327,13 @@ namespace COLCALC {
             case COLONY_PRODUCTION_TRADE_GOODS:
             case COLONY_PRODUCTION_NONE:
                 // Certain special production projects (e.g., Trade, Housing) cannot be bought.
-                break;
+                return 0;
 
-            default: {
-                int32_t total_cost = (int16_t)Colony_Product_Cost_(colony, (int16_t)product);
-                int32_t half_cost = total_cost / 2;
-                int32_t tenth_cost = total_cost / 10;
-
-                if (production_spent < total_cost) {
-                    if (production_spent >= half_cost) {
-                        return (total_cost - production_spent) * 2;
-                    }
-
-                    // Accumulate cost for the portion from 50% to 100%
-                    buy_cost = (total_cost - half_cost) * 2;
-
-                    if (production_spent >= tenth_cost) {
-                        // Progress is between 10% and 50%
-                        return buy_cost + (half_cost - production_spent) * 5;
-                    }
-
-                    // Progress is below 10%, accumulate cost for 10%-50% and then 0%-10%
-                    buy_cost += (half_cost - tenth_cost) * 5;
-                    buy_cost += (tenth_cost - production_spent) * 10;
-                }
-                break;
-            }
+            default:
+                return Production_Cost_To_Buy_(
+                    static_cast<int16_t>(Colony_Product_Cost_(colony, static_cast<int16_t>(product))),
+                    production_spent);
         }
-
-        return buy_cost;
     }
 
     int32_t __cdecl Ship_Type_Cost_For_Player_(int32_t ship_type, int16_t player_idx) {

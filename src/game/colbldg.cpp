@@ -1613,6 +1613,7 @@ namespace COLBLDG {
             if (_fields[10] == input_field) {
                 Do_Exit_Screen_Cleanup_();
                 COLONY::Tested_Colony_Buys_Outright_(COLONY::_colony_handle);
+                _active_prod[0] = -1;
                 Do_Draw_Build_Queue_();
                 fields::Clear_Mouse_Buffer_();
                 fields::Set_Input_Delay_(3);
@@ -1720,18 +1721,25 @@ namespace COLBLDG {
             }
             if (*selected_field_id == _queue_fields[i]) {
                 if (_active_prod[0] == -1) {
-                    if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0 && i == 0) {
+                    int16_t selected_idx = static_cast<int16_t>(i);
+                    if (selected_idx > 0 &&
+                        _current_item[selected_idx] == COLONY_PRODUCTION_REPEAT) {
+                        selected_idx--;
+                    }
+                    if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0 &&
+                        selected_idx == 0) {
                         GENDRAW::Help_(ESTRINGS::E_Strings_(0x23a));
                         Do_Draw_Build_Queue_();
                         return;
                     }
-                    _active_prod[0] = i + BUILDING_COUNT;
+                    _active_prod[0] = selected_idx + BUILDING_COUNT;
                 } else {
                     int16_t active_idx = _active_prod[0] - BUILDING_COUNT;
                     bool do_delete = false;
 
                     if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0) {
-                        if (i == 0 || active_idx == 0) {
+                        if (i == 0 || active_idx == 0 ||
+                            (i == 1 && _current_item[i] == COLONY_PRODUCTION_REPEAT)) {
                             GENDRAW::Help_(ESTRINGS::E_Strings_(0x23a));
                             Do_Draw_Build_Queue_();
                             _active_prod[0] = -1;
@@ -1912,6 +1920,11 @@ namespace COLBLDG {
      */
     void __cdecl Delete_From_Colony_Queue_(int16_t colony_idx, int16_t queue_idx) {
         if (queue_idx != -1) {
+            if (queue_idx == 0 &&
+                !BUILD_QUEUE::Unbuy_Product_(&MOX::_colony[colony_idx])) {
+                return;
+            }
+
             int16_t producing_id = MOX::_colony[colony_idx].producing[queue_idx];
 
             // Queued ship production items use the queued-ship encoding helper/base.
@@ -2034,6 +2047,9 @@ namespace COLBLDG {
             if ((n_terra + n_rad + n_grav + pops + 1) >= max_pop) {
                 if (GENDRAW::Do_Confirmation_Box_(ESTRINGS::E_Strings_(0x208))) {
                     add_to_queue = true;
+                } else {
+                    _field_mode = 0;
+                    COLONY::Reset_Mouse_Picture_();
                 }
             } else {
                 add_to_queue = true;

@@ -11,6 +11,15 @@ namespace TEST_COLCALC_BASE {
 
 DOCTEST_TEST_SUITE("colony production helpers") {
 
+DOCTEST_TEST_CASE("production purchase cost follows the original tiered curve") {
+    DOCTEST_CHECK(COLCALC::Production_Cost_To_Buy_(100, 0) == 400);
+    DOCTEST_CHECK(COLCALC::Production_Cost_To_Buy_(100, 10) == 300);
+    DOCTEST_CHECK(COLCALC::Production_Cost_To_Buy_(100, 49) == 105);
+    DOCTEST_CHECK(COLCALC::Production_Cost_To_Buy_(100, 50) == 100);
+    DOCTEST_CHECK(COLCALC::Production_Cost_To_Buy_(100, 99) == 2);
+    DOCTEST_CHECK(COLCALC::Production_Cost_To_Buy_(100, 100) == 0);
+}
+
 DOCTEST_TEST_CASE("building product classification excludes sentinels and upper boundary") {
     DOCTEST_CHECK_FALSE(COLBLDG::Colony_Production_Is_Building_(BUILDING_NO_BUILDING));
     DOCTEST_CHECK(COLBLDG::Colony_Production_Is_Building_(BUILDING_ALIEN_CONTROL_CENTER));

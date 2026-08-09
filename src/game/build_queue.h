@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+struct s_colony;
+
 namespace BUILD_QUEUE {
     constexpr int PRESET_COUNT = 11;
     constexpr int INSTRUCTION_CAPACITY = 200;
@@ -54,6 +56,7 @@ namespace BUILD_QUEUE {
     constexpr uint8_t AUTOBUILD_CUSTOM_BASE = 2;
 
     bool Colony_Production_Is_Continuous_Project_(int16_t product);
+    bool Unbuy_Product_(s_colony* colony);
 
     constexpr uint8_t Encode_Autobuild_Preset_(int preset_idx) {
         return preset_idx >= 0 && preset_idx < PRESET_COUNT
