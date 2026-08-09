@@ -894,6 +894,8 @@ void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
  * @param target_colony_idx_out Receives the chosen colony target, or -1.
  */
 void __cdecl Get_Local_Human_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out) {
+    SYS::Clear_System_Display_Loaded_Flag_();
+
     *target_colony_idx_out = -1;
     *target_player_idx_out = -1;
 

@@ -185,7 +185,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17018` - `blockaded freeze`: fixed in `aidudes::Do_Blockaded_Colony_()` by rechecking freshly computed farming capability when a food-deficient blockaded colony has no available farm slots, then assigning the remaining population through the existing non-farming policy; this replaces the 1.50 branch retarget with direct source-level progress enforcement.
 - [x] `asm.pl:17027` - `no assault shuttles shots`: fixed in `CMBTMIS::Resolve_Missile_()` by consuming the assault-shuttle attack counter completely after boarding, so shuttles cannot retain additional fighter shots or return; this replaces the 1.50 call-site helper with a direct source-level state transition.
 - [x] `asm.pl:17089` - `del_ships`: no source backport is required; the 1.50 topic only adds a cdecl-to-Watcom ABI wrapper used by the excluded Lua `del_ships` API, while the restored native scrap path calls `FLT1::Get_Technology_From_Scrapped_Ship_()` directly.
-- [ ] `asm.pl:17144` - `no green system popup`
+- [x] `asm.pl:17144` - `no green system popup`: fixed in `COMBFIND::Get_Local_Human_Target_()` by invalidating the cached system display before combat target selection, forcing the next system popup to rebuild its reduced palette instead of reusing stale loaded state; this replaces the 1.50 all-call wrapper with direct source-level cache invalidation.
 - [ ] `asm.pl:17265` - `planets screen: high-g race has -25% prod penalty on low-g planet`
 - [ ] `asm.pl:17281` - `new pop not assigned to farming on housing colony`
 - [ ] `asm.pl:17307` - `amoeba regeneration`
