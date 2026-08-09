@@ -189,7 +189,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17265` - `planets screen: high-g race has -25% prod penalty on low-g planet`: fixed in `PLNTSUM::Productivity_Penalty_()` by reporting the same 25 percent Low-G-world penalty for High-G races that colony production applies; this directly expresses the two 1.50 branch corrections in source.
 - [x] `asm.pl:17281` - `new pop not assigned to farming on housing colony`: implemented in `COLCALC::Apply_Colony_Pop_Growth_()` by bypassing farmer selection for population grown while Housing is active when `housing_creates_no_farmers` is enabled; this replaces the 1.50 binary diversion with a direct source-level guard while preserving classic behavior by default.
 - [ ] `asm.pl:17307` - `amoeba regeneration`
-- [ ] `asm.pl:17417` - `new leader window2 shown on tutor only`
+- [x] `asm.pl:17417` - `new leader window2 shown on tutor only`: fixed in `MAINPUPS::Random_New_Officer_Popup_()` by retaining and redrawing the accept or reject result window only for Tutor-level random leader reports, while officer-screen hiring and higher difficulties close immediately; this replaces the two 1.50 immediate-byte edits with one source-level UI invariant.
 - [ ] `asm.pl:17828` - `AI zero field research`
 - [ ] `asm.pl:17871` - `food replicator no negative production`
 - [ ] `asm.pl:17981` - `artificial planet on outposts climate fix`

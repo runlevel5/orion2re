@@ -839,6 +839,9 @@ namespace MAINPUPS {
 
         bool done = false;
         bool accepted = false;
+        const bool show_result_window =
+            MOX::_settings.game_difficulty == GAME_DIFFICULTY_TUTOR &&
+            _on_officer_screen_flag == 0;
 
         do {
             int16_t input = fields::Get_Input_();
@@ -860,8 +863,8 @@ namespace MAINPUPS {
                     Eric_Pop_Fields_();
                     Update_Random_New_Officer_Fields_();
 
-                    if (MOX::_settings.game_difficulty <= GAME_DIFFICULTY_TUTOR && _on_officer_screen_flag != 0) {
-                        COLONY::_full_draw = 0;
+                    if (show_result_window) {
+                        COLONY::_full_draw = 1;
                     } else {
                         done = true;
                     }
@@ -875,8 +878,8 @@ namespace MAINPUPS {
                     Eric_Pop_Fields_();
                     Update_Random_New_Officer_Fields_();
 
-                    if (MOX::_settings.game_difficulty <= GAME_DIFFICULTY_TUTOR && _on_officer_screen_flag != 0) {
-                        COLONY::_full_draw = 0;
+                    if (show_result_window) {
+                        COLONY::_full_draw = 1;
                     } else {
                         _field_state = 0;
                         done = true;
