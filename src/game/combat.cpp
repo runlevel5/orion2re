@@ -1467,7 +1467,10 @@ namespace COMBAT {
             turns--;
         } while (turns != 0);
 
-        bomb_result->bomb_hits_remaining = MOX::_combat_data[0].structure_max / 100;
+        int16_t best_armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data[0].owner);
+        uint16_t civilian_armor_hits = CMBTFIRE::_civilian_armor[best_armor_idx];
+        bomb_result->bomb_hits_remaining =
+            MOX::_combat_data[0].structure_max / civilian_armor_hits;
         bomb_result->is_planetary_hit = MOX::_combat_bomb_result.is_planetary_hit;
         bomb_result->is_bio_weapon = MOX::_combat_bomb_result.is_bio_weapon;
         bomb_result->bio_hits_remaining = MOX::_combat_bomb_result.bio_hits_remaining;

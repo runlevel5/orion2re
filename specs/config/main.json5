@@ -523,6 +523,31 @@
       reject_unknown_numeric: true,
       values: { none: 0, titanium: 1, tritanium: 2, zortrium: 3, neutronium: 4, adamantium: 5, xentronium: 6 },
     },
+    civilian_armor_type: {
+      title: "Civilian armor",
+      description: "Armor material used to select civilian bombardment hit points.",
+      remarks: "Complete MOO2 1.50 civilian_armor selector domain.",
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: {
+        no_armor: 0,
+        titanium: 1,
+        tritanium: 2,
+        zortrium: 3,
+        neutronium: 4,
+        adamantium: 5,
+        xentronium: 6,
+      },
+    },
+    civilian_structure_hits: {
+      title: "Civilian bombardment hit points",
+      description: "Damage required to process one civilian building or population hit.",
+      kind: "alias",
+      type: "uint16",
+      constraints: { min: 1 },
+    },
     ship_shield: {
       title: "Ship shield",
       description: "Shield installed in a predefined ship design.",
@@ -1438,6 +1463,26 @@
         symbol: "COMBAT1::_rephase_cloak_next_turn",
       },
       default: false,
+    },
+
+    civilian_armor: {
+      title: "Civilian armor hit points",
+      description: "Sets the bombardment hit points of civilian structures and population for each defending armor technology.",
+      remarks: "The all-100 default preserves classic behavior. Zero is rejected because this value is used as a divisor.",
+      examples: ["civilian_armor tritanium = 120;"],
+      group: "gameplay",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_civilian_armor",
+      },
+      type: {
+        kind: "array",
+        count: 7,
+        index_base: 0,
+        index_type: "civilian_armor_type",
+        element: { type: "civilian_structure_hits" },
+      },
+      default: [100, 100, 100, 100, 100, 100, 100],
     },
 
     fighters_use_point_defense: {

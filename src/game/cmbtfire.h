@@ -7,6 +7,9 @@
 #define COMBAT_PLANET_DEFENSE_FIGHTER_GARRISON 0x8
 
 namespace CMBTFIRE {
+    inline uint16_t _civilian_armor[ARMOR_COUNT] = {
+        100, 100, 100, 100, 100, 100, 100,
+    };
     inline uint8_t _fighters_use_point_defense = 0;
 
     /** Applies the supplied weapon damage to the defending planet or colony. */

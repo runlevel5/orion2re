@@ -906,6 +906,7 @@ namespace CMBTFIRE {
         int16_t best_armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
         int16_t armor_threshold = (int16_t)(((TECHDATA::_armor[best_armor_idx].ships_bonus * 4 + 400) * 25) /
             100);
+        uint16_t civilian_armor_hits = _civilian_armor[best_armor_idx];
 
         (void)specials;
 
@@ -993,12 +994,12 @@ namespace CMBTFIRE {
                         MOX::_combat_data->structure_max += colony_hits;
                     }
 
-                    if (MOX::_combat_data->structure_max >= 100) {
+                    if (MOX::_combat_data->structure_max >= civilian_armor_hits) {
                         bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                         bomb_stats.colony_idx = MOX::_cmbt_colony_id;
                         bomb_stats.is_planetary_hit = 1;
                         MOX::_combat_bomb_result.is_planetary_hit = 1;
-                        bomb_stats.bomb_hits_remaining = MOX::_combat_data->structure_max / 100;
+                        bomb_stats.bomb_hits_remaining = MOX::_combat_data->structure_max / civilian_armor_hits;
 
                         if (MOX::_apply_damage_to_planet != 0 && MOX::_cmbt_colony_id != -1) {
                             BOMB::Apply_Bomb_Hits_(&bomb_stats);
@@ -1019,7 +1020,8 @@ namespace CMBTFIRE {
                                 MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[PLANETARY_FLUX_SHIELD].absorption;
                             }
                         }
-                        MOX::_combat_data->structure_max += (int16_t)((int16_t)bomb_stats.total_hits_processed * -100);
+                        MOX::_combat_data->structure_max -=
+                            (int16_t)(bomb_stats.total_hits_processed * civilian_armor_hits);
                     }
                 }
                 else {

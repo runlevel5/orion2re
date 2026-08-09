@@ -178,7 +178,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`: fixed in `COLCALC::Player_N_Turns_Until_Research_Complete_()` by applying each projected turn's research before accumulating that same turn's breakthrough chance, so the threshold-crossing turn is counted once; this directly expresses the 1.50 unconditional skip of the redundant pre-threshold loop.
 - [x] `asm.pl:16567` - `true omni`: fixed in `PLNTSUM::Set_Planet_Explored_Flags_()` and `PLNTSUM::Filter_Explored_Planets_()` by distinguishing race-trait Omniscience from Galactic Lore when marking explored planets and applying that explored-world gate only while enemy-controlled planets are filtered; this replaces the 1.50 call diversion and branch trampoline with direct source-level visibility rules.
 - [ ] `asm.pl:16692` - `bombardment ammo fix`
-- [ ] `asm.pl:16729` - `bombardment fair armor`
+- [x] `asm.pl:16729` - `bombardment fair armor`: implemented in `CMBTFIRE::Apply_Damage_To_Planet_()` and `COMBAT::Tactical_Bombardment_()` with the configurable `civilian_armor` table, using the defender's best armor consistently for civilian damage thresholds, processed-hit accounting, and tactical bombardment results; this replaces the 1.50 code-cave wrappers with direct source-level calculations and rejects the unsafe zero divisor.
 - [ ] `asm.pl:16814` - `wormhole to Orion fix`
 - [ ] `asm.pl:16823` - `planet screen arti`
 - [ ] `asm.pl:16869` - `empty bombardment`

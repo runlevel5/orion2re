@@ -139,6 +139,35 @@ DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default")
     DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
 }
 
+DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor name") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const uint16_t expected[ARMOR_COUNT] = {
+        100, 100, 100, 100, 100, 100, 100,
+    };
+    DOCTEST_CHECK(std::memcmp(CMBTFIRE::_civilian_armor, expected,
+                              sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "civilian_armor no_armor = 90;"
+        "civilian_armor tritanium = 120;"
+        "civilian_armor xentronium = 200;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_civilian_armor[ARMOR_NO_ARMOR] == 90);
+    DOCTEST_CHECK(CMBTFIRE::_civilian_armor[ARMOR_TRITANIUM_ARMOR] == 120);
+    DOCTEST_CHECK(CMBTFIRE::_civilian_armor[ARMOR_XENTRONIUM_ARMOR] == 200);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "civilian_armor titanium = 0;", &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
