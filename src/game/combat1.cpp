@@ -1300,6 +1300,29 @@ namespace COMBAT1 {
                 }
             }
         }
+
+        if (_continuous_bhg != 0) {
+            int16_t active_target_count = 0;
+            for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+                if (MOX::_combat_data[i].black_hole_source_idx == ship_idx) {
+                    active_target_count++;
+                }
+            }
+
+            for (int i = 0; i < 8 && active_target_count > 0; ++i) {
+                s_combat_weapon_slot* slot = &ship->weapons[i];
+                if (slot->weapon_id != WEAPON_BLACK_HOLE_GENERATOR) {
+                    continue;
+                }
+
+                int16_t committed_shots = slot->shots_left;
+                if (committed_shots > active_target_count) {
+                    committed_shots = active_target_count;
+                }
+                slot->shots_left -= (int8_t)committed_shots;
+                active_target_count -= committed_shots;
+            }
+        }
     }
 
     int __cdecl qsort_ship_initiative_(const void* p1, const void* p2) {

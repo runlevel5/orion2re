@@ -4,6 +4,7 @@ namespace {
     s_combat_data combat_data[2];
     s_qship qcombat_data[2];
     s_leader_data leaders[1];
+    s_player players[MAX_PLAYERS];
 }
 
 namespace TEST_STASIS_AREA_EFFECTS {
@@ -11,17 +12,21 @@ namespace TEST_STASIS_AREA_EFFECTS {
         memset(combat_data, 0, sizeof(combat_data));
         memset(qcombat_data, 0, sizeof(qcombat_data));
         memset(leaders, 0, sizeof(leaders));
+        memset(players, 0, sizeof(players));
 
         for (s_combat_data& ship : combat_data) {
             ship.owner = 1;
             ship.officer_idx = -1;
             ship.stasis_source_idx = UINT8_MAX;
+            ship.black_hole_source_idx = UINT8_MAX;
+            ship.special_cooldown = UINT8_MAX;
         }
 
         MOX::_combat_total_ship_count = 2;
         MOX::_combat_attacker_count = 1;
         MOX::_combat_attacker_player = 0;
         MOX::_combat_defender_player = 1;
+        COMBAT1::_continuous_bhg = 0;
     }
 
     void Set_Special_(int16_t ship_idx, int16_t special_id) {
@@ -43,6 +48,7 @@ namespace MOX {
     int16_t _combat_attacker_player;
     int16_t _combat_defender_player;
     s_leader_data* _leaders = leaders;
+    s_player* _player = players;
 }
 
 namespace COMBINIT {
@@ -78,10 +84,25 @@ namespace CMBTMOV1 {
     int8_t __cdecl Ship_Is_In_Stasis_(int16_t ship_idx) {
         return MOX::_combat_data[ship_idx].stasis_source_idx != UINT8_MAX;
     }
+
+    bool __cdecl Ship_In_Black_Hole_(int16_t ship_idx) {
+        return MOX::_combat_data[ship_idx].black_hole_source_idx != UINT8_MAX;
+    }
+}
+
+namespace struct_ {
+    int16_t __cdecl Test_Bit_Field_(void* bit_field, uint16_t bit_index) {
+        const uint8_t* bytes = static_cast<const uint8_t*>(bit_field);
+        return (bytes[bit_index / 8] >> (bit_index % 8)) & 1;
+    }
 }
 
 namespace OFFICER {
     int16_t __cdecl Owned_Officer_Level_(int16_t) {
         return 0;
     }
+}
+
+namespace TECHDATA {
+    s_tech_weapon_data _weapons[WEAPON_COUNT];
 }

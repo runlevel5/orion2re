@@ -60,6 +60,20 @@ DOCTEST_TEST_CASE("stasis disables warp dissipator") {
     DOCTEST_CHECK(COMBAT1::Enemy_Dissipator_Exists_(0) == 0);
 }
 
+DOCTEST_TEST_CASE("continuous BHG keeps one shot committed to an active target") {
+    TEST_STASIS_AREA_EFFECTS::Reset_();
+    MOX::_combat_data[0].weapons[0].weapon_id = WEAPON_BLACK_HOLE_GENERATOR;
+    MOX::_combat_data[0].weapons[0].count = 2;
+    MOX::_combat_data[1].black_hole_source_idx = 0;
+
+    COMBAT1::Init_Ship_For_Start_Of_Turn_(0);
+    DOCTEST_CHECK(MOX::_combat_data[0].weapons[0].shots_left == 2);
+
+    COMBAT1::_continuous_bhg = 1;
+    COMBAT1::Init_Ship_For_Start_Of_Turn_(0);
+    DOCTEST_CHECK(MOX::_combat_data[0].weapons[0].shots_left == 1);
+}
+
 DOCTEST_TEST_CASE("artemis restores the network turn random seed before rolling") {
     TEST_STASIS_AREA_EFFECTS::Reset_();
     MOX::_game_type = 3;

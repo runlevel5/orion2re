@@ -483,6 +483,7 @@ DOCTEST_TEST_CASE("interactive combat stat settings preserve classic defaults") 
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COMBAT1::_interactive_combat_stats == 0);
+    DOCTEST_CHECK(COMBAT1::_continuous_bhg == 0);
     DOCTEST_CHECK(COMBAT1::_non_ics_tractor_and_bhg_mode == 0);
     DOCTEST_CHECK(COMBAT1::_recloak_next_turn == 0);
     DOCTEST_CHECK(COMBAT1::_rephase_cloak_next_turn == 0);
@@ -491,6 +492,7 @@ DOCTEST_TEST_CASE("interactive combat stat settings preserve classic defaults") 
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
         "combat interactive_combat_stats = true;"
+        "combat continuous_bhg = true;"
         "combat non_ics_tractor_and_bhg_mode = true;"
         "combat recloak_next_turn = true;"
         "combat rephase_cloak_next_turn = true;",
@@ -498,6 +500,7 @@ DOCTEST_TEST_CASE("interactive combat stat settings preserve classic defaults") 
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COMBAT1::_interactive_combat_stats == 1);
+    DOCTEST_CHECK(COMBAT1::_continuous_bhg == 1);
     DOCTEST_CHECK(COMBAT1::_non_ics_tractor_and_bhg_mode == 1);
     DOCTEST_CHECK(COMBAT1::_recloak_next_turn == 1);
     DOCTEST_CHECK(COMBAT1::_rephase_cloak_next_turn == 1);

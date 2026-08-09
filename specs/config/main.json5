@@ -544,6 +544,7 @@
     civilian_structure_hits: {
       title: "Civilian bombardment hit points",
       description: "Damage required to process one civilian building or population hit.",
+      remarks: "Higher values make civilian structures and population more resistant to bombardment damage.",
       kind: "alias",
       type: "uint16",
       constraints: { min: 1 },
@@ -1452,6 +1453,21 @@
       bind_root: {
         header: "game/combat1.h",
         symbol: "COMBAT1::_interactive_combat_stats",
+      },
+      default: false,
+    },
+
+    continuous_bhg: {
+      title: "Continuous Black Hole Generators",
+      description: "Keeps one Black Hole Generator shot committed for each target still trapped by the firing ship.",
+      remarks: "False preserves classic behavior, where Black Hole Generators recharge every turn. When enabled, recharge matches Stasis Field behavior.",
+      examples: ["combat continuous_bhg = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/combat1.h",
+        symbol: "COMBAT1::_continuous_bhg",
       },
       default: false,
     },

@@ -174,10 +174,13 @@ DOCTEST_TEST_CASE("main schema game-domain types are documented and match native
     const config::tool::s_json_value* types = Member_(&root, "types");
     DOCTEST_REQUIRE(types != nullptr);
 
-    for (const config::tool::s_json_value& type : types->values) {
+    for (size_t type_index = 0; type_index < types->values.size(); ++type_index) {
+        const config::tool::s_json_value& type = types->values[type_index];
         for (const char* field : {"title", "description", "remarks"}) {
             const config::tool::s_json_value* documentation = Member_(&type, field);
-            DOCTEST_REQUIRE(documentation != nullptr);
+            DOCTEST_REQUIRE_MESSAGE(
+                documentation != nullptr,
+                types->member_names[type_index], " is missing ", field);
             DOCTEST_CHECK(documentation->kind == config::tool::JSON_STRING);
             DOCTEST_CHECK_FALSE(documentation->string_value.empty());
         }
