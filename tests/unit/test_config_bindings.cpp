@@ -567,6 +567,21 @@ DOCTEST_TEST_CASE("missile defense settings preserve classic defaults") {
     DOCTEST_CHECK(CMBTMIS::missile_defense.displacement_device_missiles_miss_percent == 35);
 }
 
+DOCTEST_TEST_CASE("alternative refit formula preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(DESIGN::_alternative_refit == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "design alternative_refit = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(DESIGN::_alternative_refit == 1);
+}
+
 DOCTEST_TEST_CASE("miniaturization curves and categories preserve 1.50 defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

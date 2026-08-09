@@ -186,6 +186,16 @@ orion2re_add_unit_test(test_aidudes
         tests/fakes/fake_aidudes_runtime.cpp
 )
 
+orion2re_add_unit_test(test_refit_cost
+    SOURCES
+        tests/unit/test_refit_cost.cpp
+    PRODUCTION_SOURCES
+        src/game/aibuild.cpp
+        src/game/design_config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_refit_cost_runtime.cpp
+)
+
 orion2re_add_unit_test(test_settler
     SOURCES
         tests/unit/test_settler.cpp
@@ -399,6 +409,8 @@ orion2re_add_unit_test(test_stasis_area_effects
 if(MSVC)
     target_compile_options(test_aidudes PRIVATE /Gy)
     target_link_options(test_aidudes PRIVATE /OPT:REF)
+    target_compile_options(test_refit_cost PRIVATE /Gy)
+    target_link_options(test_refit_cost PRIVATE /OPT:REF)
     target_compile_options(test_colony_production_helpers PRIVATE /Gy)
     target_link_options(test_colony_production_helpers PRIVATE /OPT:REF)
     target_compile_options(test_colony_production_draw PRIVATE /Gy)
@@ -431,6 +443,7 @@ if(MSVC)
     target_link_options(test_colony_replicators PRIVATE /OPT:REF)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_aidudes PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_refit_cost PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_colony_production_helpers PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_colony_production_draw PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_bombardment_ammo PRIVATE -ffunction-sections -fdata-sections)
@@ -448,6 +461,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_colony_replicators PRIVATE -ffunction-sections -fdata-sections)
     if(APPLE)
         target_link_options(test_aidudes PRIVATE -Wl,-dead_strip)
+        target_link_options(test_refit_cost PRIVATE -Wl,-dead_strip)
         target_link_options(test_colony_production_helpers PRIVATE -Wl,-dead_strip)
         target_link_options(test_colony_production_draw PRIVATE -Wl,-dead_strip)
         target_link_options(test_bombardment_ammo PRIVATE -Wl,-dead_strip)
@@ -465,6 +479,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_colony_replicators PRIVATE -Wl,-dead_strip)
     else()
         target_link_options(test_aidudes PRIVATE -Wl,--gc-sections)
+        target_link_options(test_refit_cost PRIVATE -Wl,--gc-sections)
         target_link_options(test_colony_production_helpers PRIVATE -Wl,--gc-sections)
         target_link_options(test_colony_production_draw PRIVATE -Wl,--gc-sections)
         target_link_options(test_bombardment_ammo PRIVATE -Wl,--gc-sections)

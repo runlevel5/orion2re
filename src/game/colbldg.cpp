@@ -1927,7 +1927,6 @@ namespace COLBLDG {
     void __cdecl Add_Refited_Ship_To_Queue_() {
         MOX::_refit_ship = 0;
         int16_t ship_n = _refitting_ship_n;
-        int16_t old_cost = MOX::_ship[ship_n].d.cost;
 
         if (!Add_To_Queue_(COLBLDG::Colony_Production_From_Ship_Index_(ship_n))) {
             GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_NO_ROOM_IN_QUEUE_SHIP_NOT_REFITTED));
@@ -1937,24 +1936,15 @@ namespace COLBLDG {
         }
 
         int8_t owner = MOX::_colony[COLONY::_colony_handle].owner;
-        struct_::Copy_Structure_(&MOX::_ship[ship_n].d, &MOX::_player[owner].ship_designs[5], sizeof(MOX::_ship[ship_n].d));
+        s_ship_design old_design = MOX::_ship[ship_n].d;
+        s_ship_design new_design = MOX::_player[owner].ship_designs[5];
+        new_design.cost = DESIGN::Cost_Of_Design_(owner, &new_design);
+        int16_t refit_cost = AIBUILD::Refit_Cost_(owner, &old_design, &new_design);
 
+        struct_::Copy_Structure_(
+            &MOX::_ship[ship_n].d, &new_design, sizeof(MOX::_ship[ship_n].d));
         MOX::_ship[ship_n].status = 4;
-
-        int32_t delta_cost = ((int32_t)DESIGN::Cost_Of_Design_(owner, &MOX::_player[owner].ship_designs[5]) -
-                              (int32_t)old_cost) * 2;
-
-        int8_t size = MOX::_ship[ship_n].d.size;
-        int32_t min_cost = (int16_t)TECHDATA::_hull_data[size].cost / 4;
-
-        if (delta_cost <= min_cost) {
-            MOX::_ship[ship_n].d.cost = (int16_t)min_cost;
-            MAINSCR::Update_Ship_Icons_In_Between_Turns_();
-            return;
-        }
-
-        MOX::_ship[ship_n].d.cost = (int16_t)(((int32_t)DESIGN::Cost_Of_Design_(owner, &MOX::_player[owner].ship_designs[5]) -
-                                               (int32_t)old_cost) * 2);
+        MOX::_ship[ship_n].d.cost = refit_cost;
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
     }
 

@@ -183,3 +183,7 @@ namespace netcode {
 namespace sound {
     void __cdecl Sound_Update_() {}
 }
+
+namespace SHIPS {
+    void __cdecl Kill_Ship_(int16_t) {}
+}

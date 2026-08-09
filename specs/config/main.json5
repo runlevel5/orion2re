@@ -1584,6 +1584,21 @@
       },
     },
 
+    alternative_refit: {
+      title: "Alternative refit cost",
+      description: "Uses the alternative ship-refit cost formula.",
+      remarks: "False uses max(2 * delta, minimum cost). True uses max(delta, 0) plus the minimum cost. Delta is new design cost minus old design cost, and the minimum is one quarter of standard hull cost after government reduction.",
+      examples: ["design alternative_refit = true;"],
+      group: "gameplay",
+      namespace: "design",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_alternative_refit",
+      },
+    },
+
     miniaturization: {
       title: "Miniaturization curves",
       description: "Configures ship-component cost percentages and category-specific space multipliers for miniaturization levels 0 through 5.",

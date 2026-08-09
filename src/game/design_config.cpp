@@ -4,6 +4,7 @@ namespace DESIGN {
     static_assert(MINIATURIZATION_TECHNOLOGY_COUNT == TECH_APP_COUNT);
 
     uint8_t _missile_x3_shot = 0;
+    uint8_t _alternative_refit = 0;
 
     static const int16_t missile_rack_quantities[2][MISSILE_RACK_COUNT] = {
         { 2, 5, 10, 15, 20 },

@@ -221,7 +221,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 ### Mixed topics requiring block-level review
 
 - [ ] `asm.pl:1158` - `mapgen`
-- [ ] `asm.pl:1973` - `refit`
+- [x] `asm.pl:1973` - `refit`: fixed in `AIBUILD::Refit_Cost_()` and `COLBLDG::Add_Refited_Ship_To_Queue_()` by sharing the quarter-hull, government-adjusted refit formula across UI, AI, and queue charging, with synchronized `design alternative_refit` support; restored design-cost recalculation makes the 1.50 cache-branch patch unnecessary.
 - [ ] `asm.pl:2387` - `town Zero`
 - [ ] `asm.pl:3545` - `ICS + weapon breakages`
 - [ ] `asm.pl:5757` - `antaran fixup for starbasi`

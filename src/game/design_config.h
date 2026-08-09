@@ -22,6 +22,7 @@ namespace DESIGN {
     extern s_miniaturization_settings miniaturization;
     extern uint8_t miniaturization_categories[MINIATURIZATION_TECHNOLOGY_COUNT];
     extern uint8_t _missile_x3_shot;
+    extern uint8_t _alternative_refit;
 
     uint16_t Miniaturization_Cost_Multiplier_(int16_t level);
     uint16_t Miniaturization_Space_Multiplier_(int16_t level, int8_t category);
