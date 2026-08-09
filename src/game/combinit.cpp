@@ -2792,12 +2792,12 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
         
-        if (star_idx == MOX::_NUM_STARS && ship->owner == MAX_PLAYERS &&
+        if (star_idx == MOX::_NUM_STARS && ship->previous_owner == MAX_PLAYERS &&
             ship->unit_status == 5 && ship->ftl_type != 0) {
             antarans::Kill_Antaran_Defensive_Ship_(ship->size_class);
         } 
         else if (ship->unit_status == 5 && ship->ship_idx != -1 && ship->is_retreating != 2) {
-            if (ship->owner == MAX_PLAYERS) {
+            if (ship->previous_owner == MAX_PLAYERS) {
                 antarans::Kill_Antaran_Offensive_Ship_(ship->size_class);
             }
             if (MOX::_ship[ship->ship_idx].officer_index > -1) {

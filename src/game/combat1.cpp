@@ -1160,7 +1160,7 @@ namespace COMBAT1 {
     {
         int16_t speed = 0;
 
-        if (MOX::_combat_data[ship_idx].ship_idx == -1 || CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
+        if (MOX::_combat_data[ship_idx].ftl_type == DRIVE_NO_DRIVE || CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
             speed = 0;
         } else {
             int combat_speed = (uint8_t)MOX::_combat_data[ship_idx].combat_speed_base;

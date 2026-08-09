@@ -11,7 +11,7 @@ namespace BOARDING {
 
         s_combat_data* target = &MOX::_combat_data[target_idx];
         int16_t hull_class = target->size_class;
-        if (target->ship_idx == -1) {
+        if (target->ftl_type == DRIVE_NO_DRIVE) {
             hull_class += HULL_STAR_BASE - HULL_CRUISER;
         }
 

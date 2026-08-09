@@ -81,10 +81,23 @@ DOCTEST_TEST_CASE("captured bases use orbital hull marine capacity") {
     TEST_BOARDING::Reset_();
     BOARDING::_kill_excess_marines_after_capture = 1;
     MOX::_combat_data[1].ship_idx = -1;
+    MOX::_combat_data[1].ftl_type = DRIVE_NO_DRIVE;
     MOX::_combat_data[1].size_class = HULL_CRUISER;
     TECHDATA::_hull_data[HULL_STAR_BASE].marines = 20;
 
     DOCTEST_CHECK(BOARDING::Captured_Marine_Count_(1, 30) == 20);
+}
+
+DOCTEST_TEST_CASE("generated Antaran ships use normal hull marine capacity") {
+    TEST_BOARDING::Reset_();
+    BOARDING::_kill_excess_marines_after_capture = 1;
+    MOX::_combat_data[1].ship_idx = -1;
+    MOX::_combat_data[1].ftl_type = DRIVE_HYPER_DRIVE;
+    MOX::_combat_data[1].size_class = HULL_CRUISER;
+    TECHDATA::_hull_data[HULL_CRUISER].marines = 12;
+    TECHDATA::_hull_data[HULL_STAR_BASE].marines = 20;
+
+    DOCTEST_CHECK(BOARDING::Captured_Marine_Count_(1, 30) == 12);
 }
 
 DOCTEST_TEST_CASE("classic telepathic recapture retains captured state") {
@@ -120,6 +133,17 @@ DOCTEST_TEST_CASE("enabled non-telepathic capture sets captured state") {
     CMBTFIR2::Capture_Ship_(1, 0, 0);
 
     DOCTEST_CHECK(MOX::_combat_data[1].is_captured == 1);
+}
+
+DOCTEST_TEST_CASE("capture preserves Antaran origin") {
+    TEST_BOARDING::Reset_();
+    MOX::_combat_data[1].owner = 1;
+    MOX::_combat_data[1].previous_owner = MAX_PLAYERS;
+
+    CMBTFIR2::Capture_Ship_(1, 0, 0);
+
+    DOCTEST_CHECK(MOX::_combat_data[1].owner == 0);
+    DOCTEST_CHECK(MOX::_combat_data[1].previous_owner == MAX_PLAYERS);
 }
 
 DOCTEST_TEST_CASE("captured ships retain an existing turn-order entry") {

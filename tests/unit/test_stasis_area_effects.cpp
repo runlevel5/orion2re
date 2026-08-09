@@ -49,6 +49,23 @@ DOCTEST_TEST_CASE("stasis disables scout lab") {
     DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 0);
 }
 
+DOCTEST_TEST_CASE("generated Antaran ships retain tactical movement") {
+    TEST_STASIS_AREA_EFFECTS::Reset_();
+    s_combat_data& ship = MOX::_combat_data[0];
+    ship.owner = MAX_PLAYERS;
+    ship.previous_owner = MAX_PLAYERS;
+    ship.ship_idx = -1;
+    ship.ftl_type = DRIVE_HYPER_DRIVE;
+    ship.combat_speed_base = 12;
+    ship.drive_max_hits = 10;
+    ship.drive_current_hits = 10;
+
+    DOCTEST_CHECK(COMBAT1::Calc_Current_Speed_(0) == 12);
+
+    ship.ftl_type = DRIVE_NO_DRIVE;
+    DOCTEST_CHECK(COMBAT1::Calc_Current_Speed_(0) == 0);
+}
+
 DOCTEST_TEST_CASE("stasis disables warp dissipator") {
     TEST_STASIS_AREA_EFFECTS::Reset_();
     MOX::_combat_data[1].owner = 1;

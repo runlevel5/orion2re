@@ -95,6 +95,11 @@ namespace struct_ {
         const uint8_t* bytes = static_cast<const uint8_t*>(bit_field);
         return (bytes[bit_index / 8] >> (bit_index % 8)) & 1;
     }
+
+    void __cdecl Set_Bit_Field_(void* bit_field, uint16_t bit_index) {
+        uint8_t* bytes = static_cast<uint8_t*>(bit_field);
+        bytes[bit_index / 8] |= static_cast<uint8_t>(1u << (bit_index % 8));
+    }
 }
 
 namespace OFFICER {
