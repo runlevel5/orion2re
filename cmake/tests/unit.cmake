@@ -197,6 +197,7 @@ orion2re_add_unit_test(test_colony_production_helpers
     PRODUCTION_SOURCES
         src/game/colcalc_base.cpp
         src/game/colcalc_config.cpp
+        src/game/plntsum.cpp
     FAKE_SOURCES
         tests/fakes/fake_colcalc_base_runtime.cpp
 )
@@ -302,6 +303,8 @@ orion2re_add_unit_test(test_stasis_area_effects
 if(MSVC)
     target_compile_options(test_aidudes PRIVATE /Gy)
     target_link_options(test_aidudes PRIVATE /OPT:REF)
+    target_compile_options(test_colony_production_helpers PRIVATE /Gy)
+    target_link_options(test_colony_production_helpers PRIVATE /OPT:REF)
     target_compile_options(test_bombardment_ammo PRIVATE /Gy)
     target_link_options(test_bombardment_ammo PRIVATE /OPT:REF)
     target_compile_options(test_animation_frame PRIVATE /Gy)
@@ -322,6 +325,7 @@ if(MSVC)
     target_link_options(test_stasis_area_effects PRIVATE /OPT:REF)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_aidudes PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_colony_production_helpers PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_bombardment_ammo PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_animation_frame PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_ericnet PRIVATE -ffunction-sections -fdata-sections)
@@ -333,6 +337,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_stasis_area_effects PRIVATE -ffunction-sections -fdata-sections)
     if(APPLE)
         target_link_options(test_aidudes PRIVATE -Wl,-dead_strip)
+        target_link_options(test_colony_production_helpers PRIVATE -Wl,-dead_strip)
         target_link_options(test_bombardment_ammo PRIVATE -Wl,-dead_strip)
         target_link_options(test_animation_frame PRIVATE -Wl,-dead_strip)
         target_link_options(test_ericnet PRIVATE -Wl,-dead_strip)
@@ -344,6 +349,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_stasis_area_effects PRIVATE -Wl,-dead_strip)
     else()
         target_link_options(test_aidudes PRIVATE -Wl,--gc-sections)
+        target_link_options(test_colony_production_helpers PRIVATE -Wl,--gc-sections)
         target_link_options(test_bombardment_ammo PRIVATE -Wl,--gc-sections)
         target_link_options(test_animation_frame PRIVATE -Wl,--gc-sections)
         target_link_options(test_ericnet PRIVATE -Wl,--gc-sections)

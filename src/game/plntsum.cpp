@@ -668,19 +668,16 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         // 50% Penalty Conditions:
         // - Low-G race on Heavy-G planet (2)
         // - Normal-G race on Heavy-G planet (2)
-        // - Heavy-G race on Low-G planet (0)
         if ((low_g_trait != 0 && planet_gravity == PLANET_GRAVITY_HEAVY_G) ||
-            (is_normal_g_race && planet_gravity == PLANET_GRAVITY_HEAVY_G) ||
-            (heavy_g_trait != 0 && planet_gravity == PLANET_GRAVITY_LOW_G)) {
+            (is_normal_g_race && planet_gravity == PLANET_GRAVITY_HEAVY_G)) {
             return 50;
         }
 
         // 25% Penalty Conditions:
         // - Low-G race on Normal-G planet (1)
-        // - Normal-G race on Low-G planet (0)
-        // (Note: Heavy-G races do not suffer 25% penalties on Normal-G planets)
+        // - Normal-G or Heavy-G race on Low-G planet (0)
         if ((low_g_trait != 0 && planet_gravity == PLANET_GRAVITY_NORMAL_G) ||
-            (is_normal_g_race && planet_gravity == PLANET_GRAVITY_LOW_G)) {
+            (low_g_trait == 0 && planet_gravity == PLANET_GRAVITY_LOW_G)) {
             return 25;
         }
 

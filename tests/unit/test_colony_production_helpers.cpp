@@ -59,6 +59,38 @@ DOCTEST_TEST_CASE("ship product encodings round trip through their matching rang
     }
 }
 
+DOCTEST_TEST_CASE("planet summary gravity penalties match colony production rules") {
+    struct s_gravity_case {
+        int8_t low_g_trait;
+        int8_t heavy_g_trait;
+        int16_t planet_gravity;
+        int16_t expected_penalty;
+    };
+
+    const s_gravity_case cases[] = {
+        {1, 0, PLANET_GRAVITY_LOW_G, 0},
+        {1, 0, PLANET_GRAVITY_NORMAL_G, 25},
+        {1, 0, PLANET_GRAVITY_HEAVY_G, 50},
+        {0, 0, PLANET_GRAVITY_LOW_G, 25},
+        {0, 0, PLANET_GRAVITY_NORMAL_G, 0},
+        {0, 0, PLANET_GRAVITY_HEAVY_G, 50},
+        {0, 1, PLANET_GRAVITY_LOW_G, 25},
+        {0, 1, PLANET_GRAVITY_NORMAL_G, 0},
+        {0, 1, PLANET_GRAVITY_HEAVY_G, 0},
+    };
+
+    TEST_COLCALC_BASE::Reset_();
+
+    for (const s_gravity_case& test_case : cases) {
+        MOX::_player[0].traits[TRAIT_LOW_G_WORLD] = test_case.low_g_trait;
+        MOX::_player[0].traits[TRAIT_HEAVY_G_WORLD] = test_case.heavy_g_trait;
+
+        DOCTEST_CHECK(
+            PLNTSUM::Productivity_Penalty_(0, test_case.planet_gravity) ==
+            test_case.expected_penalty);
+    }
+}
+
 DOCTEST_TEST_CASE("base production reflects recalculated colony fields") {
     TEST_COLCALC_BASE::Reset_();
 
