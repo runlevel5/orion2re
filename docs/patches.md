@@ -206,7 +206,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:19157` - `dimensional portal icon in system display box displays race name instead of ruler name`: fixed in `SYS::Print_Gate_Info_()` by appending each dimensional-portal owner's race name instead of ruler name; this directly expresses the 1.50 player-field displacement correction in source.
 - [x] `asm.pl:19225` - `energy absorber 21 squares range bug`: fixed in `CMBTFIRE::Pre_Weapon_Specials_()` by allowing the Energy Absorber counterattack at computed range 8; this directly expresses the 1.50 inclusive branch correction in source.
 - [ ] `asm.pl:19256` - `artemis desync`
-- [ ] `asm.pl:19295` - `food shortage anims also shown when colony has 0 food production and 0 food import`
+- [x] `asm.pl:19295` - `food shortage anims also shown when colony has 0 food production and 0 food import`: fixed in `COLDRAW::Draw_Colony_Prod_Both_()` by treating zero food imports as eligible for the existing shortage-animation path; this directly expresses the 1.50 signed branch-boundary correction in source.
 - [ ] `asm.pl:19304` - `scrap freighters wrong message`
 - [ ] `asm.pl:19313` - `captured ship's missile's armor's owner`
 - [ ] `asm.pl:19362` - `non-zero missile hp`
