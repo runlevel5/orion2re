@@ -59,3 +59,16 @@ DOCTEST_TEST_CASE("zero research field is not advanced") {
 
     DOCTEST_CHECK(player.tech_fields[TECH_FIELD_STARTING_TECH] == 2);
 }
+
+DOCTEST_TEST_CASE("Capitol can be built when the player has no homeworld") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_colony* colony = &MOX::_colony[0];
+    colony->owner = 0;
+
+    s_player* player = &MOX::_player[0];
+    player->home_planet_id = -1;
+    player->tech_applications[TECH_APP_CAPITOL] = TECH_RESEARCH_STATUS_RESEARCHED;
+
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(colony, BUILDING_CAPITOL) == 1);
+}

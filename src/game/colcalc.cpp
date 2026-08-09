@@ -2819,7 +2819,9 @@ namespace COLCALC {
                     }
                     case BUILDING_CAPITOL: {
                         if (MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT] / 2 == 3) return 0;
-                        int16_t c = MOX::_planet[MOX::_player[owner].home_planet_id].colony_index;
+                        int16_t home_planet_id = MOX::_player[owner].home_planet_id;
+                        if (home_planet_id == -1) return 1;
+                        int16_t c = MOX::_planet[home_planet_id].colony_index;
                         if (MOX::_colony[c].buildings[BUILDING_CAPITOL] != 0) return 0;
                         return 1;
                     }

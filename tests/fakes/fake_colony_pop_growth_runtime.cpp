@@ -1,16 +1,24 @@
 #include "pch.h"
 
 namespace {
-    s_colony colonies[1];
-    s_planet_data planets[1];
+    s_colony colonies[2];
+    s_planet_data planet_storage[2];
     s_player players[1];
+    s_star_data stars[1];
+    s_ship_data ships[1];
 }
 
 namespace TEST_COLONY_POP_GROWTH {
     void Reset_() {
         memset(colonies, 0, sizeof(colonies));
-        memset(planets, 0, sizeof(planets));
+        memset(planet_storage, 0, sizeof(planet_storage));
         memset(players, 0, sizeof(players));
+        memset(stars, 0, sizeof(stars));
+        memset(ships, 0, sizeof(ships));
+        memset(TECHDATA::_buildings, 0, sizeof(TECHDATA::_buildings));
+        planet_storage[0].colony_index = 1;
+        colonies[1].buildings[BUILDING_CAPITOL] = 1;
+        TECHDATA::_buildings[BUILDING_CAPITOL].tech_app = TECH_APP_CAPITOL;
         COLCALC::_housing_creates_no_farmers = 0;
     }
 }
@@ -19,12 +27,15 @@ namespace MOX {
     int16_t _NUM_COLONIES = 1;
     int16_t _NUM_PLAYERS = 1;
     s_colony* _colony = colonies;
-    s_planet_data* _planet = planets;
+    s_planet_data* _planet = &planet_storage[1];
     s_player* _player = players;
+    s_star_data* _star = stars;
+    s_ship_data* _ship = ships;
     int8_t _planet_max_population[PLANET_SIZE_COUNT] = {5, 10, 15, 20, 25};
 }
 
 namespace TECHDATA {
+    s_tech_building_data _buildings[BUILDING_COUNT] = {};
     s_tech_field_data _technology_fields[TECH_FIELD_COUNT] = {};
 }
 
