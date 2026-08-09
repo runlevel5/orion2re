@@ -54,6 +54,10 @@ namespace NETSTART {
     void __cdecl Mox_Net_Uninit_() {}
 }
 
+namespace CMBTFIR2 {
+    void __cdecl Save_Artemis_Random_Seed_() {}
+}
+
 namespace MULTPLAY {
     void (*g_chat_box_input_loop_hook)() = nullptr;
 

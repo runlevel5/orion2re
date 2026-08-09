@@ -32,6 +32,9 @@ namespace CMBTFIR2 {
     /** Applies the Artemis Net effect to eligible combat units. */
     bool __cdecl Apply_Combat_Artemis_Net_(char strategic);
 
+    /** Captures the synchronized random seed used by subsequent Artemis Net combats. */
+    void __cdecl Save_Artemis_Random_Seed_();
+
     int16_t __cdecl Used_Teleporter_(int16_t ship_idx);
 
     void __cdecl Set_Teleporter_Used_(int16_t ship_idx);

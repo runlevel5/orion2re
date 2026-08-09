@@ -3,6 +3,7 @@
 #include "doctest/doctest.h"
 #include "game/cmbtfir2.h"
 #include "game/combat1.h"
+#include "game/random.h"
 
 namespace TEST_STASIS_AREA_EFFECTS {
     void Reset_();
@@ -57,4 +58,31 @@ DOCTEST_TEST_CASE("stasis disables warp dissipator") {
 
     TEST_STASIS_AREA_EFFECTS::Set_In_Stasis_(1, true);
     DOCTEST_CHECK(COMBAT1::Enemy_Dissipator_Exists_(0) == 0);
+}
+
+DOCTEST_TEST_CASE("artemis restores the network turn random seed before rolling") {
+    TEST_STASIS_AREA_EFFECTS::Reset_();
+    MOX::_game_type = 3;
+    MOX::_qcombat_data[1].size = 0;
+    MOX::_qcombat_data[1].status = 1;
+    CMBTFIR2::_artemis_net_chance[0] = 100;
+
+    constexpr uint32_t synchronized_seed = 0x13572468u;
+    game_random::Set_Random_Seed_(synchronized_seed);
+    CMBTFIR2::Save_Artemis_Random_Seed_();
+
+    game_random::Set_Random_Seed_(synchronized_seed);
+    game_random::Random_(100);
+    game_random::Random_(201);
+    const uint32_t expected_seed = game_random::Get_Random_Seed_();
+
+    game_random::Set_Random_Seed_(synchronized_seed);
+    game_random::Random_(5);
+    game_random::Random_(5);
+
+    CMBTFIR2::Apply_Combat_Artemis_Net_(1);
+
+    DOCTEST_CHECK(game_random::Get_Random_Seed_() == expected_seed);
+
+    CMBTFIR2::_artemis_net_chance[0] = 20;
 }

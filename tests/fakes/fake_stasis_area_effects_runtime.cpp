@@ -2,12 +2,14 @@
 
 namespace {
     s_combat_data combat_data[2];
+    s_qship qcombat_data[2];
     s_leader_data leaders[1];
 }
 
 namespace TEST_STASIS_AREA_EFFECTS {
     void Reset_() {
         memset(combat_data, 0, sizeof(combat_data));
+        memset(qcombat_data, 0, sizeof(qcombat_data));
         memset(leaders, 0, sizeof(leaders));
 
         for (s_combat_data& ship : combat_data) {
@@ -17,6 +19,7 @@ namespace TEST_STASIS_AREA_EFFECTS {
         }
 
         MOX::_combat_total_ship_count = 2;
+        MOX::_combat_attacker_count = 1;
         MOX::_combat_attacker_player = 0;
         MOX::_combat_defender_player = 1;
     }
@@ -33,19 +36,42 @@ namespace TEST_STASIS_AREA_EFFECTS {
 
 namespace MOX {
     s_combat_data* _combat_data = combat_data;
+    s_qship* _qcombat_data = qcombat_data;
+    int8_t _game_type;
     int16_t _combat_total_ship_count;
+    int16_t _combat_attacker_count;
     int16_t _combat_attacker_player;
     int16_t _combat_defender_player;
     s_leader_data* _leaders = leaders;
 }
 
 namespace COMBINIT {
+    int16_t __cdecl Calc_Combat_Shield_Max_(int16_t) {
+        return 0;
+    }
+
     int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special_id) {
         const uint8_t mask = (uint8_t)(1u << (special_id % 8));
         const s_combat_data& ship = MOX::_combat_data[ship_idx];
         return (ship.special_device_flags[special_id / 8] & mask) != 0 &&
                (ship.special_device_damage_flags[special_id / 8] & mask) == 0;
     }
+}
+
+namespace CMBTFIRE {
+    int16_t __cdecl Is_Combat_Ship_Dead_(int16_t) {
+        return 0;
+    }
+
+    uint16_t __cdecl Apply_Ship_Damage_(
+        int16_t, int16_t*, int16_t*, int16_t, uint16_t, uint16_t,
+        int16_t, int16_t, int16_t) {
+        return 0;
+    }
+}
+
+namespace COMBAT {
+    void __cdecl Apply_Damage_To_Qship_(int16_t, int16_t) {}
 }
 
 namespace CMBTMOV1 {

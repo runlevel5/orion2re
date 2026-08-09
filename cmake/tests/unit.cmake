@@ -391,6 +391,7 @@ orion2re_add_unit_test(test_stasis_area_effects
     PRODUCTION_SOURCES
         src/game/cmbtfir2.cpp
         src/game/combat1.cpp
+        src/game/random.cpp
     FAKE_SOURCES
         tests/fakes/fake_stasis_area_effects_runtime.cpp
 )

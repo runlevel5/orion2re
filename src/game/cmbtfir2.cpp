@@ -3,6 +3,11 @@
 #include "game/strbuild.h"
 
 namespace CMBTFIR2 {
+    namespace {
+        uint32_t artemis_random_seed;
+        bool has_artemis_random_seed;
+    }
+
     int16_t _artemis_net_chance[6] = { 20, 30, 40, 50, 80, 100 };
 
     int16_t __cdecl Helmsman_Bonus_(int16_t leader_idx) {
@@ -423,7 +428,16 @@ namespace CMBTFIR2 {
         return min_range;
     }
 
+    void __cdecl Save_Artemis_Random_Seed_() {
+        artemis_random_seed = game_random::Get_Random_Seed_();
+        has_artemis_random_seed = true;
+    }
+
     bool __cdecl Apply_Combat_Artemis_Net_(char strategic) {
+        if (has_artemis_random_seed && (MOX::_game_type == 2 || MOX::_game_type == 3)) {
+            game_random::Set_Random_Seed_(artemis_random_seed);
+        }
+
         int16_t ship_idx = 1;
         bool is_active = true;
 
