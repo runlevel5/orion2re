@@ -198,7 +198,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:18649` - `no homeworld`: fixed in `COLCALC::Colony_Can_Build_Product_()` by treating a missing home planet as no existing Capitol before indexing planet and colony state; this replaces the 1.50 code-cave diversion with a direct source-level eligibility guard.
 - [x] `asm.pl:18679` - `outpost false button`: fixed in `FLEETPOP::Set_Build_Outpost_Button_Flag_()` by requiring the selected fleet to be directly located at a star before checking its outpost ships and eligible planets; this replaces the 1.50 branch rewrite with a source-level location invariant so an encoded in-transit destination cannot expose the Build Outpost button.
 - [ ] `asm.pl:18757` - `nebula check`
-- [ ] `asm.pl:18774` - `zero colony loss`
+- [x] `asm.pl:18774` - `zero colony loss`: implemented in `COLCALC::Ghost_Colony_Stuff_()` with the configurable `colony zero_colony_lost` rule; the owner-level condition replaces the 1.50 diversion and preserves the classic exception for inbound colonists by default.
 - [ ] `asm.pl:18883` - `unload troops button wrong message`
 - [ ] `asm.pl:18925` - `telepatic capture`
 - [ ] `asm.pl:18959` - `autodesign considers x3 shot`

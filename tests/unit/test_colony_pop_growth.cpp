@@ -4,6 +4,7 @@
 
 namespace TEST_COLONY_POP_GROWTH {
     void Reset_();
+    int32_t Destroy_Colony_Reason_();
 }
 
 namespace {
@@ -28,6 +29,17 @@ namespace {
     uint32_t New_Colonist_Job_(const s_colony* colony) {
         return (colony->pop[1] & 0x180u) >> 7;
     }
+
+    s_colony* Prepare_Zero_Colony_With_Inbound_Settlers_() {
+        TEST_COLONY_POP_GROWTH::Reset_();
+
+        s_colony* colony = &MOX::_colony[0];
+        colony->owner = 0;
+        colony->planet = 0;
+        SETTLER::Set_Dest_Planet(&MOX::_player[0].settlers[0].val, colony->planet);
+        MOX::_player[0].settlers_freighted = 1;
+        return colony;
+    }
 }
 
 DOCTEST_TEST_CASE("classic Housing growth may create a farmer") {
@@ -47,6 +59,23 @@ DOCTEST_TEST_CASE("configured Housing growth bypasses farmer assignment") {
 
     DOCTEST_REQUIRE(colony->n_pops == 2);
     DOCTEST_CHECK(New_Colonist_Job_(colony) == 1);
+}
+
+DOCTEST_TEST_CASE("classic zero colony survives while settlers are inbound") {
+    s_colony* colony = Prepare_Zero_Colony_With_Inbound_Settlers_();
+
+    COLCALC::Ghost_Colony_Stuff_(colony);
+
+    DOCTEST_CHECK(TEST_COLONY_POP_GROWTH::Destroy_Colony_Reason_() == -1);
+}
+
+DOCTEST_TEST_CASE("configured zero colony is lost despite inbound settlers") {
+    s_colony* colony = Prepare_Zero_Colony_With_Inbound_Settlers_();
+    COLCALC::_zero_colony_lost = 1;
+
+    COLCALC::Ghost_Colony_Stuff_(colony);
+
+    DOCTEST_CHECK(TEST_COLONY_POP_GROWTH::Destroy_Colony_Reason_() == 3);
 }
 
 DOCTEST_TEST_CASE("zero research field is not advanced") {

@@ -3745,7 +3745,7 @@ namespace COLCALC {
                 }
             }
 
-            if (!has_incoming_settlers) {
+            if (_zero_colony_lost || !has_incoming_settlers) {
                 BOMB::Destroy_Colony_(colony, 3);
             }
         }

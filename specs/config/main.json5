@@ -1735,6 +1735,21 @@
       },
     },
 
+    zero_colony_lost: {
+      title: "Zero-population colony loss",
+      description: "Always destroys a colony with no population and no surviving buildings, even when colonists are inbound.",
+      remarks: "False preserves classic behavior, where inbound colonists belonging to any player keep the empty colony intact.",
+      examples: ["colony zero_colony_lost = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_zero_colony_lost",
+      },
+    },
+
     replicator_food_pp: {
       title: "Food Replicator production cost",
       description: "Sets the production points spent per unit of replicated food.",
