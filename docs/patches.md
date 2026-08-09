@@ -211,7 +211,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:19313` - `captured ship's missile's armor's owner`: fixed in `CMBTAI::Expected_Weapon_Damage_()`, `CMBTAI::Target_Missile_Value_()`, and `CMBTFIRE::Apply_Damage_To_Missile_()` by calculating launched fighter hit points from the missile's stored launch owner rather than the current owner of its source ship; this directly expresses the three 1.50 owner-field replacements in source.
 - [x] `asm.pl:19362` - `non-zero missile hp`: fixed in `CMBTMIS::Get_Missile_Hits_()` by normalizing zero computed or fallback durability to one; this replaces the 1.50 all-call wrapper with a direct source-level return invariant.
 - [x] `asm.pl:19409` - `assassin message race_name instead of ruler_name`: fixed in `MSG_::sprintf_msg_()` by using the defending and attacking players' race names in all assassination-report language paths; this directly expresses the three 1.50 player-field substitutions in source.
-- [ ] `asm.pl:19594` - `large fleet net freeze`
+- [x] `asm.pl:19594` - `large fleet net freeze`: already fixed in `NETMOX::Send_Pick_Target_Info_()` and `NETMOX::Send_You_Are_Target_Info_()` by serializing combat state into the shared 8 MiB bounded payload workspace and sending one 32-bit-length framed message; 16-bit ship counts and ids preserve values above 127. This removes the DOS `0x7800` chunk threshold and per-chunk send wait rather than reproducing the 1.50 buffer and control-flow patches.
 - [ ] `asm.pl:19640` - `grain and barrels not shown during anomaly`
 - [ ] `asm.pl:19659` - `Loknar cannot give tech_0`
 - [ ] `asm.pl:19675` - `Leader #0, Ruola, shown in ship refit popup`
