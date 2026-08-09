@@ -149,7 +149,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
 
     drawn_count++;
 
-    if (colony->imports[prod_type] <= 0 || prod_type == ECON_INDUSTRY) {
+    if (colony->imports[prod_type] < 0 || prod_type == ECON_INDUSTRY) {
         for (int i = 0; i < import_tens; ++i) {
             animate::Draw_(step * drawn_count + x, y, COLONY::Prod_Anims_(prod_type, 1, frame));
             drawn_count++;
