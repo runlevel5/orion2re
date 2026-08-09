@@ -69,6 +69,28 @@ namespace COLBLDG {
     uint8_t* _arrow_palette;
     s_palette_header _arrow_palette_span = {0, 256};
 
+    // Copies the Build List title bar's art (left cap, middle slice,
+    // right cap) from the freshly drawn background and composes a shorter
+    // bar above the left panel; must run before the title text and arrows
+    // are drawn over the source bar.
+    void Draw_Left_Category_Bar_() {
+        static uint8_t left_buf[1200];
+        static uint8_t mid_buf[3200];
+        static uint8_t right_buf[1200];
+        s_animation_header* left = (s_animation_header*)left_buf;
+        s_animation_header* mid = (s_animation_header*)mid_buf;
+        s_animation_header* right = (s_animation_header*)right_buf;
+        bitmap::Create_Blank_Bitmap_(35, 25, left);
+        bitmap::Screen_Bitmap_Capture_(218, 306, 252, 330, left);
+        bitmap::Create_Blank_Bitmap_(101, 25, mid);
+        bitmap::Screen_Bitmap_Capture_(253, 306, 353, 330, mid);
+        bitmap::Create_Blank_Bitmap_(35, 25, right);
+        bitmap::Screen_Bitmap_Capture_(411, 306, 445, 330, right);
+        animate::Draw_(13, 20, left);
+        animate::Draw_(48, 20, mid);
+        animate::Draw_(149, 20, right);
+    }
+
     void Prepare_Arrow_Remap_() {
         animate::_palette_header = &_arrow_palette_span;
         remap::Create_Picture_Remap_Palette_(_arrow_palette, remap::_picture_remap_color_list);
@@ -1917,6 +1939,11 @@ namespace COLBLDG {
             graphics::Darken_Fill_(202, 304, 463, 470);
             animate::Draw_(0, 0, COLBLDG::_anims[0]);
 
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                COLBLDG::_g_preset_edit_mode != 0) {
+                COLBLDG::Draw_Left_Category_Bar_();
+            }
+
             char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[COLONY::_colony_handle].planet);
             char* format = ESTRINGS::E_Strings_(ESTR_BUILD_LIST_FOR_S);
             if (COLBLDG::_g_preset_edit_mode != 0) {
@@ -1938,7 +1965,7 @@ namespace COLBLDG {
                     animate::Reset_Animation_Frame_(COLBLDG::_next_colony_anim);
                     animate::Remap_Draw_(149, 20, COLBLDG::_next_colony_anim);
                     fonts::Set_Font_Style_Shadow_Down_(3, &COLBLDG::_l_font_color_array);
-                    fonts::Print_Centered_(98, 25,
+                    fonts::Print_Centered_(98, 26,
                         (COLBLDG::_g_preset_left_category == 0) ? "Buildings" : "Ships");
                 }
                 if (COLBLDG::_g_preset_edit_mode != 0 &&
