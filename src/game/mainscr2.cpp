@@ -268,7 +268,7 @@ namespace MAINSCR2 {
         int16_t scrap_amount = SETTLER::N_Freighters_Player_Can_Scrap_(MOX::_PLAYER_NUM);
 
         if (scrap_amount <= 0) {
-            strlcpy(message_text, HAROLD::H_Message_(0xe6 /* HESTR_0E6_NO_SHIPS_SELECTED */), sizeof(message_text));
+            strlcpy(message_text, HAROLD::H_Message_(HESTR_0EC_ALL_FREIGHTERS_ARE_CUR), sizeof(message_text));
             HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_text, 3);
         } else {
             fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);

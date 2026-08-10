@@ -8,11 +8,12 @@ struct s_animation_header;
 namespace EVENTS {
     extern uint8_t _current_event;
     extern s_animation_header* _event_display_seg;
-    extern s_event_data _event_data[36];
+    extern s_event_data _event_data[EVENT_COUNT];
     extern MOX2::action_func_t _jim_saved_autofunction;
     extern uint32_t _last_event_year;
     extern int16_t _event_delay_count;
-    extern int8_t _event_good_array[36];
+    extern int8_t _event_good_array[EVENT_COUNT];
+    extern uint16_t event_delay[EVENT_RANDOM_COUNT];
 
     int16_t __cdecl Get_Antaran_Victim_();
     void __cdecl Init_Events_();

@@ -25,7 +25,6 @@ namespace COLCALC {
     char* _morale_summary_msg;
     char* _total_morale_msg;
     char* _command_summary_msg;
-    int8_t _colony_calc_food_cache[10];
     char* _ship_maintenance_costs_msg;
     char* _d_from_1_s_ship_msg;
     char* _d_from_d_battlestations_msg;
@@ -44,12 +43,6 @@ namespace COLCALC {
     char* _from_imperium_msg;
     char* _d_from_1_battlestation_msg;
     char* _d_from_1_fortress_msg;
-
-    const s_colony* _colony_calc_food_colony;
-    uint8_t _colony_calc_food_type;
-    const s_colony* _colony_calc_industry_colony;
-    uint8_t _colony_calc_industry_type;
-    int8_t _colony_calc_industry_cache[10];
 
     int8_t _assimilation_rate_by_government[GOVERNMENT_COUNT] = {30, 60, 30, 60, 60, 120, 12, 16};
 
@@ -92,10 +85,6 @@ namespace COLCALC {
 
     char* _taxed_msg;
     char* _base_msg;
-
-    const s_colony* _colony_calc_research_colony;
-    uint8_t _colony_calc_research_type;
-    int8_t _colony_calc_research_cache[10];
 
     char _tmp_quotient[20];
 
@@ -250,6 +239,7 @@ namespace COLCALC {
 
                     MOX::_ship[MOX::_NUM_SHIPS].owner = (int8_t)i;
                     INITSHIP::Update_Player_Ship_Designs_((int16_t)i);
+                    COLBLDG::Create_Ship_((int16_t)i, (int16_t)max_design_idx, first_colony);
 
                     pool_remaining -= (max_design_idx + 1);
                 }
@@ -448,13 +438,6 @@ namespace COLCALC {
         }
 
         int16_t turns = 0;
-
-        if (accumulated <= cost) {
-            do {
-                turns++;
-                accumulated += produced;
-            } while (accumulated <= cost);
-        }
 
         int32_t total_chance = 0;
         do {
@@ -1123,9 +1106,8 @@ namespace COLCALC {
                 }
 
                 int32_t climate_modifier = _climate_maintenance_modifiers[(uint8_t)colony->climate] + 100;
-                int32_t base_cost = (uint8_t)colony->n_food_replicated + total_building_maintenance;
-
-                int32_t calculated_bc = (((climate_modifier * base_cost) * 4 + 200) * 25) / 10000;
+                int32_t calculated_bc = (((climate_modifier * total_building_maintenance) * 4 + 200) * 25) / 10000;
+                calculated_bc += (uint8_t)colony->n_food_replicated * _replicator_food_bc;
                 colony->maintenance[ECON_BC] = (uint8_t)calculated_bc;
             }
         }
@@ -1338,8 +1320,6 @@ namespace COLCALC {
     }
 
     int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent) {
-        int32_t buy_cost = 0;
-
         switch (product) {
             case COLONY_PRODUCTION_AI_UNASSIGNED:
             case COLONY_PRODUCTION_AI_TRADE_GOODS:
@@ -1347,35 +1327,13 @@ namespace COLCALC {
             case COLONY_PRODUCTION_TRADE_GOODS:
             case COLONY_PRODUCTION_NONE:
                 // Certain special production projects (e.g., Trade, Housing) cannot be bought.
-                break;
+                return 0;
 
-            default: {
-                int32_t total_cost = (int16_t)Colony_Product_Cost_(colony, (int16_t)product);
-                int32_t half_cost = total_cost / 2;
-                int32_t tenth_cost = total_cost / 10;
-
-                if (production_spent < total_cost) {
-                    if (production_spent >= half_cost) {
-                        return (total_cost - production_spent) * 2;
-                    }
-
-                    // Accumulate cost for the portion from 50% to 100%
-                    buy_cost = (total_cost - half_cost) * 2;
-
-                    if (production_spent >= tenth_cost) {
-                        // Progress is between 10% and 50%
-                        return buy_cost + (half_cost - production_spent) * 5;
-                    }
-
-                    // Progress is below 10%, accumulate cost for 10%-50% and then 0%-10%
-                    buy_cost += (half_cost - tenth_cost) * 5;
-                    buy_cost += (tenth_cost - production_spent) * 10;
-                }
-                break;
-            }
+            default:
+                return Production_Cost_To_Buy_(
+                    static_cast<int16_t>(Colony_Product_Cost_(colony, static_cast<int16_t>(product))),
+                    production_spent);
         }
-
-        return buy_cost;
     }
 
     int32_t __cdecl Ship_Type_Cost_For_Player_(int32_t ship_type, int16_t player_idx) {
@@ -1547,6 +1505,10 @@ namespace COLCALC {
     }
 
     void __cdecl Advance_Player_Field_(s_player* player, int field_idx, bool skip_first_advance) {
+        if (field_idx == TECH_FIELD_STARTING_TECH) {
+            return;
+        }
+
         int loop_count = 0;
         int techs_known = 0;
 
@@ -1732,8 +1694,6 @@ namespace COLCALC {
                 }
             }
         }
-
-        SHIPMOVE::Unmark_Just_Built_AI_Ships_();
     }
 
     void __cdecl Do_Surrenders_() {
@@ -1742,7 +1702,7 @@ namespace COLCALC {
                 if (MOX::_NUM_PLAYERS > 0) {
                     for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
                         int8_t target = MOX::_star[star_idx].surrender_to[player_idx];
-                        if (target != -1) {
+                        if (target >= 0 && target < MAX_PLAYERS) {
                             Do_Surrender_Star_(star_idx, player_idx, target);
                         }
                     }
@@ -1868,6 +1828,14 @@ namespace COLCALC {
         s_player* surrender_plr = &MOX::_player[surrender_id];
         s_player* receiver_plr = &MOX::_player[receiver_id];
 
+        const uint8_t surrender_bit = (uint8_t)(1u << (uint8_t)surrender_id);
+        const uint8_t receiver_bit = (uint8_t)(1u << (uint8_t)receiver_id);
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            if ((MOX::_star[i].visited & surrender_bit) != 0) {
+                MOX::_star[i].visited |= receiver_bit;
+            }
+        }
+
         for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->owner == (int8_t)surrender_id) {
@@ -1881,7 +1849,7 @@ namespace COLCALC {
 
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
-        for (int i = 0; i < 83; ++i) {
+        for (int i = 0; i <= TECH_APP_ZORTRIUM_ARMOR; ++i) {
             if (surrender_plr->tech_applications[i] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 if (Player_May_Get_Tech_App_(receiver_plr, (int16_t)i)) {
                     Player_Gets_Tech_App_(receiver_plr, (int16_t)i);
@@ -1917,33 +1885,33 @@ namespace COLCALC {
     }
 
     void __cdecl Produce_Ground_Military_(s_colony* colony) {
-        if (colony->buildings[BUILDING_MARINE_BARRACKS] != 0) {
-            if (invasion::Colony_Infantry_Barracks_Limit_(colony) > colony->military[0]) {
+        int16_t infantry_barracks_limit = invasion::Colony_Infantry_Barracks_Limit_(colony);
+        if (infantry_barracks_limit > colony->military[0]) {
+            if (colony->buildings[BUILDING_MARINE_BARRACKS] != 0) {
                 ++colony->infantry_roundoff;
                 if (colony->infantry_roundoff == 5) {
                     colony->infantry_roundoff = 0;
                     ++colony->military[0];
                 }
-            } else {
-                if (invasion::Colony_Infantry_Limit_(colony) < colony->military[0]) {
-                    --colony->military[0];
-                }
             }
+        } else if (infantry_barracks_limit < colony->military[0] &&
+                   invasion::Colony_Infantry_Limit_(colony) < colony->military[0]) {
+            --colony->military[0];
         }
 
-        if (colony->buildings[BUILDING_ARMOR_BARRACKS] != 0) {
-            if (invasion::Colony_Tank_Barracks_Limit_(colony) > colony->military[1]) {
+        int tank_barracks_limit = invasion::Colony_Tank_Barracks_Limit_(colony);
+        if (tank_barracks_limit > colony->military[1]) {
+            if (colony->buildings[BUILDING_ARMOR_BARRACKS] != 0) {
                 ++colony->tank_roundoff;
                 if (colony->tank_roundoff == 5) {
                     colony->tank_roundoff = 0;
                     ++colony->military[1];
                     return;
                 }
-            } else {
-                if (invasion::Colony_Tank_Limit_(colony) < colony->military[1]) {
-                    --colony->military[1];
-                }
             }
+        } else if (tank_barracks_limit < colony->military[1] &&
+                   invasion::Colony_Tank_Limit_(colony) < colony->military[1]) {
+            --colony->military[1];
         }
     }
 
@@ -2025,6 +1993,8 @@ namespace COLCALC {
 
         const int32_t owner_idx = static_cast<int8_t>(colony->owner);
         s_player* const owner_player = &MOX::_player[owner_idx];
+        const bool preserve_last_population =
+                _planet_extinction == 0 || owner_player->objectives != PLAYER_OBJECTIVE_HUMAN;
         int16_t race_counts[10] = {};
         uint8_t protected_race[10] = {};
         bool had_negative_growth = false;
@@ -2072,7 +2042,9 @@ namespace COLCALC {
                     static_cast<int16_t>(colony->pop_roundoff[race_idx] + colony->pop_growth[race_idx]);
 
             while (colony->pop_roundoff[race_idx] < 0) {
-                if (static_cast<int32_t>(protected_race[race_idx]) >= race_counts[race_idx]) {
+                const int32_t protected_count = static_cast<int32_t>(protected_race[race_idx]);
+                if (protected_count > race_counts[race_idx] ||
+                    (preserve_last_population && protected_count == race_counts[race_idx])) {
                     colony->pop_roundoff[race_idx] = 0;
                 } else {
                     int16_t selected_special = -1;
@@ -2176,7 +2148,9 @@ namespace COLCALC {
 
                 int32_t job_class = -1;
 
-                if (colony->food2_per_farmer != 0) {
+                if ((_housing_creates_no_farmers == 0 ||
+                     colony->producing[0] != COLONY_PRODUCTION_HOUSING) &&
+                    colony->food2_per_farmer != 0) {
                     const int32_t food_balance =
                             static_cast<uint8_t>(colony->food2_needed_for_our_empire) -
                             static_cast<int32_t>(colony->production[0]) * 2 +
@@ -2289,24 +2263,6 @@ namespace COLCALC {
                 break;
             }
         } while (current < &MOX::_colony[num_colonies]);
-    }
-
-    void __cdecl Check_For_Research_Breakthrough_(s_player* player) {
-        uint8_t field = (uint8_t)player->current_research_field;
-
-        if (field == 0) {
-            return;
-        }
-
-        int32_t breakthrough_chance = Chance_For_Research_Breakthrough_(player);
-        player->research_breakthrough = 0;
-        player->research_accumulated += (int32_t)player->research_produced;
-
-        if ((int32_t)game_random::Random_(100) <= breakthrough_chance) {
-            player->research_breakthrough = 1;
-            player->research_accumulated = 0;
-            Give_Player_Field_(player, field, 0);
-        }
     }
 
     bool __cdecl May_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t recipient_idx) {
@@ -2852,7 +2808,9 @@ namespace COLCALC {
                     }
                     case BUILDING_CAPITOL: {
                         if (MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT] / 2 == 3) return 0;
-                        int16_t c = MOX::_planet[MOX::_player[owner].home_planet_id].colony_index;
+                        int16_t home_planet_id = MOX::_player[owner].home_planet_id;
+                        if (home_planet_id == -1) return 1;
+                        int16_t c = MOX::_planet[home_planet_id].colony_index;
                         if (MOX::_colony[c].buildings[BUILDING_CAPITOL] != 0) return 0;
                         return 1;
                     }
@@ -3527,10 +3485,13 @@ namespace COLCALC {
 
                 if (ship->status == 4) {
                     build_msg.u.colony.c.build.is_refit = 1;
-                } else if (colony->buildings[BUILDING_SPACE_ACADEMY] != 0) {
-                    ++ship->crew_quality;
-                    ship->crew_experience =
-                        static_cast<int16_t>(MOX::_crew_data[static_cast<int32_t>(ship->crew_quality)].experience);
+                } else {
+                    if (colony->buildings[BUILDING_SPACE_ACADEMY] != 0) {
+                        ++ship->crew_quality;
+                        ship->crew_experience =
+                            static_cast<int16_t>(MOX::_crew_data[static_cast<int32_t>(ship->crew_quality)].experience);
+                    }
+                    ERICNET::Calc_Ship_Level_(ship_idx);
                 }
             }
 
@@ -3540,7 +3501,6 @@ namespace COLCALC {
 
             if (COLBLDG::Colony_Production_Is_Building_(current_product)) {
                 ERICNET::Add_Building_(colony_idx, current_product);
-                player.bc += static_cast<int32_t>(TECHDATA::_buildings[current_product].maintenance);
 
                 if (colony->producing[1] == COLONY_PRODUCTION_REPEAT) {
                     COLCALC::Colony_Calculation_(colony_idx);
@@ -3599,15 +3559,14 @@ namespace COLCALC {
                     switch (current_product) {
                     case COLONY_PRODUCTION_FREIGHTERS:
                         player.n_freighters = static_cast<int16_t>(player.n_freighters + 5);
-                        player.bc += 5;
+                        player.bc += _freighters_cash_bonus;
                         break;
 
                     case COLONY_PRODUCTION_SPY:
                         if (BILL::Add_Their_Spy_(static_cast<int16_t>(owner_player_idx), static_cast<int16_t>(owner_player_idx)) == 0) {
-                            player.bc += 100;
+                            player.bc += product_cost / 2;
                             COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, COLONY_PRODUCTION_SPY);
                         }
-                        ++player.bc;
                         break;
 
                     case COLONY_PRODUCTION_SCIENTIST:
@@ -3773,7 +3732,7 @@ namespace COLCALC {
                 }
             }
 
-            if (!has_incoming_settlers) {
+            if (_zero_colony_lost || !has_incoming_settlers) {
                 BOMB::Destroy_Colony_(colony, 3);
             }
         }

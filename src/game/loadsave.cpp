@@ -2263,7 +2263,7 @@ namespace LOADSAVE {
             sound::Set_Sound_Max_Volume_(MOX::_settings.sound_fx_level);
 
             if (play_sound_effect != 0) {
-                sound::Play_Sound_(0x21);
+                ERICNET::Mox_Play_Sound_(0x21);
             }
 
             popup->sound_fx_on = 1;

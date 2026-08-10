@@ -286,7 +286,7 @@ namespace HAROLD {
             }
         }
 
-        MOX::_star[star_idx].wormhole_star_id = 0;
+        MOX::_star[star_idx].wormhole_star_id = -1;
     }
 
     /**
@@ -306,13 +306,17 @@ namespace HAROLD {
     int16_t __cdecl N_Food_Planets_In_System_(int16_t system_index) {
         int16_t food_planet_count = 0;
 
+        if (system_index < 0) {
+            return 0;
+        }
+
         for (int16_t i = 0; i < 5; ++i) {
             int16_t planet_idx = MOX::_star[system_index].planet_index[i];
 
-            if (planet_idx > -1) {
-                if (MOX::_planet[planet_idx].food_per_farmer > 0) {
-                    food_planet_count++;
-                }
+            if (planet_idx > -1 &&
+                MOX::_planet[planet_idx].planet_type == PLANET_TYPE_PLANET &&
+                MOX::_planet[planet_idx].food_per_farmer > 0) {
+                food_planet_count++;
             }
         }
 

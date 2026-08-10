@@ -212,6 +212,7 @@ struct s_schema {
 };
 
 bool Load_And_Validate_Schema(const char* path, s_schema* schema, std::string* diagnostic);
+bool Validate_Runtime_Layout(const s_schema* schema, std::string* diagnostic);
 const char* Primitive_Name(e_primitive_type type);
 std::string Encode_Game_String(const std::string& value);
 

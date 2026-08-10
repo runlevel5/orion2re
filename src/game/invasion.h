@@ -1,6 +1,9 @@
 #pragma once
 
 namespace invasion {
+    extern uint8_t _ground_commando_defender_x5;
+    extern uint8_t _ground_commando_attacker_x2;
+
     /// Unloads transport ships into a colony until its infantry cap is reached.
     int __cdecl Unload_Transports_(s_colony* colony, int16_t* transport_ship_ids, int num_transports);
 

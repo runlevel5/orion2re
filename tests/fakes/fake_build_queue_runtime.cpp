@@ -80,6 +80,26 @@ namespace COLBLDG {
 }
 
 namespace COLCALC {
+    int32_t __cdecl Production_Cost_To_Buy_(int32_t product_cost, int32_t production_spent) {
+        if (production_spent >= product_cost) {
+            return 0;
+        }
+
+        const int32_t half_cost = product_cost / 2;
+        const int32_t tenth_cost = product_cost / 10;
+        if (production_spent >= half_cost) {
+            return (product_cost - production_spent) * 2;
+        }
+
+        int32_t cost = (product_cost - half_cost) * 2;
+        if (production_spent >= tenth_cost) {
+            return cost + (half_cost - production_spent) * 5;
+        }
+
+        cost += (half_cost - tenth_cost) * 5;
+        return cost + (tenth_cost - production_spent) * 10;
+    }
+
     uint8_t __cdecl Colony_Can_Build_Product_(s_colony*, int16_t product) {
         return product == TEST_BUILD_QUEUE::rejected_product ? 0 : 1;
     }

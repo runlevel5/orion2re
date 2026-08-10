@@ -80,17 +80,21 @@ namespace AIBUILD {
     }
 
     int16_t __cdecl Refit_Cost_(int16_t player_idx, s_ship_design* old_design, s_ship_design* new_design) {
-        int32_t min_cost = (int32_t)TECHDATA::_hull_data[(int16_t)new_design->size].cost / 2;
-
-        int32_t refit_cost = ((int32_t)new_design->cost - (int32_t)old_design->cost) * 2;
-
+        int32_t min_cost =
+            (uint16_t)TECHDATA::_hull_data[(int16_t)new_design->size].cost / 4;
         DESIGN::Cost_Reduction_For_Govt_Type_(player_idx, &min_cost);
 
-        if (refit_cost < min_cost) {
-            refit_cost = min_cost;
+        int32_t delta_cost =
+            (int32_t)new_design->cost - (int32_t)old_design->cost;
+        if (DESIGN::_alternative_refit != 0) {
+            if (delta_cost < 0) {
+                delta_cost = 0;
+            }
+            return (int16_t)(delta_cost + min_cost);
         }
 
-        return (int16_t)refit_cost;
+        int32_t refit_cost = delta_cost * 2;
+        return (int16_t)(refit_cost < min_cost ? min_cost : refit_cost);
     }
 
     int16_t __cdecl Player_War_Level_(int16_t player_idx) {

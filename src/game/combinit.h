@@ -1,6 +1,61 @@
 #pragma once
 
 namespace COMBINIT {
+    struct s_repair_rate {
+        uint8_t cyber;
+        uint8_t aru;
+        uint8_t regen;
+    };
+
+    inline s_repair_rate repair_rate = {10, 20, 20};
+    inline uint8_t _amoeba_regeneration = 0;
+    inline uint8_t _crystal_keep = 0;
+    inline uint8_t _planet_damper_enabled = 0;
+    inline uint8_t _satellite_capture_enabled = 0;
+    inline uint8_t _satellite_warlord_bonus = 0;
+    inline uint8_t _phasing_cloak_effective_turns = 10;
+
+    struct s_satellite_capture_state {
+        int16_t colony_idx = -1;
+        int16_t building_idx = -1;
+    };
+
+    inline void Reset_Satellite_Capture_State_(s_satellite_capture_state* state) {
+        state->colony_idx = -1;
+        state->building_idx = -1;
+    }
+
+    inline void Record_Captured_Satellite_State_(
+        s_satellite_capture_state* state, int16_t colony_idx, int16_t building_idx) {
+        state->colony_idx = colony_idx;
+        state->building_idx = building_idx;
+    }
+
+    inline int16_t Take_Captured_Satellite_State_(
+        s_satellite_capture_state* state, int16_t colony_idx) {
+        if (state->colony_idx != colony_idx) {
+            return -1;
+        }
+
+        const int16_t building_idx = state->building_idx;
+        Reset_Satellite_Capture_State_(state);
+        return building_idx;
+    }
+
+    inline bool Satellite_Was_Captured_By_Attacker_(
+        int16_t satellite_owner, int16_t victor_player, int16_t attacker_player) {
+        return _satellite_capture_enabled != 0 &&
+               victor_player == attacker_player &&
+               satellite_owner == attacker_player;
+    }
+
+    // Clears any satellite awaiting the outcome of colony capture.
+    void __cdecl Reset_Satellite_Capture_();
+    // Records a removed satellite that may transfer with its colony.
+    void __cdecl Record_Captured_Satellite_(int16_t colony_idx, int16_t building_idx);
+    // Returns and clears the satellite recorded for this colony, or -1.
+    int16_t __cdecl Take_Captured_Satellite_(int16_t colony_idx);
+
     // Loads the tactical planet graphics for the specified colony.
     // colony_idx: Colony whose planet art should be loaded.
     void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx);
@@ -124,6 +179,24 @@ namespace COMBINIT {
     // colony_idx: Defending colony index, or -1.
     // retreat_flag: Initial retreat-control flag.
     int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int16_t retreat_flag);
+
+    // Converts subsystem hit-point loss to a strategic damage percentage.
+    inline int16_t Damage_Percent_From_Hits_(int16_t maximum_hits, int16_t current_hits) {
+        if (maximum_hits <= 0) {
+            return 0;
+        }
+
+        return (100 * (maximum_hits - current_hits)) / maximum_hits;
+    }
+
+    // Reconstructs surviving units from a slot's aggregate hit points.
+    inline int8_t Surviving_Weapon_Count_From_Hits_(int16_t current_hits, int16_t hits_per_unit) {
+        if (current_hits <= 0 || hits_per_unit <= 0) {
+            return 0;
+        }
+
+        return (int8_t)((current_hits + hits_per_unit - 1) / hits_per_unit);
+    }
 
     // Writes tactical combat damage state back to the strategic ship record.
     // combat_ship_idx: Combat-data ship index to unload.

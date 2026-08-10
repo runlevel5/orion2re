@@ -246,6 +246,7 @@ bool Cleanup_Path_(const char* input_path, char* output_path, size_t output_path
 bool Resolve_File_Path_Case_(const char* path, char* resolved_path, size_t resolved_path_size) {
     char clean_path[512];
     char directory_path[512];
+    char resolved_directory_path[512];
     const char* open_path;
     const char* slash;
     const char* backslash;
@@ -253,6 +254,7 @@ bool Resolve_File_Path_Case_(const char* path, char* resolved_path, size_t resol
     const char* file_name;
     size_t directory_length;
     s_case_insensitive_file_match match;
+    SDL_PathInfo path_info;
 
     if (path == nullptr || resolved_path == nullptr || resolved_path_size == 0) {
         return false;
@@ -267,7 +269,7 @@ bool Resolve_File_Path_Case_(const char* path, char* resolved_path, size_t resol
         return false;
     }
 
-    if (File_Exists_(resolved_path)) {
+    if (SDL_GetPathInfo(resolved_path, &path_info)) {
         return true;
     }
 
@@ -296,12 +298,18 @@ bool Resolve_File_Path_Case_(const char* path, char* resolved_path, size_t resol
         directory_path[1] = '\0';
     }
 
+    if (!Resolve_File_Path_Case_(directory_path, resolved_directory_path,
+                                 sizeof(resolved_directory_path))) {
+        return false;
+    }
+
     match.requested_file_name = file_name;
     match.resolved_path = resolved_path;
     match.resolved_path_size = resolved_path_size;
     match.found = false;
 
-    if (!SDL_EnumerateDirectory(directory_path, Find_Case_Insensitive_File_Match_, &match)) {
+    if (!SDL_EnumerateDirectory(resolved_directory_path,
+                                Find_Case_Insensitive_File_Match_, &match)) {
         return false;
     }
 

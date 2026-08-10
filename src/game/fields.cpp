@@ -182,7 +182,7 @@ namespace fields {
         if (input_result != 0) {
             int16_t field_idx = (input_result < 0) ? -input_result : input_result;
             if (field_idx > 0 && field_idx < _fields_count) {
-                sound::Play_Sound_(_fields[field_idx].sound);
+                ERICNET::Mox_Play_Sound_(_fields[field_idx].sound);
             }
         }
 
@@ -1744,7 +1744,7 @@ namespace fields {
 
         video::Clear_Display_And_Release_Palette_();
 
-        Show_Message_Box_(platform::g_main_window, buffer, "Microprose", true);
+        Show_Message_Box_(platform::g_main_window, buffer, "Orion2re", true);
 
         platform::Prepare_Exit_();
         platform::Check_Exit_();

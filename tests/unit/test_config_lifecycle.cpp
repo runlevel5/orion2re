@@ -74,9 +74,9 @@ DOCTEST_TEST_CASE("complete documents commit state and per-value provenance atom
     config::s_cfg_diagnostic diagnostic;
 
     DOCTEST_REQUIRE(Apply_(
-        "music_enabled = false;\n"
-        "music_volume = 75;\n"
-        "sound_effects_volume = 25;\n",
+        "audio music_enabled = false;\n"
+        "audio music_volume = 75;\n"
+        "audio sound_effects_volume = 25;\n",
         "base_game", &effective, &diagnostic));
 
     DOCTEST_CHECK_FALSE(effective.state.values[0].bool_value);
@@ -88,7 +88,7 @@ DOCTEST_TEST_CASE("complete documents commit state and per-value provenance atom
 
     config::t_variable_id music_index = 0;
     DOCTEST_REQUIRE(config::Find_Variable(
-        "music_volume", std::strlen("music_volume"), &music_index));
+        "audio.music_volume", std::strlen("audio.music_volume"), &music_index));
     DOCTEST_CHECK(effective.provenance[music_index].has_override);
     DOCTEST_CHECK(effective.provenance[music_index].package_id == "base_game");
     DOCTEST_CHECK(effective.provenance[music_index].location.source == "lifecycle.cfg");
@@ -98,7 +98,7 @@ DOCTEST_TEST_CASE("complete documents commit state and per-value provenance atom
     DOCTEST_CHECK(effective.prior_values[music_index][0].value.integer_value == 50);
     DOCTEST_CHECK_FALSE(effective.prior_values[music_index][0].provenance.has_override);
 
-    DOCTEST_REQUIRE(Apply_("music_volume = 90;", "balance_mod",
+    DOCTEST_REQUIRE(Apply_("audio music_volume = 90;", "balance_mod",
                            &effective, &diagnostic));
     DOCTEST_CHECK(effective.state.values[music_index].integer_value == 90);
     DOCTEST_CHECK(effective.provenance[music_index].package_id == "balance_mod");
@@ -116,7 +116,7 @@ DOCTEST_TEST_CASE("document failure rolls back earlier writes provenance and nat
     config::s_effective_config effective;
     config::Read_Effective_Native_Config(&effective);
     config::s_cfg_diagnostic diagnostic;
-    DOCTEST_REQUIRE(Apply_("music_enabled = false;", "first",
+    DOCTEST_REQUIRE(Apply_("audio music_enabled = false;", "first",
                            &effective, &diagnostic));
     const config::s_config_state prior_state = effective.state;
     const std::vector<config::s_value_provenance> prior_provenance = effective.provenance;
@@ -124,11 +124,11 @@ DOCTEST_TEST_CASE("document failure rolls back earlier writes provenance and nat
         effective.prior_values;
 
     DOCTEST_CHECK_FALSE(Apply_(
-        "music_volume = 80;\n"
-        "sound_effects_volume = 101;\n",
+        "audio music_volume = 80;\n"
+        "audio sound_effects_volume = 101;\n",
         "broken", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
-                  "invalid value '101' for 'sound_effects_volume'; expected int8 in range 0..100");
+                  "invalid value '101' for 'audio.sound_effects_volume'; expected int8 in range 0..100");
     DOCTEST_CHECK(States_Equal_(effective.state, prior_state));
     DOCTEST_CHECK(effective.provenance.size() == prior_provenance.size());
     DOCTEST_CHECK(effective.prior_values.size() == prior_values.size());
@@ -150,7 +150,7 @@ DOCTEST_TEST_CASE("stop terminates the current document before later statements"
     config::s_cfg_diagnostic diagnostic;
 
     DOCTEST_REQUIRE(Apply_(
-        "music_volume = 70; stop; music_volume = 99;",
+        "audio music_volume = 70; stop; audio music_volume = 99;",
         "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(effective.state.values[1].integer_value == 70);
     DOCTEST_CHECK(MOX::_settings.music_level == 70);
@@ -162,14 +162,14 @@ DOCTEST_TEST_CASE("include remains a loader operation and deferred enable is ign
     config::s_cfg_diagnostic diagnostic;
 
     DOCTEST_CHECK_FALSE(Apply_(
-        "music_volume = 70; include extra.cfg;",
+        "audio music_volume = 70; include extra.cfg;",
         "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
                   "include execution requires the configuration loader");
     DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
 
     DOCTEST_REQUIRE(Apply_(
-        "music_volume = 70; enable balance_mod;",
+        "audio music_volume = 70; enable balance_mod;",
         "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(effective.state.values[1].integer_value == 70);
 }

@@ -772,8 +772,10 @@ namespace COLONY {
         char buf[500];
 
         if (col->bought_outright != 0) {
-            GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_HAVE_ALREADY_BOUGHT_THIS_PRODUCT));
-            COLONY::Show_Colony_Screen_();
+            if (!BUILD_QUEUE::Unbuy_Product_(col)) {
+                GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_HAVE_ALREADY_BOUGHT_THIS_PRODUCT));
+                COLONY::Show_Colony_Screen_();
+            }
             return;
         }
 

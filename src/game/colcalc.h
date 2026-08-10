@@ -3,6 +3,15 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    extern uint8_t _housing_creates_no_farmers;
+    extern uint8_t _planet_extinction;
+    extern uint8_t _zero_colony_lost;
+    extern uint8_t _keep_research_on_breakthrough;
+    extern uint8_t _keep_research_on_finds;
+    extern uint8_t _replicator_food_pp;
+    extern uint8_t _replicator_food_bc;
+    extern uint8_t _freighters_cash_bonus;
+
     typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, int16_t player_idx, s_colony_job_production* out);
 
     extern ColonyBaseFunc _colony_empire_base_functions[3];
@@ -26,7 +35,6 @@ namespace COLCALC {
     extern char* _morale_summary_msg;
     extern char* _total_morale_msg;
     extern char* _command_summary_msg;
-    extern int8_t _colony_calc_food_cache[10];
     extern char* _ship_maintenance_costs_msg;
     extern char* _d_from_1_s_ship_msg;
     extern char* _d_from_d_battlestations_msg;
@@ -46,19 +54,11 @@ namespace COLCALC {
     extern char* _d_from_1_battlestation_msg;
     extern char* _d_from_1_fortress_msg;
 
-    extern const s_colony* _colony_calc_food_colony;
-
-    extern uint8_t _colony_calc_food_type;
-
-    extern const s_colony* _colony_calc_industry_colony;
-
-    extern uint8_t _colony_calc_industry_type;
-
-    extern int8_t _colony_calc_industry_cache[10];
-
     uint8_t __cdecl Colony_Can_Build_Product_(s_colony* colony, int16_t product);
 
     bool __cdecl Room_For_Another_Dude_(s_colony* colony, int race_idx);
+
+    int32_t __cdecl Production_Cost_To_Buy_(int32_t product_cost, int32_t production_spent);
 
     int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent);
 
@@ -165,12 +165,6 @@ namespace COLCALC {
 
     int16_t __cdecl Colony_Industry_Per_Worker_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out);
     int16_t __cdecl Colony_Food2_Per_Farmer_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out);
-    extern const s_colony* _colony_calc_research_colony;
-
-    extern uint8_t _colony_calc_research_type;
-
-    extern int8_t _colony_calc_research_cache[10];
-
     int16_t __cdecl Colony_Research_Per_Scientist_(const s_colony* colony, int16_t player_idx, s_colony_job_production* out);
 
     void __cdecl Twiddle_Initial_Homeworlds_();
@@ -369,6 +363,8 @@ namespace COLCALC {
     void __cdecl Apply_All_Player_Changes_();
 
     void __cdecl Check_For_Research_Breakthrough_(s_player* player);
+
+    void __cdecl Resolve_Research_Completion_(s_player* player, bool keep_points, int32_t points_spent);
 
     void __cdecl Give_Player_Field_(s_player* player, int field_id, char get_all_flag);
 

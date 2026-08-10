@@ -188,6 +188,14 @@
       }
     },
     {
+      "name": "mingw-win32-debug-asan",
+      "displayName": "MinGW Win32 Debug (ASan)",
+      "inherits": "mingw-win32-debug",
+      "cacheVariables": {
+        "ORION2RE_ENABLE_ASAN": "ON"
+      }
+    },
+    {
       "name": "mingw-win32-release",
       "displayName": "MinGW Win32 Release",
       "generator": "Ninja",
@@ -405,10 +413,9 @@
     {
       "name": "mingw-win32-debug-asan-tests",
       "displayName": "MinGW Win32 Debug (ASan) + Tests",
-      "inherits": "mingw-win32-debug",
+      "inherits": "mingw-win32-debug-asan",
       "cacheVariables": {
-        "ORION2RE_BUILD_TESTS": "ON",
-        "ORION2RE_ENABLE_ASAN": "ON"
+        "ORION2RE_BUILD_TESTS": "ON"
       }
     },
     {
@@ -498,6 +505,11 @@
     {
       "name": "mingw-win32-debug",
       "configurePreset": "mingw-win32-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "mingw-win32-debug-asan",
+      "configurePreset": "mingw-win32-debug-asan",
       "configuration": "Debug"
     },
     {

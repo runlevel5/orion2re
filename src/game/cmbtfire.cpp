@@ -90,6 +90,15 @@ namespace CMBTFIRE {
                 n_to_destroy--;
             } while (n_to_destroy != 0);
         }
+
+        if (Does_Combat_Planet_Have_Defenses_() == 0) {
+            struct_::Clear_Bit_Field_(
+                MOX::_combat_data->special_device_flags,
+                SPECIAL_DAMPER_FIELD);
+            struct_::Clear_Bit_Field_(
+                MOX::_combat_data->special_device_flags,
+                SPECIAL_RANGEMASTER_UNIT);
+        }
     }
 
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_() {
@@ -120,7 +129,10 @@ namespace CMBTFIRE {
         if (ship_idx != 0) {
             s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-            if (ship->structure_damage >= ship->structure_max) {
+            if (ship->reflected_damage_pool == INT16_MAX) {
+                result = 4;
+            }
+            else if (ship->structure_damage >= ship->structure_max) {
                 result = 1;
             }
             else if (ship->drive_current_hits == 0 && ship->owner <= 9 && ship->ftl_type > 0) {
@@ -179,10 +191,7 @@ namespace CMBTFIRE {
     }
 
     void __cdecl Remove_Stasis_Beam_(int16_t ship_idx) {
-        for (int i = 0; i < 8; ++i) {
-            MOX::_combat_data[ship_idx].weapons[i].shots_left = 0;
-        }
-        MOX::_combat_data[ship_idx].stasis_source_idx = 0xFF;
+        MOX::_combat_data[ship_idx].stasis_source_idx = UINT8_MAX;
     }
 
     void __cdecl Destroy_Ship_(int16_t ship_idx, int16_t draw_x, int16_t draw_y, int16_t death_state) {
@@ -211,6 +220,8 @@ namespace CMBTFIRE {
             for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[i].owner == 11 && i != ship_idx) {
                     MOX::_combat_data[i].owner = new_owner;
+                    MOX::_combat_data[i].ship_image_seg = nullptr;
+                    COMBAT1::Remove_Continuing_Effect_Specials_(i);
                 }
             }
         }
@@ -314,6 +325,11 @@ namespace CMBTFIRE {
 
         specials = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].specials;
         weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
+
+        if (weapon_id == WEAPON_TRACTOR_BEAM && target_type == 0 &&
+            MOX::_combat_data[ship_idx].special_cooldown == target_idx) {
+            return 0;
+        }
 
         if (range == 0) {
             if (target_type == 1) {
@@ -535,7 +551,7 @@ namespace CMBTFIRE {
         // Calculate health for a single missile in the stack
         int16_t max_hits = CMBTMIS::Get_Missile_Hits_(
             missile->type,
-            (int16_t)MOX::_combat_data[missile->source_unit_idx].owner,
+            missile->owner,
             missile->specials
         );
 
@@ -641,7 +657,14 @@ namespace CMBTFIRE {
                 reflected = 1;
             }
             *dmg_out -= reflected;
-            MOX::_combat_data[target_ship_idx].reflected_damage_pool += reflected;
+            int32_t absorber_charge =
+                (int32_t)MOX::_combat_data[target_ship_idx].reflected_damage_pool +
+                reflected;
+            if (absorber_charge > INT16_MAX) {
+                absorber_charge = INT16_MAX;
+            }
+            MOX::_combat_data[target_ship_idx].reflected_damage_pool =
+                (int16_t)absorber_charge;
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 7 /* Hard Shields */)) {
@@ -883,6 +906,7 @@ namespace CMBTFIRE {
         int16_t best_armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
         int16_t armor_threshold = (int16_t)(((TECHDATA::_armor[best_armor_idx].ships_bonus * 4 + 400) * 25) /
             100);
+        uint16_t civilian_armor_hits = _civilian_armor[best_armor_idx];
 
         (void)specials;
 
@@ -918,13 +942,19 @@ namespace CMBTFIRE {
             }
         }
         else {
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(0, 7 /* HARD_SHIELDS */) == 1) {
-                *damage = (int16_t)((*damage + (((int32_t)*damage >> 31) & 3)) >> 2);
-                *damage -= 1;
-            }
-
             if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() > 0) {
-                defense_hits = *damage - MOX::_combat_data->shield_arc_current[0];
+                if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                        0, SPECIAL_DAMPER_FIELD) != 0) {
+                    defense_hits =
+                        *damage - MOX::_combat_data->shield_arc_current[1];
+                    if (defense_hits < 0) {
+                        defense_hits = 0;
+                    }
+                    defense_hits /= 4;
+                } else {
+                    defense_hits =
+                        *damage - MOX::_combat_data->shield_arc_current[0];
+                }
                 if (MOX::_combat_data->shield_type > 0) {
                     shield_hit_flag = 1;
                 }
@@ -964,12 +994,12 @@ namespace CMBTFIRE {
                         MOX::_combat_data->structure_max += colony_hits;
                     }
 
-                    if (MOX::_combat_data->structure_max >= 100) {
+                    if (MOX::_combat_data->structure_max >= civilian_armor_hits) {
                         bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                         bomb_stats.colony_idx = MOX::_cmbt_colony_id;
                         bomb_stats.is_planetary_hit = 1;
                         MOX::_combat_bomb_result.is_planetary_hit = 1;
-                        bomb_stats.bomb_hits_remaining = MOX::_combat_data->structure_max / 100;
+                        bomb_stats.bomb_hits_remaining = MOX::_combat_data->structure_max / civilian_armor_hits;
 
                         if (MOX::_apply_damage_to_planet != 0 && MOX::_cmbt_colony_id != -1) {
                             BOMB::Apply_Bomb_Hits_(&bomb_stats);
@@ -990,7 +1020,8 @@ namespace CMBTFIRE {
                                 MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[PLANETARY_FLUX_SHIELD].absorption;
                             }
                         }
-                        MOX::_combat_data->structure_max += (int16_t)((int16_t)bomb_stats.total_hits_processed * -100);
+                        MOX::_combat_data->structure_max -=
+                            (int16_t)(bomb_stats.total_hits_processed * civilian_armor_hits);
                     }
                 }
                 else {
@@ -1100,6 +1131,7 @@ namespace CMBTFIRE {
                                         CMBTSPEC::Draw_Cloak_(source_ship_idx, 2);
                                     }
                                     MOX::_combat_data[source_ship_idx].special_status_flag = 2;
+                                    COMBAT1::Recalculate_Combat_Ship_(source_ship_idx);
                                 } else if (MOX::_combat_data[source_ship_idx].special_status_flag == 4) {
                                     if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
                                         CMBTSPEC::Draw_Cloak_(source_ship_idx, 5);
@@ -1215,7 +1247,8 @@ namespace CMBTFIRE {
                                         }
                                         case WEAPON_TYPE_SPECIAL: {
                                             Fire_Special_Weapon_(source_ship_idx, sx, sy, target_ship_idx, weapon_slot_idx, flag);
-                                            if (weapon->weapon_id == WEAPON_STASIS_FIELD) {
+                                            if (weapon->weapon_id == WEAPON_STASIS_FIELD ||
+                                                weapon->weapon_id == WEAPON_BLACK_HOLE_GENERATOR) {
                                                 continue_firing = 0;
                                             }
                                             break;
@@ -1327,7 +1360,7 @@ namespace CMBTFIRE {
         special_idx = 0;
         for (bit_idx = 0; bit_idx < 39; ++bit_idx) {
             // Check for Energy Absorber (Bit 10)
-            if (bit_idx == SPECIAL_ENERGY_ABSORBER && target_type == 0 && range < 8) {
+            if (bit_idx == SPECIAL_ENERGY_ABSORBER && target_type == 0 && range <= 8) {
                 if (MOX::_combat_data[unit_idx].reflected_damage_pool > 0) {
                     if (CMBTFIRE::Special_Is_On_(unit_idx, special_idx)) {
                         CMBTFIRE::Energy_Absorber_Attack_(unit_idx, target_idx);
@@ -1366,6 +1399,7 @@ namespace CMBTFIRE {
                 if (target_idx != 0 && target_type == 0) {
                     CMBTSPEC::Draw_Stasis_Beam_(ship_idx, target_idx);
                     Place_Ship_In_Stasis_(target_idx, ship_idx);
+                    CMBTDRW1::Refresh_Combat_Screen_Full_();
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left--;
                 }
                 break;
@@ -1400,12 +1434,14 @@ namespace CMBTFIRE {
                 }
                 MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 break;
-            case WEAPON_BLACK_HOLE_GENERATOR:
-                if (target_idx != 0 && target_type == 0) {
+            case WEAPON_BLACK_HOLE_GENERATOR: {
+                s_combat_weapon_slot* weapon = &MOX::_combat_data[ship_idx].weapons[weapon_slot_idx];
+                if (target_idx != 0 && target_type == 0 && weapon->shots_left > 0) {
                     BHG_(ship_idx, target_idx);
-                    MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
+                    weapon->shots_left--;
                 }
                 break;
+            }
             case WEAPON_STELLAR_CONVERTER:
                 if (target_type == 0) {
                     CMBTSPEC::Stellar_Converter_(ship_idx, target_idx, MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left);
@@ -1616,7 +1652,9 @@ namespace CMBTFIRE {
         int16_t damage = (int16_t)(((bonus - 100) * MOX::_combat_data[source_ship_idx].reflected_damage_pool + 50) / 100);
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_DISPLACEMENT_DEVICE) != 0) {
-            if (game_random::Random_(100) > 30) {
+            if (CMBTMIS::Missile_Defense_Roll_Succeeds_(
+                    game_random::Random_(100),
+                    CMBTMIS::missile_defense.displacement_device_missiles_miss_percent)) {
                 damage = 0;
             }
         }
@@ -1711,6 +1749,7 @@ namespace CMBTFIRE {
     void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int16_t source_idx) {
         MOX::_combat_data[ship_idx].stasis_source_idx = (uint8_t)source_idx;
         CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
+        COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
     }
 
     void __cdecl BHG_(int16_t source_idx, int16_t target_idx) {
@@ -1778,5 +1817,6 @@ namespace CMBTFIRE {
 
         MOX::_combat_data[target_idx].black_hole_flag = 1;
         MOX::_combat_data[target_idx].black_hole_source_idx = (uint8_t)source_idx;
+        COMBAT1::Recalculate_Combat_Ship_(target_idx);
     }
 }

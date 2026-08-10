@@ -9,7 +9,39 @@ Use this skill to backport one change from `C:\Projects\MOO2150\src\asm.pl` into
 
 The goal is not to translate patched machine code literally. Recover the defect, intended behavior, and relevant invariants, then implement the clearest semantic fix in the restored source.
 
+Every proposed implementation must also evaluate whether the restored architecture permits a simpler, safer, or more maintainable source-level solution than the original patch mechanism. Do not introduce helpers, public APIs, persistent state, or binary-shaped control flow solely to resemble or test the assembly patch when an existing source abstraction can enforce the same invariant directly.
+
 Use the `grpc` skill for all Ghidra access and follow its read-only and assembly-validation rules.
+
+## Helper-agent delegation
+
+Use of `agent-helper` is optional. Delegate bounded, read-only evidence collection only when it reduces parent-agent
+work; there is no requirement to invoke it in any phase or at every affected location. Suitable tasks include:
+
+- locating and inventorying the selected topic in `docs/patches.md`, `asm.pl`, `patch.c`, symbols, and history
+- calculating candidate file-offset-to-address mappings from patcher section metadata
+- collecting Ghidra program metadata, bytes, disassembly, cross-references, callers, callees, and decompiler output
+- locating semantic equivalents, style requirements, configuration definitions, generated-code workflows, and tests
+- comparing evidence or triaging build and test failures
+
+Every delegation must request one directly scoped evidence-collection task. State the exact files, line ranges,
+symbols, addresses, or supplied output the helper may inspect; the specific evidence it must return; what it must not
+inspect or decide; and the condition at which it must stop. Do not delegate the patch topic as a whole, combine
+dependent workflow phases, issue overlapping requests, or ask the helper to choose its own investigation scope.
+Complete and validate prerequisite phases in the parent before delegating later-phase evidence collection.
+
+For Ghidra tasks, give the helper the RPC host, port, bearer token, exact addresses or symbols, and the evidence to
+return. Require it to follow the `grpc` skill, keep every `/exec` request at `write=false`, and validate decompiler
+claims against disassembly. The helper may use shell `curl` to reach Ghidra and may inspect the MOO2150 files
+outside the current repository, but it must not modify files, mutate the Ghidra program, or call `/shutdown`.
+
+Keep each delegation narrow and request file paths, line numbers, addresses, bytes or instructions, uncertainties,
+and unresolved mismatches in the report. Factual evidence returned within the delegated scope may be trusted without
+repeating the same collection. The parent agent must still reconcile conflicting or incomplete evidence and remains
+solely responsible for understanding and validating the complete 1.50 change, drawing semantic conclusions, deciding
+stop conditions, reading complete files before proposing diffs, selecting the implementation, obtaining approval,
+applying changes, and validating the result. Never adopt a helper's interpretation, design choice, or final decision
+without parent-agent validation.
 
 ## Required inputs
 
@@ -33,7 +65,7 @@ Treat connection information already supplied in the conversation as valid input
 ## Environment constraints
 
 - The Orion2 binary open in Ghidra is a slightly different 1.40 version, not the exact executable used as the MOO2 1.50 patch base. It should be very close to that base, but this expected version difference must be recorded rather than treated as exact equivalence.
-- Do not perform a full project build in WSL; WSL builds are too slow. CMake parser-code generation is a required exception when configuration variables are added. After implementation, generation, and static checks, ask the user to build the project in Visual Studio and report the result.
+- Compilation is allowed and required for validation. After implementation and any required parser-code generation, build the project and run the applicable tests using the repository's current build workflow.
 
 ## Scope
 
@@ -161,6 +193,10 @@ Never silently analyze a near match. Document any version-related differences, a
 
 ### 4. Reconstruct the complete semantic change
 
+The parent agent must personally understand or validate the complete 1.50 change before using it to determine
+migration status, recommend an implementation, invoke a stop condition, or present conclusions. Helper-collected
+facts may support this validation, but a helper's semantic reconstruction or recommendation is not a substitute for it.
+
 Explain:
 
 - in plain language, what the actual bug is, including its trigger and observable incorrect result
@@ -198,6 +234,17 @@ Determine whether the selected fix is:
 
 Prefer a root fix in the restored abstraction over binary-compatible instruction mimicry. Preserve original behavior outside the selected defect. Avoid importing unrelated patch-specific configuration, globals, hooks, or code caves when ordinary source logic is sufficient.
 
+Before selecting an implementation, compare at least these source-level options where applicable:
+
+- a direct fix at the owner of the violated invariant
+- reuse of an existing helper, state transition, or subsystem abstraction
+- deriving state from authoritative data instead of adding duplicated persistent state
+- updating state at the event that invalidates it instead of checking or repairing it in a hot path
+- keeping logic file-local instead of adding a public helper used only by tests
+- removing an obsolete faulty mechanism instead of reproducing its patched control flow
+
+Choose the smallest option that fully preserves the proven behavior, including all required configuration, AI, UI, network, save, and compatibility effects. Reject an apparently simpler option if it bypasses existing consumers or changes observable behavior. Document the alternatives considered and why the selected design is better for the restored source.
+
 If 1.50 introduces configuration variables as part of the selected topic, restore every one of them through the project's configuration-variable definitions. Do not omit a variable merely because the main behavioral fix can be approximated without it. Preserve its proven name, type, default value, parser metadata, and use sites. If a configuration variable is genuinely unnecessary because the restored architecture represents the same setting elsewhere, treat that as a material implementation difference and obtain explicit approval during pre-apply review.
 
 Identify suitable existing tests. Add a regression test when the project already has an applicable test pattern and the defect can be reproduced deterministically.
@@ -212,15 +259,16 @@ Present the user with:
 2. A plain-language statement of the actual bug and what the patch fixes, including the trigger and incorrect result. If the topic is not a bug fix, identify it as a behavior or feature change and explain that change instead.
 3. The verified original and patched behavior.
 4. Migration status in the restored source.
-5. A file-by-file implementation plan.
-6. Focused suggested diffs for every proposed source, test, and documentation edit.
-7. When configuration variables will be added, the repository-defined CMake command or target that will regenerate the C++ parser, plus the expected generated outputs.
-8. Assumptions, compatibility effects, and validation commands.
+5. A source-level design comparison describing the faithful patch-shaped approach, any simpler alternatives, and why the recommended option best fits the restored architecture.
+6. A file-by-file implementation plan.
+7. Focused suggested diffs for every proposed source, test, and documentation edit.
+8. When configuration variables will be added, the repository-defined CMake command or target that will regenerate the C++ parser, plus the expected generated outputs.
+9. Assumptions, compatibility effects, and validation commands.
 
 Before the suggested diffs, include two short implementation paragraphs:
 
 - **Original patch implementation:** state concretely what the selected `asm.pl` edits do, including saved/restored state, changed instructions, wrappers, diversions, and added code or data that matter to the behavior.
-- **Proposed source implementation:** when the source-level fix differs from the original binary implementation, explain how it enforces the same invariant in the restored code and why the binary mechanism is unnecessary or inappropriate. If it is equivalent in structure, say so explicitly.
+- **Proposed source implementation:** compare the viable source-level designs, including whether state can be derived, an existing abstraction can be reused, cleanup can occur at the invalidating event, or logic can remain local. Explain why the recommended design is simpler, safer, or more maintainable without losing any proven behavior. When it differs from the original binary implementation, explain how it enforces the same invariant and why the binary mechanism is unnecessary or inappropriate. If the patch-shaped approach is still best, say why explicitly.
 
 Suggested diffs must be based on complete current file contents, not summaries. Keep them focused; do not print complete files.
 
@@ -239,9 +287,8 @@ After approval:
 - retain existing project style and abstractions
 - avoid unrelated cleanup
 - add the approved regression tests
-- run formatting and static checks that do not build the project
-- do not run full builds or compiled tests in WSL; the required CMake parser-generation target is allowed
-- ask the user to build and run relevant tests in Visual Studio, and request the result
+- run formatting and static checks
+- build the project and run all applicable tests using the repository's current build workflow
 
 If implementation requires a material departure from the approved diffs, stop and obtain approval for the revised proposal before continuing.
 
@@ -272,8 +319,8 @@ Before finishing:
 - run `git diff --check`
 - confirm every configuration variable added by 1.50 for the topic was restored with the correct definition and use sites
 - when configuration variables changed, confirm CMake regenerated the C++ parser code and that the generated output is current
-- run applicable non-build static checks and formatting in WSL
-- ask the user to run the relevant build and tests in Visual Studio; do not build in WSL
+- run applicable static checks and formatting
+- build the project and run the relevant tests; tests are required validation and must not be deferred solely because they compile code
 - verify the catalog entry describes the implemented fix accurately
 - confirm no unrelated files changed
 
@@ -281,7 +328,7 @@ Report:
 
 - the actual bug and what the patch fixes, or the behavior or feature change when the topic is not a bug fix
 - the restored semantic fix
-- static checks run and the Visual Studio build/test result, or clearly state that user validation is pending
+- static checks, build, and tests run, including their results
 - catalog status update
 - any unresolved uncertainty or follow-up topic
 
@@ -311,6 +358,7 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Every patch block in the topic inventoried.
 - [ ] Original locations and bytes/instructions verified.
 - [ ] Patched behavior reconstructed, including C implementation refinements.
+- [ ] The parent agent understood or validated the complete 1.50 semantic change before drawing conclusions.
 - [ ] Every configuration variable introduced by 1.50 for the selected topic inventoried and restored with its proven name, type, default, parser metadata, and use sites.
 - [ ] Current semantic source path analyzed.
 - [ ] Existing migration status determined.
@@ -318,5 +366,5 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Explicit user approval received.
 - [ ] Approved source and tests implemented.
 - [ ] If configuration variables were added, CMake used to regenerate the C++ parser code and generated changes reviewed.
-- [ ] WSL static checks and `git diff --check` passed; Visual Studio build and test results requested from the user.
+- [ ] Static checks, project build, applicable tests, and `git diff --check` passed.
 - [ ] Matching `docs/patches.md` item completed with a short semantic descriptor.

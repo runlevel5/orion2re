@@ -62,19 +62,21 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
         ship->facing_dir = (int8_t)current_facing;
         moved_count = 0;
 
-        for (int16_t i = 0; i < 300; ++i) {
-            s_missile* missile = &MOX::_missile[i];
-            if (missile->type > 0 && missile->target_unit_idx == ship_idx) {
-                int16_t move_speed = 5;
-                if (ship->current_speed != 0) {
-                    move_speed = (int16_t)((missile->speed * 5) / ship->current_speed);
-                }
-                if (move_speed < 2) {
-                    move_speed = 2;
-                }
+        if (!COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_INERTIAL_NULLIFIER)) {
+            for (int16_t i = 0; i < 300; ++i) {
+                s_missile* missile = &MOX::_missile[i];
+                if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx)) {
+                    int16_t move_speed = 5;
+                    if (ship->current_speed != 0) {
+                        move_speed = (int16_t)((missile->speed * 5) / ship->current_speed);
+                    }
+                    if (move_speed < 2) {
+                        move_speed = 2;
+                    }
 
-                if (CMBTMIS::Move_Missile_(i, center_x, center_y, move_speed) != 0) {
-                    moved_missiles[moved_count++] = i;
+                    if (CMBTMIS::Move_Missile_(i, center_x, center_y, move_speed) != 0) {
+                        moved_missiles[moved_count++] = i;
+                    }
                 }
             }
         }
@@ -98,7 +100,7 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
 
             for (int16_t i = 0; i < 300; ++i) {
                 s_missile* missile = &MOX::_missile[i];
-                if (missile->type > 0 && missile->target_unit_idx == ship_idx) {
+                if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx)) {
                     CMBTMIS::Draw_Missile_(i, missile->x - MOX::_cur_combat_x * 20, missile->y - MOX::_cur_combat_y * 20, 0);
                 }
             }
@@ -224,6 +226,24 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
         int16_t dest_x_px = dest_x * 20;
         int16_t dest_y_px = dest_y * 20;
 
+        int16_t tractor_ships[MAX_SHIPS + 1];
+        int16_t tractor_target_idx;
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+
+        if (CMBTSPEC::Try_Get_Active_Tractor_Target_(ship_idx, &tractor_target_idx)) {
+            tractor_ships[tractor_count++] = ship_idx;
+        }
+
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            const int16_t active_tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
+                ? int16_t{-1}
+                : MOX::_combat_data[i].special_cooldown;
+            if (active_tractor_target_idx == ship_idx &&
+                CMBTSPEC::Try_Get_Active_Tractor_Target_(i, &tractor_target_idx)) {
+                tractor_ships[tractor_count++] = i;
+            }
+        }
+
         bool has_teleporter = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) != 0 ||
                               COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_PHASE_SHIFTER) != 0;
 
@@ -237,27 +257,9 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
             }
         }
 
-        int16_t tractor_ships[MAX_SHIPS + 1];
-        s_combat_data* ship = &MOX::_combat_data[ship_idx];
-
         if (!skip_normal_move) {
             int16_t center_x, center_y;
             COMBINIT::Ship_Center_Offsets_(ship_idx, &center_x, &center_y);
-
-            int16_t tractor_target_idx;
-            if (CMBTSPEC::Try_Get_Active_Tractor_Target_(ship_idx, &tractor_target_idx)) {
-                tractor_ships[tractor_count++] = ship_idx;
-            }
-
-            for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-                const int16_t active_tractor_target_idx = MOX::_combat_data[i].special_cooldown == UINT8_MAX
-                    ? int16_t{-1}
-                    : MOX::_combat_data[i].special_cooldown;
-                if (active_tractor_target_idx == ship_idx &&
-                    CMBTSPEC::Try_Get_Active_Tractor_Target_(i, &tractor_target_idx)) {
-                    tractor_ships[tractor_count++] = i;
-                }
-            }
 
             MOX::_shields_flag = 0;
 
@@ -357,7 +359,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
 
                     for (int16_t m = 0; m < 300; ++m) {
                         s_missile* msl = &MOX::_missile[m];
-                        if (msl->type > 0 && msl->target_unit_idx == ship_idx) {
+                        if (CMBTMIS::Missile_Targets_Ship_(msl, ship_idx)) {
                             int16_t msl_speed = 5;
                             if (ship->current_speed != 0) {
                                 msl_speed = ((uint8_t)msl->speed * speed_px) / ship->current_speed;
@@ -389,7 +391,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
 
                         for (int16_t m = 0; m < 300; ++m) {
                             s_missile* msl = &MOX::_missile[m];
-                            if (msl->type > 0 && msl->target_unit_idx == ship_idx) {
+                            if (CMBTMIS::Missile_Targets_Ship_(msl, ship_idx)) {
                                 CMBTMIS::Draw_Missile_(m, msl->x - MOX::_cur_combat_x * 20, msl->y - MOX::_cur_combat_y * 20, 0);
                             }
                         }
@@ -443,6 +445,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
                 if (CMBTSPEC::Try_Get_Active_Tractor_Target_(t_ship_idx, &target_ship_idx)) {
                     if (CMBTAI::Range_To_Ship_(t_ship_idx, target_ship_idx) > 4) {
                         MOX::_combat_data[t_ship_idx].special_cooldown = 0xFF;
+                        COMBAT1::Recalculate_Combat_Ship_(target_ship_idx);
                     }
                 }
             }
@@ -541,11 +544,16 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
 }
 
     int16_t __cdecl Rotate_Ship_Until_Impact_(int16_t ship_idx, int16_t* target_facing) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_INERTIAL_NULLIFIER)) {
+            return 0;
+        }
+
         int16_t impact_detected = 0;
         uint8_t missile_tracked[300];
         int16_t saved_missile_x[300];
         int16_t saved_missile_y[300];
         int16_t saved_missile_travel[300];
+        int8_t saved_missile_facing[300];
         int16_t sx, sy;
         int16_t rotation_step;
         int8_t current_facing;
@@ -572,7 +580,8 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
 
                 for (int32_t i = 0; i < 300; ++i) {
                     s_missile* missile = &MOX::_missile[i];
-                    if (missile->type > 0 && missile->target_unit_idx == ship_idx && missile->source_unit_idx != ship_idx) {
+                    if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx) &&
+                        missile->source_unit_idx != ship_idx) {
                         int16_t move_speed = 5;
                         if (ship->current_speed != 0) {
                             move_speed = (int16_t)(((int32_t)missile->speed * 5) / (int32_t)ship->current_speed);
@@ -585,6 +594,7 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
                             saved_missile_x[i] = missile->x;
                             saved_missile_y[i] = missile->y;
                             saved_missile_travel[i] = missile->travel_dist;
+                            saved_missile_facing[i] = missile->facing_dir;
                             missile_tracked[i] = 1;
                         }
 
@@ -612,6 +622,7 @@ int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
                 MOX::_missile[i].x = saved_missile_x[i];
                 MOX::_missile[i].y = saved_missile_y[i];
                 MOX::_missile[i].travel_dist = saved_missile_travel[i];
+                MOX::_missile[i].facing_dir = saved_missile_facing[i];
             }
         }
 
@@ -626,6 +637,7 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
     int16_t missile_x_saved[300];
     int16_t missile_y_saved[300];
     int16_t missile_travel_dist_saved[300];
+    int8_t missile_facing_saved[300];
 
     struct_::Clear_Structure_(missile_checked, sizeof(missile_checked));
 
@@ -677,7 +689,8 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
 
             for (int16_t i = 0; i < 300; ++i) {
                 s_missile *missile = &MOX::_missile[i];
-                if (missile->type > 0 && missile->target_unit_idx == ship_idx && missile->source_unit_idx != ship_idx) {
+                if (CMBTMIS::Missile_Targets_Ship_(missile, ship_idx) &&
+                    missile->source_unit_idx != ship_idx) {
                     
                     int16_t missile_speed = 5;
                     if (ship->current_speed != 0) {
@@ -692,6 +705,7 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
                         missile_x_saved[i] = missile->x;
                         missile_y_saved[i] = missile->y;
                         missile_travel_dist_saved[i] = missile->travel_dist;
+                        missile_facing_saved[i] = missile->facing_dir;
                         missile_checked[i] = 1;
                     }
 
@@ -739,6 +753,7 @@ int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16
             missile->x = missile_x_saved[i];
             missile->y = missile_y_saved[i];
             missile->travel_dist = missile_travel_dist_saved[i];
+            missile->facing_dir = missile_facing_saved[i];
         }
     }
 

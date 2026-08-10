@@ -279,6 +279,7 @@ namespace OFFICER {
         s_leader_data& leader = MOX::_leaders[leader_idx];
         int16_t player_idx = (int16_t)leader.player_index;
 
+        NETMOX::Mark_Leader_Deassigned_(leader_idx);
         OFFICER::Increase_Officer_Level_By_One_(leader_idx);
 
         if (leader.type == LEADER_TYPE_COLONY) {
@@ -1171,12 +1172,13 @@ namespace OFFICER {
                 FLT2::Set_Initial_Stack_Pointer_();
             }
         } else {
-            _officer_star_displayed = MOX::_temp_star_handle;
-            _officer_star_chosen = MOX::_temp_star_handle;
-            if (MOX::_temp_star_handle == -1) {
-                _officer_star_chosen = MOX::_planet[MOX::_player[MOX::_PLAYER_NUM].home_planet_id].star_index;
+            int16_t star_idx = MOX::_temp_star_handle;
+            if (star_idx == -1) {
+                star_idx = MOX::_planet[MOX::_player[MOX::_PLAYER_NUM].home_planet_id].star_index;
             }
-            SYS::Init_System_Display_(MOX::_temp_star_handle);
+            _officer_star_displayed = star_idx;
+            _officer_star_chosen = star_idx;
+            SYS::Init_System_Display_(star_idx);
         }
 
         MOX::_draw_officer_to_back = 1;
@@ -1359,14 +1361,14 @@ namespace OFFICER {
             }
 
             if (_officer_button_mode == -1 && !is_fleet) {
-                int16_t orbit_scanned, dummy_val1, dummy_val2, icon_scanned, ship_scanned;
-                int16_t sys_res = MAINSCR::Scan_System_Display_Fields_(scanned_id, input, MOX::_planet_buttons, &dummy_val1, &orbit_scanned, &dummy_val2, &icon_scanned, &ship_scanned);
-                MOX::_system_display_ship_scanned = ship_scanned;
-                if (icon_scanned > -1) {
-                    MOX::_system_icon_scanned = icon_scanned;
+                int16_t hovered_planet_idx, clicked_planet_idx, hovered_ship_idx, clicked_ship_idx, hovered_system_icon;
+                int16_t sys_res = MAINSCR::Scan_System_Display_Fields_(scanned_id, input, MOX::_planet_buttons, &hovered_planet_idx, &clicked_planet_idx, &hovered_ship_idx, &clicked_ship_idx, &hovered_system_icon);
+                MOX::_system_display_ship_scanned = hovered_ship_idx;
+                if (hovered_system_icon > -1) {
+                    MOX::_system_icon_scanned = hovered_system_icon;
                 }
-                if (sys_res == 0 && orbit_scanned > -1) {
-                    int16_t planet_idx = HAROLD::Planet_Index_(_officer_star_displayed, orbit_scanned);
+                if (sys_res == 0 && clicked_planet_idx > -1) {
+                    int16_t planet_idx = HAROLD::Planet_Index_(_officer_star_displayed, clicked_planet_idx);
                     if (MOX::_planet[planet_idx].colony_index > -1 && MOX::_planet[planet_idx].colony_index < MOX::_NUM_COLONIES && MAINSCR::_officer_screen_return_screen == 0x27) {
                         Officer_Screen_User_Box_(HAROLD::H_Message_(0x12E), 0);
                     }
@@ -2295,13 +2297,19 @@ namespace OFFICER {
         }
     }
 
-    void __cdecl Give_Leader_Specials_To_Player_(int16_t leader_idx, int16_t player_idx) {
+    static void Give_Leader_Specials_To_Player_Impl_(
+        int16_t leader_idx, int16_t player_idx,
+        int16_t* granted_tech_apps, int16_t* granted_tech_app_count) {
         if (leader_idx == 47) {
             int16_t gov_type = static_cast<int16_t>(Get_Advanced_Government_Type_(player_idx));
             int16_t tech_app = COLCALC::Get_Govt_Type_Tech_App_(gov_type);
 
             if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], tech_app)) {
                 COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], tech_app);
+                if (granted_tech_apps != nullptr && granted_tech_app_count != nullptr) {
+                    granted_tech_apps[*granted_tech_app_count] = tech_app;
+                    ++(*granted_tech_app_count);
+                }
             }
         } else {
             for (int i = 0; i < 3; ++i) {
@@ -2309,6 +2317,10 @@ namespace OFFICER {
                 if (tech_app != 0) {
                     if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], (int32_t)tech_app)) {
                         COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], (int16_t)tech_app);
+                        if (granted_tech_apps != nullptr && granted_tech_app_count != nullptr) {
+                            granted_tech_apps[*granted_tech_app_count] = tech_app;
+                            ++(*granted_tech_app_count);
+                        }
                     }
                 }
             }
@@ -2324,6 +2336,10 @@ namespace OFFICER {
                 MOX::_player[player_idx].has_galactic_lore = 1;
             }
         }
+    }
+
+    void __cdecl Give_Leader_Specials_To_Player_(int16_t leader_idx, int16_t player_idx) {
+        Give_Leader_Specials_To_Player_Impl_(leader_idx, player_idx, nullptr, nullptr);
     }
 
     void __cdecl Set_Officer_To_Player_(int16_t officer_idx, int16_t player_idx, uint8_t is_instant) {
@@ -2372,10 +2388,7 @@ namespace OFFICER {
     void __cdecl Print_Galmap_Scanned_Ship_(int16_t icon_idx) {
         int16_t ship_stack_head_node_idx = MOX::_ship_icon[icon_idx].node_idx;
         int16_t ship_idx = MOX::_ship_node[ship_stack_head_node_idx].ship_idx;
-        s_ship_data* ship = &MOX::_ship[ship_idx];
-        int16_t ship_x = ship->x;
-        int16_t ship_y = ship->y;
-        int16_t owner = (int16_t)ship->owner;
+        int16_t owner = static_cast<int16_t>(MOX::_ship[ship_idx].owner);
 
         fonts::Set_Outline_Color_(0, 0);
 
@@ -2414,7 +2427,7 @@ namespace OFFICER {
             int16_t n_unknown, n_colony_ships, n_outposts, n_transports;
             int16_t hull_counts[6];
 
-            SYS::N_Ships_By_Type_At_Location_(ship_x, ship_y, owner, &n_unknown, &n_colony_ships, &n_outposts, &n_transports, hull_counts);
+            SYS::N_Ships_By_Type_In_Stack_(ship_stack_head_node_idx, &n_unknown, &n_colony_ships, &n_outposts, &n_transports, hull_counts);
 
             uint8_t player_palette_color = 0x49; // 'I'
             if (owner < MAX_PLAYERS) {
@@ -3558,6 +3571,8 @@ int16_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
 }
 
 void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int16_t* num_techs) {
+    int16_t loknar_techs[3];
+    int16_t num_loknar_techs = 0;
     bool dont_assign = false;
     int16_t ship_idx = Assign_Loknar_Ship_To_Player_(player_idx);
 
@@ -3581,7 +3596,8 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int
             MOX::_leaders[0x41].location = ship_idx;
             MOX::_leaders[0x41].player_index = static_cast<int8_t>(player_idx);
             MOX::_leaders[0x41].status = 1;
-            Give_Leader_Specials_To_Player_(0x41, player_idx);
+            Give_Leader_Specials_To_Player_Impl_(
+                0x41, player_idx, loknar_techs, &num_loknar_techs);
         }
     }
 
@@ -3594,6 +3610,12 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int
     }
 
     Get_Random_Antaran_Tech_(player_idx, 3, techs, num_techs);
+
+    for (int16_t i = 0; i < num_loknar_techs; ++i) {
+        techs[*num_techs] = loknar_techs[i];
+        ++(*num_techs);
+    }
+
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
@@ -3621,11 +3643,9 @@ void __cdecl Rescued_Loknar_Popup_(int16_t unused, int16_t* tech_app_ids, int16_
     char buffer[500];
     (void)unused;
 
-    if (tech_app_count > 0) {
-        Make_Loknar_Message_(buffer, sizeof(buffer), tech_app_ids, tech_app_count);
-        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
-        MOX::_FULL_DRAW_SCREEN_FLAG = 1;
-    }
+    Make_Loknar_Message_(buffer, sizeof(buffer), tech_app_ids, tech_app_count);
+    HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
+    MOX::_FULL_DRAW_SCREEN_FLAG = 1;
 }
 
 void __cdecl Get_Random_Antaran_Tech_(int16_t player_idx, int16_t count, int16_t* tech_list, int16_t* num_techs) {

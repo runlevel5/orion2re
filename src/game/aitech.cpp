@@ -376,6 +376,7 @@ namespace aitech {
             // Look up field ID from technology applications table
             int8_t field_id = (int8_t)TECHDATA::_technology_applications[app_id].tech_field_id;
             player->current_research_field = field_id;
+            player->research_breakthrough = 0;
 
             // If we've reached a high-tier research field, stop active research selection logic
             if (field_id >= 75 /* HYPER_ADVANCED_THRESHOLD */) {

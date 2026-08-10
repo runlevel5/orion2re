@@ -559,11 +559,22 @@ namespace COLCALC {
             }
         }
 
-        // Apply final changes. Replicator ratio is 2 Industry : 1 Food
         int16_t final_food_gain = industry_spent / 2;
+        int16_t final_industry_cost = 0;
+        if (_replicator_food_pp != 0) {
+            int16_t maximum_food_gain = colony->production[ECON_INDUSTRY] / _replicator_food_pp;
+            if (maximum_food_gain < 0) {
+                maximum_food_gain = 0;
+            }
+            if (final_food_gain > maximum_food_gain) {
+                final_food_gain = maximum_food_gain;
+            }
+            final_industry_cost = final_food_gain * _replicator_food_pp;
+        }
+
         colony->n_food_replicated = (int8_t)final_food_gain;
         colony->production[ECON_FOOD] += final_food_gain;
-        colony->production[ECON_INDUSTRY] -= industry_spent;
+        colony->production[ECON_INDUSTRY] -= final_industry_cost;
     }
 
     void __cdecl Update_Player_Stats_(s_player* plr) {
@@ -732,7 +743,12 @@ namespace COLCALC {
             plr->tech_fields[static_cast<uint8_t>(plr->current_research_field)] == 2) {
 
             bool advance_field = true;
-            if (plr->traits[TRAIT_CREATIVE] != 0 || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
+            bool inspect_remaining_apps =
+                plr->traits[TRAIT_CREATIVE] != 0 || _keep_research_on_finds != 0;
+            if (inspect_remaining_apps && plr->traits[TRAIT_UNCREATIVE] != 0) {
+                Ensure_Uncreative_Field_OK_(plr, static_cast<uint8_t>(plr->current_research_field));
+            }
+            if (inspect_remaining_apps || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
                 auto& field_data = TECHDATA::_technology_fields[static_cast<uint8_t>(plr->current_research_field)];
                 int16_t* field_techs = field_data.tech;
 
@@ -746,8 +762,7 @@ namespace COLCALC {
 
             if (advance_field) {
                 Advance_Player_Field_(plr, static_cast<uint8_t>(plr->current_research_field), 1);
-                plr->current_research_field = 0;
-                plr->research_accumulated = 0;
+                Resolve_Research_Completion_(plr, _keep_research_on_finds != 0, 0);
             }
         }
         else {
@@ -1512,6 +1527,8 @@ namespace COLCALC {
         int16_t colony_idx = (int16_t)(colony - MOX::_colony);
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
             colony->production[ECON_INDUSTRY] = 0;
+            colony->pollution = 0;
+            colony->imports[ECON_FOOD] = 0;
             if (debug_out) {
                 STRBUILD::Copy(debug_out, _anomaly_msg);
             }
@@ -1691,9 +1708,10 @@ namespace COLCALC {
 
             if (colony->n_food_replicated != 0) {
                 char replicated_food_text[256];
+                int32_t replication_cost = (uint8_t)colony->n_food_replicated * _replicator_food_pp;
                 snprintf(replicated_food_text, sizeof(replicated_food_text), _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
-                STRBUILD::Sprintf(debug_out, "\t%d\t%s\r", (int32_t)(uint8_t)colony->n_food_replicated * -2, replicated_food_text);
-                colony->production[ECON_INDUSTRY] -= (uint16_t)(uint8_t)colony->n_food_replicated * 2;
+                STRBUILD::Sprintf(debug_out, "\t%d\t%s\r", -replication_cost, replicated_food_text);
+                colony->production[ECON_INDUSTRY] -= (int16_t)replication_cost;
             }
 
             if (colony->n_industry_taxed != 0) {
@@ -1704,163 +1722,5 @@ namespace COLCALC {
             STRBUILD::Sprintf(debug_out, "%s", "\r");
             STRBUILD::Sprintf(debug_out, "\t%+d\t%s\r", (int)colony->production[ECON_INDUSTRY], _total_industry_produced_msg);
         }
-    }
-
-
-    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(const s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out) {
-        int32_t idx = (int32_t)player_idx;
-        int16_t food_per_farmer;
-
-        if (colony->owner == (int8_t)owner_idx && out == nullptr) {
-            food_per_farmer = (int16_t)(uint8_t)colony->food2_per_farmer;
-        }
-        else {
-            food_per_farmer = Colony_Food2_Per_Farmer_(colony, owner_idx, out);
-        }
-
-        if (food_per_farmer <= 0) {
-            return food_per_farmer;
-        }
-
-        if (colony != _colony_calc_food_colony || (int16_t)_colony_calc_food_type != owner_idx || out != nullptr) {
-            _colony_calc_food_colony = colony;
-            _colony_calc_food_type = (uint8_t)owner_idx;
-            memset(_colony_calc_food_cache, 0x63, sizeof(_colony_calc_food_cache));
-        }
-
-        if (_colony_calc_food_cache[idx] == 0x63) {
-            int16_t trait_bonus = 0;
-            int32_t extra_food = 0;
-
-            if (player_idx < MAX_PLAYERS) {
-                s_player* player = &MOX::_player[player_idx];
-
-                trait_bonus = (int16_t)player->traits[TRAIT_FOOD_BONUS];
-
-                if (player->traits[TRAIT_AQUATIC] != 0) {
-                    int climate = (int)colony->climate;
-                    switch (climate) {
-                    case PLANET_CLIMATE_TUNDRA:
-                    case PLANET_CLIMATE_SWAMP:
-                        extra_food = ((int32_t)MOX::_food_per_farmer_table[8] - (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
-                        break;
-                    case PLANET_CLIMATE_OCEAN:
-                    case PLANET_CLIMATE_TERRAN:
-                        extra_food = ((int32_t)MOX::_food_per_farmer_table[9] - (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
-                        break;
-                    default:
-                        break;
-                    }
-                }
-            }
-            else if (player_idx == 8) {
-                trait_bonus = 6;
-            }
-            else if (player_idx == 9) {
-                trait_bonus = 4;
-            }
-
-            if (out != nullptr) {
-                if (idx < 10) {
-                    out->racial_bonuses[idx] = trait_bonus;
-                }
-                out->food_bonus = extra_food;
-            }
-
-            int16_t result = food_per_farmer + trait_bonus + (int16_t)extra_food;
-            _colony_calc_food_cache[idx] = (int8_t)result;
-            return result;
-        }
-
-        return (int16_t)(int8_t)_colony_calc_food_cache[idx];
-    }
-
-    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(const s_colony* colony, int16_t type, int16_t player_idx, s_colony_job_production* out) {
-        int16_t base_industry;
-
-        if ((int16_t)colony->owner == (int16_t)type && out == nullptr) {
-            base_industry = (int16_t)(uint8_t)colony->industry_per_worker;
-        }
-        else {
-            base_industry = Colony_Industry_Per_Worker_(colony, type, out);
-        }
-
-        if (_colony_calc_industry_colony != colony || _colony_calc_industry_type != (uint8_t)type || out != nullptr) {
-            _colony_calc_industry_colony = colony;
-            _colony_calc_industry_type = (uint8_t)type;
-            memset(_colony_calc_industry_cache, 0x63, sizeof(_colony_calc_industry_cache));
-        }
-
-        int32_t idx = (int32_t)player_idx;
-        if (_colony_calc_industry_cache[idx] == 0x63) {
-            int16_t bonus = 0;
-            if (player_idx < MAX_PLAYERS) {
-                bonus = MOX::_player[idx].traits[TRAIT_PRODUCTION_BONUS];
-            }
-            else if (player_idx == 8) {
-                bonus = 3;
-            }
-
-            if (out != nullptr) {
-                if (idx < 10) {
-                    out->racial_bonuses[idx] = bonus;
-                }
-            }
-
-            int16_t total_produced = base_industry + bonus;
-            _colony_calc_industry_cache[idx] = (int8_t)total_produced;
-            return total_produced;
-        }
-
-        return (int16_t)(int8_t)_colony_calc_industry_cache[idx];
-    }
-    int16_t __cdecl Colony_Empire_Base_Research_Produced_(const s_colony* colony, int16_t research_type, int16_t player_idx, s_colony_job_production* out) {
-        int32_t idx = (int32_t)player_idx;
-        uint16_t base_research_per_scientist;
-
-        if (colony->owner == (int8_t)research_type && out == nullptr) {
-            base_research_per_scientist = (uint8_t)colony->research_per_scientist;
-        }
-        else {
-            base_research_per_scientist = Colony_Research_Per_Scientist_(colony, research_type, out);
-        }
-
-        if (_colony_calc_research_colony != colony ||
-            (int16_t)_colony_calc_research_type != research_type ||
-            out != nullptr) {
-
-            _colony_calc_research_colony = colony;
-            _colony_calc_research_type = (uint8_t)research_type;
-            memset(_colony_calc_research_cache, 0x63, sizeof(_colony_calc_research_cache));
-        }
-
-        if (_colony_calc_research_cache[idx] == 0x63) {
-            int16_t trait_bonus = 0;
-            int32_t intelligence_bonus = 0;
-
-            if (player_idx < MAX_PLAYERS) {
-                trait_bonus = (int16_t)MOX::_player[idx].traits[TRAIT_RESEARCH_BONUS];
-
-                if (colony->owner == (int8_t)player_idx && MOX::_player[idx].tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                    intelligence_bonus = 1;
-                }
-            }
-            else if (player_idx == 8) {
-                trait_bonus = 3;
-            }
-
-            if (out != nullptr) {
-                if (idx < 10) {
-                    out->racial_bonuses[idx] = trait_bonus;
-                }
-                out->intelligence_bonus = intelligence_bonus;
-            }
-
-            int16_t total_research = (int16_t)base_research_per_scientist + trait_bonus + (int16_t)intelligence_bonus;
-            _colony_calc_research_cache[idx] = (int8_t)total_research;
-            return total_research;
-        }
-
-        return (int16_t)_colony_calc_research_cache[idx];
     }
 }

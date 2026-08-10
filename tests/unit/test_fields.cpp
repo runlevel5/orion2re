@@ -2493,12 +2493,23 @@ DOCTEST_TEST_CASE("get input throws after exit is requested") {
     DOCTEST_CHECK_THROWS_AS(fields::Get_Input_(), platform::process_exit_requested);
 }
 
-DOCTEST_TEST_CASE("exit with message defers dialog display to the main-thread shutdown path") {
+DOCTEST_TEST_CASE("fatal exit with message defers dialog display to the main-thread shutdown path") {
     Fields_Test_Reset reset;
 
     DOCTEST_CHECK_THROWS_AS(exitm::Exit_With_Message("Quit message"), platform::process_exit_requested);
     DOCTEST_CHECK(platform::Exit_Requested_());
     DOCTEST_CHECK(std::strcmp(platform::Exit_Message_(), "Quit message") == 0);
+    DOCTEST_CHECK(platform::Exit_Status_() == EXIT_FAILURE);
+    DOCTEST_CHECK(test::fakes::g_last_message_box_text.empty());
+}
+
+DOCTEST_TEST_CASE("normal exit preserves successful status and defers its message") {
+    Fields_Test_Reset reset;
+
+    DOCTEST_CHECK_THROWS_AS(exitm::Exit_Normally("Thanks for playing"), platform::process_exit_requested);
+    DOCTEST_CHECK(platform::Exit_Requested_());
+    DOCTEST_CHECK(std::strcmp(platform::Exit_Message_(), "Thanks for playing") == 0);
+    DOCTEST_CHECK(platform::Exit_Status_() == EXIT_SUCCESS);
     DOCTEST_CHECK(test::fakes::g_last_message_box_text.empty());
 }
 

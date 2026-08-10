@@ -95,10 +95,6 @@ namespace BOMB {
         for (int32_t building_idx = 0; building_idx < BUILDING_COUNT; ++building_idx) {
             if (colony->buildings[building_idx] != 0 &&
                 building_idx != BUILDING_CAPITOL &&
-                building_idx != BUILDING_MISSILE_BASE &&
-                building_idx != BUILDING_GROUND_BATTERIES &&
-                building_idx != BUILDING_STELLAR_CONVERTER &&
-                building_idx != BUILDING_FIGHTER_GARRISON &&
                 building_idx != BUILDING_BATTLESTATION &&
                 building_idx != BUILDING_STAR_BASE &&
                 building_idx != BUILDING_STAR_FORTRESS) {
@@ -153,6 +149,10 @@ namespace BOMB {
                 ERICNET::Remove_Building_(colony_idx, (int16_t)building_id);
                 bomb_result->buildings_destroyed[building_id] = 1;
                 bomb_result->damage_occurred = 1;
+                if (colony->n_pops == 0 && target_building_count == 1) {
+                    bomb_result->colony_wiped_out = 1;
+                    owner_player->colony_war_losses[bomb_result->attacker_idx] += 10;
+                }
                 return 1;
             }
 

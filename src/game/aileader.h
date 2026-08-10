@@ -23,7 +23,7 @@ namespace aileader {
     void __cdecl Assign_Star_Officer_(int32_t player_index, int32_t leader_index);
 
     /**
-     * Reassigns an already-assigned fleet officer to a better ship at the same location when possible.
+     * Reassigns a fleet officer to a better ship at the same location, or any eligible ship when the current assignment is being scrapped.
      * @param player_index Owning player index.
      * @param leader_index Leader index in the global leader table.
      */

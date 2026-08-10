@@ -53,8 +53,10 @@ namespace platform {
 	void __cdecl Shutdown_Exit_();
 	void __cdecl Reset_Exit_();
 	void __cdecl Request_Exit_(const char* message = nullptr);
+	void __cdecl Request_Fatal_Exit_(const char* message);
 	bool __cdecl Exit_Requested_();
 	const char* __cdecl Exit_Message_();
+	int __cdecl Exit_Status_();
 	void __cdecl Check_Exit_();
 	void __cdecl Mark_Game_Thread_Exited_();
 	bool __cdecl Game_Thread_Exited_();

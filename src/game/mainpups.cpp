@@ -960,6 +960,9 @@ namespace MAINPUPS {
 
         bool done = false;
         bool accepted = false;
+        const bool show_result_window =
+            MOX::_settings.game_difficulty == GAME_DIFFICULTY_TUTOR &&
+            _on_officer_screen_flag == 0;
 
         do {
             // Enhancement: 'i' shows all of the offered leader's skills.
@@ -991,8 +994,8 @@ namespace MAINPUPS {
                     Eric_Pop_Fields_();
                     Update_Random_New_Officer_Fields_();
 
-                    if (MOX::_settings.game_difficulty <= GAME_DIFFICULTY_TUTOR && _on_officer_screen_flag != 0) {
-                        COLONY::_full_draw = 0;
+                    if (show_result_window) {
+                        COLONY::_full_draw = 1;
                     } else {
                         done = true;
                     }
@@ -1006,8 +1009,8 @@ namespace MAINPUPS {
                     Eric_Pop_Fields_();
                     Update_Random_New_Officer_Fields_();
 
-                    if (MOX::_settings.game_difficulty <= GAME_DIFFICULTY_TUTOR && _on_officer_screen_flag != 0) {
-                        COLONY::_full_draw = 0;
+                    if (show_result_window) {
+                        COLONY::_full_draw = 1;
                     } else {
                         _field_state = 0;
                         done = true;
@@ -2880,7 +2883,7 @@ namespace MAINPUPS {
         );
 
         if (popup_mode == 1) {
-            if (_g_data_ptr->bombardment_result < 0 || *combat_state_ptr == 0 || *combat_state_ptr == 3 || _g_data_ptr->n_pops <= 0 || *combat_state_ptr == 2) {
+            if (_g_data_ptr->bombardment_result < 0 || *combat_state_ptr == 0 || *combat_state_ptr == 3 || *combat_state_ptr == 2) {
                 _mp_fields[18] = -1000;
             } else {
                 _mp_fields[18] = fields::Add_Button_Field_(
@@ -2894,7 +2897,7 @@ namespace MAINPUPS {
                 si = 2;
             }
 
-            if (_g_data_ptr->bombardment_result <= 0 || *combat_state_ptr == 1 || *combat_state_ptr == 3 || _g_data_ptr->n_pops <= 0 || *combat_state_ptr == 2) {
+            if (_g_data_ptr->bombardment_result <= 0 || *combat_state_ptr == 1 || *combat_state_ptr == 3 || *combat_state_ptr == 2) {
                 _mp_fields[17] = -1000;
             } else {
                 _mp_fields[17] = fields::Add_Button_Field_(
@@ -2908,7 +2911,7 @@ namespace MAINPUPS {
                 si++;
             }
 
-            if (_g_data_ptr->bombardment_result <= 0 || *combat_state_ptr == 2 || *combat_state_ptr == 3 || _g_data_ptr->n_pops <= 0) {
+            if (_g_data_ptr->bombardment_result <= 0 || *combat_state_ptr == 2 || *combat_state_ptr == 3) {
                 _mp_fields[16] = -1000;
             } else {
                 _mp_fields[16] = fields::Add_Button_Field_(
@@ -2923,7 +2926,7 @@ namespace MAINPUPS {
             }
         }
 
-        if (_g_data_ptr->bombardment_result < 0 || popup_mode == 1 || popup_mode == 2 || _g_data_ptr->n_pops <= 0) {
+        if (_g_data_ptr->bombardment_result < 0 || popup_mode == 1 || popup_mode == 2) {
             if (_mp_fields[13] != -1000) {
                 fields::Clear_Mouse_Buffer_();
                 fields::Set_Input_Delay_(3);
@@ -2941,7 +2944,7 @@ namespace MAINPUPS {
             si++;
         }
 
-        if (_g_data_ptr->attacker_unit_counts[1] <= 0 || _g_data_ptr->n_pops <= 0 || popup_mode == 2) {
+        if (_g_data_ptr->attacker_unit_counts[1] <= 0 || _g_data_ptr->n_bldgs <= 0 || popup_mode == 2) {
             _mp_fields[12] = -1000;
         } else {
             _mp_fields[12] = fields::Add_Button_Field_(

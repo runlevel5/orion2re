@@ -22,6 +22,8 @@ namespace NETTURN {
         s_net_chat chat_buffer;
         s_net_election_msg election_msg;
 
+        CMBTFIR2::Save_Artemis_Random_Seed_();
+
         if (MOX::_player[MOX::_PLAYER_NUM].surrender_to != -1) {
             NETMOX::Human_Surrenders_(MOX::_PLAYER_NUM);
             NETSTART::Mox_Net_Uninit_();
@@ -114,6 +116,7 @@ namespace NETTURN {
             (int)MOX::_PLAYER_NUM,
             (unsigned int)MOX::_stardate,
             (int)NETMOX::_net.num_connected_players);
+        NETMOX::Clear_Leader_Deassignments_();
         NETMOX::_net.host_sync_counter = 0;
 
         if (MOX::_NUM_PLAYERS > 0) {

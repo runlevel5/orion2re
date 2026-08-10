@@ -1,6 +1,7 @@
 #include "pch.h"
 
 namespace MAPGEN {
+    int16_t _maximum_star_count = 99;
     uint8_t _n_marooned_heroes;
     uint8_t _n_wormholes;
     uint8_t _make_food_planet;
@@ -46,9 +47,8 @@ int16_t Generation_Progress_Max_() {
 }
 
 int16_t Maximum_Galaxy_Grid_Y_() {
-    const int16_t star_count = MAX_STARS - 1;
     int16_t grid_y = 8;
-    while ((((grid_y * 5) + 3) / 4) * grid_y < star_count) {
+    while ((((grid_y * 5) + 3) / 4) * grid_y < _maximum_star_count) {
         ++grid_y;
     }
     return grid_y;
@@ -538,7 +538,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
             int16_t removable_planet_count = 0;
             for (int16_t planet_idx = 0; planet_idx < original_planet_count; ++planet_idx) {
                 s_planet_data* backup_p = &_pl[planet_idx];
-                if (is_home_system[backup_p->star_index] == 0 && backup_p->planet_type != PLANET_TYPE_GAS_GIANT) {
+                if (is_home_system[backup_p->star_index] == 0 &&
+                    !HOMEGEN::Is_Added_Food_World_(backup_p->star_index) &&
+                    backup_p->planet_type != PLANET_TYPE_GAS_GIANT) {
                     removable_planets[removable_planet_count++] = planet_idx;
                 }
             }
@@ -566,6 +568,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                     RUSS::PFMT_(0, 10, "Moving planet %d to planet %d", old_idx, new_idx);
 
                     MOX::_planet[new_idx] = _pl[old_idx];
+                    int16_t colony_idx = MOX::_planet[new_idx].colony_index;
+                    if (colony_idx >= 0) {
+                        MOX::_colony[colony_idx].planet = new_idx;
+                    }
                     MOX::_star[MOX::_planet[new_idx].star_index].planet_index[(uint8_t)MOX::_planet[new_idx].orbit] = new_idx;
 
                     new_idx++;
@@ -1481,7 +1487,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
                 break;
 #if MAX_STARS > ORIGINAL_MAX_STARS
             case GALAXY_SIZE_MAXIMUM:
-                MOX::_NUM_STARS = MAX_STARS - 1;
+                MOX::_NUM_STARS = _maximum_star_count;
                 grid_x = Maximum_Galaxy_Grid_X_();
                 grid_y = Maximum_Galaxy_Grid_Y_();
                 break;

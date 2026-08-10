@@ -29,3 +29,27 @@ DOCTEST_TEST_CASE("same-owner outpost ship does not suppress colony ship priorit
 
     DOCTEST_CHECK(MOX::_star[0].colonize_player == 0);
 }
+
+DOCTEST_TEST_CASE("outpost on non-planet body uses barren climate") {
+    TEST_COLONIZE::Reset_();
+
+    MOX::_planet[0].star_index = 0;
+    MOX::_planet[0].planet_type = PLANET_TYPE_ASTEROID;
+    MOX::_planet[0].climate = PLANET_CLIMATE_GAIA;
+
+    COLONIZE::Make_New_Outpost_(0, 0);
+
+    DOCTEST_CHECK(MOX::_colony[0].climate == PLANET_CLIMATE_BARREN);
+}
+
+DOCTEST_TEST_CASE("outpost on planet preserves planet climate") {
+    TEST_COLONIZE::Reset_();
+
+    MOX::_planet[0].star_index = 0;
+    MOX::_planet[0].planet_type = PLANET_TYPE_PLANET;
+    MOX::_planet[0].climate = PLANET_CLIMATE_OCEAN;
+
+    COLONIZE::Make_New_Outpost_(0, 0);
+
+    DOCTEST_CHECK(MOX::_colony[0].climate == PLANET_CLIMATE_OCEAN);
+}

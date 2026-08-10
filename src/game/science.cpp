@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace SCIENCE {
+    uint8_t _finds_presented_by_scientist;
+
     const char* _spy_anim_fmt = "SR_R%x_SP.LBX";
     const char* _trooper_anim_fmt = "SR_R%x_TR.LBX";
     const char* _spy_anim_find_pat = "SR_R?_SP.LBX";
@@ -30,6 +32,34 @@ namespace SCIENCE {
         char* trooper_anim = BILL::Cache_Player_Trooper_Anim_();
         SCIENCE::Science_Room_(trooper_anim, tech_count, captured_tech_ids, text_buffer);
 
+        file_ani::Reset_File_Animation_Buffer_();
+        allocate::Pop_Block_(MOX::_screen_seg);
+        COLONY::Reset_Mouse_Picture_();
+        JIM::Play_Background_Music_();
+    }
+
+    void __cdecl Show_Off_Artifact_Tech_(uint16_t tech_idx, int16_t planet_idx) {
+        int16_t discovered_tech = (int16_t)tech_idx;
+
+        if (_finds_presented_by_scientist == 0) {
+            Show_Off_Captured_Tech_(&discovered_tech, 1, planet_idx);
+            return;
+        }
+
+        char message_text[0x100];
+        char scientist_animation[64];
+
+        allocate::Push_Block_(MOX::_screen_seg);
+        void* animation_block = allocate::Allocate_First_Block_(MOX::_screen_seg, 0x7C830);
+        file_ani::Set_File_Animation_Buffer_(animation_block);
+        JIM::Get_Text_Message_("billtext.lbx", 0, message_text, sizeof(message_text));
+        JIM::Decode_Text_Name_And_Tech_(message_text, MOX::_PLAYER_NUM, tech_idx, sizeof(message_text));
+        snprintf(
+            scientist_animation,
+            sizeof(scientist_animation),
+            "SR_R%x_SC.LBX",
+            (unsigned int)(uint8_t)MOX::_player[MOX::_PLAYER_NUM].race);
+        Science_Room_(scientist_animation, 1, &discovered_tech, message_text);
         file_ani::Reset_File_Animation_Buffer_();
         allocate::Pop_Block_(MOX::_screen_seg);
         COLONY::Reset_Mouse_Picture_();

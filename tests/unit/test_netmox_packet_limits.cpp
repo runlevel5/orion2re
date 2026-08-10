@@ -8,15 +8,24 @@
 
 namespace netcode {
     extern void (*g_net_update_hook)();
+    extern void (*g_net_send_hook)(int32_t, int16_t, void*, uint32_t);
 }
 
 namespace {
     int g_net_update_hook_invocations = 0;
+    std::vector<uint8_t> g_game_orders_payload;
 
     void Snapshot_Encode_Mutation_Hook_() {
         ++g_net_update_hook_invocations;
         MOX::_player[1].bc += 999;
         netcode::g_net_update_hook = nullptr;
+    }
+
+    void Capture_Game_Orders_(int32_t, int16_t packet_id, void* packet, uint32_t packet_len) {
+        if (packet_id == NET_PACKET_GAME_ORDERS_PAYLOAD) {
+            uint8_t* bytes = static_cast<uint8_t*>(packet);
+            g_game_orders_payload.assign(bytes, bytes + packet_len);
+        }
     }
 
     constexpr uint32_t Broadcast_Game_Data_Snapshot_Max_Bytes_() {
@@ -64,6 +73,7 @@ namespace {
         s_network saved_net = NETMOX::_net;
         uint32_t saved_stardate = MOX::_stardate;
         s_settings saved_settings = MOX::_settings;
+        int8_t saved_game_type = MOX::_game_type;
         int16_t saved_player_num = MOX::_PLAYER_NUM;
         int16_t saved_num_players = MOX::_NUM_PLAYERS;
         int16_t saved_num_stars = MOX::_NUM_STARS;
@@ -88,6 +98,8 @@ namespace {
         s_ship_data* saved_ship_ptr = MOX::_ship;
         s_leader_data* saved_leader_ptr = MOX::_leaders;
         s_nebula* saved_nebula_ptr = MOX::_nebula;
+        s_animation_header* saved_screen_seg = MOX::_screen_seg;
+        void (*saved_net_send_hook)(int32_t, int16_t, void*, uint32_t) = netcode::g_net_send_hook;
         uint8_t* saved_snapshot_cache_buffer = NETMOX::_net_snapshot_cache.buffer;
         uint8_t* saved_snapshot_cache_current_ptr = NETMOX::_net_snapshot_cache.current_ptr;
         uint32_t saved_snapshot_cache_size = NETMOX::_net_snapshot_cache.buffer_size;
@@ -119,6 +131,10 @@ namespace {
         }
 
         ~Scoped_Netmox_Roundtrip_State_() {
+            if (MOX::_screen_seg != saved_screen_seg) {
+                std::free((s_alloc_header*)MOX::_screen_seg - 1);
+            }
+
             MOX::_player = saved_player_ptr;
             MOX::_star = saved_star_ptr;
             MOX::_planet = saved_planet_ptr;
@@ -130,6 +146,7 @@ namespace {
             NETMOX::_net = saved_net;
             MOX::_stardate = saved_stardate;
             MOX::_settings = saved_settings;
+            MOX::_game_type = saved_game_type;
             MOX::_PLAYER_NUM = saved_player_num;
             MOX::_NUM_PLAYERS = saved_num_players;
             MOX::_NUM_STARS = saved_num_stars;
@@ -138,6 +155,8 @@ namespace {
             MOX::_NUM_SHIPS = saved_num_ships;
             MOX::_NUM_NEBULAS = saved_num_nebulas;
             MOX::_antarans = saved_antarans;
+            MOX::_screen_seg = saved_screen_seg;
+            netcode::g_net_send_hook = saved_net_send_hook;
             game_random::Set_Random_Seed_(saved_random_seed);
             REPORT::_n_reports = saved_report_count;
             std::memcpy(MOX::_bill_savegame, saved_bill_savegame.data(), sizeof(MOX::_bill_savegame));
@@ -688,6 +707,50 @@ DOCTEST_TEST_CASE("broadcast snapshot encode suppresses live network updates whi
     DOCTEST_CHECK(MOX::_player[1].bc == expected_bc);
 
     netcode::g_net_update_hook = nullptr;
+}
+
+DOCTEST_TEST_CASE("game orders preserve the advanced XP of a deassigned leader") {
+    Scoped_Netmox_Roundtrip_State_ scope;
+    Fill_Netmox_Roundtrip_State_();
+
+    MOX::_game_type = 3;
+    MOX::_PLAYER_NUM = 1;
+    MOX::_NUM_STARS = 0;
+    MOX::_NUM_COLONIES = 0;
+    MOX::_NUM_SHIPS = 0;
+    MOX::_screen_seg = static_cast<s_animation_header*>(allocate::Allocate_Space_(
+        NETMOX::NETMOX_MAX_GAME_DATA_PAYLOAD_BYTES + sizeof(s_alloc_header)));
+    NETMOX::_net.is_network_active = 1;
+    NETMOX::_net.net_host_id = 101;
+    NETMOX::_net.local_net_id = 202;
+
+    constexpr int16_t leader_idx = 4;
+    MOX::_leaders[leader_idx].player_index = 1;
+    MOX::_leaders[leader_idx].status = 0;
+    MOX::_leaders[leader_idx].xp = 59;
+
+    NETMOX::Mark_Leader_Deassigned_(leader_idx);
+    MOX::_leaders[leader_idx].xp = 60;
+    NETMOX::Ditch_Leader_(leader_idx);
+
+    g_game_orders_payload.clear();
+    netcode::g_net_send_hook = &Capture_Game_Orders_;
+    NETMOX::Send_Game_Orders_();
+    netcode::g_net_send_hook = nullptr;
+
+    DOCTEST_REQUIRE(!g_game_orders_payload.empty());
+
+    MOX::_leaders[leader_idx].player_index = 1;
+    MOX::_leaders[leader_idx].status = 0;
+    MOX::_leaders[leader_idx].xp = 59;
+
+    NETMOX::Decode_Game_Orders_(
+        g_game_orders_payload.data(),
+        static_cast<uint32_t>(g_game_orders_payload.size()));
+
+    DOCTEST_CHECK(MOX::_leaders[leader_idx].xp == 60);
+    DOCTEST_CHECK(MOX::_leaders[leader_idx].player_index == -1);
+    DOCTEST_CHECK(MOX::_leaders[leader_idx].status == -1);
 }
 
 }

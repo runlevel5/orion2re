@@ -85,8 +85,8 @@ namespace FLT2 {
     void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx);
 
     /// Counts the ships in a stack that pass the current fleet-screen filter.
-    /// @param ship_stack_idx Ship-stack index to inspect.
-    int16_t __cdecl Fltscrn_Ships_To_Be_Displayed_(int16_t ship_stack_idx);
+    /// @param ship_stack_head_node_idx First node in the ship stack to inspect.
+    int16_t __cdecl Fltscrn_Ships_To_Be_Displayed_(int16_t ship_stack_head_node_idx);
 
     /// Loads the owning player's ship palette and refreshes the fleet screen.
     /// @param player_idx Player index whose ship palette should be loaded.

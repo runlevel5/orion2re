@@ -117,34 +117,24 @@ namespace GEO {
      * world position before being scaled down and checked against the animation frame data.
      */
     bool __cdecl Point_Is_In_Nebula_N_(int16_t x, int16_t y, int16_t nebula_idx) {
-        s_nebula* nebula = &MOX::_nebula[nebula_idx];
+        const s_nebula* nebula = &MOX::_nebula[nebula_idx];
 
-        // Calculate relative coordinates and scale down by 3
-        int32_t rel_x = ((int32_t)x - nebula->x) / 3;
-        if (rel_x < 0) {
+        if (x < nebula->x || y < nebula->y) {
             return false;
         }
 
-        int32_t rel_y = ((int32_t)y - nebula->y) / 3;
-        if (rel_y < 0) {
-            return false;
-        }
+        const int32_t rel_x = ((int32_t)x - nebula->x) / 3;
+        const int32_t rel_y = ((int32_t)y - nebula->y) / 3;
 
         // Access the 4th variant of the nebula animation
-        s_animation_header* anim = MOX::_nebula_pict_seg[(uint8_t)nebula->type % 12][3];
+        const s_animation_header* anim = MOX::_nebula_pict_seg[(uint8_t)nebula->type % 12][3];
 
-        // Check if the relative coordinates are within the animation frame dimensions
-        if (rel_x < (int32_t)anim->width && rel_y < (int32_t)anim->height) {
-            uint8_t* pixel_data = (uint8_t*)anim + sizeof(s_animation_header) + sizeof(uint32_t);
-            uint8_t pixel_value = pixel_data[rel_y * anim->width + rel_x];
-
-            // The nebula is considered present if the pixel value exceeds a transparency threshold
-            if (pixel_value > 5) {
-                return true;
-            }
+        if (rel_x >= (int32_t)anim->width || rel_y >= (int32_t)anim->height) {
+            return false;
         }
 
-        return false;
+        const uint8_t* pixel_data = Animation_Frame_Data_(anim, 0);
+        return pixel_data[rel_y * anim->width + rel_x] > 5;
     }
 
     bool __cdecl Point_Is_In_Some_Nebula_(int16_t x, int16_t y) {

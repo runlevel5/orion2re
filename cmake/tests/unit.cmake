@@ -90,6 +90,11 @@ orion2re_add_unit_test(test_config_decode
         src/config/config_decode.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/colcalc_config.cpp
+        src/game/design_config.cpp
+        src/game/ericnet_config.cpp
+        src/game/events_config.cpp
+        src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/settings.cpp
     FAKE_SOURCES
@@ -104,6 +109,11 @@ orion2re_add_unit_test(test_config_bindings
         src/config/config_decode.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/colcalc_config.cpp
+        src/game/design_config.cpp
+        src/game/ericnet_config.cpp
+        src/game/events_config.cpp
+        src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/settings.cpp
     FAKE_SOURCES
@@ -119,6 +129,11 @@ orion2re_add_unit_test(test_config_lifecycle
         src/config/config_lifecycle.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/colcalc_config.cpp
+        src/game/design_config.cpp
+        src/game/ericnet_config.cpp
+        src/game/events_config.cpp
+        src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/settings.cpp
     FAKE_SOURCES
@@ -137,6 +152,11 @@ orion2re_add_unit_test(test_config_loader
         src/config/mod_manager.cpp
         src/config/config_runtime.cpp
         src/config/generated/config.cpp
+        src/game/colcalc_config.cpp
+        src/game/design_config.cpp
+        src/game/ericnet_config.cpp
+        src/game/events_config.cpp
+        src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/settings.cpp
         src/game/compat.cpp
@@ -161,6 +181,27 @@ orion2re_add_unit_test(test_pop_helpers
         tests/unit/test_pop_helpers.cpp
 )
 
+orion2re_add_unit_test(test_aidudes
+    SOURCES
+        tests/unit/test_aidudes.cpp
+    PRODUCTION_SOURCES
+        src/game/aileader.cpp
+        src/game/aidudes.cpp
+        src/game/maintain.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_aidudes_runtime.cpp
+)
+
+orion2re_add_unit_test(test_refit_cost
+    SOURCES
+        tests/unit/test_refit_cost.cpp
+    PRODUCTION_SOURCES
+        src/game/aibuild.cpp
+        src/game/design_config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_refit_cost_runtime.cpp
+)
+
 orion2re_add_unit_test(test_settler
     SOURCES
         tests/unit/test_settler.cpp
@@ -173,6 +214,42 @@ orion2re_add_unit_test(test_settler
 orion2re_add_unit_test(test_colony_production_helpers
     SOURCES
         tests/unit/test_colony_production_helpers.cpp
+    PRODUCTION_SOURCES
+        src/game/colcalc_base.cpp
+        src/game/colcalc_config.cpp
+        src/game/plntsum.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colcalc_base_runtime.cpp
+)
+
+orion2re_add_unit_test(test_colony_production_draw
+    SOURCES
+        tests/unit/test_colony_production_draw.cpp
+    PRODUCTION_SOURCES
+        src/game/coldraw.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_coldraw_runtime.cpp
+)
+
+orion2re_add_unit_test(test_colony_pop_growth
+    SOURCES
+        tests/unit/test_colony_pop_growth.cpp
+    PRODUCTION_SOURCES
+        src/game/colcalc.cpp
+        src/game/colcalc_config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colony_pop_growth_runtime.cpp
+)
+
+orion2re_add_unit_test(test_colony_replicators
+    SOURCES
+        tests/unit/test_colony_replicators.cpp
+    PRODUCTION_SOURCES
+        src/game/colcalc.cpp
+        src/game/colcalc_config.cpp
+        src/game/colcalc_main.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colony_replicators_runtime.cpp
 )
 
 orion2re_add_unit_test(test_build_queue
@@ -193,14 +270,311 @@ orion2re_add_unit_test(test_colonize
         tests/fakes/fake_colonize_runtime.cpp
 )
 
+orion2re_add_unit_test(test_shipmove
+    SOURCES
+        tests/unit/test_shipmove.cpp
+    PRODUCTION_SOURCES
+        src/game/shipmove.cpp
+        src/game/ships.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_shipmove_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_shipmove PRIVATE /Gy)
+    target_link_options(test_shipmove PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_shipmove PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_shipmove PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_shipmove PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
+orion2re_add_unit_test(test_fleetpop
+    SOURCES
+        tests/unit/test_fleetpop.cpp
+    PRODUCTION_SOURCES
+        src/game/fleetpop.cpp
+        src/game/sys.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_fleetpop_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_fleetpop PRIVATE /Gy)
+    target_link_options(test_fleetpop PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_fleetpop PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_fleetpop PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_fleetpop PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
+orion2re_add_unit_test(test_geo
+    SOURCES
+        tests/unit/test_geo.cpp
+    PRODUCTION_SOURCES
+        src/game/geo.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_geo_runtime.cpp
+)
+
+orion2re_add_unit_test(test_homegen
+    SOURCES
+        tests/unit/test_homegen.cpp
+    PRODUCTION_SOURCES
+        src/game/homegen.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_homegen_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_geo PRIVATE /Gy)
+    target_link_options(test_geo PRIVATE /OPT:REF)
+    target_compile_options(test_homegen PRIVATE /Gy)
+    target_link_options(test_homegen PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_geo PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_homegen PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_geo PRIVATE -Wl,-dead_strip)
+        target_link_options(test_homegen PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_geo PRIVATE -Wl,--gc-sections)
+        target_link_options(test_homegen PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
+orion2re_add_unit_test(test_ground_commando
+    SOURCES
+        tests/unit/test_ground_commando.cpp
+    PRODUCTION_SOURCES
+        src/game/invasion.cpp
+        src/game/invasion_config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_ground_commando_runtime.cpp
+)
+
+orion2re_add_unit_test(test_ericnet
+    SOURCES
+        tests/unit/test_ericnet.cpp
+    PRODUCTION_SOURCES
+        src/game/ericnet.cpp
+        src/game/ericnet_config.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_ericnet_runtime.cpp
+)
+
+orion2re_add_unit_test(test_missile_defense
+    SOURCES
+        tests/unit/test_missile_defense.cpp
+    PRODUCTION_SOURCES
+        src/game/cmbtmis.cpp
+)
+
+orion2re_add_unit_test(test_combat_stats
+    SOURCES
+        tests/unit/test_combat_stats.cpp
+    PRODUCTION_SOURCES
+        src/game/cmbtmov1.cpp
+)
+
+orion2re_add_unit_test(test_combat_repair
+    SOURCES
+        tests/unit/test_combat_repair.cpp
+    PRODUCTION_SOURCES
+        src/game/combinit.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_combat_repair_runtime.cpp
+)
+
+orion2re_add_unit_test(test_bombardment_ammo
+    SOURCES
+        tests/unit/test_bombardment_ammo.cpp
+    PRODUCTION_SOURCES
+        src/game/combat.cpp
+)
+
+orion2re_add_unit_test(test_town_zero
+    SOURCES
+        tests/unit/test_town_zero.cpp
+    PRODUCTION_SOURCES
+        src/game/bomb.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_town_zero_runtime.cpp
+)
+
+orion2re_add_unit_test(test_animation_frame
+    SOURCES
+        tests/unit/test_animation_frame.cpp
+    PRODUCTION_SOURCES
+        src/game/animate.cpp
+)
+
+orion2re_add_unit_test(test_absorber_cleanup
+    SOURCES
+        tests/unit/test_absorber_cleanup.cpp
+    PRODUCTION_SOURCES
+        src/game/cmbtfire.cpp
+        src/game/cmbtfir2.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_absorber_cleanup_runtime.cpp
+)
+
 orion2re_add_unit_test(test_boarding
     SOURCES
         tests/unit/test_boarding.cpp
     PRODUCTION_SOURCES
         src/game/boarding.cpp
+        src/game/cmbtfir2.cpp
+        src/game/strbuild.cpp
+        src/game/struct.cpp
     FAKE_SOURCES
         tests/fakes/fake_boarding_runtime.cpp
+    LINK_SDL
 )
+
+orion2re_add_unit_test(test_cmbtfire
+    SOURCES
+        tests/unit/test_cmbtfire.cpp
+    PRODUCTION_SOURCES
+        src/game/cmbtfire.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_stasis_runtime.cpp
+)
+
+orion2re_add_unit_test(test_stasis_area_effects
+    SOURCES
+        tests/unit/test_stasis_area_effects.cpp
+    PRODUCTION_SOURCES
+        src/game/cmbtfir2.cpp
+        src/game/combat1.cpp
+        src/game/random.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_stasis_area_effects_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_aidudes PRIVATE /Gy)
+    target_link_options(test_aidudes PRIVATE /OPT:REF)
+    target_compile_options(test_refit_cost PRIVATE /Gy)
+    target_link_options(test_refit_cost PRIVATE /OPT:REF)
+    target_compile_options(test_colony_production_helpers PRIVATE /Gy)
+    target_link_options(test_colony_production_helpers PRIVATE /OPT:REF)
+    target_compile_options(test_colony_production_draw PRIVATE /Gy)
+    target_link_options(test_colony_production_draw PRIVATE /OPT:REF)
+    target_compile_options(test_bombardment_ammo PRIVATE /Gy)
+    target_link_options(test_bombardment_ammo PRIVATE /OPT:REF)
+    target_compile_options(test_town_zero PRIVATE /Gy)
+    target_link_options(test_town_zero PRIVATE /OPT:REF)
+    target_compile_options(test_animation_frame PRIVATE /Gy)
+    target_compile_options(test_ericnet PRIVATE /Gy)
+    target_link_options(test_animation_frame PRIVATE /OPT:REF)
+    target_link_options(test_ericnet PRIVATE /OPT:REF)
+    target_compile_options(test_missile_defense PRIVATE /Gy)
+    target_link_options(test_missile_defense PRIVATE /OPT:REF)
+    target_compile_options(test_absorber_cleanup PRIVATE /Gy)
+    target_link_options(test_absorber_cleanup PRIVATE /OPT:REF)
+    target_compile_options(test_boarding PRIVATE /Gy)
+    target_link_options(test_boarding PRIVATE /OPT:REF)
+    target_compile_options(test_combat_stats PRIVATE /Gy)
+    target_link_options(test_combat_stats PRIVATE /OPT:REF)
+    target_compile_options(test_ground_commando PRIVATE /Gy)
+    target_link_options(test_ground_commando PRIVATE /OPT:REF)
+    target_compile_options(test_combat_repair PRIVATE /Gy)
+    target_link_options(test_combat_repair PRIVATE /OPT:REF)
+    target_compile_options(test_cmbtfire PRIVATE /Gy)
+    target_link_options(test_cmbtfire PRIVATE /OPT:REF)
+    target_compile_options(test_stasis_area_effects PRIVATE /Gy)
+    target_link_options(test_stasis_area_effects PRIVATE /OPT:REF)
+    target_compile_options(test_colony_pop_growth PRIVATE /Gy)
+    target_link_options(test_colony_pop_growth PRIVATE /OPT:REF)
+    target_compile_options(test_colony_replicators PRIVATE /Gy)
+    target_link_options(test_colony_replicators PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_aidudes PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_refit_cost PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_colony_production_helpers PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_colony_production_draw PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_bombardment_ammo PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_town_zero PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_animation_frame PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_ericnet PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_missile_defense PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_absorber_cleanup PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_boarding PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_combat_stats PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_ground_commando PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_combat_repair PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_cmbtfire PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_stasis_area_effects PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_colony_pop_growth PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_colony_replicators PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_aidudes PRIVATE -Wl,-dead_strip)
+        target_link_options(test_refit_cost PRIVATE -Wl,-dead_strip)
+        target_link_options(test_colony_production_helpers PRIVATE -Wl,-dead_strip)
+        target_link_options(test_colony_production_draw PRIVATE -Wl,-dead_strip)
+        target_link_options(test_bombardment_ammo PRIVATE -Wl,-dead_strip)
+        target_link_options(test_town_zero PRIVATE -Wl,-dead_strip)
+        target_link_options(test_animation_frame PRIVATE -Wl,-dead_strip)
+        target_link_options(test_ericnet PRIVATE -Wl,-dead_strip)
+        target_link_options(test_missile_defense PRIVATE -Wl,-dead_strip)
+        target_link_options(test_absorber_cleanup PRIVATE -Wl,-dead_strip)
+        target_link_options(test_boarding PRIVATE -Wl,-dead_strip)
+        target_link_options(test_combat_stats PRIVATE -Wl,-dead_strip)
+        target_link_options(test_ground_commando PRIVATE -Wl,-dead_strip)
+        target_link_options(test_combat_repair PRIVATE -Wl,-dead_strip)
+        target_link_options(test_cmbtfire PRIVATE -Wl,-dead_strip)
+        target_link_options(test_stasis_area_effects PRIVATE -Wl,-dead_strip)
+        target_link_options(test_colony_pop_growth PRIVATE -Wl,-dead_strip)
+        target_link_options(test_colony_replicators PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_aidudes PRIVATE -Wl,--gc-sections)
+        target_link_options(test_refit_cost PRIVATE -Wl,--gc-sections)
+        target_link_options(test_colony_production_helpers PRIVATE -Wl,--gc-sections)
+        target_link_options(test_colony_production_draw PRIVATE -Wl,--gc-sections)
+        target_link_options(test_bombardment_ammo PRIVATE -Wl,--gc-sections)
+        target_link_options(test_town_zero PRIVATE -Wl,--gc-sections)
+        target_link_options(test_animation_frame PRIVATE -Wl,--gc-sections)
+        target_link_options(test_ericnet PRIVATE -Wl,--gc-sections)
+        target_link_options(test_missile_defense PRIVATE -Wl,--gc-sections)
+        target_link_options(test_absorber_cleanup PRIVATE -Wl,--gc-sections)
+        target_link_options(test_boarding PRIVATE -Wl,--gc-sections)
+        target_link_options(test_combat_stats PRIVATE -Wl,--gc-sections)
+        target_link_options(test_ground_commando PRIVATE -Wl,--gc-sections)
+        target_link_options(test_combat_repair PRIVATE -Wl,--gc-sections)
+        target_link_options(test_cmbtfire PRIVATE -Wl,--gc-sections)
+        target_link_options(test_stasis_area_effects PRIVATE -Wl,--gc-sections)
+        target_link_options(test_colony_pop_growth PRIVATE -Wl,--gc-sections)
+        target_link_options(test_colony_replicators PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
+orion2re_add_unit_test(test_techinit
+    SOURCES
+        tests/unit/test_techinit.cpp
+    PRODUCTION_SOURCES
+        src/game/techinit.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_techinit_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_techinit PRIVATE /Gy)
+    target_link_options(test_techinit PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_techinit PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_techinit PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_techinit PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
 
 orion2re_add_unit_test(test_map_scale
     SOURCES
@@ -336,11 +710,11 @@ orion2re_add_unit_test(test_fields
     SOURCES
         tests/unit/test_fields.cpp
     PRODUCTION_SOURCES
+        src/game/exitm.cpp
         src/game/fields.cpp
         src/game/settings.cpp
     FAKE_SOURCES
         tests/fakes/fake_animate.cpp
-        tests/fakes/fake_exitm.cpp
         tests/fakes/fake_fields_runtime.cpp
         tests/fakes/fake_input.cpp
         tests/fakes/fake_memory.cpp

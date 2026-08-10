@@ -954,7 +954,7 @@ namespace AIMOVE {
                         INITSHIP::Load_Eel_Ship_Design_(&eel_design, 1);
 
                         s_star_data* star = &MOX::_star[ship->location];
-                        int16_t new_ship_idx = SHIPMOVE::Create_Nonplayer_Ship_(13, &eel_design, star->x, star->y);
+                        int16_t new_ship_idx = SHIPMOVE::Create_Nonplayer_Ship_(NONPLAYER_SHIP_TYPE_EEL, &eel_design, star->x, star->y);
 
                         if (new_ship_idx != -1) {
                             s_MSG msg = {};
@@ -2142,7 +2142,7 @@ namespace AIMOVE {
             if (valid_count >= 7) {
                 break;
             }
-            if (npc_dest[i].dist != 0 && npc_dest[i].dist < 15) {
+            if (npc_dest[i].dist != 0 && npc_dest[i].dist < 20) {
                 valid_count++;
                 if (game_random::Random_(valid_count) == 1) {
                     dest_star_idx = npc_dest[i].star_idx;

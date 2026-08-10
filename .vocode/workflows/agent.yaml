@@ -2,12 +2,16 @@ workflows:
   agent:
     description: "End-to-end development loop: discover requirements, design a plan, write code, apply patches, and run tests with retries."
     agent_workflows:
-      - agent-discovery
+      - agent-helper
     nodes:
       - $include:
           template: nodes/agent.yaml
-        system_append:
+        system_append: |
           If you need to search through the codebase, run `rg` via `exec` tool.
+          Delegate bounded, read-only tasks that do not require strong reasoning to `agent-helper`.
+          Good delegation candidates include repository discovery, summaries, comparisons, test planning,
+          and error triage. You may trust factual evidence returned within the delegated scope, but the parent
+          agent must make and validate all interpretations, design choices, and final decisions.
         confirmation: loop
         max_rounds: 0
         preprocessors:

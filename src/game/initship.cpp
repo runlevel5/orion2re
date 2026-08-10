@@ -444,11 +444,7 @@ namespace INITSHIP {
         design->ftl_type = (int8_t)Best_Warp_Drive_(player_idx);
         design->computer_type = COMPUTER_NO_COMPUTER;
 
-        int16_t armor = Best_Armor_(player_idx);
-        if (armor > ARMOR_TITANIUM_ARMOR) {
-            armor--;
-        }
-        design->armor_type = (int8_t)armor;
+        design->armor_type = (int8_t)Best_Armor_(player_idx);
 
         struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
         design->picture_num = 45;
@@ -470,11 +466,7 @@ namespace INITSHIP {
         design->ftl_type = static_cast<int8_t>(Best_Warp_Drive_(player_idx));
         design->computer_type = COMPUTER_NO_COMPUTER;
 
-        int16_t best_armor = Best_Armor_(player_idx);
-        if (best_armor > ARMOR_TITANIUM_ARMOR) {
-            best_armor--;
-        }
-        design->armor_type = static_cast<int8_t>(best_armor);
+        design->armor_type = (int8_t)Best_Armor_(player_idx);
 
         struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
 
@@ -548,12 +540,13 @@ namespace INITSHIP {
     int16_t __cdecl Get_Ship_Structure_(int16_t ship_idx) {
         int16_t result;
         s_ship_data* ship = &MOX::_ship[ship_idx];
+        const uint8_t builder = ship->d.previous_owner;
 
-        if (ship->owner <= 9) {
+        if (builder <= 9) {
             return Get_Design_Structure_(ship->d);
         }
 
-        switch (ship->owner) {
+        switch (builder) {
         case 10:
             result = 750;
             if (ship->d.ftl_type <= 0) {
@@ -1729,11 +1722,7 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     design->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(player_idx);
     design->computer_type = COMPUTER_NO_COMPUTER;
 
-    int16_t best_armor = INITSHIP::Best_Armor_(player_idx);
-    if (best_armor > ARMOR_TITANIUM_ARMOR) {
-        best_armor--;
-    }
-    design->armor_type = (int8_t)best_armor;
+    design->armor_type = (int8_t)INITSHIP::Best_Armor_(player_idx);
 
     // Clear special devices
     design->special_device_flags[0] = 0;

@@ -1485,27 +1485,15 @@ uint8_t __cdecl Set_Build_Outpost_Button_Flag_(int16_t ship_count) {
     int16_t ship_owner = HACCESS::Ship_Owner_(ship_idx);
     uint8_t can_build_outpost = 0;
 
-    int16_t location = MOX::_ship[ship_idx].location;
-
-    bool valid_star_location = false;
-    if (location > -1 && location < SHIP_LOCATION_MOVING_OFFSET) {
-        valid_star_location = true;
-    }
-
-    bool valid_offset_location = false;
-    if (location > SHIP_LOCATION_WORMHOLE_OFFSET && location < SHIP_LOCATION_LIMIT) {
-        valid_offset_location = true;
-    }
-
-    if (valid_offset_location) {
-        location -= SHIP_LOCATION_WORMHOLE_OFFSET;
-    }
+    const int16_t location = MOX::_ship[ship_idx].location;
+    const bool valid_star_location =
+        location > -1 && location < SHIP_LOCATION_MOVING_OFFSET;
 
     if (MOX::_PLAYER_NUM != ship_owner) {
         return can_build_outpost;
     }
 
-    if (!valid_star_location && !valid_offset_location) {
+    if (!valid_star_location) {
         return can_build_outpost;
     }
 
@@ -1642,7 +1630,9 @@ bool __cdecl Set_Attack_Antares_Button_Flag_(void) {
 
             if (found_matching_ship) {
                 has_dimensional_portal =
-                        HAROLD::Star_Has_Dimensional_Portal_(&MOX::_star[star_idx]);
+                        HAROLD::Player_Has_Dimensional_Portal_(
+                            &MOX::_player[MOX::_ship[selected_ship_idx].owner],
+                            &MOX::_star[star_idx]);
             }
         }
     }

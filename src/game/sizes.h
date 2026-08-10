@@ -49,7 +49,7 @@ ORION2RE_STATIC_SIZE_ASSERT_PTR(s_field, 0x35, 0x51);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_network, 0x218, 0x220);
 ORION2RE_STATIC_SIZE_ASSERT(s_net_player_info, 0xd);
 ORION2RE_STATIC_SIZE_ASSERT(s_net_tactical_combat_message, 0x10);
-ORION2RE_STATIC_SIZE_ASSERT_PTR(s_battle_results, 0x6d0, 0x6d8);
+ORION2RE_STATIC_SIZE_ASSERT_PTR(s_battle_results, 0x6d6, 0x6de);
 ORION2RE_STATIC_SIZE_ASSERT(s_load_net_screen_packet, 0x60);
 
 ORION2RE_STATIC_SIZE_ASSERT(AIDATA::s_turns_from_to_intermediate_cache_entry, 10);

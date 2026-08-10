@@ -1163,6 +1163,7 @@ namespace COLGCBT {
                 case TECH_APP_PLASMA_RIFLE:
                     sound_id = 13;
                     break;
+                case TECH_APP_NO_TECH:
                 case TECH_APP_PULSE_RIFLE:
                     sound_id = 12;
                     break;

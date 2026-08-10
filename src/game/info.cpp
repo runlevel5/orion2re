@@ -605,8 +605,6 @@ namespace INFO {
 
             allocate::Push_Block_(MOX::_screen_seg);
 
-            int32_t saved_mark_pos = allocate::_mark_stack_pos[0];
-
             fields::Clear_Fields_Above_(field_counter - 1);
             palette::Reset_Cycle_Palette_Color_();
             fonts::Set_Font_Style_(5, &_info_normal_color);
@@ -634,10 +632,6 @@ namespace INFO {
                     break;
                 default:
                     break;
-            }
-
-            if (saved_mark_pos < allocate::_mark_stack_pos[0]) {
-                allocate::_mark_stack_pos[0] = saved_mark_pos;
             }
 
             allocate::Pop_Block_(MOX::_screen_seg);
@@ -981,6 +975,9 @@ namespace INFO {
 
                 if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
                     RUSS::Mox_Update_();
+                    if (is_tech_image_loaded) {
+                        allocate::Pop_Block_(MOX::_screen_seg);
+                    }
                     return input;
                 }
 
@@ -1022,6 +1019,9 @@ namespace INFO {
                     animate::Draw_(434, 60, reinterpret_cast<s_animation_header*>(_g_bitmap2_p));
                     platform::Toggle_Pages_Stub_();
                     RUSS::Mox_Update_();
+                    if (is_tech_image_loaded) {
+                        allocate::Pop_Block_(MOX::_screen_seg);
+                    }
                     return input;
                 }
             }
@@ -1270,7 +1270,7 @@ namespace INFO {
         INFO::Set_Up_Player_Colors_(lbx_images);
         *MOX::_active_player = static_cast<int8_t>(MOX::_PLAYER_NUM);
 
-        BILL::Get_Players_Alive_Or_Omniscient_(1, 0);
+        BILL::Get_Players_Dead_Or_Alive_Or_Omniscient_(1, 0);
         INFO::Get_Plyr_Hist_Btns_(player_hist_buttons);
 
         // Ensure at least one graph is active

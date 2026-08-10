@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace CMBTMIS {
+    int8_t _missile_initiative = -1;
+
     int16_t _missile_group_offset[16][16] = {
         { 0, -12, 8, -6, 15, 0, 8, 6, 0, 12, -8, 6, -15, 0, -8, -6 },
         { -9, -10, 1, -8, 13, -8, 11, 1, 9, 10, -1, 8, -13, 8, -11, -1 },
@@ -97,7 +99,7 @@ namespace CMBTMIS {
                             ship.special_status_flag != 4 /* Stasis */ &&
                             !CMBTMOV1::Ship_Is_In_Stasis_(ship_idx) &&
                             ship.unit_status == 0 &&
-                            missile.target_unit_idx != ship_idx) {
+                            !Missile_Targets_Ship_(&missile, ship_idx)) {
 
                             int16_t range = CMBTAI::Range_To_Missile_(ship_idx, missile_idx);
                             if (range < min_range) {
@@ -240,6 +242,36 @@ namespace CMBTMIS {
         );
     }
 
+    void __cdecl Land_Returning_Fighters_(
+        s_combat_data* source, int16_t type, int16_t returned_count) {
+        for (int16_t i = 0; i < 8 && returned_count > 0; ++i) {
+            s_combat_weapon_slot* slot = &source->weapons[i];
+            if (slot->weapon_id != type) {
+                continue;
+            }
+
+            int16_t capacity = COMBINIT::Surviving_Weapon_Count_From_Hits_(
+                source->weapon_hits[i],
+                source->weapon_hits_per_unit[i]);
+
+            if (slot->ammo == 0) {
+                slot->count = 0;
+            }
+
+            int16_t missing_count = capacity - slot->count;
+            if (missing_count <= 0) {
+                continue;
+            }
+
+            int16_t restored_count =
+                returned_count < missing_count ? returned_count : missing_count;
+            slot->count += (int8_t)restored_count;
+            returned_count -= restored_count;
+            slot->ammo = 1;
+            slot->shots_left = 0;
+        }
+    }
+
     int16_t __cdecl Resolve_Missile_(int16_t missile_idx, int16_t x, int16_t y) {
         int16_t owner = Missile_Owner_(missile_idx);
         MOX::_missile_warning = 0;
@@ -258,24 +290,8 @@ namespace CMBTMIS {
 
         if (target_unit_idx == source_unit_idx && is_anti_missile_rocket == 0) {
             int16_t reload_count = missile->quantity / 4;
-            if (reload_count != 0) {
-                for (int16_t i = 0; i < 8; ++i) {
-                    if (MOX::_combat_data[source_unit_idx].weapons[i].weapon_id == type &&
-                        MOX::_combat_data[source_unit_idx].weapons[i].ammo == 0) {
-                        
-                        MOX::_combat_data[source_unit_idx].weapons[i].ammo = 1;
-                        MOX::_combat_data[source_unit_idx].weapons[i].shots_left = 0;
-
-                        if (reload_count >= MOX::_combat_data[source_unit_idx].weapons[i].count) {
-                            reload_count -= MOX::_combat_data[source_unit_idx].weapons[i].count;
-                        } else {
-                            MOX::_combat_data[source_unit_idx].weapons[i].count = (int8_t)reload_count;
-                            reload_count = 0;
-                        }
-                    }
-                    if (reload_count == 0) break;
-                }
-            }
+            Land_Returning_Fighters_(
+                &MOX::_combat_data[source_unit_idx], type, reload_count);
             Kill_Missile_(missile_idx);
             return 0;
         }
@@ -292,14 +308,21 @@ namespace CMBTMIS {
 
         if (is_anti_missile_rocket == 0) {
             if (COMBINIT::Does_Combat_Ship_Have_Special_(target_unit_idx, SPECIAL_LIGHTNING_FIELD)) {
-                int16_t loop_count = 0;
-                if (missile->quantity > 0) {
-                    do {
-                        if (game_random::Random_(100) < 50) {
+                if (_lightning_field_mode == LIGHTNING_FIELD_MODE_UNIFORM) {
+                    int16_t destroyed = 0;
+                    int16_t roll_count = missile->quantity;
+                    for (int16_t i = 0; i < roll_count; ++i) {
+                        if (game_random::Random_(100) <= _lightning_field_ratio) {
+                            destroyed++;
+                        }
+                    }
+                    missile->quantity -= destroyed;
+                } else {
+                    for (int16_t i = 0; i < missile->quantity; ++i) {
+                        if (game_random::Random_(100) <= _lightning_field_ratio) {
                             missile->quantity--;
                         }
-                        loop_count++;
-                    } while (loop_count < missile->quantity);
+                    }
                 }
 
                 if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
@@ -362,7 +385,7 @@ namespace CMBTMIS {
             missile->is_active = 0;
             if (type == WEAPON_ASSAULT_SHUTTLE) {
                 CMBTFIR2::Resolve_Capture_(missile->source_unit_idx, target_unit_idx, missile->quantity, x, y);
-                missile->fighter_count--;
+                missile->fighter_count = 0;
             } else {
                 if (type != WEAPON_BOMBER) {
                     int16_t dmg_out = 0;
@@ -427,13 +450,18 @@ namespace CMBTMIS {
                     int16_t roll = game_random::Random_(100);
 
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(target_unit_idx, SPECIAL_DISPLACEMENT_DEVICE)) {
-                        if (game_random::Random_(100) < 30) {
+                        if (Missile_Defense_Roll_Succeeds_(
+                                game_random::Random_(100),
+                                missile_defense.displacement_device_missiles_miss_percent)) {
                             roll = -1000;
                         }
                     }
 
-                    if (MOX::_combat_data[target_unit_idx].special_status_flag == 1) {
-                        if (game_random::Random_(100) < 50) {
+                    if (MOX::_combat_data[target_unit_idx].special_status_flag == 1 &&
+                        missile_defense.cloaking_device_missile_defense == 0) {
+                        if (Missile_Defense_Roll_Succeeds_(
+                                game_random::Random_(100),
+                                missile_defense.cloaking_device_missile_miss_percent)) {
                             roll = -1000;
                         }
                     }
@@ -1001,6 +1029,7 @@ namespace CMBTMIS {
         int16_t window_height;
         int16_t facing_dir;
         s_animation_header* fighter_anim;
+        int16_t final_target_idx = Final_Flyer_Target_(MOX::_missile, missile_idx);
 
         num_missiles = MOX::_missile[missile_idx].quantity / 4;
         if (num_missiles > 9) {
@@ -1036,7 +1065,7 @@ namespace CMBTMIS {
             facing_dir = (uint8_t)MOX::_missile[missile_idx].facing_dir;
             fighter_anim = MOX::_fighter_seg[owner][type * 16 + facing_dir];
 
-            if (MOX::_missile[missile_idx].target_unit_idx == MOX::_cur_ship) {
+            if (final_target_idx == MOX::_cur_ship) {
                 animate::Set_Animation_Frame_(fighter_anim, (MOX::_ship_frame + missile_idx) % 3);
             } else {
                 animate::Reset_Animation_Frame_(fighter_anim);
@@ -1057,6 +1086,7 @@ namespace CMBTMIS {
                 Missile_Owner_(missile_idx);
                 int16_t type_idx = Missile_Type_(missile_idx);
                 int16_t facing_idx = (int16_t)(uint8_t)MOX::_missile[missile_idx].facing_dir;
+                int16_t final_target_idx = Final_Flyer_Target_(MOX::_missile, missile_idx);
 
                 if (TECHDATA::_weapons[MOX::_missile[missile_idx].type].type != WEAPON_TYPE_FIGHTER) {
                     if (MOX::_missile[missile_idx].target_unit_idx == MOX::_cur_ship || MOX::_missile[missile_idx].type == WEAPON_PROTON_TORPEDO) {
@@ -1066,7 +1096,7 @@ namespace CMBTMIS {
                     }
                 }
 
-                if (MOX::_missile[missile_idx].target_unit_idx != MOX::_cur_ship || MOX::_draw_active_missiles == 1) {
+                if (final_target_idx != MOX::_cur_ship || MOX::_draw_active_missiles == 1) {
                     int16_t weapon_type = MOX::_missile[missile_idx].type;
                     if (TECHDATA::_weapons[weapon_type].type == WEAPON_TYPE_FIGHTER) {
                         Draw_Fighter_(missile_idx, screen_x, screen_y, draw_fullscreen_view);
@@ -1164,11 +1194,8 @@ namespace CMBTMIS {
 
             MOX::_missile[missile_idx].facing_dir = (int8_t)Missile_Facing_(missile_idx, target_idx, is_anti_rocket);
 
-            if (MOX::_combat_init != 0) {
-                MOX::_missile[missile_idx].fighter_count = -1;
-            } else {
-                MOX::_missile[missile_idx].fighter_count = 0;
-            }
+            MOX::_missile[missile_idx].fighter_count =
+                MOX::_combat_init != 0 ? _missile_initiative : 0;
 
             MOX::_missile[missile_idx].speed = (uint8_t)Missile_Speed_(MOX::_missile[missile_idx].type,
                                                                     MOX::_missile[missile_idx].specials,
@@ -1231,8 +1258,7 @@ namespace CMBTMIS {
     }
 
     int16_t __cdecl Get_Missile_Hits_(int16_t missile_id, int16_t ship_idx, uint16_t flags) {
-        // Unmapped or out-of-range missile IDs fall back to returning the original missile_id.
-        int16_t hits = missile_id;
+        int16_t hits = 0;
         int16_t armor_idx;
         int16_t absorption;
 
@@ -1290,6 +1316,10 @@ namespace CMBTMIS {
 
         if (flags & WEAPON_MOD_FLAG_HEAVILY_ARMORED) {
             hits *= 2;
+        }
+
+        if (hits == 0) {
+            hits = 1;
         }
 
         return hits;
@@ -1367,6 +1397,8 @@ namespace CMBTMIS {
 
         if (TECHDATA::_weapons[weapon_idx].type == WEAPON_TYPE_FIGHTER) {
             bonus = CMBTFIR2::Get_Fleet_Pilot_Bonus_(player_idx);
+            int16_t fleet_base = 0;
+            bonus += CMBTFIR2::Fleet_Defensive_Bonus_(player_idx, 0, &fleet_base);
 
             // Add defense trait bonus if player is valid
             if (player_idx < MAX_PLAYERS && player_idx != -1) {

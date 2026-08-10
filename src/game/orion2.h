@@ -330,7 +330,7 @@ struct s_battle_results_info {
     int16_t captured_tech_id;
     int16_t captured_tech_planet_id;
     int8_t planet_destroyed_flag;
-    int16_t orion_techs[4];
+    int16_t orion_techs[7];
     int16_t rescued_hero_id;
     char summary[100];
     char details[1000];
@@ -615,7 +615,7 @@ struct s_combat_data {
     int16_t movement_left;
     int8_t target_type_flag;
     int8_t special_status_flag;
-    int8_t special_status_timer;
+    uint8_t special_status_timer;
     uint8_t special_cooldown;
     int16_t plasma_web_damage;
     int16_t reflected_damage_pool;
@@ -2410,6 +2410,13 @@ typedef struct s_report_enemy_steal s_report_enemy_steal, *Ps_report_enemy_steal
 
 typedef struct s_report_enemy_sabotage s_report_enemy_sabotage, *Ps_report_enemy_sabotage;
 
+typedef struct s_report_artifacts s_report_artifacts, *Ps_report_artifacts;
+
+struct s_report_artifacts {
+    int16_t planet_idx;
+    int16_t tech_app_id;
+};
+
 struct s_report_enemy_sabotage {
     int16_t enemy_player_idx;
     int16_t planet_idx;
@@ -2439,6 +2446,7 @@ union s_report_data {
     struct s_report_sabotage sabotage;
     struct s_report_enemy_steal enemy_steal;
     struct s_report_enemy_sabotage enemy_sabotage;
+    struct s_report_artifacts artifacts;
 };
 
 struct s_report {

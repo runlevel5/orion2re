@@ -573,7 +573,8 @@ bool Decode_Assignment_With_Schema(const s_cfg_statement* statement,
     uint32_t boundary = selected;
     if (selected_variable == CONFIG_NO_VARIABLE &&
         selected_node.kind == CONFIG_NODE_SCALAR &&
-        selected_node.parent != CONFIG_NO_NODE) {
+        selected_node.parent != CONFIG_NO_NODE &&
+        schema->nodes[selected_node.parent].kind != CONFIG_NODE_NAMESPACE) {
         boundary = selected_node.parent;
     }
     const t_variable_id first_variable = selected_variable != CONFIG_NO_VARIABLE ?

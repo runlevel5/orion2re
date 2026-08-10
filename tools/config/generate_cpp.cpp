@@ -970,6 +970,9 @@ namespace {
 
 bool Generate_Cpp(const s_schema* schema, const char* output_directory,
                   std::string* diagnostic) {
+    if (!Validate_Runtime_Layout(schema, diagnostic)) {
+        return false;
+    }
     std::error_code error;
     std::filesystem::create_directories(output_directory, error);
     if (error) {

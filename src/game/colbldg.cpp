@@ -2339,7 +2339,7 @@ namespace COLBLDG {
     }
 
     void __cdecl Build_Ship_Info_Formatted_Paragraph_(s_ship_data* ship, STRBUILD::s_builder* builder) {
-        if (ship->officer_index <= 0) {
+        if (ship->officer_index < 0) {
             STRBUILD::Sprintf(
                 builder,
                 ESTRINGS::E_Strings_(79),
@@ -2792,6 +2792,7 @@ namespace COLBLDG {
             if (_fields[10] == input_field) {
                 Do_Exit_Screen_Cleanup_();
                 COLONY::Tested_Colony_Buys_Outright_(COLONY::_colony_handle);
+                _active_prod[0] = -1;
                 Do_Draw_Build_Queue_();
                 fields::Clear_Mouse_Buffer_();
                 fields::Set_Input_Delay_(3);
@@ -2901,18 +2902,25 @@ namespace COLBLDG {
             }
             if (*selected_field_id == _queue_fields[i]) {
                 if (_active_prod[0] == -1) {
-                    if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0 && i == 0) {
+                    int16_t selected_idx = static_cast<int16_t>(i);
+                    if (selected_idx > 0 &&
+                        _current_item[selected_idx] == COLONY_PRODUCTION_REPEAT) {
+                        selected_idx--;
+                    }
+                    if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0 &&
+                        selected_idx == 0) {
                         GENDRAW::Help_(ESTRINGS::E_Strings_(0x23a));
                         Do_Draw_Build_Queue_();
                         return;
                     }
-                    _active_prod[0] = i + BUILDING_COUNT;
+                    _active_prod[0] = selected_idx + BUILDING_COUNT;
                 } else {
                     int16_t active_idx = _active_prod[0] - BUILDING_COUNT;
                     bool do_delete = false;
 
                     if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0) {
-                        if (i == 0 || active_idx == 0) {
+                        if (i == 0 || active_idx == 0 ||
+                            (i == 1 && _current_item[i] == COLONY_PRODUCTION_REPEAT)) {
                             GENDRAW::Help_(ESTRINGS::E_Strings_(0x23a));
                             Do_Draw_Build_Queue_();
                             _active_prod[0] = -1;
@@ -3093,6 +3101,11 @@ namespace COLBLDG {
      */
     void __cdecl Delete_From_Colony_Queue_(int16_t colony_idx, int16_t queue_idx) {
         if (queue_idx != -1) {
+            if (queue_idx == 0 &&
+                !BUILD_QUEUE::Unbuy_Product_(&MOX::_colony[colony_idx])) {
+                return;
+            }
+
             int16_t producing_id = MOX::_colony[colony_idx].producing[queue_idx];
 
             // Queued ship production items use the queued-ship encoding helper/base.
@@ -3108,7 +3121,6 @@ namespace COLBLDG {
     void __cdecl Add_Refited_Ship_To_Queue_() {
         MOX::_refit_ship = 0;
         int16_t ship_n = _refitting_ship_n;
-        int16_t old_cost = MOX::_ship[ship_n].d.cost;
 
         if (!Add_To_Queue_(COLBLDG::Colony_Production_From_Ship_Index_(ship_n))) {
             GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_NO_ROOM_IN_QUEUE_SHIP_NOT_REFITTED));
@@ -3118,24 +3130,15 @@ namespace COLBLDG {
         }
 
         int8_t owner = MOX::_colony[COLONY::_colony_handle].owner;
-        struct_::Copy_Structure_(&MOX::_ship[ship_n].d, &MOX::_player[owner].ship_designs[5], sizeof(MOX::_ship[ship_n].d));
+        s_ship_design old_design = MOX::_ship[ship_n].d;
+        s_ship_design new_design = MOX::_player[owner].ship_designs[5];
+        new_design.cost = DESIGN::Cost_Of_Design_(owner, &new_design);
+        int16_t refit_cost = AIBUILD::Refit_Cost_(owner, &old_design, &new_design);
 
+        struct_::Copy_Structure_(
+            &MOX::_ship[ship_n].d, &new_design, sizeof(MOX::_ship[ship_n].d));
         MOX::_ship[ship_n].status = 4;
-
-        int32_t delta_cost = ((int32_t)DESIGN::Cost_Of_Design_(owner, &MOX::_player[owner].ship_designs[5]) -
-                              (int32_t)old_cost) * 2;
-
-        int8_t size = MOX::_ship[ship_n].d.size;
-        int32_t min_cost = (int16_t)TECHDATA::_hull_data[size].cost / 4;
-
-        if (delta_cost <= min_cost) {
-            MOX::_ship[ship_n].d.cost = (int16_t)min_cost;
-            MAINSCR::Update_Ship_Icons_In_Between_Turns_();
-            return;
-        }
-
-        MOX::_ship[ship_n].d.cost = (int16_t)(((int32_t)DESIGN::Cost_Of_Design_(owner, &MOX::_player[owner].ship_designs[5]) -
-                                               (int32_t)old_cost) * 2);
+        MOX::_ship[ship_n].d.cost = refit_cost;
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
     }
 
@@ -3252,6 +3255,9 @@ namespace COLBLDG {
             if ((n_terra + n_rad + n_grav + pops + 1) >= max_pop) {
                 if (GENDRAW::Do_Confirmation_Box_(ESTRINGS::E_Strings_(0x208))) {
                     add_to_queue = true;
+                } else {
+                    _field_mode = 0;
+                    COLONY::Reset_Mouse_Picture_();
                 }
             } else {
                 add_to_queue = true;

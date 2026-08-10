@@ -211,7 +211,7 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                     case WEAPON_ANTI_MISSILE_ROCKET:
                         if (target_type != TARGET_TYPE_SHIP) {
                             s_missile* m = &MOX::_missile[target_idx];
-                            int hits = CMBTMIS::Get_Missile_Hits_(m->type, MOX::_combat_data[m->source_unit_idx].owner, m->specials);
+                            int hits = CMBTMIS::Get_Missile_Hits_(m->type, m->owner, m->specials);
                             expected_damage = hits * (((8 - range) * count * 5 + 25) * 2 / 100);
                         }
                         break;
@@ -1282,6 +1282,9 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_idx, int16_t target_idx) {
             if (movement_used > 0) {
                 moved = 1;
                 cur_ship->movement_left -= movement_used;
+                if (cur_ship->movement_left < 0) {
+                    cur_ship->movement_left = 0;
+                }
             }
         }
     }
@@ -1693,7 +1696,7 @@ int16_t __cdecl Get_Current_Missile_Target_(int16_t unit_idx, int32_t* value_out
         s_missile* missile = &MOX::_missile[i];
 
         if (missile->type > 0 && missile->quantity > 0) {
-            if (MOX::_combat_data[missile->source_unit_idx].owner != MOX::_combat_data[unit_idx].owner) {
+            if (CMBTMIS::Missile_Owner_(i) != MOX::_combat_data[unit_idx].owner) {
                 if (CMBTAI::Will_Missile_Do_Damage_(unit_idx, i)) {
                     int8_t weapon_type_class = TECHDATA::_weapons[missile->type].type;
                     if (weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_FIGHTER) {
@@ -1984,9 +1987,9 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
         int16_t volley_damage = (int16_t)((damage - shield_reduction) * weapon_count);
         result_damage = (int16_t)(((100 - evade) * (int32_t)volley_damage) / 100);
 
-        if (MOX::_combat_data[target_ship_idx].special_status_flag == 1) {
-            result_damage /= 2;
-        }
+        result_damage = (int16_t)CMBTMIS::Expected_Damage_After_Cloak_(
+            result_damage,
+            MOX::_combat_data[target_ship_idx].special_status_flag == 1);
     }
 
     if (result_damage < 1) {
@@ -2017,7 +2020,7 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     s_missile* missile = &MOX::_missile[m_idx];
     int16_t hits_to_kill = CMBTMIS::Get_Missile_Hits_(
         missile->type,
-        MOX::_combat_data[missile->source_unit_idx].owner,
+        missile->owner,
         missile->specials
     );
 
@@ -2339,7 +2342,11 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
 
     s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
-    if (ship->owner > 8 || ship->ftl_type <= 0) return ret_val;
+    if (ship->owner > 8 || ship->ftl_type <= 0 ||
+        (BOARDING::_board_in_black_hole == 0 &&
+         CMBTMOV1::Ship_In_Black_Hole_(ship_idx))) {
+        return ret_val;
+    }
 
     int16_t player_id = MOX::_combat_attacker_player;
     if (ship->owner == MOX::_combat_attacker_player) {

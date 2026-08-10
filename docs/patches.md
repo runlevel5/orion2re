@@ -104,145 +104,145 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:2160` - `diplomatic event`: fixed in `EVENTS::Event_Twiddle_()` and `diplomac::Change_Relations_()` by passing event participants in the relation updater's expected roles and adding the full signed relation delta before clamping to `-100..100`; this replaces the 1.50 register-swap wrapper and 16-bit assembly saturation with direct source-level logic.
 - [x] `asm.pl:2219` - `relax end of turn`: fixed at the `COMBAT1::Next_Ship_()` winner-check site by keeping combat active for a human-controlled surviving side while hostile missiles remain and by allowing a manual attacker to finish actions against an undefended colony; this replaces the 1.50 register-preserving diversion and C wrapper with a direct source-level end-of-combat predicate.
 - [x] `asm.pl:2261` - `pop limit bug`: fixed in `SETTLER::Room_For_Another_()` by counting settlers already heading to the destination and validating every applicable mixed-race capacity tier plus the 42-population bound; this replaces the 1.50 call-site wrappers with the restored function's explicit freight-inclusion parameter.
-- [ ] `asm.pl:2364` - `recalc prod`
-- [ ] `asm.pl:2885` - `displacer, cloak missile`
-- [ ] `asm.pl:3474` - `teleporter + tractor fix`
-- [ ] `asm.pl:4421` - `AI missile targeting`
-- [ ] `asm.pl:5530` - `speed calc speed driveless no div zero`
-- [ ] `asm.pl:5877` - `other player's portal fix`
-- [ ] `asm.pl:6090` - `BHG slot multiple shots`
-- [ ] `asm.pl:6295` - `lightning field`
-- [ ] `asm.pl:6433` - `woes of stasis`
-- [ ] `asm.pl:6573` - `tractor cuts`
-- [ ] `asm.pl:6787` - `specials repair`
-- [ ] `asm.pl:6812` - `ICS cloak`
-- [ ] `asm.pl:6866` - `starbase capture`
-- [ ] `asm.pl:6994` - `retreat fix`
-- [ ] `asm.pl:7084` - `flyer targeting`
-- [ ] `asm.pl:7224` - `stolen prod`
-- [ ] `asm.pl:7839` - `turn 1 research`
-- [ ] `asm.pl:7864` - `unload ship damage storage`
-- [ ] `asm.pl:7887` - `destroying combat cloaks`
-- [ ] `asm.pl:8101` - `miniaturization`
-- [ ] `asm.pl:8114` - `mark stack overflow`
-- [ ] `asm.pl:8145` - `turn order ini overflow`
-- [ ] `asm.pl:8169` - `damper planet`
-- [ ] `asm.pl:8263` - `satellites plasma darkening`
-- [ ] `asm.pl:8272` - `shuttle hijack`
-- [ ] `asm.pl:8367` - `marines overload`
-- [ ] `asm.pl:8662` - `cloak initialize`
-- [ ] `asm.pl:8685` - `stasis cut`
-- [ ] `asm.pl:8703` - `infantry and armor growth and death bug fixes`
-- [ ] `asm.pl:8762` - `nullifier missiles`
-- [ ] `asm.pl:8814` - `cybernetic advanced damage control`
-- [ ] `asm.pl:8838` - `stasis area effects`
-- [ ] `asm.pl:8897` - `absorber cleanup`
-- [ ] `asm.pl:9091` - `monster bug`
-- [ ] `asm.pl:9871` - `send leader to pool on capture`
-- [ ] `asm.pl:9900` - `system popup freeze`
-- [ ] `asm.pl:9995` - `stumble breakthrough research storage`
-- [ ] `asm.pl:10195` - `curship visuals`
-- [ ] `asm.pl:10260` - `fighter retargeting`
-- [ ] `asm.pl:10315` - `pirate overflow`
-- [ ] `asm.pl:10339` - `skan cleanup`
-- [ ] `asm.pl:10633` - `beam sfx crash`
-- [ ] `asm.pl:10675` - `getchar die`
-- [ ] `asm.pl:11151` - `warlord woes`
-- [ ] `asm.pl:11345` - `raid message`
-- [ ] `asm.pl:11591` - `get all technology from surrender`
-- [ ] `asm.pl:12180` - `fighters return`
-- [ ] `asm.pl:12231` - `no computer hp`
-- [ ] `asm.pl:12253` - `destroy building trigger engage`
-- [ ] `asm.pl:12319` - `lander ships no best armor minus 1`
-- [ ] `asm.pl:12342` - `event conditions`
-- [ ] `asm.pl:12386` - `leaders desynch`
-- [ ] `asm.pl:12470` - `fighters helmsman`
-- [ ] `asm.pl:12492` - `crystal fleet`
-- [ ] `asm.pl:13063` - `ensure officer_star_displayed is set`
-- [ ] `asm.pl:13295` - `wrong missile bearing`
-- [ ] `asm.pl:13430` - `no rifle no sound on invasion crash`
-- [ ] `asm.pl:14094` - `wandering monster search range`
-- [ ] `asm.pl:14103` - `AI selfdestruct`
-- [ ] `asm.pl:14203` - `Loknar message`
-- [ ] `asm.pl:14312` - `brown stars blank`
-- [ ] `asm.pl:14445` - `comet event message`
-- [ ] `asm.pl:14479` - `negative thrust`
-- [ ] `asm.pl:14529` - `scrap value cap`
-- [ ] `asm.pl:14561` - `AI fleet strength assessment`
-- [ ] `asm.pl:15387` - `sound of crash`
-- [ ] `asm.pl:15470` - `msgbox overflow`
-- [ ] `asm.pl:15618` - `fast mod removal from anti-matter torpedo`
-- [ ] `asm.pl:16269` - `hypertech bug`
-- [ ] `asm.pl:16341` - `dead on graphs`
-- [ ] `asm.pl:16430` - `usable orbit fix`
-- [ ] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`
-- [ ] `asm.pl:16567` - `true omni`
-- [ ] `asm.pl:16692` - `bombardment ammo fix`
-- [ ] `asm.pl:16729` - `bombardment fair armor`
-- [ ] `asm.pl:16814` - `wormhole to Orion fix`
-- [ ] `asm.pl:16823` - `planet screen arti`
-- [ ] `asm.pl:16869` - `empty bombardment`
-- [ ] `asm.pl:17018` - `blockaded freeze`
-- [ ] `asm.pl:17027` - `no assault shuttles shots`
-- [ ] `asm.pl:17089` - `del_ships`
-- [ ] `asm.pl:17144` - `no green system popup`
-- [ ] `asm.pl:17265` - `planets screen: high-g race has -25% prod penalty on low-g planet`
-- [ ] `asm.pl:17281` - `new pop not assigned to farming on housing colony`
-- [ ] `asm.pl:17307` - `amoeba regeneration`
-- [ ] `asm.pl:17417` - `new leader window2 shown on tutor only`
-- [ ] `asm.pl:17828` - `AI zero field research`
-- [ ] `asm.pl:17871` - `food replicator no negative production`
-- [ ] `asm.pl:17981` - `artificial planet on outposts climate fix`
-- [ ] `asm.pl:18002` - `commando bonus`
-- [ ] `asm.pl:18437` - `net nested combat`
-- [ ] `asm.pl:18649` - `no homeworld`
-- [ ] `asm.pl:18679` - `outpost false button`
-- [ ] `asm.pl:18757` - `nebula check`
-- [ ] `asm.pl:18774` - `zero colony loss`
-- [ ] `asm.pl:18883` - `unload troops button wrong message`
-- [ ] `asm.pl:18925` - `telepatic capture`
-- [ ] `asm.pl:18959` - `autodesign considers x3 shot`
-- [ ] `asm.pl:18989` - `ship explosion leader says nooo`
-- [ ] `asm.pl:19157` - `dimensional portal icon in system display box displays race name instead of ruler name`
-- [ ] `asm.pl:19225` - `energy absorber 21 squares range bug`
-- [ ] `asm.pl:19256` - `artemis desync`
-- [ ] `asm.pl:19295` - `food shortage anims also shown when colony has 0 food production and 0 food import`
-- [ ] `asm.pl:19304` - `scrap freighters wrong message`
-- [ ] `asm.pl:19313` - `captured ship's missile's armor's owner`
-- [ ] `asm.pl:19362` - `non-zero missile hp`
-- [ ] `asm.pl:19409` - `assassin message race_name instead of ruler_name`
-- [ ] `asm.pl:19594` - `large fleet net freeze`
-- [ ] `asm.pl:19640` - `grain and barrels not shown during anomaly`
-- [ ] `asm.pl:19659` - `Loknar cannot give tech_0`
-- [ ] `asm.pl:19675` - `Leader #0, Ruola, shown in ship refit popup`
-- [ ] `asm.pl:19684` - `galactic lore does not see planet defenses`
-- [ ] `asm.pl:19702` - `destroying multi-phased shields`
+- [x] `asm.pl:2364` - `recalc prod`: fixed in `COLCALC::Colony_Empire_Base_Food2_Produced_()`, `COLCALC::Colony_Empire_Base_Industry_Produced_()`, and `COLCALC::Colony_Empire_Base_Research_Produced_()` by recomputing each result from current colony and player state instead of returning values from state-blind per-race caches; this directly expresses the three 1.50 cache-branch removals in source.
+- [x] `asm.pl:2885` - `displacer, cloak missile`: fixed in `CMBTMIS::Resolve_Missile_()`, `CMBTFIRE::Energy_Absorber_Attack_()`, `CMBTFIR2::Ship_Specials_Defensive_Bonus_()`, and `CMBTAI::Expected_Missile_Damage_()` by using inclusive configured miss chances, applying Displacement Device's 30% protection consistently, and making live combat and AI prediction use either classic independent cloak miss chance or configured Missile Evasion without double application; this replaces the 1.50 branch patches and diversions with direct source-level combat rules while restoring only the inseparable cloak dependency from the later expected-damage work.
+- [x] `asm.pl:3474` - `teleporter + tractor fix`: fixed in `CMBTMOV1::Move_Ship_()` by collecting active tractor links before selecting teleport or ordinary movement, so the shared post-move range check breaks beams beyond four squares after either path; this directly expresses the 1.50 control-flow reorder in source.
+- [x] `asm.pl:4421` - `AI missile targeting`: fixed in `CMBTAI::Get_Current_Missile_Target_()` by classifying missiles using their stored launch owner rather than the current owner of the source ship; this directly expresses the 1.50 owner-helper call in source.
+- [x] `asm.pl:5530` - `speed calc speed driveless no div zero`: fixed in `COMBAT1::Calc_Current_Speed_()` by skipping drive-hit division for real driveless ships while retaining later Trans-Dimensional and tractor modifiers; this replaces the 1.50 code-cave diversion with a direct source-level drive-presence guard while keeping synthetic combat units immobile.
+- [x] `asm.pl:5877` - `other player's portal fix`: fixed in `FLEETPOP::Set_Attack_Antares_Button_Flag_()` by requiring the selected fleet owner's dimensional-portal bit instead of accepting any player's portal in the system; this replaces the 1.50 register bridge and diverted call with a direct source-level ownership check.
+- [x] `asm.pl:6090` - `BHG slot multiple shots`: fixed in `CMBTFIRE::Fire_Ship_()` and `CMBTFIRE::Fire_Special_Weapon_()` by consuming one BHG shot and ending the current firing pass, preserving additional generators in the same slot for later targets; this directly expresses the 1.50 jump reroute and caller helper in source.
+- [x] `asm.pl:6295` - `lightning field`: implemented inline in `CMBTMIS::Resolve_Missile_()` with configurable classic and uniform roll distributions and an inclusive destruction ratio; this replaces the 1.50 call-site diversion while retaining classic mode as the default.
+- [x] `asm.pl:6433` - `woes of stasis`: fixed in `COMBAT1::Do_Combat_Turn_()`, `COMBAT1::Init_Ship_For_Start_Of_Turn_()`, and `CMBTFIRE::Remove_Stasis_Beam_()` by retaining stasis ships in initiative turn order, preserving their shots when released, and reserving one Stasis Field shot per existing target; this replaces the 1.50 branch diversion and instruction suppression with direct source-level state invariants while retaining classic-mode stall prevention.
+- [x] `asm.pl:6573` - `tractor cuts`: fixed in `COMBAT1::Do_Combat_Turn_()` by severing both outgoing and incoming tractor links when a ship completes phasing cloak, recalculating released ships' speeds, and refreshing combat rendering; this directly expresses the 1.50 cloak wrapper and tractor-scan helper while retaining the restored unsigned target representation with `255` as invalid.
+- [x] `asm.pl:6787` - `specials repair`: fixed inline in `CMBTFIR2::Repair_Combat_Ship_()` by applying only the repair points consumed, re-enabling repaired special devices, and refreshing Hard Shields capacity; this replaces the 1.50 instruction patch and call-site wrapper with direct source-level repair invariants.
+- [x] `asm.pl:6812` - `ICS cloak`: fixed in `CMBTFIRE::Fire_Ship_()` and `COMBAT1::Initiate_Boarding_Action_()` by recalculating the firing or boarding ship immediately after Cloaking Device decloaking in local and network combat; this directly expresses the five 1.50 cloak-state wrappers through the shared source-level combat-stat recalculation path while preserving classic behavior by default.
+- [x] `asm.pl:6866` - `starbase capture`: implemented in `COMBINIT::End_Of_Combat_()`, `invasion::Change_Colony_Ownership_()`, and the `COMBINIT` satellite-capture state by recording an attacker-captured satellite before removal and restoring it only when the same colony is captured immediately afterward; this replaces the 1.50 call-site state machine with bounded source-level state and retains classic behavior by default through `combat satellite_capture`.
+- [x] `asm.pl:6994` - `retreat fix`: fixed in `COMBAT1::Do_Combat_Turn_()`, `COMBAT1::Calc_Current_Speed_()`, and `COMBAT1::Retreat_Ship_()` by fully initializing pending retreaters, preserving their retreat marker during speed calculation, and allowing only living mobile ships not blocked by Warp Dissipator to escape; this replaces the 1.50 call-site wrappers with a source-level post-initialization retreat pass.
+- [x] `asm.pl:7084` - `flyer targeting`: fixed in `CMBTMIS::Draw_Missile_()`, `CMBTMIS::Draw_Fighter_()`, and the `CMBTMOV1` ship-movement paths by resolving anti-missile chains to their final ship for drawing while excluding missile-targeting flyers from ship movement and impact checks; this replaces the 1.50 register wrappers and six call-site filters with shared source-level target-domain invariants.
+- [x] `asm.pl:7224` - `stolen prod`: fixed in `invasion::Change_Pop_Ownership_()` by clearing purchased production when a colony changes ownership, so the conqueror cannot inherit production bought by the previous owner; this replaces the 1.50 four-byte assembly clear with a named source-field reset.
+- [x] `asm.pl:7839` - `turn 1 research`: fixed in `COLCALC::Check_For_Research_Breakthrough_()` by banking signed research production when no field is selected, so first-turn output survives until a research choice is made; this directly expresses the 1.50 call-site helper as a source-level branch.
+- [x] `asm.pl:7864` - `unload ship damage storage`: fixed in `COMBINIT::Unload_Combat_Ship_()` by persisting actual computer damage, calculating shield and drive damage directly from lost hit points, and reconstructing surviving fighter counts from slot hit points; this replaces the 1.50 diverted wrapper with direct source-level strategic-state persistence.
+- [x] `asm.pl:7887` - `destroying combat cloaks`: fixed in `CMBTFIR2::Apply_Internal_Damage_()` and the `COMBAT1` cloak-state paths by updating cloak state when a device breaks, falling back to a working Cloaking Device, requiring working devices for recovery, guarding phase timeout transitions, and recognizing repaired Phasing Cloaks; this replaces the 1.50 damage wrapper and code-cave checks with direct source-level invariants while retaining the configurable `recloak_next_turn` and `rephase_cloak_next_turn` behavior.
+- [x] `asm.pl:8101` - `miniaturization`: implemented in `DESIGN::Miniaturization_Category_()`, `DESIGN::Cost_Given_M_Level_()`, and `DESIGN::Space_Given_M_Level_()` with configurable technology categories and normalized six-level cost and per-category space curves; this replaces the 1.50 call diversions, immediate rewrites, and flattened multiplier fields with direct source-level data bindings.
+- [x] `asm.pl:8114` - `mark stack overflow`: fixed in `INFO::_Tech_Review_Subscreen_()` by popping its active technology-image allocation before every return, preserving push-stack balance for both the info screen and race report; this replaces the 1.50 race-report cursor stash with cleanup at the allocation owner.
+- [x] `asm.pl:8145` - `turn order ini overflow`: fixed in `COMBAT1::Restore_Captured_Ship_To_Turn_Order_()` and `CMBTFIR2::Capture_Ship_()` by reusing an existing turn-order vacancy or performing a bounded append, without shifting the 210-entry queue or changing its cursors; this replaces the 1.50 capture-aware recalculation wrapper and legacy insertion bypass with a bounded source-level invariant.
+- [x] `asm.pl:8169` - `damper planet`: implemented in `COMBINIT::Load_Tactical_Colony_()`, `CMBTFIRE::Apply_Damage_To_Planet_()`, and `CMBTFIRE::Destroy_Colony_Defense_()` with the optional `planet_damper` setting; eligible planetary defenses subtract planetary shield absorption before reducing remaining damage to one quarter, and Damper and Rangemaster protection ends when the last defense is destroyed, replacing the 1.50 wrappers and byte clears with direct source-level rules.
+- [x] `asm.pl:8263` - `satellites plasma darkening`: fixed in `COMBINIT::Tactical_Combat_()` by checking every loaded combat unit for installed cloak capabilities after colony defenses are added and initializing the shared plasma-darkening resources when needed; this replaces the 1.50 unconditional load with a capability-based source invariant.
+- [x] `asm.pl:8272` - `shuttle hijack`: fixed in `COMBAT1::Do_Combat_Turn_()` by preserving the active ship's turn-order entry and reselecting control when assault-shuttle capture changes ownership during movement or rotation; this replaces the 1.50 movement skips, rotation wrappers, and strict-mode cursor hooks with a direct source-level ownership invariant.
+- [x] `asm.pl:8367` - `marines overload`: implemented in `CMBTFIR2::Resolve_Capture_()` and `BOARDING::Captured_Marine_Count_()` by optionally limiting surviving attackers to the captured ship or orbital base's hull capacity, doubled by working Troop Pods; this replaces the 1.50 call-site wrapper with a direct source-level capture invariant while preserving classic behavior by default.
+- [x] `asm.pl:8662` - `cloak initialize`: fixed in `COMBINIT::Init_Special_Devices_()` by letting a working Phasing Cloak override an ordinary Cloaking Device and initialize the configurable `combat_bonus phasing_cloak_effective_turns` timeout; this replaces the 1.50 assembly diversion and C wrapper with a direct source-level cloak-state invariant.
+- [x] `asm.pl:8685` - `stasis cut`: fixed in `CMBTFIRE::Place_Ship_In_Stasis_()` by removing continuing effects associated with the ship as it enters stasis, with the firing path refreshing combat rendering afterward; this replaces the 1.50 call-site wrapper with the existing source-level stasis transition and cleanup abstractions.
+- [x] `asm.pl:8703` - `infantry and armor growth and death bug fixes`: fixed in `COLCALC::Produce_Ground_Military_()` by treating each barracks capacity as a three-way boundary before checking building-backed growth, so troops at capacity remain stable and unsupported over-cap troops decay; this replaces the 1.50 call-site diversion with direct source-level cap enforcement.
+- [x] `asm.pl:8762` - `nullifier missiles`: fixed in `CMBTMOV1::Rotate_Ship_()` and `CMBTMOV1::Rotate_Ship_Until_Impact_()` by preventing a working Inertial Nullifier's zero-time turns from advancing incoming missiles during actual and predicted rotation; this replaces the 1.50 code-cave branches and call wrapper with direct source-level guards.
+- [x] `asm.pl:8814` - `cybernetic advanced damage control`: fixed in `TECHINIT::Tech_Is_Legal_For_Player_()` by making Advanced Damage Control illegal for Cybernetic races, preventing the redundant racial benefit from occupying their technology tree; this replaces the 1.50 call-site helper with the existing centralized source-level eligibility rule.
+- [x] `asm.pl:8838` - `stasis area effects`: fixed in `CMBTFIR2::Fleet_Defensive_Bonus_()`, `CMBTFIR2::Fleet_Offensive_Bonus_()`, and `COMBAT1::Enemy_Dissipator_Exists_()` by excluding stasis-held ships from jammer, scout lab, satellite attack, and warp dissipator fleet effects; this replaces the 1.50 call-site wrappers with direct source-level eligibility checks.
+- [x] `asm.pl:8897` - `absorber cleanup`: fixed in `CMBTFIRE::Apply_Ship_Damage_()`, `CMBTFIRE::Is_Combat_Ship_Dead_()`, and `CMBTFIR2::Damage_From_Ship_Exploding_()` by saturating stored absorber charge at 32767, treating that cap as overload destruction, and applying the overload warning and 77x drive explosion; this replaces the 1.50 transient explosion-state byte with state derived directly from the combat ship.
+- [x] `asm.pl:9091` - `monster bug`: fixed in `COMBFIND::Do_Net_Combat_Update_()` by clearing pending combat participants only when both their attacker and star match the battle being processed; this replaces the 1.50 code-cave star checks with direct validation of the synchronized player records.
+- [x] `asm.pl:9871` - `send leader to pool on capture`: fixed in `CMBTFIR2::Capture_Ship_()` by handling the tactical officer and strategic ship leader independently and returning any remaining strategic leader through `OFFICER::Move_Officer_To_Pool_()`; this replaces the 1.50 branch retarget and code-cave helper with the existing source-level officer transition.
+- [x] `asm.pl:9900` - `system popup freeze`: fixed in `animate::Set_Animation_Frame_()` and `SYS::Draw_System_Display_Popup_()` by interpreting packed frame counts, requested indices, and the shared popup animation counter as unsigned at their use boundaries; this directly expresses the 1.50 signedness corrections without changing shared storage layouts.
+- [x] `asm.pl:9995` - `stumble breakthrough research storage`: fixed in `COLCALC::Resolve_Research_Completion_()` and the current-technology acquisition and selection paths by retaining configured excess research while keeping the completed field pending until replacement selection; this replaces the 1.50 code-cave wrappers with shared source-level accounting and the existing player breakthrough marker.
+- [x] `asm.pl:10195` - `curship visuals`: fixed in `COMBAT1::Seeking_Missiles_()`, `COMBINIT::Increment_Bhg_()`, and `COMBINIT::Plasma_Web_Damage_()` by selecting the affected ship before automatic missile, black-hole, and plasma-web visual or destruction processing; this replaces the 1.50 seeking wrapper and code-cave hooks with direct source-level assignments from authoritative target indices.
+- [x] `asm.pl:10260` - `fighter retargeting`: fixed in `CMBTMIS::Retarget_Missile_()` by excluding a previous target only when the stored target identifies a ship; this replaces the 1.50 temporary `-1` target rewrite with the existing source-level target-domain predicate.
+- [x] `asm.pl:10315` - `pirate overflow`: fixed in `EVENTS::Determine_Event_()` by capping pirate-raid losses at 32767 before storing them in the signed 16-bit event amount, preventing large treasuries from wrapping the loss negative and turning raids into credits; this replaces the 1.50 call-site helper with direct source-level saturation.
+- [x] `asm.pl:10339` - `skan cleanup`: fixed in `COMBINIT::Load_Display_Combat_Ship_()` by clearing the shared temporary combat record before reconstructing each strategic ship, preventing stale capture and display state from selecting incorrect ship pictures; this moves the 1.50 call-site code-cave cleanup to the state owner.
+- [x] `asm.pl:10633` - `beam sfx crash`: fixed in `BEAMS::Beam_SFX_()` by using inclusive, nonzero random bounds for ship/shield and slot-zero fighter target scatter, preventing `game_random::Random_()` from dividing by zero when fighter resolution collapses to a zero radius; this directly expresses the two 1.50 helper increments in source.
+- [x] `asm.pl:10675` - `getchar die`: fixed in `exitm::Exit_With_Message()`, `exitm::Exit_Normally()`, and the platform shutdown path by classifying normal and fatal exits explicitly, preserving their process status, and deferring dialog presentation and graphics cleanup to the SDL main thread; this replaces the 1.50 return-address allowlist, graphics-mode byte, and DOS key wait with the restored ownership model and modal message box.
+- [x] `asm.pl:11151` - `warlord woes`: fixed in `COLCALC::Apply_Production_()` by normalizing newly completed ship crew quality from experience and Warlord before same-turn combat, with AI `just_built` cleanup moved before the XP pass; optional satellite Warlord and strategic crew bonuses are applied directly by the tactical and strategic combat loaders, replacing the 1.50 temporary tactical-load promotion.
+- [x] `asm.pl:11345` - `raid message`: fixed in `CMBTFIR2::Resolve_Raid_()` by using the bounded source-level string builder for complete raid reports, reporting each affected special device once, deriving damaged or destroyed wording from its remaining hit points, and suppressing the report during super-fast combat; this replaces the 1.50 global accumulator and call-site diversions with local message construction.
+- [x] `asm.pl:11591` - `get all technology from surrender`: fixed in `COLCALC::Do_Surrender_Empire_()` by checking every real technology application through `TECH_APP_ZORTRIUM_ARMOR`, so the recipient receives all eligible researched technology; this replaces the 1.50 immediate-bound correction with the named source-level application boundary.
+- [x] `asm.pl:12180` - `fighters return`: fixed in `CMBTMIS::Land_Returning_Fighters_()` and `COMBINIT::End_Of_Turn_Bookeeping_()` by rebuilding launched bay availability from surviving weapon hit points before distributing returning squadrons, and by restoring fighter-garrison bay counts as well as ammo on replacement turns; this replaces the 1.50 C helpers and binary diversions with direct tactical-state updates derived from authoritative slot data.
+- [x] `asm.pl:12231` - `no computer hp`: fixed in `CMBTFIR2::Init_Internal_Space_()` by assigning hull computer hit points only when a computer is installed, preventing computerless ships from gaining a phantom damageable subsystem; this replaces the 1.50 call-site helper with a direct source-level initialization invariant.
+- [x] `asm.pl:12253` - `destroy building trigger engage`: fixed in `ERICNET::Add_Building_()` and `ERICNET::Remove_Building_()` by clearing system combat-ignore state when a building in the synchronized `combat reengage_buildings` list is added or removed; its default reproduces the eight 1.50 defense buildings while replacing binary branch rewrites and the destruction hook with one configurable source-level invariant.
+- [x] `asm.pl:12319` - `lander ships no best armor minus 1`: fixed in `INITSHIP::Load_Colony_Ship_Design_()`, `INITSHIP::Load_Outpost_Ship_Design_()`, and `INITSHIP::Load_Transport_Ship_Design_()` by assigning the best available armor directly to every generated lander design; this replaces the three 1.50 one-byte instruction suppressions with the equivalent source-level equipment invariant.
+- [x] `asm.pl:12342` - `event conditions`: fixed in `EVENTS::Determine_Event_()` by applying the configured per-event minimum turn and blocking comet and space-monster candidates while hyperspace flux is active; shared `EVENT` and `NONPLAYER_SHIP_TYPE` constants replace the misleading numeric identities, and the direct source-level eligibility rule replaces the 1.50 code-cave diversion and hardcoded-condition bypass.
+- [x] `asm.pl:12386` - `leaders desynch`: fixed in `OFFICER::Deassign_Officer_()` and `NETMOX::Send_Game_Orders_()` by retaining deassigned leader records through the next game-order packet so the host receives their advanced XP before ownership is cleared; this replaces the 1.50 call-site wrappers with centralized transient event tracking.
+- [x] `asm.pl:12470` - `fighters helmsman`: fixed in `CMBTMIS::Missile_Dcv_()` by adding the owning fleet's full Helmsman defensive bonus to fighter defense alongside the fighter-pilot and racial bonuses; this replaces the 1.50 diverted-call wrapper with direct reuse of the restored fleet-bonus helper.
+- [x] `asm.pl:12492` - `crystal fleet`: implemented in `COMBINIT`, `CMBTFIRE`, and `INITSHIP` by deriving builder-sensitive art and structure from `previous_owner`, invalidating effects when a destroyed Crystal releases captures, and retaining victorious Crystal captures only when `combat crystal_keep` is enabled; this replaces the 1.50 code-cave wrappers with direct source-level invariants while preserving the classic default.
+- [x] `asm.pl:13063` - `ensure officer_star_displayed is set`: fixed in `OFFICER::Officers_Screen_()` by resolving the initial colony-officer star once and assigning it to both the chosen and displayed state before initializing the system display; this replaces the 1.50 call-site wrapper with a direct source-level initialization invariant.
+- [x] `asm.pl:13295` - `wrong missile bearing`: fixed in `CMBTMOV1::Rotate_Ship_Until_Impact_()` and `CMBTMOV1::Test_Move_Until_Impact_()` by restoring missile facing together with the position and travel distance modified during impact prediction; this replaces the 1.50 global bearing stash and epilogue cleanup hooks with function-local source snapshots.
+- [x] `asm.pl:13430` - `no rifle no sound on invasion crash`: fixed in `COLGCBT::Play_Unit_Beam_Sound_()` by assigning the Pulse Rifle firing sound when a combatant has no rifle technology; this replaces the 1.50 branch-target correction with an explicit source-level fallback.
+- [x] `asm.pl:14094` - `wandering monster search range`: fixed in `AIMOVE::Npc_Dest_()` by extending eligible colony destinations from less than 15 to less than 20 parsecs, preventing mobile nonplayer monsters from being removed when a target exists 15 through 19 parsecs away; this directly expresses the 1.50 immediate correction in source.
+- [x] `asm.pl:14103` - `AI selfdestruct`: fixed in `CMBTAI::Ai_Self_Destruct_Check_()` by excluding Black Hole Generator victims from capture-avoidance self-destruction when `combat board_in_black_hole` is disabled; this replaces the 1.50 flag-producing assembly wrapper with a direct source-level eligibility guard while preserving classic-enabled behavior.
+- [x] `asm.pl:14203` - `Loknar message`: fixed in `OFFICER::Give_Player_Loknar_Special_()` by appending technologies actually granted by Loknar to the Orion reward list and allowing the rescue message to display without technology rewards; this replaces the 1.50 global stash and popup-buffer wrappers with result-owned transient state.
+- [x] `asm.pl:14312` - `brown stars blank`: fixed in `MOVEBOX::Draw_Galaxy_Map_Box_()` by allowing brown stars to use the normal owner and visibility color selection, so colonized brown systems display their owner's color instead of the uninhabited marker; this directly expresses the 1.50 branch suppression in source.
+- [x] `asm.pl:14445` - `comet event message`: fixed in `EVENTS::Event_Twiddle_()` by clamping destroyed-comet strength to zero and preventing periodic progress status from replacing a terminal result, so destroyed comets report exactly 100 percent and colony impacts retain their finishing message; this replaces the 1.50 code-cave clamp and unconditional progress-report suppression with direct source-level state invariants.
+- [x] `asm.pl:14479` - `negative thrust`: fixed in `CMBTAI::Auto_Move_Ship_()` and both movement paths in `COMBAT1::Do_Combat_Turn_()` by clamping remaining movement to zero after subtracting the actual movement cost; this directly expresses the three 1.50 code-cave clamps in source.
+- [x] `asm.pl:14529` - `scrap value cap`: fixed in `FLT1::Get_Scrap_Ship_Value_()` and `FLT1::Scrap_Ships_()` by retaining the selected ships' aggregate scrap value as signed 32-bit through validation, confirmation formatting, and treasury credit; this directly expresses the 1.50 instruction-width corrections in source.
+- [x] `asm.pl:14561` - `AI fleet strength assessment`: fixed in `TECHDATA::_weapons` by clearing generic interceptor damage that is assessed through separate fighter handling and assigning the Black Hole Generator its intended 100-point strength; this directly expresses the two 1.50 weapon-table corrections while preserving their separate strategic-combat values.
+- [x] `asm.pl:15387` - `sound of crash`: fixed in `ERICNET::Mox_Play_Sound_()`, `fields::Get_Input_()`, `LOADSAVE::Set_Sound_For_Game_Popup_()`, and `COMBINIT::Tactical_Combat_()` by routing gameplay effects through the shared sound-enabled and super-fast-mode gate and clearing fast mode during combat cleanup; the restored VFS validates resource ids against the effective `sound.lbx`, replacing the 1.50 fixed-id wrapper and call diversions with archive-driven source-level validation.
+- [x] `asm.pl:15470` - `msgbox overflow`: fixed in `TEXTBOX::Do_Text_Box_()` by capping formatted body height at 374 before sizing the frame, keeping oversized message boxes within supported screen geometry; this directly expresses the 1.50 call-site wrapper in source.
+- [x] `asm.pl:15618` - `fast mod removal from anti-matter torpedo`: fixed in `TECHDATA::_weapons` by removing the Fast capability from Anti-Matter Torpedo while retaining Enveloping, ECCM, and Overloaded; this directly expresses the 1.50 weapon-table correction in source.
+- [x] `asm.pl:16269` - `hypertech bug`: fixed in `TECH::Technology_Applications_Name_()` and `TECHDATA::_technology_fields` by deriving the next displayed rank from the completed-rank counter and restoring the 25,000 RP base cost consumed by `COLCALC::Player_Research_Cost_()`; this removes the original binary's temporary save/increment/restore UI mutation.
+- [x] `asm.pl:16341` - `dead on graphs`: fixed in `INFO::History_Subscreen_()` by retaining eliminated opponents in the history graph player list, so their recorded population, production, fleet, and technology histories remain visible after elimination; this directly expresses the sole 1.50 call diversion through the existing source-level player-list abstraction.
+- [x] `asm.pl:16430` - `usable orbit fix`: already fixed in `HOMEGEN::Usable_Orbit_()` by checking the actual candidate orbit occupant through `p_idx` instead of indexing the next unused `_planet_count` slot; this directly expresses the invariant implemented by the 1.50 `CWDE` and jump byte patch.
+- [x] `asm.pl:16439` - `1 turn display for 1 turn breakthrough`: fixed in `COLCALC::Player_N_Turns_Until_Research_Complete_()` by applying each projected turn's research before accumulating that same turn's breakthrough chance, so the threshold-crossing turn is counted once; this directly expresses the 1.50 unconditional skip of the redundant pre-threshold loop.
+- [x] `asm.pl:16567` - `true omni`: fixed in `PLNTSUM::Set_Planet_Explored_Flags_()` and `PLNTSUM::Filter_Explored_Planets_()` by distinguishing race-trait Omniscience from Galactic Lore when marking explored planets and applying that explored-world gate only while enemy-controlled planets are filtered; this replaces the 1.50 call diversion and branch trampoline with direct source-level visibility rules.
+- [x] `asm.pl:16692` - `bombardment ammo fix`: fixed in `COMBAT::Tactical_Bombardment_()` by advancing only torpedo cooldown during bombardment turns and refreshing the attacker's fighter beam and bomb weapon types before combat; this replaces the 1.50 instruction patch and wrapper with direct source-level initialization and ammo invariants.
+- [x] `asm.pl:16729` - `bombardment fair armor`: implemented in `CMBTFIRE::Apply_Damage_To_Planet_()` and `COMBAT::Tactical_Bombardment_()` with the configurable `civilian_armor` table, using the defender's best armor consistently for civilian damage thresholds, processed-hit accounting, and tactical bombardment results; this replaces the 1.50 code-cave wrappers with direct source-level calculations and rejects the unsafe zero divisor.
+- [x] `asm.pl:16814` - `wormhole to Orion fix`: fixed in `HAROLD::Set_Wormhole_Id_()` by retaining the no-link sentinel when no eligible wormhole partner exists, preventing the failed pairing fallback from creating a one-way link to Orion; this directly expresses the 1.50 immediate-byte correction in source.
+- [x] `asm.pl:16823` - `planet screen arti`: fixed in `PLNTSUM::Summary_Screen_Print_Data_()` by deriving Ancient Artifacts display status from the selected planet's persistent special when the star-level discovery status no longer carries it; this replaces the 1.50 call-site wrapper with a direct local display invariant.
+- [x] `asm.pl:16869` - `empty bombardment`: fixed in `COMBAT::Tactical_Bombardment_()` by taking the attacker from the bombardment context instead of the first collected ship, so an empty ship list cannot select an arbitrary owner; this directly expresses the 1.50 instruction replacement in source.
+- [x] `asm.pl:17018` - `blockaded freeze`: fixed in `aidudes::Do_Blockaded_Colony_()` by rechecking freshly computed farming capability when a food-deficient blockaded colony has no available farm slots, then assigning the remaining population through the existing non-farming policy; this replaces the 1.50 branch retarget with direct source-level progress enforcement.
+- [x] `asm.pl:17027` - `no assault shuttles shots`: fixed in `CMBTMIS::Resolve_Missile_()` by consuming the assault-shuttle attack counter completely after boarding, so shuttles cannot retain additional fighter shots or return; this replaces the 1.50 call-site helper with a direct source-level state transition.
+- [x] `asm.pl:17089` - `del_ships`: no source backport is required; the 1.50 topic only adds a cdecl-to-Watcom ABI wrapper used by the excluded Lua `del_ships` API, while the restored native scrap path calls `FLT1::Get_Technology_From_Scrapped_Ship_()` directly.
+- [x] `asm.pl:17144` - `no green system popup`: fixed in `COMBFIND::Get_Local_Human_Target_()` by invalidating the cached system display before combat target selection, forcing the next system popup to rebuild its reduced palette instead of reusing stale loaded state; this replaces the 1.50 all-call wrapper with direct source-level cache invalidation.
+- [x] `asm.pl:17265` - `planets screen: high-g race has -25% prod penalty on low-g planet`: fixed in `PLNTSUM::Productivity_Penalty_()` by reporting the same 25 percent Low-G-world penalty for High-G races that colony production applies; this directly expresses the two 1.50 branch corrections in source.
+- [x] `asm.pl:17281` - `new pop not assigned to farming on housing colony`: implemented in `COLCALC::Apply_Colony_Pop_Growth_()` by bypassing farmer selection for population grown while Housing is active when `housing_creates_no_farmers` is enabled; this replaces the 1.50 binary diversion with a direct source-level guard while preserving classic behavior by default.
+- [x] `asm.pl:17307` - `amoeba regeneration`: implemented in `COMBINIT::Repair_All_Combat_Ships_()` with the configurable `amoeba_regeneration` gate and `repair_rate` values, while both combat special displays include Regeneration only when enabled; this replaces the 1.50 diversion and branch patches with direct source-level repair and visibility rules while preserving classic behavior by default.
+- [x] `asm.pl:17417` - `new leader window2 shown on tutor only`: fixed in `MAINPUPS::Random_New_Officer_Popup_()` by retaining and redrawing the accept or reject result window only for Tutor-level random leader reports, while officer-screen hiring and higher difficulties close immediately; this replaces the two 1.50 immediate-byte edits with one source-level UI invariant.
+- [x] `asm.pl:17828` - `AI zero field research`: fixed in `COLCALC::Advance_Player_Field_()` by treating the zero starting-technology field as no selected research and returning before field traversal; this replaces the 1.50 all-call wrapper with an owner-level source invariant.
+- [x] `asm.pl:17871` - `food replicator no negative production`: fixed in `COLCALC::Colony_Replicators_()` by capping replicated food to the amount affordable at the configured production cost before updating colony production; this replaces the 1.50 call-site wrapper with a direct source-level accounting invariant.
+- [x] `asm.pl:17981` - `artificial planet on outposts climate fix`: fixed in `COLONIZE::Make_New_Colony_Or_Outpost_()` by assigning Barren climate to outposts founded on asteroids or gas giants while preserving the real climate of normal planets; this directly expresses the 1.50 helper as a source-level creation invariant.
+- [x] `asm.pl:18002` - `commando bonus`: implemented in `invasion::Compute_Colony_Officer_Bonus_()` and `invasion::Compute_Attacker_Officer_Bonus_()` with synchronized `leaders ground_commando_defender_x5` and `leaders ground_commando_attacker_x2` settings; direct source-level formula selection replaces the 1.50 code-cave wrappers and immediate-byte edit while preserving classic defaults.
+- [x] `asm.pl:18437` - `net nested combat`: fixed in `COMBFIND::Do_1_Combat_()` and `COMBFIND::Do_Net_Combat_Update_()` by rejecting direct combat reentry and deferring strategic network combat progression while another combat owns the shared combat state; this replaces the 1.50 all-call wrappers with a file-local source invariant while leaving normal network pumping active.
+- [x] `asm.pl:18649` - `no homeworld`: fixed in `COLCALC::Colony_Can_Build_Product_()` by treating a missing home planet as no existing Capitol before indexing planet and colony state; this replaces the 1.50 code-cave diversion with a direct source-level eligibility guard.
+- [x] `asm.pl:18679` - `outpost false button`: fixed in `FLEETPOP::Set_Build_Outpost_Button_Flag_()` by requiring the selected fleet to be directly located at a star before checking its outpost ships and eligible planets; this replaces the 1.50 branch rewrite with a source-level location invariant so an encoded in-transit destination cannot expose the Build Outpost button.
+- [x] `asm.pl:18757` - `nebula check`: fixed in `GEO::Point_Is_In_Nebula_N_()` by rejecting points left of or above the nebula before coordinate scaling and reading pixels through the animation's first-frame offset; this replaces the 1.50 call diversion and register wrapper with direct source-level bounds and image-layout invariants.
+- [x] `asm.pl:18774` - `zero colony loss`: implemented in `COLCALC::Ghost_Colony_Stuff_()` with the configurable `colony zero_colony_lost` rule; the owner-level condition replaces the 1.50 diversion and preserves the classic exception for inbound colonists by default.
+- [x] `asm.pl:18883` - `unload troops button wrong message`: fixed in `MAINSCR::Scan_Moveable_Box_Fields()` by displaying the dedicated no-transport-selected message when the Unload Troops button is clicked without a selected transport; this directly expresses the 1.50 message-id replacement with a named source constant.
+- [x] `asm.pl:18925` - `telepatic capture`: implemented in `CMBTFIR2::Capture_Ship_()` with the configurable `combat telepathic_multiple_capture` rule, clearing stale captured state when a Telepathic player recaptures a ship; this replaces the 1.50 comparison wrapper and code-cave clear with a direct source-level ownership invariant while preserving classic behavior by default.
+- [x] `asm.pl:18959` - `autodesign considers x3 shot`: implemented with the synchronized `design missile_x3_shot` setting and shared `DESIGN` rack helpers, so UI selection, rack cost and space, and autodesign use the same x2/x3/x5/x10/x20 ladder; this replaces the 1.50 data patches and code-cave diversion with one source-level rule while preserving classic behavior by default.
+- [x] `asm.pl:18989` - `ship explosion leader says nooo`: implemented in `CMBTSPEC::Do_Spherical_SFX_()` and `CMBTSPEC::Destroy_Ship_FX_()` by deriving the leader death exclamation from the destroyed combat ship's officer; the optional `leaders leader_dies_with_no` setting extends it to regular and Quantum Detonator destruction, replacing the 1.50 call-site wrappers with direct source-level sound policy.
+- [x] `asm.pl:19157` - `dimensional portal icon in system display box displays race name instead of ruler name`: fixed in `SYS::Print_Gate_Info_()` by appending each dimensional-portal owner's race name instead of ruler name; this directly expresses the 1.50 player-field displacement correction in source.
+- [x] `asm.pl:19225` - `energy absorber 21 squares range bug`: fixed in `CMBTFIRE::Pre_Weapon_Specials_()` by allowing the Energy Absorber counterattack at computed range 8; this directly expresses the 1.50 inclusive branch correction in source.
+- [x] `asm.pl:19256` - `artemis desync`: fixed in `NETTURN::Net_Next_Turn_()` and `CMBTFIR2::Apply_Combat_Artemis_Net_()` by checkpointing the synchronized RNG state before network turn processing and restoring it before Artemis rolls; this replaces the 1.50 call diversions and global code-cave seed variable with guarded source-level state owned by the Artemis subsystem.
+- [x] `asm.pl:19295` - `food shortage anims also shown when colony has 0 food production and 0 food import`: fixed in `COLDRAW::Draw_Colony_Prod_Both_()` by treating zero food imports as eligible for the existing shortage-animation path; this directly expresses the 1.50 signed branch-boundary correction in source.
+- [x] `asm.pl:19304` - `scrap freighters wrong message`: fixed in `MAINSCR2::Scrap_Freighters_()` by displaying the dedicated all-freighters-in-use message when no freighters are available to scrap; this directly expresses the 1.50 message-id correction with a named source constant.
+- [x] `asm.pl:19313` - `captured ship's missile's armor's owner`: fixed in `CMBTAI::Expected_Weapon_Damage_()`, `CMBTAI::Target_Missile_Value_()`, and `CMBTFIRE::Apply_Damage_To_Missile_()` by calculating launched fighter hit points from the missile's stored launch owner rather than the current owner of its source ship; this directly expresses the three 1.50 owner-field replacements in source.
+- [x] `asm.pl:19362` - `non-zero missile hp`: fixed in `CMBTMIS::Get_Missile_Hits_()` by normalizing zero computed or fallback durability to one; this replaces the 1.50 all-call wrapper with a direct source-level return invariant.
+- [x] `asm.pl:19409` - `assassin message race_name instead of ruler_name`: fixed in `MSG_::sprintf_msg_()` by using the defending and attacking players' race names in all assassination-report language paths; this directly expresses the three 1.50 player-field substitutions in source.
+- [x] `asm.pl:19594` - `large fleet net freeze`: already fixed in `NETMOX::Send_Pick_Target_Info_()` and `NETMOX::Send_You_Are_Target_Info_()` by serializing combat state into the shared 8 MiB bounded payload workspace and sending one 32-bit-length framed message; 16-bit ship counts and ids preserve values above 127. This removes the DOS `0x7800` chunk threshold and per-chunk send wait rather than reproducing the 1.50 buffer and control-flow patches.
+- [x] `asm.pl:19640` - `grain and barrels not shown during anomaly`: fixed in `COLCALC::Colony_Industry_Production_()` by clearing industry production, pollution barrels, and food import/export state together when a colony is affected by a time-space anomaly; this directly expresses the 1.50 helper's three field resets in source.
+- [x] `asm.pl:19659` - `Loknar cannot give tech_0`: fixed in `INITGAME::Init_Leaders_()` by generating Loknar's first technology directly in the valid `1..101` range; this replaces the 1.50 immediate rewrite and removed decrement with the equivalent source-level initialization invariant.
+- [x] `asm.pl:19675` - `Leader #0, Ruola, shown in ship refit popup`: fixed in `COLBLDG::Build_Ship_Info_Formatted_Paragraph_()` by treating every nonnegative officer index as assigned, so valid leader index 0 reaches `OFFICER::Leader_Name_()`; this directly expresses the 1.50 signed branch-boundary correction in source.
+- [x] `asm.pl:19684` - `galactic lore does not see planet defenses`: fixed in `SYS::Do_Print_Planet_Info_()` by requiring race-trait Omniscience, rather than Galactic Lore's broader visibility predicate, before revealing colony defense buildings; this replaces the 1.50 call diversion with a direct source-level display gate.
+- [x] `asm.pl:19702` - `destroying multi-phased shields`: fixed in `CMBTFIR2::Apply_Internal_Damage_()` by recalculating and storing shield capacity when shield-generator damage or Multi-Phased Shields destruction invalidates it, then clamping every current arc; this replaces the 1.50 code-cave helpers with one file-local source invariant.
 
 ### Mixed topics requiring block-level review
 
-- [ ] `asm.pl:1158` - `mapgen`
-- [ ] `asm.pl:1973` - `refit`
-- [ ] `asm.pl:2387` - `town Zero`
-- [ ] `asm.pl:3545` - `ICS + weapon breakages`
-- [ ] `asm.pl:5757` - `antaran fixup for starbasi`
-- [ ] `asm.pl:6957` - `free maintenance cash`
-- [ ] `asm.pl:9343` - `unbuy and queue`
-- [ ] `asm.pl:10360` - `show arti tech`
-- [ ] `asm.pl:11479` - `scrap ships`
-- [ ] `asm.pl:13245` - `fleet summary giveaways`
+- [x] `asm.pl:1158` - `mapgen`: fixed in `HAROLD::N_Food_Planets_In_System_()`, `HOMEGEN::Ensure_At_Least_1_Food_Planet_()`, and `MAPGEN::Enforce_Planet_Max_()` by counting only real food planets, resetting candidates per colony, removing monster guards, and preserving selected food systems during trimming; restored new-game flow already autosaves after native map generation, so the 1.50 wrappers are unnecessary.
+- [x] `asm.pl:1973` - `refit`: fixed in `AIBUILD::Refit_Cost_()` and `COLBLDG::Add_Refited_Ship_To_Queue_()` by sharing the quarter-hull, government-adjusted refit formula across UI, AI, and queue charging, with synchronized `design alternative_refit` support; restored design-cost recalculation makes the 1.50 cache-branch patch unnecessary.
+- [x] `asm.pl:2387` - `town Zero`: fixed in `MAINPUPS::Add_Colony_Combat_Fields_()`, `BOMB::Resolve_Bomb_Hit_()`, and `COLCALC` by allowing valid actions against zero-population colonies with remaining buildings, making planetary defense buildings bombable, destroying a colony when its final eligible building is bombed, and restoring configurable human-colony starvation extinction; direct source predicates replace the 1.50 diversions and temporary state.
+- [x] `asm.pl:3545` - `ICS + weapon breakages`: completed in `COMBAT1::Init_Ship_For_Start_Of_Turn_()`, `COMBAT1::Recalculate_Combat_Ship_()`, `COMBAT1::Remove_Continuing_Effect_Specials_()`, and `CMBTFIR2::Apply_Internal_Damage_()` by keeping movement and combat statistics synchronized, releasing continuing effects when sustaining weapons break, using unsigned tractor targets, and reserving BHG shots for active targets when `combat continuous_bhg` is enabled; direct source transitions replace the 1.50 call-site wrappers.
+- [x] `asm.pl:5757` - `antaran fixup for starbasi`: fixed in `COMBAT1::Calc_Current_Speed_()`, `BOARDING::Captured_Marine_Count_()`, and `COMBINIT::End_Of_Combat_()` by distinguishing mobile generated Antaran ships from driveless bases and accounting Antaran losses by immutable previous ownership; source retains one nonpersistent-ship sentinel instead of the 1.50 `-257` sentinel and widened binary guards.
+- [x] `asm.pl:6957` - `free maintenance cash`: fixed in `COLCALC::Apply_Production_()` by removing obsolete building and spy maintenance credits, refunding half the actual spy cost when no spy can be added, and restoring the synchronized `colony freighters_cash_bonus` compatibility setting with a zero default; direct source accounting replaces the 1.50 NOPs and helper.
+- [x] `asm.pl:9343` - `unbuy and queue`: fixed in `BUILD_QUEUE::Unbuy_Product_()`, `COLONY::Tested_Colony_Buys_Outright_()`, and the `COLBLDG` queue mutation paths by refunding the stored purchase snapshot before cancellation and treating Repeat as part of its preceding product; direct source invariants replace the 1.50 wrappers and diversions.
+- [x] `asm.pl:10360` - `show arti tech`: implemented in `COMBFIND::Do_System_Discoveries_At_Star_()`, `REPORT::Has_Report_()`, and `SCIENCE::Show_Off_Artifact_Tech_()` by queuing every granted artifact technology with its source planet and presenting it through the report flow; direct source data replaces the 1.50 saved-star and temporary-planet globals, with `finds_presented_by_scientist` retaining the original default and presentation choice.
+- [x] `asm.pl:11479` - `scrap ships`: fixed in `FLT1::Get_Technology_From_Scrapped_Ship_()` by adding installed shields to scrap-plunder candidates, ignoring absent drive, computer, and armor entries, and granting each selected technology once; direct source list checks replace the 1.50 diversions and duplicate-scan wrapper.
+- [x] `asm.pl:13245` - `fleet summary giveaways`: fixed in `SYS::N_Ships_By_Type_In_Stack_()` and its fleet, galaxy-map, and system-popup callers by counting only ships linked into the already visibility-filtered stack; direct node traversal replaces the 1.50 call diversions and register bridge.
 - [ ] `asm.pl:13578` - `overmap speed recalc`
-- [ ] `asm.pl:14135` - `scrap stuff maintenance`
-- [ ] `asm.pl:15487` - `keep autocolonization`
-- [ ] `asm.pl:16349` - `design button behaviour`
-- [ ] `asm.pl:16395` - `runaway homeworlds`
-- [ ] `asm.pl:16409` - `home systems min 3 planets default`
+- [x] `asm.pl:14135` - `scrap stuff maintenance`: fixed in `maintain::Kill_Ships_()` and `aileader::Reassign_Fleet_Officer_()` by marking forced-scrap ships inactive before maintenance recalculation and moving their officers to any eligible local replacement before falling back to the pool; authoritative ship status replaces the 1.50 temporary distress flag.
+- [x] `asm.pl:15487` - `keep autocolonization`: fixed in `SHIPMOVE::Make_Ships_Move_To_()` by retaining a colony or outpost ship's auto-colonization assignment when its movement destination is the assigned planet's star; this replaces the 1.50 encoded-location code-cave guard and obsolete bulk-clear pass with a direct source-level destination invariant.
+- [x] `asm.pl:16349` - `design button behaviour`: implemented in `DESIGN::Build_Initial_Design_Template_()` with local `design design_button_computer` and `design design_button_shield` settings that either select the best available component or preserve the saved design choice; direct source selection replaces the 1.50 call-site wrappers.
+- [x] `asm.pl:16395` - `runaway homeworlds`: fixed in `MAPGEN::Enforce_Planet_Max_()` by updating each moved colony's planet back-reference during planet-array compaction; the restored candidate-list selection already replaces the original out-of-bounds orbit lookup and preserves home systems directly.
+- [x] `asm.pl:16409` - `home systems min 3 planets default`: already implemented in `HOMEGEN::Enforce_3_Planet_Minimum_()` by directly ensuring each home system contains at least three real planets; the restored source has no legacy `/planets=` parser, so the 1.50 default and parser-byte edits reduce to this source-level invariant.
 - [ ] `asm.pl:16448` - `BH to real star planet generation`
-- [ ] `asm.pl:16621` - `orphans fix`
-- [ ] `asm.pl:17094` - `surrender maps`
+- [x] `asm.pl:16621` - `orphans fix`: fixed in `HOMEGEN::Guarantee_A_Planet_At_Min_Dist_()` by preserving existing orbit records and reusing the shared add-or-convert operation until the target contains two real planets; this replaces the 1.50 cross-function flag and control-flow diversions with a file-local source invariant.
+- [x] `asm.pl:17094` - `surrender maps`: fixed in `COLCALC::Do_Surrender_Empire_()` by merging the surrendering empire's visited-system map into the recipient before elimination; this replaces the 1.50 register-preserving call wrapper with a direct source-level surrender invariant.
 
 ### Behavior and balance review
 
-- [ ] `asm.pl:339` - `missile initiative`
+- [x] `asm.pl:339` - `missile initiative`: implemented in `CMBTMIS::Fire_Missile_()` with synchronized `combat missile_initiative` configuration, selecting whether initiative-launched missiles begin eligible for current-round movement; direct source initialization replaces the 1.50 writable instruction immediate while preserving the classic `-1` default.
 - [ ] `asm.pl:343` - `HEF/mount`
 - [ ] `asm.pl:1230` - `torpedoes for satellites`
 - [ ] `asm.pl:1244` - `tractor power table`
@@ -324,6 +324,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 
 ### Follow-up topics
 
+- [ ] `asm.pl:1158` / `asm.pl:2344` / `asm.pl:4986` - `mapgen configurable postprocessor`: restore the excluded `proc_mapgen()` feature together with every `conf_mapgen` option, parser definition, default, command-line override, and synchronization path; the correctness-only `mapgen` backport above intentionally does not include this optional map-mod feature.
 - [ ] `asm.pl:29` - `meta`
 - [ ] `asm.pl:158` - `library`
 - [ ] `asm.pl:567` - `shortcuts`
@@ -411,7 +412,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:17625` - `draw race_extra info`
 - [ ] `asm.pl:17749` - `planet extra specials`
 - [ ] `asm.pl:17840` - `independent space scanner`
-- [ ] `asm.pl:17912` - `food replicator pp and bc cost`
+- [x] `asm.pl:17912` - `food replicator pp and bc cost`: implemented with synchronized `colony replicator_food_pp` and `colony replicator_food_bc` settings used by replication, industry breakdowns, and BC maintenance; source applies the BC surcharge after climate-adjusted building maintenance instead of reproducing the 1.50 binary hooks.
 - [ ] `asm.pl:18087` - `antaran ship designs`
 - [ ] `asm.pl:18178` - `system monster weapons`
 - [ ] `asm.pl:18326` - `build screen colors and ordering`

@@ -814,6 +814,14 @@ namespace REPORT {
                                 REPORT::_reports[i].d.steal.victim_player_idx
                             );
                             report_handled = true;
+                        } else if (REPORT::_reports[i].type == 3) {
+                            status = 2;
+                            MOVEBOX::Remove_Box_Check_();
+                            SCIENCE::Show_Off_Artifact_Tech_(
+                                REPORT::_reports[i].d.artifacts.tech_app_id,
+                                REPORT::_reports[i].d.artifacts.planet_idx
+                            );
+                            report_handled = true;
                         }
 
                         if (!report_handled) {

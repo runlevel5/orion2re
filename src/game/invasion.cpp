@@ -74,10 +74,13 @@ void __cdecl Compute_Colony_Officer_Bonus_(s_colony* colony, s_invasion_player_b
 
         if (leader->general_skills & LEADER_GENERAL_SKILL_COMMANDO2) {
             int16_t level = OFFICER::Owned_Officer_Level_(leader_idx);
-            bonuses->officer_bonus = (level + 1) * 3;
+            bonuses->officer_bonus = _ground_commando_defender_x5
+                ? ((level + 1) * 15) / 2
+                : (level + 1) * 3;
         } else if (leader->general_skills & LEADER_GENERAL_SKILL_COMMANDO) {
             int16_t level = OFFICER::Owned_Officer_Level_(leader_idx);
-            bonuses->officer_bonus = level * 2 + 2;
+            bonuses->officer_bonus =
+                (level + 1) * (_ground_commando_defender_x5 ? 5 : 2);
         }
 
         if (bonuses->officer_bonus > 0) {
@@ -101,10 +104,13 @@ void __cdecl Compute_Attacker_Officer_Bonus_(int16_t* ship_indexes, int16_t coun
 
                 if ((MOX::_leaders[officer_idx].general_skills & LEADER_GENERAL_SKILL_COMMANDO2) != 0) {
                     int16_t level = OFFICER::Owned_Officer_Level_(officer_idx);
-                    bonus = (level * 15 + 16) / 2;
+                    bonus = _ground_commando_attacker_x2
+                        ? (level + 1) * 3
+                        : (level * 15 + 16) / 2;
                 } else if ((MOX::_leaders[officer_idx].general_skills & LEADER_GENERAL_SKILL_COMMANDO) != 0) {
                     int16_t level = OFFICER::Owned_Officer_Level_(officer_idx);
-                    bonus = (level + 1) * 5;
+                    bonus = (level + 1) *
+                        (_ground_commando_attacker_x2 ? 2 : 5);
                 }
 
                 if (bonuses->officer_bonus < bonus) {
@@ -505,6 +511,11 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
     invasion::Change_Pop_Ownership_(colony_idx, new_owner_idx);
 
+    const int16_t captured_satellite = COMBINIT::Take_Captured_Satellite_(colony_idx);
+    if (captured_satellite != -1) {
+        ERICNET::Add_Building_(colony_idx, captured_satellite);
+    }
+
     // Remove defensive/security buildings upon capture
     if (colony->buildings[BUILDING_ARMOR_BARRACKS] != 0) {
         ERICNET::Remove_Building_(colony_idx, BUILDING_ARMOR_BARRACKS);
@@ -674,6 +685,7 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner_idx) {
     COLBLDG::Clear_Colony_Queue_(colony_idx);
 
     colony->production_spent = 0;
+    colony->bought_outright = 0;
     colony->just_produced = COLONY_PRODUCTION_JUST_CONQUERED;
     colony->occupation_points = 0;
     colony->occupation_policy = 4;

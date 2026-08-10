@@ -63,6 +63,7 @@ namespace platform {
 		SDL_Mutex* g_exit_mutex;
 		SDL_Condition* g_exit_condition;
 		SDL_AtomicInt g_exit_requested;
+		SDL_AtomicInt g_exit_status;
 		SDL_AtomicInt g_game_thread_exited;
 		SDL_AtomicInt g_mouse_wheel_accum; // hundredths of a wheel step
 		SDL_AtomicInt g_mouse_wheel_accum_x; // hundredths, positive = right
@@ -362,6 +363,34 @@ namespace platform {
 			}
 
 			return g_exit_mutex != nullptr && g_exit_condition != nullptr;
+		}
+
+		void Store_Exit_Request_(const char* message, int status) {
+			Ensure_Exit_Primitives_();
+
+			if (g_exit_mutex != nullptr) {
+				SDL_LockMutex(g_exit_mutex);
+			}
+
+			const bool first_request = SDL_GetAtomicInt(&g_exit_requested) == 0;
+			if (first_request ||
+				(status != EXIT_SUCCESS && message != nullptr && message[0] != '\0') ||
+				(g_exit_message[0] == '\0' && message != nullptr && message[0] != '\0')) {
+				Copy_Exit_Message_(message);
+			}
+
+			if (first_request || status != EXIT_SUCCESS) {
+				SDL_SetAtomicInt(&g_exit_status, status);
+			}
+			SDL_SetAtomicInt(&g_exit_requested, 1);
+
+			if (g_exit_condition != nullptr) {
+				SDL_BroadcastCondition(g_exit_condition);
+			}
+
+			if (g_exit_mutex != nullptr) {
+				SDL_UnlockMutex(g_exit_mutex);
+			}
 		}
 
 		void Request_SDL_Exit_() {
@@ -843,9 +872,9 @@ namespace platform {
 			}
 
 			const int32_t dst_x0 =
-				SDL_GetAtomicInt(&g_present_mouse_x) + (int32_t)cursor_state.offset;
+				SDL_GetAtomicInt(&g_present_mouse_x);
 			const int32_t dst_y0 =
-				SDL_GetAtomicInt(&g_present_mouse_y) + (int32_t)cursor_state.offset;
+				SDL_GetAtomicInt(&g_present_mouse_y);
 
 			SDL_Rect dst_rect = {dst_x0, dst_y0, k_cursor_dimension, k_cursor_dimension};
 			(void)SDL_BlitSurface(
@@ -931,6 +960,7 @@ namespace platform {
 		}
 
 		SDL_SetAtomicInt(&g_exit_requested, 0);
+		SDL_SetAtomicInt(&g_exit_status, EXIT_SUCCESS);
 		SDL_SetAtomicInt(&g_game_thread_exited, 0);
 		g_exit_message[0] = '\0';
 	}
@@ -943,6 +973,7 @@ namespace platform {
 		}
 
 		SDL_SetAtomicInt(&g_exit_requested, 0);
+		SDL_SetAtomicInt(&g_exit_status, EXIT_SUCCESS);
 		SDL_SetAtomicInt(&g_game_thread_exited, 0);
 		g_exit_message[0] = '\0';
 
@@ -956,26 +987,11 @@ namespace platform {
 	}
 
 	void __cdecl Request_Exit_(const char* message) {
-		Ensure_Exit_Primitives_();
+		Store_Exit_Request_(message, EXIT_SUCCESS);
+	}
 
-		if (g_exit_mutex != nullptr) {
-			SDL_LockMutex(g_exit_mutex);
-		}
-
-		if (SDL_GetAtomicInt(&g_exit_requested) == 0) {
-			Copy_Exit_Message_(message);
-			SDL_SetAtomicInt(&g_exit_requested, 1);
-		} else if (g_exit_message[0] == '\0' && message != nullptr && message[0] != '\0') {
-			Copy_Exit_Message_(message);
-		}
-
-		if (g_exit_condition != nullptr) {
-			SDL_BroadcastCondition(g_exit_condition);
-		}
-
-		if (g_exit_mutex != nullptr) {
-			SDL_UnlockMutex(g_exit_mutex);
-		}
+	void __cdecl Request_Fatal_Exit_(const char* message) {
+		Store_Exit_Request_(message, EXIT_FAILURE);
 	}
 
 	bool __cdecl Exit_Requested_() {
@@ -984,6 +1000,10 @@ namespace platform {
 
 	const char* __cdecl Exit_Message_() {
 		return g_exit_message;
+	}
+
+	int __cdecl Exit_Status_() {
+		return SDL_GetAtomicInt(&g_exit_status);
 	}
 
 	void __cdecl Check_Exit_() {
@@ -1451,7 +1471,7 @@ namespace platform {
         SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
 #endif
 
-        g_sdl_window = SDL_CreateWindow("Microprose", nWidth, nHeight, window_flags);
+        g_sdl_window = SDL_CreateWindow("Orion2 Redone", nWidth, nHeight, window_flags);
         if (g_sdl_window == nullptr) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "platform: SDL_CreateWindow failed: %s", SDL_GetError());
 			SDL_DestroyMutex(g_present_cursor_mutex);
@@ -1545,8 +1565,9 @@ namespace platform {
             g_worker_thread_handle = nullptr;
         }
 
+		const int exit_status = Exit_Status_();
 		if (g_exit_message[0] != '\0') {
-			Show_Message_Box_(g_main_window, g_exit_message, "Microprose", true);
+			Show_Message_Box_(g_main_window, g_exit_message, "Microprose", exit_status != EXIT_SUCCESS);
 		}
 
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "platform: Run_Main_Loop shutdown");
@@ -1563,7 +1584,7 @@ namespace platform {
 		Shutdown_Exit_();
         SDL_Quit();
 
-        return 0;
+        return exit_status;
     }
 
     void __cdecl Pump_Game_Input_Queue_() {

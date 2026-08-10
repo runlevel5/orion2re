@@ -3,10 +3,57 @@
 #include "game/boarding.h"
 
 namespace COMBAT1 {
+    static constexpr int kMaxCombatShips = 210;
+    static int16_t movement_reserve[kMaxCombatShips] = {};
+
+    static int16_t Maximum_Combat_Speed_(int16_t ship_idx) {
+        s_combat_data& ship = MOX::_combat_data[ship_idx];
+        int16_t speed = (uint8_t)ship.combat_speed_base;
+
+        if (struct_::Test_Bit_Field_(
+                ship.special_device_flags, SPECIAL_AUGMENTED_ENGINES) != 0) {
+            speed += 5;
+        }
+
+        if (ship.owner >= 0 && ship.owner < MAX_PLAYERS &&
+            MOX::_player[ship.owner].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
+            speed += 4;
+        }
+
+        return speed;
+    }
 
     int32_t _end_of_turn_button;
 
     uint16_t _start_of_turn;
+
+    void Recalculate_Combat_Ship_(int16_t ship_idx, bool tractor_applied) {
+        if (ship_idx < 0 || ship_idx >= MOX::_combat_total_ship_count) {
+            return;
+        }
+
+        s_combat_data& ship = MOX::_combat_data[ship_idx];
+        const int16_t old_speed = ship.current_speed;
+        const int16_t new_speed = Calc_Current_Speed_(ship_idx);
+        ship.current_speed = new_speed;
+
+        if (_interactive_combat_stats != 0) {
+            ship.movement_left = Adjust_Movement_After_Speed_Change_(
+                old_speed,
+                new_speed,
+                Maximum_Combat_Speed_(ship_idx),
+                ship.movement_left,
+                &movement_reserve[ship_idx]
+            );
+            ship.tac_val_attack = CMBTFIR2::Offensive_Combat_Bonus_(ship_idx);
+            ship.tac_val_defense = CMBTFIR2::Defensive_Combat_Bonus_(ship_idx, 0);
+            ship.tac_val_evade = CMBTFIR2::Defensive_Combat_Bonus_(ship_idx, 1);
+        } else if (_non_ics_tractor_and_bhg_mode != 0 &&
+                   ship.movement_left > new_speed &&
+                   (tractor_applied || ship.black_hole_source_idx != UINT8_MAX)) {
+            ship.movement_left = new_speed;
+        }
+    }
 
     void __cdecl Add_Tactical_Combat_Fields_(void) {
         int16_t auto_combat_idx = 0;
@@ -190,6 +237,58 @@ namespace COMBAT1 {
         return is_functional;
     }
 
+    static void Process_Retreating_Ships_(int16_t active_player_id, int16_t time_warp_only) {
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            if (Combat_Ship_Is_Functional_(i) == 0) {
+                continue;
+            }
+            if (time_warp_only != 0 &&
+                COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TIME_WARP_FACILITATOR) == 0) {
+                continue;
+            }
+
+            s_combat_data* ship = &MOX::_combat_data[i];
+            if ((MOX::_combat_init == 0 && ship->owner != active_player_id) ||
+                ship->is_retreating != 1) {
+                continue;
+            }
+
+            if (ship->current_speed <= 0 || Enemy_Dissipator_Exists_(ship->owner) != 0) {
+                ship->is_retreating = 0;
+                continue;
+            }
+
+            if (MOX::_net_flag != 0 && MOX::_combat_init != 0) {
+                NETMOX::Net_Debug_Log_(
+                    "Wait_Until_Net_Opponent_Finished_: caller=%s:%d",
+                    __FILE__,
+                    __LINE__);
+                CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
+            }
+
+            MOX::_cur_ship = i;
+            Retreat_Ship_(i);
+        }
+    }
+
+    static void Advance_After_Ship_Action_(
+        int8_t original_owner,
+        int16_t active_player_id,
+        int16_t* next_ship_flag
+    ) {
+        const bool owner_changed =
+            MOX::_combat_data[MOX::_cur_ship].owner != original_owner;
+        const bool ship_done = Ship_Done_Check_() != 0;
+        if (!owner_changed && !ship_done) {
+            return;
+        }
+
+        if (!owner_changed) {
+            MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
+        }
+        *next_ship_flag = Next_Ship_(active_player_id);
+    }
+
     void __cdecl Do_Combat_Turn_(int16_t active_player_id, int16_t time_warp_only) {
         MOX::_player_mode[MOX::_combat_attacker_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_attacker_player);
         MOX::_player_mode[MOX::_combat_defender_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_defender_player);
@@ -210,6 +309,7 @@ namespace COMBAT1 {
             }
         }
 
+        Process_Retreating_Ships_(active_player_id, time_warp_only);
         RUSS::Mox_Update_();
         
         int16_t order_idx = 0;
@@ -218,7 +318,7 @@ namespace COMBAT1 {
         if (MOX::_combat_total_ship_count > 0) {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[i].unit_status == 0) {
-                    if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0) {
+                    if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0 || MOX::_combat_init != 0) {
                         if (time_warp_only == 0 || COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TIME_WARP_FACILITATOR) != 0) {
                             if (MOX::_combat_init != 0 || MOX::_combat_data[i].owner == active_player_id) {
                                 if (MOX::_combat_data[i].is_captured == 0) {
@@ -481,9 +581,6 @@ namespace COMBAT1 {
                                                 if (MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].active < -1) {
                                                     MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].active = 1;
                                                 }
-                                                if (MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].active != 1 && MOX::_combat_data[MOX::_cur_ship].weapons[w_idx].weapon_id == WEAPON_TRACTOR_BEAM) {
-                                                    MOX::_combat_data[MOX::_cur_ship].special_cooldown = 0xFF;
-                                                }
                                                 if (MOX::_net_flag != 0) {
                                                     NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                     CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
@@ -577,10 +674,12 @@ namespace COMBAT1 {
                                     if ((int16_t)(input_val + MOX::_space_field) == 0) {
                                         int16_t face_x = MOX::_cur_combat_x + MOX::_xpos / 2;
                                         int16_t face_y = MOX::_cur_combat_y + MOX::_ypos / 2;
+                                        int8_t original_owner = MOX::_combat_data[MOX::_cur_ship].owner;
                                         if (MOX::_net_flag != 0 && MOX::_PLAYER_NUM != MOX::_net_destination) {
                                             Send_Tactical_Combat_Message_(MOX::_net_destination, TACTICAL_NET_MSG_TURN_TO_FACE, face_x, face_y, 0);
                                         }
                                         CMBTMOV1::Turn_To_Face_(MOX::_cur_ship, face_x, face_y);
+                                        Advance_After_Ship_Action_(original_owner, active_player_id, &next_ship_flag);
                                         if (MOX::_net_flag != 0) {
                                             NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                             CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
@@ -622,13 +721,13 @@ namespace COMBAT1 {
                                                 int16_t used_tp2 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
                                                 if (used_tp1 == used_tp2) {
                                                     MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;
+                                                    if (MOX::_combat_data[MOX::_cur_ship].movement_left < 0) {
+                                                        MOX::_combat_data[MOX::_cur_ship].movement_left = 0;
+                                                    }
                                                 }
                                                 Assign_Combat_Grids_(MOX::_cur_ship);
                                                 CMBTDRW1::Refresh_Combat_Screen_Full_();
-                                                if (Ship_Done_Check_() != 0 || MOX::_combat_data[MOX::_cur_ship].owner != orig_owner) {
-                                                    MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
-                                                    next_ship_flag = Next_Ship_(active_player_id);
-                                                }
+                                                Advance_After_Ship_Action_(orig_owner, active_player_id, &next_ship_flag);
                                                 if (MOX::_net_flag != 0) {
                                                     NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
                                                     CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
@@ -806,13 +905,13 @@ namespace COMBAT1 {
                                                     int16_t used_tp2 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
                                                     if (used_tp1 == used_tp2) {
                                                         MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;
+                                                        if (MOX::_combat_data[MOX::_cur_ship].movement_left < 0) {
+                                                            MOX::_combat_data[MOX::_cur_ship].movement_left = 0;
+                                                        }
                                                     }
                                                     Assign_Combat_Grids_(MOX::_cur_ship);
                                                     CMBTDRW1::Refresh_Combat_Screen_Full_();
-                                                    if (Ship_Done_Check_() != 0 || MOX::_combat_data[MOX::_cur_ship].owner != orig_owner) {
-                                                        MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
-                                                        next_ship_flag = Next_Ship_(active_player_id);
-                                                    }
+                                                    Advance_After_Ship_Action_(orig_owner, active_player_id, &next_ship_flag);
                                                     break;
                                                 }
                                                 case TACTICAL_NET_MSG_FIRE_WEAPON:
@@ -854,18 +953,18 @@ namespace COMBAT1 {
                                                     if (MOX::_combat_data[MOX::_cur_ship].weapons[f10].active < -1) {
                                                         MOX::_combat_data[MOX::_cur_ship].weapons[f10].active = 1;
                                                     }
-                                                    if (MOX::_combat_data[MOX::_cur_ship].weapons[f10].active != 1 && MOX::_combat_data[MOX::_cur_ship].weapons[f10].weapon_id == WEAPON_TRACTOR_BEAM) {
-                                                        MOX::_combat_data[MOX::_cur_ship].special_cooldown = 0xFF;
-                                                    }
                                                     break;
                                                 case TACTICAL_NET_MSG_RETREAT:
                                                     MOX::_combat_data[MOX::_cur_ship].is_retreating = 1;
                                                     MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
                                                     next_ship_flag = Next_Ship_(active_player_id);
                                                     break;
-                                                case TACTICAL_NET_MSG_TURN_TO_FACE:
+                                                case TACTICAL_NET_MSG_TURN_TO_FACE: {
+                                                    int8_t original_owner = MOX::_combat_data[MOX::_cur_ship].owner;
                                                     CMBTMOV1::Turn_To_Face_(MOX::_cur_ship, f10, f12);
+                                                    Advance_After_Ship_Action_(original_owner, active_player_id, &next_ship_flag);
                                                     break;
+                                                }
                                                 case TACTICAL_NET_MSG_REMOVE_STASIS:
                                                     CMBTFIRE::Remove_Stasis_Beam_(f10);
                                                     break;
@@ -881,6 +980,7 @@ namespace COMBAT1 {
                                                                 CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 2);
                                                             }
                                                             MOX::_combat_data[MOX::_cur_ship].special_status_flag = 2;
+                                                            Recalculate_Combat_Ship_(MOX::_cur_ship);
                                                         } else if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 4) {
                                                             if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
                                                                 CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 5);
@@ -897,6 +997,7 @@ namespace COMBAT1 {
                                                                 CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 2);
                                                             }
                                                             MOX::_combat_data[MOX::_cur_ship].special_status_flag = 2;
+                                                            Recalculate_Combat_Ship_(MOX::_cur_ship);
                                                         } else if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 4) {
                                                             if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
                                                                 CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 5);
@@ -969,13 +1070,40 @@ namespace COMBAT1 {
                                 MOX::_combat_data[i].weapons[j].status = 1;
                             }
                         }
-                        if (MOX::_combat_data[i].special_status_flag == 3) {
+                        const int8_t recloak_state =
+                            _recloak_next_turn != 0 ? 2 : 3;
+                        if (MOX::_combat_data[i].special_status_flag == recloak_state &&
+                            COMBINIT::Does_Combat_Ship_Have_Special_(
+                                i, SPECIAL_CLOAKING_DEVICE) != 0) {
                             CMBTSPEC::Draw_Cloak_(i, 1);
                             MOX::_combat_data[i].special_status_flag = 1;
                         }
-                        if (MOX::_combat_data[i].special_status_flag == 7) {
+                        const int8_t rephase_state =
+                            _rephase_cloak_next_turn != 0 ? 6 : 7;
+                        if (MOX::_combat_data[i].special_status_flag == rephase_state &&
+                            MOX::_combat_data[i].special_status_timer > 0 &&
+                            COMBINIT::Does_Combat_Ship_Have_Special_(
+                                i, SPECIAL_PHASING_CLOAK) != 0) {
                             CMBTSPEC::Draw_Cloak_(i, 4);
                             MOX::_combat_data[i].special_status_flag = 4;
+
+                            const uint8_t tractor_target_idx = MOX::_combat_data[i].special_cooldown;
+                            MOX::_combat_data[i].special_cooldown = UINT8_MAX;
+                            if (tractor_target_idx < MOX::_combat_total_ship_count) {
+                                Recalculate_Combat_Ship_(tractor_target_idx);
+                            }
+
+                            for (int16_t tractor_ship_idx = 0;
+                                 tractor_ship_idx < MOX::_combat_total_ship_count;
+                                 ++tractor_ship_idx) {
+                                if (MOX::_combat_data[tractor_ship_idx].special_cooldown == i) {
+                                    MOX::_combat_data[tractor_ship_idx].special_cooldown = UINT8_MAX;
+                                }
+                            }
+
+                            Recalculate_Combat_Ship_(i);
+                            CMBTDRW1::Refresh_Combat_Screen_Full_();
+
                             for (int16_t m = 0; m < 300; ++m) {
                                 if (MOX::_missile[m].type > 0 && MOX::_missile[m].target_unit_idx == i && MOX::_missile[m].source_unit_idx != i) {
                                     CMBTMIS::Retarget_Missile_(m);
@@ -1010,7 +1138,9 @@ namespace COMBAT1 {
             }
 
             s_combat_data* ship = &MOX::_combat_data[i];
-            if (ship->special_status_flag != 4) {
+            if (ship->special_status_flag != 4 ||
+                COMBINIT::Does_Combat_Ship_Have_Special_(
+                    i, SPECIAL_PHASING_CLOAK) == 0) {
                 continue;
             }
 
@@ -1030,7 +1160,7 @@ namespace COMBAT1 {
     {
         int16_t speed = 0;
 
-        if (MOX::_combat_data[ship_idx].ftl_type == 0 || CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
+        if (MOX::_combat_data[ship_idx].ftl_type == DRIVE_NO_DRIVE || CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
             speed = 0;
         } else {
             int combat_speed = (uint8_t)MOX::_combat_data[ship_idx].combat_speed_base;
@@ -1041,15 +1171,18 @@ namespace COMBAT1 {
             }
             
             int owner = MOX::_combat_data[ship_idx].owner;
-            int current_hits = MOX::_combat_data[ship_idx].drive_current_hits;
-            int max_hits = MOX::_combat_data[ship_idx].drive_max_hits;
-            
-            if (owner <= 9) {
-                int half_max = max_hits / 2;
-                int range = max_hits - half_max;
-                speed = (int16_t)(((current_hits - half_max) * combat_speed) / range);
-            } else {
-                speed = (int16_t)((current_hits * combat_speed) / max_hits);
+
+            if (MOX::_combat_data[ship_idx].ftl_type != DRIVE_NO_DRIVE) {
+                int current_hits = MOX::_combat_data[ship_idx].drive_current_hits;
+                int max_hits = MOX::_combat_data[ship_idx].drive_max_hits;
+
+                if (owner <= 9) {
+                    int half_max = max_hits / 2;
+                    int range = max_hits - half_max;
+                    speed = (int16_t)(((current_hits - half_max) * combat_speed) / range);
+                } else {
+                    speed = (int16_t)((current_hits * combat_speed) / max_hits);
+                }
             }
             
             if (speed < 0) {
@@ -1086,17 +1219,12 @@ namespace COMBAT1 {
                 }
             }
         }
-        
-        if (speed <= 0) {
-            MOX::_combat_data[ship_idx].is_retreating = 0;
-        }
-        
+
         return speed;
     }
 
     void __cdecl Init_Ship_For_Start_Of_Turn_(int16_t ship_idx) {
         int16_t is_captured_now = CMBTFIR2::Being_Captured_(ship_idx);
-        uint8_t capture_flag8 = (uint8_t)is_captured_now;
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
         ship->combat_status_flags = 0;
@@ -1104,15 +1232,6 @@ namespace COMBAT1 {
             CMBTFIR2::Set_Capturing_Flag_(ship_idx);
         }
         ship->field42_0x49 = 0;
-
-        if (ship->is_retreating == 1) {
-            if (MOX::_net_flag != 0 && MOX::_combat_init != 0) {
-                NETMOX::Net_Debug_Log_("Wait_Until_Net_Opponent_Finished_: caller=%s:%d", __FILE__, __LINE__);
-                CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
-            }
-            Retreat_Ship_(ship_idx);
-            return;
-        }
 
         if (ship->is_captured == 1) {
             ship->movement_left = 0;
@@ -1128,7 +1247,14 @@ namespace COMBAT1 {
         int16_t speed = Calc_Current_Speed_(ship_idx);
         ship->current_speed = speed;
         ship->movement_left = speed;
+        movement_reserve[ship_idx] = Maximum_Combat_Speed_(ship_idx) - speed;
 
+        if (ship->special_status_flag < 4 &&
+            ship->special_status_timer != 0 &&
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                ship_idx, SPECIAL_PHASING_CLOAK) != 0) {
+            ship->special_status_flag = 6;
+        }
         if (ship->special_status_flag == 2) {
             ship->special_status_flag = 3;
         }
@@ -1145,7 +1271,8 @@ namespace COMBAT1 {
                     slot->shots_left = 0;
                     stasis_count -= (int16_t)count;
                 } else {
-                    slot->shots_left = (int8_t)((uint8_t)count - capture_flag8);
+                    slot->shots_left = (int8_t)((int16_t)count - stasis_count);
+                    stasis_count = 0;
                 }
             } else {
                 slot->shots_left = count;
@@ -1171,6 +1298,29 @@ namespace COMBAT1 {
                 if (slot->ammo > 0) {
                     slot->ammo--;
                 }
+            }
+        }
+
+        if (_continuous_bhg != 0) {
+            int16_t active_target_count = 0;
+            for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+                if (MOX::_combat_data[i].black_hole_source_idx == ship_idx) {
+                    active_target_count++;
+                }
+            }
+
+            for (int i = 0; i < 8 && active_target_count > 0; ++i) {
+                s_combat_weapon_slot* slot = &ship->weapons[i];
+                if (slot->weapon_id != WEAPON_BLACK_HOLE_GENERATOR) {
+                    continue;
+                }
+
+                int16_t committed_shots = slot->shots_left;
+                if (committed_shots > active_target_count) {
+                    committed_shots = active_target_count;
+                }
+                slot->shots_left -= (int8_t)committed_shots;
+                active_target_count -= committed_shots;
             }
         }
     }
@@ -1419,19 +1569,32 @@ namespace COMBAT1 {
     }
 
     void __cdecl Retreat_Ship_(int16_t ship_idx) {
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+        int16_t is_dead = CMBTFIRE::Is_Combat_Ship_Dead_(ship_idx);
+        int16_t speed = 0;
+        if (is_dead == 0) {
+            speed = Calc_Current_Speed_(ship_idx);
+        }
+
+        if (is_dead != 0 || speed <= 0 || ship->is_retreating != 1) {
+            if (is_dead != 0 || speed <= 0) {
+                ship->movement_left = 0;
+            }
+            ship->is_retreating = 0;
+            return;
+        }
+
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
             if (CMBTDRW1::Ship_On_Screen_(ship_idx) == 0) {
-                COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[ship_idx].x, MOX::_combat_data[ship_idx].y);
+                COMBINIT::Snap_Center_Combat_Screen_(ship->x, ship->y);
             }
             CMBTDRW1::Draw_Retreating_Ship_(ship_idx);
         }
 
-        if (CMBTFIRE::Is_Combat_Ship_Dead_(ship_idx) == 0) {
-            MOX::_combat_data[ship_idx].unit_status = 5;
-            MOX::_combat_data[ship_idx].is_retreating = 2;
-            CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
-            COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
-        }
+        ship->unit_status = 5;
+        ship->is_retreating = 2;
+        CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
+        COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
     }
 
     int16_t __cdecl Get_Number_Of_Ships_In_Stasis_(int16_t source_ship_idx) {
@@ -1512,6 +1675,13 @@ namespace COMBAT1 {
             if (MOX::_combat_data[i].special_cooldown == source_idx) {
                 MOX::_combat_data[i].special_cooldown = 0xFF;
             }
+        }
+
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            Recalculate_Combat_Ship_(i);
+        }
+        if (_interactive_combat_stats != 0) {
+            CMBTFIR2::Set_Combat_Ordnance_Values_();
         }
     }
 
@@ -1722,7 +1892,8 @@ namespace COMBAT1 {
         int16_t total_ships = MOX::_combat_total_ship_count;
 
         for (int16_t i = 0; i < total_ships; ++i) {
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WARP_DISSIPATOR) != 0) {
+            if (!CMBTMOV1::Ship_Is_In_Stasis_(i) &&
+                COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WARP_DISSIPATOR) != 0) {
                 s_combat_data* ship = &MOX::_combat_data[i];
 
                 if (ship->is_captured == 0 && ship->unit_status == 0 && ship->owner != player_idx) {
@@ -1900,6 +2071,7 @@ namespace COMBAT1 {
                             CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 2);
                         }
                         MOX::_combat_data[MOX::_cur_ship].special_status_flag = 2;
+                        Recalculate_Combat_Ship_(MOX::_cur_ship);
                     } else if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 4) {
                         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
                             CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 5);
@@ -1915,6 +2087,7 @@ namespace COMBAT1 {
                             CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 2);
                         }
                         MOX::_combat_data[MOX::_cur_ship].special_status_flag = 2;
+                        Recalculate_Combat_Ship_(MOX::_cur_ship);
                     } else if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 4) {
                         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
                             CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 5);
@@ -2019,6 +2192,7 @@ namespace COMBAT1 {
                                 target_x = MOX::_missile[t_idx].x;
                                 target_y = MOX::_missile[t_idx].y;
                             }
+                            MOX::_cur_ship = t_idx;
                             CMBTMIS::Resolve_Missile_(m_idx, target_x, target_y);
                         } else {
                             CMBTMIS::Kill_Missile_(m_idx);

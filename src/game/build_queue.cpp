@@ -318,19 +318,6 @@ namespace {
         }
     }
 
-    void Unbuy_(s_colony& colony) {
-        if (colony.bought_outright == 0) {
-            return;
-        }
-        const int32_t refund = COLCALC::Colony_Cost_To_Buy_Given_Product_(
-            &colony, colony.producing[0], colony.production_spent);
-        int32_t& bc = MOX::_player[colony.owner].bc;
-        if (refund >= 0 && bc <= INT32_MAX - refund) {
-            bc += refund;
-            colony.bought_outright = 0;
-        }
-    }
-
     void Buy_(int16_t colony_idx, uint8_t instruction) {
         s_colony& colony = MOX::_colony[colony_idx];
         if (colony.bought_outright != 0 || COLCALC::Colony_Is_Blockaded(&colony)) {
@@ -424,7 +411,7 @@ namespace {
             }
             if (instruction == INSTRUCTION_UNBUY) {
                 memcpy(colony.producing, queue, sizeof(queue));
-                Unbuy_(colony);
+                Unbuy_Product_(&colony);
                 continue;
             }
             if (!Is_Product_(instruction)) {
@@ -486,6 +473,25 @@ namespace {
         return true;
     }
 }
+
+    bool Unbuy_Product_(s_colony* colony) {
+        if (colony == nullptr || colony->bought_outright == 0) {
+            return true;
+        }
+
+        const int32_t product_cost =
+            static_cast<int32_t>(colony->production_spent) + colony->bought_outright;
+        const int32_t refund =
+            COLCALC::Production_Cost_To_Buy_(product_cost, colony->production_spent);
+        int32_t& bc = MOX::_player[colony->owner].bc;
+        if (refund < 0 || bc > INT32_MAX - refund) {
+            return false;
+        }
+
+        bc += refund;
+        colony->bought_outright = 0;
+        return true;
+    }
 
     bool Colony_Production_Is_Continuous_Project_(int16_t product) {
         return product == COLONY_PRODUCTION_HOUSING ||

@@ -1378,8 +1378,8 @@ namespace BEAMS {
                                         if (shield_radius <= max_radius) {
                                             max_radius = shield_radius;
                                         }
-                                        rand_offsets[i + 2] = (int16_t)game_random::Random_(max_radius) - max_radius / 2;
-                                        rand_offsets[i] = (int16_t)game_random::Random_(max_radius) - max_radius / 2;
+                                        rand_offsets[i + 2] = (int16_t)game_random::Random_(max_radius + 1) - max_radius / 2;
+                                        rand_offsets[i] = (int16_t)game_random::Random_(max_radius + 1) - max_radius / 2;
                                     }
                                     else {
                                         apply_random = true;
@@ -1388,7 +1388,7 @@ namespace BEAMS {
                                 else if (fx->accum_hit_x == 0) {
                                     int16_t max_radius = ship_range / 2;
                                     if (max_radius > 30) max_radius = 30;
-                                    int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
+                                    int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4 + 1;
                                     int16_t base = max_radius / 2;
                                     rand_offsets[i + 2] = base + (int16_t)game_random::Random_(radius);
                                     rand_offsets[i + 2] *= (int16_t)(game_random::Random_(2) - 1);
@@ -1403,7 +1403,7 @@ namespace BEAMS {
                                 if (target_id == 0 && fx->accum_hit_x == 0) {
                                     int16_t max_radius = ship_range / 2;
                                     if (max_radius > 30) max_radius = 30;
-                                    int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
+                                    int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4 + 1;
                                     int16_t base = max_radius / 2;
                                     rand_offsets[i + 2] = base + (int16_t)game_random::Random_(radius);
                                     rand_offsets[i + 2] *= (int16_t)(game_random::Random_(2) - 1);

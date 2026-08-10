@@ -8,6 +8,7 @@ namespace {
     constexpr int kMaxCombatMissiles = 300;
     constexpr size_t kCombatDataBytes = sizeof(s_combat_data) * kMaxCombatShips;
     constexpr size_t kCombatMissileBytes = sizeof(s_missile) * kMaxCombatMissiles;
+    COMBINIT::s_satellite_capture_state satellite_capture_state;
 }
 
 namespace COMBINIT {
@@ -17,7 +18,21 @@ const char s_sphersfx_lbx_00551218[13] = "sphersfx.lbx";
 
 uint8_t _real_attack_flag;
 
+void __cdecl Reset_Satellite_Capture_() {
+    Reset_Satellite_Capture_State_(&satellite_capture_state);
+}
+
+void __cdecl Record_Captured_Satellite_(int16_t colony_idx, int16_t building_idx) {
+    Record_Captured_Satellite_State_(&satellite_capture_state, colony_idx, building_idx);
+}
+
+int16_t __cdecl Take_Captured_Satellite_(int16_t colony_idx) {
+    return Take_Captured_Satellite_State_(&satellite_capture_state, colony_idx);
+}
+
 void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
+    struct_::Clear_Structure_(&MOX::_global_combat_data, sizeof(MOX::_global_combat_data));
+
     if (MOX::_settings.strategic_combat_flag == 1) {
         INITSHIP::Update_Strategic_Ship_(ship_idx);
     }
@@ -26,6 +41,10 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     MOX::_global_combat_data.owner = MOX::_ship[ship_idx].owner;
     MOX::_global_combat_data.previous_owner = MOX::_ship[ship_idx].d.previous_owner;
+    if (MOX::_global_combat_data.owner > MAX_PLAYERS) {
+        MOX::_global_combat_data.owner =
+            static_cast<int8_t>(MOX::_global_combat_data.previous_owner);
+    }
     MOX::_global_combat_data.ship_idx = ship_idx;
     MOX::_global_combat_data.shield_type = MOX::_ship[ship_idx].d.shield_type;
     MOX::_global_combat_data.computer_type = MOX::_ship[ship_idx].d.computer_type;
@@ -314,7 +333,8 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->structure_damage = combat->structure_max - 1;
     }
 
-    if (combat->size_class == SHIP_SIZE_DOOM_STAR && combat->owner < MAX_PLAYERS) {
+    if (combat->size_class == SHIP_SIZE_DOOM_STAR &&
+        combat->previous_owner < MAX_PLAYERS) {
         combat->picture_num = 43 /* 0x2b */;
     } else {
         combat->picture_num = ship->d.picture_num;
@@ -365,15 +385,15 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
     ship->field42_0x49 = 0;
     ship->plasma_web_damage = 0;
     ship->special_cooldown = 0xFF;
+    ship->special_status_flag = 0;
     ship->special_status_timer = 0;
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_CLOAKING_DEVICE)) {
         ship->special_status_flag = 1;
-    } else if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_PHASING_CLOAK)) {
-        ship->special_status_flag = 4;
-        ship->special_status_timer = 10;
-    } else {
-        ship->special_status_flag = 0;
+    }
+    if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_PHASING_CLOAK)) {
+        ship->special_status_timer = _phasing_cloak_effective_turns;
+        ship->special_status_flag = ship->special_status_timer != 0 ? 4 : 1;
     }
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, SPECIAL_HYPER_X_CAPACITORS)) {
@@ -457,7 +477,6 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     bool no_defender_ships = star_idx != MOX::_NUM_STARS;
     int16_t has_tractor_beam = 0;
     int16_t has_plasma_web = 0;
-    int16_t has_cloaking = 0;
     int16_t has_special_26 = 0;
     int16_t has_bhg = 0;
     int16_t has_stellar_converter = 0;
@@ -510,8 +529,9 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_cmbt_colony_id = colony_idx;
 
     MOX::_combat_data = (s_combat_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, kCombatDataBytes);
-    // Resetting the screen pool invalidates the missile table from the previous combat.
+    // Resetting the screen pool invalidates resources from the previous combat.
     MOX::_missile = nullptr;
+    MOX::_darken_plasma_map = nullptr;
     struct_::Clear_Structure_(MOX::_combat_data, kCombatDataBytes);
 
     MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
@@ -560,11 +580,6 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
             if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_PHASING_CLOAK) == 0) {
                 COMBINIT::_real_attack_flag = 1;
-                if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_CLOAKING_DEVICE) != 0) {
-                    has_cloaking = 1;
-                }
-            } else {
-                has_cloaking = 1;
             }
 
             // Original binary calls this and discards the result.
@@ -774,13 +789,6 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                         }
                     }
 
-                    if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_CLOAKING_DEVICE) == 0 &&
-                        Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_PHASING_CLOAK) == 0) {
-                        // Empty
-                    } else {
-                        has_cloaking = 1;
-                    }
-
                     // Original binary calls this and discards the result.
                     Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 10);
                     if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, SPECIAL_REFLECTION_FIELD) != 0) {
@@ -805,7 +813,17 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         Load_Combat_Ship_Palette_(MOX::_combat_defender_player);
         RUSS::Mox_Update_();
 
-        if (has_cloaking != 0) {
+        bool needs_plasma_darkening = false;
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            s_combat_data* ship = &MOX::_combat_data[i];
+            if (struct_::Test_Bit_Field_(ship->special_device_flags, SPECIAL_CLOAKING_DEVICE) ||
+                struct_::Test_Bit_Field_(ship->special_device_flags, SPECIAL_PHASING_CLOAK)) {
+                needs_plasma_darkening = true;
+                break;
+            }
+        }
+
+        if (needs_plasma_darkening) {
             MOX::_darken_plasma_map = (s_animation_header*)farload::Far_Reload_Next_("combat.lbx", 0x31, MOX::_screen_seg);
             RUSS::Mox_Update_();
             CMBTDRW1::Create_Ship_Darken_Map_();
@@ -1101,13 +1119,13 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     End_Of_Combat_(star_idx, colony_pop, combat_winner);
 
     if (combat_winner == 1 || combat_winner == 0x29A) {
-        if (MOX::_combat_attacker_player < MAX_PLAYERS && MOX::_combat_defender_player >= 10 && MOX::_ship[plr2_ships[0]].d.ftl_type > 0) {
+        if (MOX::_combat_attacker_player < MAX_PLAYERS && MOX::_combat_defender_player >= 10 && MOX::_ship[plr2_ships[0]].d.speed > 0) {
             NETMOX::Russ_Event_Monster_Update_(MOX::_combat_defender_player, -1, MOX::_combat_attacker_player);
         }
     }
 
     if (combat_winner == -1 || combat_winner == 0x29A) {
-        if (MOX::_combat_defender_player < MAX_PLAYERS && MOX::_combat_attacker_player >= 10 && MOX::_ship[plr1_ships[0]].d.ftl_type > 0) {
+        if (MOX::_combat_defender_player < MAX_PLAYERS && MOX::_combat_attacker_player >= 10 && MOX::_ship[plr1_ships[0]].d.speed > 0) {
             NETMOX::Russ_Event_Monster_Update_(MOX::_combat_attacker_player, -1, MOX::_combat_defender_player);
         }
     }
@@ -1120,6 +1138,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         ERIC::Fast_Fade_Out_();
         palette::Set_Palette_Gradient_(160, 95, 0, 0, 0, 0, 0, 0);
         MOX2::Put_Auto_Function_(&auto_func);
+        MOX::_super_fast_flag = 0;
         sound::Fadeout_Sound_(-1, 30);
         JIM::Play_Background_Music_();
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
@@ -1718,6 +1737,15 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     }
 
     if (weapon_index > 0) {
+        if (_planet_damper_enabled != 0 &&
+            MOX::_player[MOX::_combat_defender_player]
+                .tech_applications[TECH_APP_DAMPER_FIELD] ==
+                TECH_RESEARCH_STATUS_RESEARCHED) {
+            struct_::Set_Bit_Field_(
+                MOX::_combat_data->special_device_flags,
+                SPECIAL_DAMPER_FIELD);
+        }
+
         if (MOX::_player[MOX::_combat_defender_player].tech_applications[TECH_APP_BATTLE_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
             struct_::Set_Bit_Field_(MOX::_combat_data->special_device_flags, SPECIAL_BATTLE_SCANNER);
         }
@@ -1725,6 +1753,11 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
 
     MOX::_combat_data->structure_max = 0;
     MOX::_combat_data->crew_quality = CREW_QUALITY_REGULAR;
+    if (_satellite_warlord_bonus != 0 &&
+        (uint8_t)MOX::_combat_data->owner < MAX_PLAYERS &&
+        MOX::_player[MOX::_combat_data->owner].traits[TRAIT_WARLORD] != 0) {
+        ++MOX::_combat_data->crew_quality;
+    }
     MOX::_combat_data->officer_idx = -1;
     MOX::_combat_data->marine_count = 0;
     MOX::_combat_data->structure_damage = 0;
@@ -2004,6 +2037,11 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     }
 
     MOX::_combat_data[MOX::_combat_total_ship_count].crew_quality = CREW_QUALITY_REGULAR;
+    if (_satellite_warlord_bonus != 0 &&
+        (uint16_t)defender < MAX_PLAYERS &&
+        MOX::_player[defender].traits[TRAIT_WARLORD] != 0) {
+        ++MOX::_combat_data[MOX::_combat_total_ship_count].crew_quality;
+    }
     MOX::_combat_data[MOX::_combat_total_ship_count].officer_idx = -1;
     MOX::_combat_data[MOX::_combat_total_ship_count].marine_count = (uint8_t)TECHDATA::_hull_data[station_type].marines;
     MOX::_combat_data[MOX::_combat_total_ship_count].current_speed = 0;
@@ -2289,6 +2327,7 @@ void __cdecl Increment_Bhg_(int16_t player_idx) {
                     if (ship.black_hole_flag == 3) {
                         int16_t x_pos = (int16_t)ship.x * 20;
                         int16_t y_pos = (int16_t)ship.y * 20;
+                        MOX::_cur_ship = i;
                         CMBTFIRE::Destroy_Ship_(i, x_pos, y_pos, 1);
                     }
                 }
@@ -2309,6 +2348,9 @@ void __cdecl End_Of_Turn_Bookeeping_() {
             uint16_t weapon_id = slot->weapon_id;
 
             if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_FIGHTER) {
+                slot->count = Surviving_Weapon_Count_From_Hits_(
+                    MOX::_combat_data->weapon_total_hits[i],
+                    MOX::_combat_data->weapon_hits_per_unit[i]);
                 slot->ammo = 1;
             }
         }
@@ -2487,7 +2529,9 @@ void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx) {
 
             if ((uint8_t)ship->previous_owner < MAX_PLAYERS && ship->picture_num != 44) {
                 strlcpy(lbx_filename, "cmbtshp.lbx", sizeof(lbx_filename));
-                lbx_index = (int16_t)MOX::_player[player_idx].color * 45 + ship->picture_num;
+                const int16_t image_player_idx =
+                    player_idx > MAX_PLAYERS ? ship->previous_owner : player_idx;
+                lbx_index = (int16_t)MOX::_player[image_player_idx].color * 45 + ship->picture_num;
             }
             else {
                 strlcpy(lbx_filename, "monster.lbx", sizeof(lbx_filename));
@@ -2527,13 +2571,13 @@ void __cdecl Repair_All_Combat_Ships_() {
 
     if (MOX::_combat_attacker_player < MAX_PLAYERS) {
         if (MOX::_player[MOX::_combat_attacker_player].traits[TRAIT_CYBERNETIC] != 0) {
-            attacker_bonus += 10;
+            attacker_bonus += repair_rate.cyber;
         }
     }
 
     if (MOX::_combat_defender_player < MAX_PLAYERS) {
         if (MOX::_player[MOX::_combat_defender_player].traits[TRAIT_CYBERNETIC] != 0) {
-            defender_bonus += 10;
+            defender_bonus += repair_rate.cyber;
         }
     }
 
@@ -2545,7 +2589,12 @@ void __cdecl Repair_All_Combat_Ships_() {
             !CMBTMOV1::Ship_Is_In_Stasis_(i))
         {
             if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_AUTOMATED_REPAIR_UNIT) != 0) {
-                repair_amount = 20;
+                repair_amount = repair_rate.aru;
+            }
+
+            if (_amoeba_regeneration != 0 &&
+                COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_REGENERATION) != 0) {
+                repair_amount += repair_rate.regen;
             }
 
             if (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) {
@@ -2585,20 +2634,34 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
         if (ship->ftl_type == DRIVE_NO_DRIVE && (ship->unit_status == 5 || ship->owner != MOX::_combat_defender_player)) {
             if (star_idx != MOX::_NUM_STARS) {
                 s_colony* col = &MOX::_colony[MOX::_cmbt_colony_id];
+                int16_t satellite_building = -1;
                 if (col->buildings[BUILDING_STAR_BASE] != 0) {
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_STAR_BASE);
+                    satellite_building = BUILDING_STAR_BASE;
                 } else if (col->buildings[BUILDING_BATTLESTATION] != 0) {
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_BATTLESTATION);
+                    satellite_building = BUILDING_BATTLESTATION;
                 } else if (col->buildings[BUILDING_STAR_FORTRESS] != 0) {
-                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_STAR_FORTRESS);
+                    satellite_building = BUILDING_STAR_FORTRESS;
+                }
+
+                if (satellite_building != -1) {
+                    if (Satellite_Was_Captured_By_Attacker_(
+                            ship->owner, victor_player, MOX::_combat_attacker_player)) {
+                        Record_Captured_Satellite_(MOX::_cmbt_colony_id, satellite_building);
+                    }
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, satellite_building);
                 }
             }
             continue;
         }
 
+        const bool discard_monster_capture =
+            ship->owner >= MAX_PLAYERS &&
+            ship->previous_owner != ship->owner &&
+            (_crystal_keep == 0 || ship->owner != 11 /* Crystal */);
+
         if ((ship->unit_status == 5 && ship->is_retreating != 2) ||
             (ship->is_captured != 0 && ship->owner != victor_player) ||
-            (ship->owner >= MAX_PLAYERS && ship->previous_owner != ship->owner)) {
+            discard_monster_capture) {
             
             ship->unit_status = 5;
 
@@ -2729,12 +2792,12 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
         
-        if (star_idx == MOX::_NUM_STARS && ship->owner == MAX_PLAYERS &&
+        if (star_idx == MOX::_NUM_STARS && ship->previous_owner == MAX_PLAYERS &&
             ship->unit_status == 5 && ship->ftl_type != 0) {
             antarans::Kill_Antaran_Defensive_Ship_(ship->size_class);
         } 
         else if (ship->unit_status == 5 && ship->ship_idx != -1 && ship->is_retreating != 2) {
-            if (ship->owner == MAX_PLAYERS) {
+            if (ship->previous_owner == MAX_PLAYERS) {
                 antarans::Kill_Antaran_Offensive_Ship_(ship->size_class);
             }
             if (MOX::_ship[ship->ship_idx].officer_index > -1) {
@@ -2794,16 +2857,32 @@ void __cdecl Unload_Combat_Ship_(int16_t combat_ship_idx) {
 
         MOX::_ship[ship_idx].structural_damage = MOX::_combat_data[combat_ship_idx].structure_damage;
         MOX::_ship[ship_idx].armor_damage = INITSHIP::Get_Ship_Armor_Hits_(ship_idx) - MOX::_combat_data[combat_ship_idx].armor_remaining;
-        MOX::_ship[ship_idx].computer_damage = 0;
+        MOX::_ship[ship_idx].computer_damage =
+            MOX::_combat_data[combat_ship_idx].computer_max_hits -
+            MOX::_combat_data[combat_ship_idx].computer_current_hits;
 
         if (MOX::_combat_data[combat_ship_idx].shield_max_hits > 0) {
             MOX::_ship[ship_idx].shield_damage_percent =
-                100 - (MOX::_combat_data[combat_ship_idx].shield_current_hits * 100) / MOX::_combat_data[combat_ship_idx].shield_max_hits;
+                Damage_Percent_From_Hits_(
+                    MOX::_combat_data[combat_ship_idx].shield_max_hits,
+                    MOX::_combat_data[combat_ship_idx].shield_current_hits);
         }
 
         if (MOX::_combat_data[combat_ship_idx].drive_max_hits > 0) {
             MOX::_ship[ship_idx].drive_damage_percent =
-                100 - (MOX::_combat_data[combat_ship_idx].drive_current_hits * 100) / MOX::_combat_data[combat_ship_idx].drive_max_hits;
+                Damage_Percent_From_Hits_(
+                    MOX::_combat_data[combat_ship_idx].drive_max_hits,
+                    MOX::_combat_data[combat_ship_idx].drive_current_hits);
+        }
+
+        for (int16_t i = 0; i < 8; ++i) {
+            int16_t weapon_id = MOX::_combat_data[combat_ship_idx].weapons[i].weapon_id;
+            if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_FIGHTER) {
+                MOX::_ship[ship_idx].d.ship_weapon[i].current_count =
+                    Surviving_Weapon_Count_From_Hits_(
+                        MOX::_combat_data[combat_ship_idx].weapon_hits[i],
+                        MOX::_combat_data[combat_ship_idx].weapon_hits_per_unit[i]);
+            }
         }
     }
 }
@@ -2856,6 +2935,7 @@ void __cdecl Plasma_Web_Damage_(int16_t owner_idx) {
         }
 
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+            MOX::_cur_ship = i;
             if (CMBTDRW1::Ship_Completely_On_Screen_(i) == 0) {
                 COMBINIT::Snap_Center_Combat_Screen_(ship->x, ship->y);
             }

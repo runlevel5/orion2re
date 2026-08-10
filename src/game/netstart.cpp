@@ -511,6 +511,7 @@ namespace NETSTART {
 
     void __cdecl Mox_Net_Uninit_() {
         netcode::Net_Uninit_();
+        NETMOX::Clear_Leader_Deassignments_();
 
         for (int i = 0; i < MAX_PLAYERS; ++i) {
             MOX::_player[i].network_player_id = -1;

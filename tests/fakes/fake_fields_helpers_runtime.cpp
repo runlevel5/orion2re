@@ -31,6 +31,9 @@ namespace platform {
     void __cdecl Request_Exit_(const char*) {
     }
 
+    void __cdecl Request_Fatal_Exit_(const char*) {
+    }
+
     void __cdecl Check_Exit_() {
     }
 }

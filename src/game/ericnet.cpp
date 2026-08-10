@@ -1,6 +1,26 @@
 #include "pch.h"
 #include <cstring>
 
+namespace {
+    bool Building_Forces_Combat_Reengagement_(int16_t building_id) {
+        if (building_id <= BUILDING_NO_BUILDING || building_id >= BUILDING_COUNT) {
+            return false;
+        }
+
+        for (int index = 0; index < ERICNET::COMBAT_REENGAGE_BUILDING_CAPACITY; ++index) {
+            const uint8_t configured_building = ERICNET::_combat_reengage_buildings[index];
+            if (configured_building == BUILDING_NO_BUILDING) {
+                return false;
+            }
+            if (configured_building == building_id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 namespace ERICNET {
     int8_t _start_civ_level[3] = {3, 5, 9};
     int16_t _buildlist[44] = {
@@ -163,7 +183,7 @@ namespace ERICNET {
     }
 
     int __cdecl Mox_Play_Sound_(int16_t sound_id) {
-        if (MOX::_settings.sound_fx_on != 0) {
+        if (MOX::_settings.sound_fx_on != 0 && MOX::_super_fast_flag == 0) {
             return sound::Play_Sound_(sound_id);
         }
 
@@ -256,7 +276,6 @@ namespace ERICNET {
 
         uint8_t add_to_list = 1;
         uint8_t recompute_star = 0;
-        uint8_t clear_combat_ignore = 0;
 
         switch (building_idx) {
             case BUILDING_ARMOR_BARRACKS:
@@ -331,10 +350,6 @@ namespace ERICNET {
                 COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, BUILDING_RADIATION_SHIELD);
                 /* fallthrough */
             case BUILDING_RADIATION_SHIELD:
-            case BUILDING_MISSILE_BASE:
-            case BUILDING_GROUND_BATTERIES:
-            case BUILDING_STELLAR_CONVERTER:
-                clear_combat_ignore = 1;
                 break;
 
             case BUILDING_SOIL_ENRICHMENT:
@@ -353,7 +368,6 @@ namespace ERICNET {
                 /* fallthrough */
             case BUILDING_STAR_BASE:
                 recompute_star = 1;
-                clear_combat_ignore = 1;
                 break;
 
             case BUILDING_TERRAFORMING:
@@ -445,7 +459,7 @@ namespace ERICNET {
             }
         }
 
-        if (clear_combat_ignore) {
+        if (Building_Forces_Combat_Reengagement_(building_idx)) {
             star->ignore_combat_ships = 0;
         }
     }
@@ -477,6 +491,12 @@ namespace ERICNET {
 
     void __cdecl Remove_Building_(int16_t colony_idx, int16_t building_id) {
         MOX::_colony[colony_idx].buildings[building_id] = 0;
+
+        if (Building_Forces_Combat_Reengagement_(building_id)) {
+            int16_t planet_id = MOX::_colony[colony_idx].planet;
+            int16_t star_id = MOX::_planet[planet_id].star_index;
+            MOX::_star[star_id].ignore_combat_ships = 0;
+        }
 
         switch (building_id) {
             case BUILDING_BATTLESTATION:

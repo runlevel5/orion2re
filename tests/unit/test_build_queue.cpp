@@ -270,6 +270,19 @@ DOCTEST_TEST_CASE("unbuy refuses a treasury overflow") {
     DOCTEST_CHECK(MOX::_colony[0].bought_outright == 50);
 }
 
+DOCTEST_TEST_CASE("unbuy refunds the original purchase snapshot") {
+    TEST_BUILD_QUEUE::Reset_();
+    MOX::_colony[0].producing[0] = BUILDING_AUTOMATED_FACTORY;
+    MOX::_colony[0].production_spent = 10;
+    MOX::_colony[0].bought_outright = 40;
+    MOX::_player[0].bc = 100;
+    Set_List_(6, {BUILD_QUEUE::INSTRUCTION_UNBUY, BUILD_QUEUE::INSTRUCTION_END});
+
+    DOCTEST_REQUIRE(BUILD_QUEUE::Apply_Preset_To_Colony_(0, 6));
+    DOCTEST_CHECK(MOX::_player[0].bc == 225);
+    DOCTEST_CHECK(MOX::_colony[0].bought_outright == 0);
+}
+
 DOCTEST_TEST_CASE("empire application skips outposts and other players") {
     TEST_BUILD_QUEUE::Reset_();
     MOX::_NUM_COLONIES = 4;

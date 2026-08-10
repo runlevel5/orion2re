@@ -1,6 +1,25 @@
 #include "pch.h"
 
+#include "game/strbuild.h"
+
 namespace CMBTFIR2 {
+    namespace {
+        uint32_t artemis_random_seed;
+        bool has_artemis_random_seed;
+
+        void Refresh_Shield_Capacity_(int16_t ship_idx) {
+            s_combat_data* ship = &MOX::_combat_data[ship_idx];
+            int16_t max_shield = COMBINIT::Calc_Combat_Shield_Max_(ship_idx);
+            ship->shield_arc_max = max_shield;
+
+            for (int i = 0; i < 4; ++i) {
+                if (ship->shield_arc_current[i] > max_shield) {
+                    ship->shield_arc_current[i] = max_shield;
+                }
+            }
+        }
+    }
+
     int16_t _artemis_net_chance[6] = { 20, 30, 40, 50, 80, 100 };
 
     int16_t __cdecl Helmsman_Bonus_(int16_t leader_idx) {
@@ -114,7 +133,8 @@ namespace CMBTFIR2 {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 s_combat_data* ship = &MOX::_combat_data[i];
                 if ((int16_t)ship->owner == player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
-                    if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WIDE_AREA_JAMMER)) {
+                    if (!CMBTMOV1::Ship_Is_In_Stasis_(i) &&
+                        COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_WIDE_AREA_JAMMER)) {
                         *bonus_val_ptr = 70 /* 0x46 */;
                     }
                     if (ship->officer_idx > -1) {
@@ -220,7 +240,7 @@ namespace CMBTFIR2 {
             s_combat_data* ship = &MOX::_combat_data[i];
 
             if (ship->owner == (int8_t)player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
-                if (ship->ftl_type == 0) {
+                if (ship->ftl_type == 0 && !CMBTMOV1::Ship_Is_In_Stasis_(i)) {
                     if (ship->size_class == 2) {
                         size_bonus = 0;
                     } else if (ship->size_class == 3) {
@@ -246,7 +266,8 @@ namespace CMBTFIR2 {
                 }
 
                 if (is_ancient == 1) {
-                    if (COMBINIT::Does_Combat_Ship_Have_Special_(i, 28 /* 0x1c */)) {
+                    if (!CMBTMOV1::Ship_Is_In_Stasis_(i) &&
+                        COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_SCOUT_LAB)) {
                         special_bonus = 20;
                     }
                 }
@@ -419,7 +440,16 @@ namespace CMBTFIR2 {
         return min_range;
     }
 
+    void __cdecl Save_Artemis_Random_Seed_() {
+        artemis_random_seed = game_random::Get_Random_Seed_();
+        has_artemis_random_seed = true;
+    }
+
     bool __cdecl Apply_Combat_Artemis_Net_(char strategic) {
+        if (has_artemis_random_seed && (MOX::_game_type == 2 || MOX::_game_type == 3)) {
+            game_random::Set_Random_Seed_(artemis_random_seed);
+        }
+
         int16_t ship_idx = 1;
         bool is_active = true;
 
@@ -514,7 +544,9 @@ namespace CMBTFIR2 {
             ship->drive_max_hits *= 3;
         }
 
-        ship->computer_max_hits = TECHDATA::_hull_data[ship->size_class].computer_hp;
+        ship->computer_max_hits = ship->computer_type > COMPUTER_NO_COMPUTER
+            ? TECHDATA::_hull_data[ship->size_class].computer_hp
+            : 0;
 
         for (int i = 0; i < 8; ++i) {
             if (ship->weapons[i].weapon_id < 1) {
@@ -557,6 +589,7 @@ namespace CMBTFIR2 {
                     if (hits < 2) {
                         hits = 1;
                     }
+                    hits++;
                     ship->special_device_hits[device_idx] = hits;
                 }
                 device_idx++;
@@ -674,9 +707,21 @@ namespace CMBTFIR2 {
             if (ship->special_hits[i] < ship->special_device_hits[i]) {
                 int16_t needed = ship->special_device_hits[i] - ship->special_hits[i];
                 int16_t amt = (pool < (int32_t)needed) ? (int16_t)pool : needed;
+                ship->special_hits[i] += amt;
                 pool -= (int32_t)amt;
-                // Note: Logic in binary sets hits to max even if pool was insufficient
-                ship->special_hits[i] = ship->special_device_hits[i];
+            }
+        }
+
+        int special_slot_idx = 0;
+        for (int special_id = 0; special_id < SPECIAL_COUNT && special_slot_idx < 8; ++special_id) {
+            if (struct_::Test_Bit_Field_(ship->special_device_flags, special_id)) {
+                if (ship->special_hits[special_slot_idx] > 0) {
+                    struct_::Clear_Bit_Field_(ship->special_device_damage_flags, special_id);
+                    if (special_id == SPECIAL_HARD_SHIELDS) {
+                        ship->shield_arc_max = COMBINIT::Calc_Combat_Shield_Max_(ship_idx);
+                    }
+                }
+                ++special_slot_idx;
             }
         }
     }
@@ -686,8 +731,12 @@ namespace CMBTFIR2 {
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
         // target_type: 0 = Ship, 1 = Missile/Other
-        if (ship->special_status_flag == 1 /* STATUS_PHANTOM_SHADOW */ && target_type == 0) {
-            total_bonus = 80;
+        if (ship->special_status_flag == 1 /* STATUS_PHANTOM_SHADOW */) {
+            if (target_type == 0) {
+                total_bonus = 80;
+            } else {
+                total_bonus = CMBTMIS::missile_defense.cloaking_device_missile_defense;
+            }
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x26 /* SPECIAL_DISPLACEMENT_FIELD */)) {
@@ -1127,12 +1176,7 @@ namespace CMBTFIR2 {
                     }
                     ship->shield_arc_max = 0;
                 } else {
-                    int16_t max_shield = COMBINIT::Calc_Combat_Shield_Max_(target_ship_idx);
-                    for (int i = 0; i < 4; ++i) {
-                        if (ship->shield_arc_current[i] > max_shield) {
-                            ship->shield_arc_current[i] = max_shield;
-                        }
-                    }
+                    Refresh_Shield_Capacity_(target_ship_idx);
                     *remaining_damage = 0;
                 }
             } else if (sys_index == 3) {
@@ -1176,12 +1220,25 @@ namespace CMBTFIR2 {
                                 if (new_count == 0) {
                                     MOX::_combat_data[i].black_hole_flag = 0;
                                     MOX::_combat_data[i].black_hole_source_idx = UINT8_MAX;
+                                    COMBAT1::Recalculate_Combat_Ship_(i);
                                 } else {
                                     new_count--;
                                 }
                             }
                         }
                     }
+                } else if (ship->weapons[count].weapon_id == WEAPON_TRACTOR_BEAM) {
+                    const uint8_t target_idx = ship->special_cooldown;
+                    if (ship->weapons[count].count == 0) {
+                        ship->special_cooldown = UINT8_MAX;
+                    }
+                    if (target_idx < MOX::_combat_total_ship_count) {
+                        COMBAT1::Recalculate_Combat_Ship_(target_idx);
+                    }
+                }
+
+                if (ship->weapons[count].shots_left > ship->weapons[count].count) {
+                    ship->weapons[count].shots_left = ship->weapons[count].count;
                 }
             } else if (sys_index == 5) {
                 ship->drive_current_hits -= initial_damage;
@@ -1191,7 +1248,6 @@ namespace CMBTFIR2 {
                 } else {
                     *remaining_damage = 0;
                 }
-                ship->current_speed = COMBAT1::Calc_Current_Speed_(target_ship_idx);
 
                 if (*remaining_damage > 0) {
                     ship->structure_damage += *remaining_damage;
@@ -1210,7 +1266,7 @@ namespace CMBTFIR2 {
                 }
             } else if (sys_index == 9) {
                 ship->special_hits[count] -= initial_damage;
-                if (ship->special_hits[count] < 0) {
+                if (ship->special_hits[count] <= 0) {
                     *remaining_damage = -ship->special_hits[count];
                     ship->special_hits[count] = 0;
 
@@ -1219,6 +1275,22 @@ namespace CMBTFIR2 {
                         if (struct_::Test_Bit_Field_(ship->special_device_flags, i)) {
                             if (flag_idx == count) {
                                 struct_::Set_Bit_Field_(ship->special_device_damage_flags, i);
+                                if (i == SPECIAL_CLOAKING_DEVICE ||
+                                    i == SPECIAL_PHASING_CLOAK) {
+                                    COMBAT1::Handle_Destroyed_Cloak_(
+                                        &ship->special_status_flag,
+                                        ship->special_status_timer,
+                                        i == SPECIAL_PHASING_CLOAK,
+                                        COMBINIT::Does_Combat_Ship_Have_Special_(
+                                            target_ship_idx,
+                                            SPECIAL_CLOAKING_DEVICE) != 0,
+                                        COMBINIT::Does_Combat_Ship_Have_Special_(
+                                            target_ship_idx,
+                                            SPECIAL_PHASING_CLOAK) != 0);
+                                }
+                                if (i == SPECIAL_MULTI_PHASED_SHIELDS) {
+                                    Refresh_Shield_Capacity_(target_ship_idx);
+                                }
                                 if (i == 13 && MOX::_in_nebula_flag == 1) {
                                     for (int j = 0; j < 4; ++j) {
                                         ship->shield_arc_current[j] = 0;
@@ -1252,6 +1324,8 @@ namespace CMBTFIR2 {
                 MOX::_ken_trace = 0;
             }
         }
+
+        COMBAT1::Recalculate_Combat_Ship_(target_ship_idx);
     }
 
     void __cdecl Resolve_Raid_(int16_t attacker_idx, int16_t target_idx, int16_t* raiders) {
@@ -1341,33 +1415,33 @@ namespace CMBTFIR2 {
         }
 
         char title_str[80];
-        char body_str[500];
+        char body_str[3000];
         char temp_str[80];
-        char num_buf[12];
+        STRBUILD::s_builder body_builder = STRBUILD::Init(
+            MOX::_super_fast_flag == 0 ? body_str : nullptr,
+            MOX::_super_fast_flag == 0 ? sizeof(body_str) : 0);
 
         KEN::Ken_Get_Text_Message_(42, temp_str, sizeof(temp_str));
         strlcpy(title_str, temp_str, sizeof(title_str));
         strlcat(title_str, target->name, sizeof(title_str));
 
         KEN::Ken_Get_Text_Message_(92, temp_str, sizeof(temp_str));
-        strlcpy(body_str, temp_str, sizeof(body_str));
+        STRBUILD::Copy(&body_builder, temp_str);
 
-        snprintf(num_buf, sizeof(num_buf), "%i", attacker_strength);
-        strlcat(body_str, num_buf, sizeof(body_str));
+        STRBUILD::Sprintf(&body_builder, "%i", attacker_strength);
 
-        strlcat(body_str, "          ", sizeof(body_str));
+        STRBUILD::Cat(&body_builder, "          ");
 
         KEN::Ken_Get_Text_Message_(93, temp_str, sizeof(temp_str));
-        strlcat(body_str, temp_str, sizeof(body_str));
+        STRBUILD::Cat(&body_builder, temp_str);
 
-        snprintf(num_buf, sizeof(num_buf), "%i", target_strength);
-        strlcat(body_str, num_buf, sizeof(body_str));
+        STRBUILD::Sprintf(&body_builder, "%i", target_strength);
 
-        strlcat(body_str, "\n\n", sizeof(body_str));
+        STRBUILD::Cat(&body_builder, "\n\n");
 
         if (total_damage <= 0) {
             KEN::Ken_Get_Text_Message_(47, temp_str, sizeof(temp_str));
-            strlcat(body_str, temp_str, sizeof(body_str));
+            STRBUILD::Cat(&body_builder, temp_str);
         } else {
             int16_t is_dead = CMBTFIRE::Is_Combat_Ship_Dead_(target_idx);
             if (is_dead > 0) {
@@ -1376,96 +1450,88 @@ namespace CMBTFIR2 {
 
             if (raid_results[0] > 0) {
                 KEN::Ken_Get_Text_Message_(43, temp_str, sizeof(temp_str));
-                strlcat(body_str, temp_str, sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
             }
 
             if (raid_results[1] > 0) {
                 KEN::Ken_Get_Text_Message_(44, temp_str, sizeof(temp_str));
-                strlcat(body_str, temp_str, sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
 
                 if (target->shield_current_hits < 1) {
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
                 } else {
                     KEN::Ken_Get_Text_Message_(45, temp_str, sizeof(temp_str));
                 }
-                strlcat(body_str, temp_str, sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
             }
 
             if (raid_results[2] > 0) {
                 KEN::Ken_Get_Text_Message_(21, temp_str, sizeof(temp_str));
-                strlcat(body_str, temp_str, sizeof(body_str));
-                strlcat(body_str, " ", sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
+                STRBUILD::Cat(&body_builder, " ");
 
                 if (target->computer_current_hits < 1) {
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
                 } else {
                     KEN::Ken_Get_Text_Message_(45, temp_str, sizeof(temp_str));
                 }
-                strlcat(body_str, temp_str, sizeof(body_str));
+                STRBUILD::Cat(&body_builder, temp_str);
             }
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 3] > 0) {
-                    snprintf(num_buf, sizeof(num_buf), "%i", raid_results[k + 3]);
-                    strlcat(body_str, num_buf, sizeof(body_str));
-                    strlcat(body_str, " ", sizeof(body_str));
+                    STRBUILD::Sprintf(&body_builder, "%i ", raid_results[k + 3]);
 
                     if (raid_results[k + 3] < 2) {
-                        strlcat(body_str, TECHDATA::_weapons[target->weapons[k].weapon_id].name, sizeof(body_str));
+                        STRBUILD::Cat(&body_builder, TECHDATA::_weapons[target->weapons[k].weapon_id].name);
                     } else {
-                        strlcat(body_str, TECHDATA::_weapons[target->weapons[k].weapon_id].name_plural, sizeof(body_str));
+                        STRBUILD::Cat(&body_builder, TECHDATA::_weapons[target->weapons[k].weapon_id].name_plural);
                     }
-                    strlcat(body_str, " ", sizeof(body_str));
+                    STRBUILD::Cat(&body_builder, " ");
 
                     KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
-                    strlcat(body_str, temp_str, sizeof(body_str));
+                    STRBUILD::Cat(&body_builder, temp_str);
                 }
             }
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 11] > 0) {
-                    snprintf(num_buf, sizeof(num_buf), "%i", raid_results[k + 11]);
-                    strlcat(body_str, num_buf, sizeof(body_str));
-                    strlcat(body_str, " ", sizeof(body_str));
+                    STRBUILD::Cat(&body_builder, "1 ");
 
                     int16_t special_id = Get_Combat_Ship_Special_Id_(target_idx, k);
-                    strlcat(body_str, TECHDATA::_specials[special_id].name, sizeof(body_str));
-                    strlcat(body_str, " ", sizeof(body_str));
+                    STRBUILD::Cat(&body_builder, TECHDATA::_specials[special_id].name);
+                    STRBUILD::Cat(&body_builder, " ");
 
-                    KEN::Ken_Get_Text_Message_(46, temp_str, sizeof(temp_str));
-                    strlcat(body_str, temp_str, sizeof(body_str));
+                    KEN::Ken_Get_Text_Message_(target->special_hits[k] > 0 ? 45 : 46, temp_str, sizeof(temp_str));
+                    STRBUILD::Cat(&body_builder, temp_str);
                 }
             }
         }
 
         if (target_raiders < *raiders) {
             int16_t lost = *raiders - target_raiders;
-            snprintf(num_buf, sizeof(num_buf), "%i", lost);
-            strlcat(body_str, string::s_Newline, sizeof(body_str));
-            strlcat(body_str, num_buf, sizeof(body_str));
-            strlcat(body_str, " ", sizeof(body_str));
+            STRBUILD::Cat(&body_builder, string::s_Newline);
+            STRBUILD::Sprintf(&body_builder, "%i ", lost);
 
             if (lost < 2) {
                 KEN::Ken_Get_Text_Message_(94, temp_str, sizeof(temp_str));
             } else {
                 KEN::Ken_Get_Text_Message_(95, temp_str, sizeof(temp_str));
             }
-            strlcat(body_str, temp_str, sizeof(body_str));
+            STRBUILD::Cat(&body_builder, temp_str);
         }
 
         if (marines < (int16_t)(uint8_t)target->marine_count) {
             int16_t lost = (int16_t)(uint8_t)target->marine_count - marines;
-            snprintf(num_buf, sizeof(num_buf), "%i", lost);
-            strlcat(body_str, string::s_Newline, sizeof(body_str));
-            strlcat(body_str, num_buf, sizeof(body_str));
-            strlcat(body_str, " ", sizeof(body_str));
+            STRBUILD::Cat(&body_builder, string::s_Newline);
+            STRBUILD::Sprintf(&body_builder, "%i ", lost);
 
             if (lost < 2) {
                 KEN::Ken_Get_Text_Message_(96, temp_str, sizeof(temp_str));
             } else {
                 KEN::Ken_Get_Text_Message_(97, temp_str, sizeof(temp_str));
             }
-            strlcat(body_str, temp_str, sizeof(body_str));
+            STRBUILD::Cat(&body_builder, temp_str);
         }
 
         int sound_handle = ERICNET::Mox_Play_Sound_(67); // 0x43
@@ -1484,10 +1550,12 @@ namespace CMBTFIR2 {
             show_timed_box = false;
         }
 
-        if (show_timed_box) {
-            TEXTBOX::Timed_Text_Box_(title_str, body_str, 54);
-        } else {
-            TEXTBOX::Text_Box_(title_str, body_str);
+        if (MOX::_super_fast_flag == 0) {
+            if (show_timed_box) {
+                TEXTBOX::Timed_Text_Box_(title_str, body_str, 54);
+            } else {
+                TEXTBOX::Text_Box_(title_str, body_str);
+            }
         }
 
         sound::Fadeout_Sound_(sound_handle, 10);
@@ -1601,7 +1669,10 @@ namespace CMBTFIR2 {
 
         int16_t result_msg_id;
         if (attacker_marines > 0) {
-            defender->marine_count = (int8_t)(attacker_marines - defender_marines_current);
+            int16_t captured_marines =
+                attacker_marines - defender_marines_current;
+            defender->marine_count = (int8_t)BOARDING::Captured_Marine_Count_(
+                defender_idx, captured_marines);
             Capture_Ship_(defender_idx, target_x, target_y);
             result_msg_id = (defender->unit_status == 0) ? 0x32 : 0x31;
         } else {
@@ -1728,8 +1799,12 @@ namespace CMBTFIR2 {
         if (combat_ship->officer_idx > -1) {
             OFFICER::Kill_Officer_(combat_ship->officer_idx);
             combat_ship->officer_idx = -1;
-            if (combat_ship->ship_idx != -1) {
-                MOX::_ship[combat_ship->ship_idx].officer_index = -1;
+        }
+
+        if (combat_ship->ship_idx != -1) {
+            int16_t officer_idx = MOX::_ship[combat_ship->ship_idx].officer_index;
+            if (officer_idx != -1) {
+                OFFICER::Move_Officer_To_Pool_(officer_idx);
             }
         }
 
@@ -1755,36 +1830,35 @@ namespace CMBTFIR2 {
 
         if (new_owner >= MAX_PLAYERS || !MOX::_player[new_owner].traits[TRAIT_TELEPATHIC]) {
             combat_ship->is_captured = 1;
+        } else if (BOARDING::_telepathic_multiple_capture != 0) {
+            combat_ship->is_captured = 0;
         }
 
         combat_ship->is_retreating = 0;
         combat_ship->special_cooldown = 0xFF;
 
-        int16_t i = 0;
-        while (MOX::_ship_turn_order[i] != -10) {
-            i++;
-        }
-
-        for (int16_t j = i; j >= 0; j--) {
-            MOX::_ship_turn_order[j + 1] = MOX::_ship_turn_order[j];
-        }
-
-        MOX::_ship_turn_order[0] = -1;
-        MOX::_cur_ptr++;
-        MOX::_wait_ptr++;
+        COMBAT1::Restore_Captured_Ship_To_Turn_Order_(
+            MOX::_ship_turn_order,
+            sizeof(MOX::_ship_turn_order) / sizeof(MOX::_ship_turn_order[0]),
+            ship_idx
+        );
+        struct_::Clear_Bit_Field_(&combat_ship->combat_status_flags, 2);
     }
 
     int16_t __cdecl Damage_From_Ship_Exploding_(int16_t ship_idx) {
-        int16_t damage;
-        int16_t has_special;
-        int8_t size_class;
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+        int16_t damage = TECHDATA::_hull_data[ship->size_class].drive_hp * 5;
 
-        has_special = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_QUANTUM_DETONATOR);
-
-        size_class = MOX::_combat_data[ship_idx].size_class;
-        damage = TECHDATA::_hull_data[size_class].drive_hp * 5;
-
-        if (has_special) {
+        if (ship->reflected_damage_pool == INT16_MAX) {
+            if (MOX::_apply_damage_to_planet != 0) {
+                palette::Refresh_Palette_();
+                GENDRAW::Warning_Box_("Absorber Overloaded");
+                CMBTDRW1::Refresh_Combat_Screen_Full_();
+            }
+            damage *= 77;
+        }
+        else if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                     ship_idx, SPECIAL_QUANTUM_DETONATOR)) {
             damage *= 3;
         }
 

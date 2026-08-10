@@ -474,7 +474,7 @@ namespace INITGAME {
             }
             else if (i == 65) {
                 // Special randomized tech application for leader at index 65
-                MOX::_leaders[i].tech_application[0] = (uint8_t)game_random::Random_(102) - 1;
+                MOX::_leaders[i].tech_application[0] = (uint8_t)game_random::Random_(101);
                 MOX::_leaders[i].tech_application[1] = (uint8_t)game_random::Random_(102) + 101;
             }
 
@@ -536,7 +536,7 @@ namespace INITGAME {
             if (MOX::_star[i].system_special == SYSTEM_SPECIAL_ORION_STAR) {
                 orion_spawned = true;
                 MOX::_ship[MOX::_NUM_SHIPS].owner = 8;
-                SHIPS::Build_Nonplayer_Ship_(9, i, 0);
+                SHIPS::Build_Nonplayer_Ship_(NONPLAYER_SHIP_TYPE_GUARDIAN, i, 0);
             }
         }
     }

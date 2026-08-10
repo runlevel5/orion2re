@@ -11,19 +11,6 @@ namespace SHIPS {
         }
     }
 
-    void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list) {
-        if (*ship_list == -1) {
-            return;
-        }
-
-        int i = 0;
-        do {
-            int16_t ship_idx = ship_list[i];
-            i++;
-            SHIPS::Clear_Auto_Colonization_Flag_(&MOX::_ship[ship_idx]);
-        } while (ship_list[i] != -1);
-    }
-
     void __cdecl Kill_Ship_(int16_t ship_idx) {
         HACCESS::Ship_Owner_(ship_idx);
 
@@ -72,22 +59,22 @@ namespace SHIPS {
         s_ship_design design;
 
         switch (type) {
-        case 9 /* Guardian */:
+        case NONPLAYER_SHIP_TYPE_GUARDIAN:
             INITSHIP::Load_Guardian_Ship_Design_(&design);
             break;
-        case 10 /* Amoeba */:
+        case NONPLAYER_SHIP_TYPE_AMOEBA:
             INITSHIP::Load_Amoeba_Ship_Design_(&design, owner);
             break;
-        case 11 /* Crystal */:
+        case NONPLAYER_SHIP_TYPE_CRYSTAL:
             INITSHIP::Load_Crystal_Ship_Design_(&design, owner);
             break;
-        case 12 /* Dragon */:
+        case NONPLAYER_SHIP_TYPE_DRAGON:
             INITSHIP::Load_Dragon_Ship_Design_(&design, owner);
             break;
-        case 13 /* Eel */:
+        case NONPLAYER_SHIP_TYPE_EEL:
             INITSHIP::Load_Eel_Ship_Design_(&design, owner);
             break;
-        case 14 /* Hydra */:
+        case NONPLAYER_SHIP_TYPE_HYDRA:
             INITSHIP::Load_Hydra_Ship_Design_(&design, owner);
             break;
         default:

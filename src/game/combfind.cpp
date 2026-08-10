@@ -2,6 +2,14 @@
 
 namespace COMBFIND {
 
+namespace {
+    bool combat_in_progress;
+
+    bool __cdecl Planet_Has_Ancient_Artifacts_(s_planet_data* planet) {
+        return planet->planet_special == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS;
+    }
+}
+
 uint8_t _messed_up_fleet_palette;
 uint8_t _in_net_update;
 s_combfind_target _target;
@@ -830,6 +838,8 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
 
                     star->system_special = player_idx + 90;
                     star->artifacts_gave_app = 1;
+                    planet_idx = Find_Planet_At_Star_Satisfying_(
+                        star, Planet_Has_Ancient_Artifacts_);
 
                     msg.msg_type = MSG_TYPE_ARTIFACTS;
                     msg.u.artifacts.star_idx = star_idx;
@@ -853,7 +863,15 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                             }
                         }
                         if (total_valid_techs != 0) {
-                            COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], picked_tech_ids[remaining - 1]);
+                            const int16_t tech_app_id = picked_tech_ids[remaining - 1];
+                            COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], tech_app_id);
+
+                            s_report report = {};
+                            report.type = 3;
+                            report.player_idx = player_idx;
+                            report.d.artifacts.planet_idx = planet_idx;
+                            report.d.artifacts.tech_app_id = tech_app_id;
+                            REPORT::Add_Report_(&report);
                         }
                     }
 
@@ -894,6 +912,8 @@ void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
  * @param target_colony_idx_out Receives the chosen colony target, or -1.
  */
 void __cdecl Get_Local_Human_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out) {
+    SYS::Clear_System_Display_Loaded_Flag_();
+
     *target_colony_idx_out = -1;
     *target_player_idx_out = -1;
 
@@ -1413,6 +1433,13 @@ void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_id
 }
 
 int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_idx, int16_t planet_idx, s_battle_results* result, int8_t is_sneak_attack) {
+    if (combat_in_progress) {
+        exitm::Exit_With_Message("nested combat detected");
+    }
+    combat_in_progress = true;
+
+    COMBINIT::Reset_Satellite_Capture_();
+
     int16_t colony_idx;
     int16_t plr1_ship_offset;
     int16_t plr2_ship_offset;
@@ -1543,7 +1570,10 @@ int16_t __cdecl Do_1_Combat_(int16_t star_idx, int16_t plr2_idx, int16_t plr1_id
         }
     }
 
-    return (int16_t)result->player_info.combat_result;
+    const int16_t combat_result = (int16_t)result->player_info.combat_result;
+    COMBINIT::Reset_Satellite_Capture_();
+    combat_in_progress = false;
+    return combat_result;
 }
 
 int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int16_t attacker_count, int16_t defender_idx, int16_t* defender_ships, int16_t defender_count, int16_t star_idx, int16_t colony_idx, int8_t is_sneak_attack, s_battle_results* results)
@@ -2382,6 +2412,10 @@ int8_t __cdecl Player_Owns_Transports_(int player_idx) {
 }
 
 void __cdecl Do_Net_Combat_Update_(bool unused) {
+    if (combat_in_progress) {
+        return;
+    }
+
     (void)unused;
     RUSS::Mox_Update_();
 
@@ -2583,7 +2617,8 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
     if (target_sync_owner_id == -1) {
         NETMOX::_net.sync_phase_active_flag = 0;
         for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-            if ((uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id) {
+            if ((uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id &&
+                NETMOX::_net.player_net_info[j].combat_star_id == star_id) {
                 RUSS::Mox_Update_();
                 NETMOX::_net.player_net_info[j].combat_attacker_id = (undefined)0xff;
             }
@@ -2595,7 +2630,10 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
         NETMOX::_net.player_net_info[target_sync_owner_id].combat_target_player_id = NETMOX::_net.player_net_info[attacker_id].combat_target_player_id;
 
         for (int16_t j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-            if (j != attacker_id && j != target_sync_owner_id && (uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id) {
+            if (j != attacker_id &&
+                j != target_sync_owner_id &&
+                (uint8_t)NETMOX::_net.player_net_info[j].combat_attacker_id == attacker_id &&
+                NETMOX::_net.player_net_info[j].combat_star_id == star_id) {
                 RUSS::Mox_Update_();
                 NETMOX::_net.player_net_info[j].combat_attacker_id = (undefined)0xff;
             }

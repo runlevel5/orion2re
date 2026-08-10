@@ -1,5 +1,31 @@
 #include "pch.h"
 
+namespace {
+    void Apply_Strategic_Crew_Bonuses_() {
+        if (COMBAT::_strategic_xp_bonus == 0) {
+            return;
+        }
+
+        for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+            s_qship* combat_ship = &MOX::_qcombat_data[i];
+            const int16_t ship_idx = combat_ship->ship_design_idx;
+            if ((uint16_t)ship_idx >= MAX_SHIPS) {
+                continue;
+            }
+
+            const uint8_t crew_quality = (uint8_t)MOX::_ship[ship_idx].crew_quality;
+            if (crew_quality >= CREW_QUALITY_COUNT) {
+                continue;
+            }
+
+            const s_crew_data* crew = &MOX::_crew_data[crew_quality];
+            combat_ship->base_ocv += crew->attack;
+            combat_ship->beam_defense_bonus += crew->defense;
+            combat_ship->missile_defense_bonus += crew->defense / 2;
+        }
+    }
+}
+
 namespace COMBAT {
     constexpr size_t kQCombatDataShipCount = MAX_SHIPS + 1;
     constexpr size_t kQCombatDataSize = kQCombatDataShipCount * sizeof(s_qship);
@@ -98,6 +124,8 @@ namespace COMBAT {
                 Get_Leader_Combat_Bonuses_(plr2_ships, plr2_ship_count, &bonus1, &bonus2, &leader_combat_bonuses[MOX::_combat_defender_player], &bonus3, &bonus4);
                 Qload_Ships_(plr2_ships, plr2_ship_count, bonus1, bonus2, bonus3, bonus4);
             }
+
+            Apply_Strategic_Crew_Bonuses_();
 
             MOX::_combat_defender_count = MOX::_combat_total_ship_count - attacker_ship_count;
             if (MOX::_colony_defense_flags == 0) {
@@ -1380,8 +1408,14 @@ namespace COMBAT {
         MOX::_missile = (s_missile*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1E78);
         struct_::Clear_Structure_(MOX::_missile, 0x1E78);
 
-        MOX::_combat_attacker_player = MOX::_ship[ship_array[0]].owner;
+        MOX::_combat_attacker_player = bomb_result->attacker_idx;
         MOX::_combat_defender_player = MOX::_colony[MOX::_cmbt_colony_id].owner;
+
+        if ((uint16_t)MOX::_combat_attacker_player <= MAX_PLAYERS) {
+            const int16_t attacker = MOX::_combat_attacker_player;
+            MOX::_fighter_beam_type[attacker] = INITSHIP::Best_Point_Defense_Weapon_(attacker);
+            MOX::_fighter_bomb_type[attacker] = INITSHIP::Best_Bomb_Weapon_(attacker);
+        }
 
         qsort(ship_array, (size_t)ship_count, sizeof(*ship_array), qsort_ship_array_by_size_);
 
@@ -1419,12 +1453,11 @@ namespace COMBAT {
                         MOX::_combat_data[i].weapons[j].shots_left = MOX::_combat_data[i].weapons[j].count;
                         MOX::_combat_data[i].weapons[j].active = 1;
 
-                        if (MOX::_combat_data[i].weapons[j].weapon_id > 0) {
-                            if (TECHDATA::_weapons[MOX::_combat_data[i].weapons[j].weapon_id].type != 1) {
-                                if (MOX::_combat_data[i].weapons[j].ammo > 0) {
-                                    MOX::_combat_data[i].weapons[j].ammo--;
-                                }
-                            }
+                        const int16_t weapon_id = MOX::_combat_data[i].weapons[j].weapon_id;
+                        if (weapon_id > 0 &&
+                            TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_TORPEDO &&
+                            MOX::_combat_data[i].weapons[j].ammo > 0) {
+                            MOX::_combat_data[i].weapons[j].ammo--;
                         }
                     }
                 }
@@ -1439,7 +1472,10 @@ namespace COMBAT {
             turns--;
         } while (turns != 0);
 
-        bomb_result->bomb_hits_remaining = MOX::_combat_data[0].structure_max / 100;
+        int16_t best_armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data[0].owner);
+        uint16_t civilian_armor_hits = CMBTFIRE::_civilian_armor[best_armor_idx];
+        bomb_result->bomb_hits_remaining =
+            MOX::_combat_data[0].structure_max / civilian_armor_hits;
         bomb_result->is_planetary_hit = MOX::_combat_bomb_result.is_planetary_hit;
         bomb_result->is_bio_weapon = MOX::_combat_bomb_result.is_bio_weapon;
         bomb_result->bio_hits_remaining = MOX::_combat_bomb_result.bio_hits_remaining;

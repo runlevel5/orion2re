@@ -268,6 +268,8 @@ namespace maintain {
                     player->bc += MOX::_settings.game_difficulty;
                 }
 
+                cheapest_ship->status = 7; /* Scrapped */
+
                 COLCALC::Do_Player_Colony_Post_Production_(player_idx);
 
                 int16_t ship_index = (int16_t)(cheapest_ship - MOX::_ship);
@@ -281,10 +283,13 @@ namespace maintain {
 
                 MSG_::Add_Msg_(msg, player_idx);
 
-                cheapest_ship->status = 7; /* Scrapped */
-
                 if (cheapest_ship->officer_index != -1) {
-                    OFFICER::Move_Officer_To_Pool_(cheapest_ship->officer_index);
+                    int16_t officer_idx = cheapest_ship->officer_index;
+                    aileader::Reassign_Fleet_Officer_(player_idx, officer_idx);
+
+                    if (cheapest_ship->officer_index == officer_idx) {
+                        OFFICER::Move_Officer_To_Pool_(officer_idx);
+                    }
                     cheapest_ship->officer_index = -1;
                 }
 

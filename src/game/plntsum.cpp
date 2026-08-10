@@ -88,6 +88,9 @@ void __cdecl Summary_Screen_Print_Data_(void) {
             if (system_special > SYSTEM_SPECIAL_NO_SPECIAL && system_special != SYSTEM_SPECIAL_ORION_STAR) {
                 special_id = static_cast<int16_t>(system_special);
             }
+            if (planet->planet_special == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
+                special_id = SYSTEM_SPECIAL_ANCIENT_ARTIFACTS;
+            }
 
             if (special_id > SYSTEM_SPECIAL_NO_SPECIAL && HACCESS::Special_Is_Planet_Special_(special_id)) {
                 char* special_str = nullptr;
@@ -641,9 +644,13 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     void __cdecl Set_Planet_Explored_Flags_() {
         Reset_Explored_Planets_();
 
+        bool has_omniscience_trait =
+            MOX::_player[MOX::_PLAYER_NUM].traits[TRAIT_OMNISCIENCE] != 0;
+
         for (int16_t i = 0; i < (int16_t)MOX::_planet_count; ++i) {
-            // Check if the current player can view the star system containing this planet
-            if (SYS::Ok_To_View_System_(MOX::_planet[i].star_index, MOX::_PLAYER_NUM)) {
+            int16_t star_idx = MOX::_planet[i].star_index;
+            if (has_omniscience_trait ||
+                HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
                 struct_::Set_Bit_Field_(PLNTSUM::_explored_bitmap, i);
             }
         }
@@ -661,19 +668,16 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         // 50% Penalty Conditions:
         // - Low-G race on Heavy-G planet (2)
         // - Normal-G race on Heavy-G planet (2)
-        // - Heavy-G race on Low-G planet (0)
         if ((low_g_trait != 0 && planet_gravity == PLANET_GRAVITY_HEAVY_G) ||
-            (is_normal_g_race && planet_gravity == PLANET_GRAVITY_HEAVY_G) ||
-            (heavy_g_trait != 0 && planet_gravity == PLANET_GRAVITY_LOW_G)) {
+            (is_normal_g_race && planet_gravity == PLANET_GRAVITY_HEAVY_G)) {
             return 50;
         }
 
         // 25% Penalty Conditions:
         // - Low-G race on Normal-G planet (1)
-        // - Normal-G race on Low-G planet (0)
-        // (Note: Heavy-G races do not suffer 25% penalties on Normal-G planets)
+        // - Normal-G or Heavy-G race on Low-G planet (0)
         if ((low_g_trait != 0 && planet_gravity == PLANET_GRAVITY_NORMAL_G) ||
-            (is_normal_g_race && planet_gravity == PLANET_GRAVITY_LOW_G)) {
+            (low_g_trait == 0 && planet_gravity == PLANET_GRAVITY_LOW_G)) {
             return 25;
         }
 
@@ -993,7 +997,8 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             if (passes_filter) {
                 if (!Planet_Has_Been_Visited_(i)) {
                     passes_filter = false;
-                } else if (!struct_::Test_Bit_Field_(PLNTSUM::_explored_bitmap, i)) {
+                } else if (PLNTSUM::_filter_out_enemy_controlled_planets != 0 &&
+                           !struct_::Test_Bit_Field_(PLNTSUM::_explored_bitmap, i)) {
                     passes_filter = false;
                 }
             }
