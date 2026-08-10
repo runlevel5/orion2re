@@ -1,6 +1,8 @@
 #include "pch.h"
 
 namespace CMBTMIS {
+    int8_t _missile_initiative = -1;
+
     int16_t _missile_group_offset[16][16] = {
         { 0, -12, 8, -6, 15, 0, 8, 6, 0, 12, -8, 6, -15, 0, -8, -6 },
         { -9, -10, 1, -8, 13, -8, 11, 1, 9, 10, -1, 8, -13, 8, -11, -1 },
@@ -1192,11 +1194,8 @@ namespace CMBTMIS {
 
             MOX::_missile[missile_idx].facing_dir = (int8_t)Missile_Facing_(missile_idx, target_idx, is_anti_rocket);
 
-            if (MOX::_combat_init != 0) {
-                MOX::_missile[missile_idx].fighter_count = -1;
-            } else {
-                MOX::_missile[missile_idx].fighter_count = 0;
-            }
+            MOX::_missile[missile_idx].fighter_count =
+                MOX::_combat_init != 0 ? _missile_initiative : 0;
 
             MOX::_missile[missile_idx].speed = (uint8_t)Missile_Speed_(MOX::_missile[missile_idx].type,
                                                                     MOX::_missile[missile_idx].specials,

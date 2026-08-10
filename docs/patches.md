@@ -242,7 +242,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 
 ### Behavior and balance review
 
-- [ ] `asm.pl:339` - `missile initiative`
+- [x] `asm.pl:339` - `missile initiative`: implemented in `CMBTMIS::Fire_Missile_()` with synchronized `combat missile_initiative` configuration, selecting whether initiative-launched missiles begin eligible for current-round movement; direct source initialization replaces the 1.50 writable instruction immediate while preserving the classic `-1` default.
 - [ ] `asm.pl:343` - `HEF/mount`
 - [ ] `asm.pl:1230` - `torpedoes for satellites`
 - [ ] `asm.pl:1244` - `tractor power table`

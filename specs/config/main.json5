@@ -1958,6 +1958,22 @@
       default: { cyber: 10, aru: 20, regen: 20 },
     },
 
+    missile_initiative: {
+      title: "Missile initiative",
+      description: "Controls when newly fired missiles first move while ship initiative is enabled.",
+      remarks: "Minus one preserves classic initiative behavior and delays newly fired missiles until the next round. Zero lets them move at the end of the current round. Without ship initiative, missiles already move during the current turn and this setting has no effect.",
+      examples: ["combat missile_initiative = 0;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "int8",
+      constraints: { min: -1, max: 0 },
+      default: -1,
+      bind_root: {
+        header: "game/cmbtmis.h",
+        symbol: "CMBTMIS::_missile_initiative",
+      },
+    },
+
     finds_presented_by_scientist: {
       title: "Artifact technology presenter",
       description: "Uses the scientist instead of the trooper when presenting technologies found on Ancient Artifacts planets.",

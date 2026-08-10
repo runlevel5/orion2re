@@ -2,6 +2,8 @@
 #include <cstdint>
 
 namespace CMBTMIS {
+    extern int8_t _missile_initiative;
+
     enum e_lightning_field_mode : uint8_t {
         LIGHTNING_FIELD_MODE_CLASSIC,
         LIGHTNING_FIELD_MODE_UNIFORM,
