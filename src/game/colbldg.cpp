@@ -718,6 +718,18 @@ namespace COLBLDG {
         COLONY::full_draw = 1;
     }
 
+    static bool Kbd_Blocks_Design_() {
+        if (ENHANCED_UX::enhanced_ux_settings.enabled == 0 ||
+            _g_preset_edit_mode != 0) {
+            return false;
+        }
+        if (_g_kbd_panel < 0 || Kbd_Selected_Field_() <= 0) {
+            return false;
+        }
+        return !(_g_kbd_panel == 1 &&
+                 Colony_Production_Is_Ship_Design(military_indexes[_g_kbd_index]));
+    }
+
     void Draw_Kbd_Selection_Pulse_() {
         int16_t field_id = Kbd_Selected_Field_();
         if (field_id <= 0) {
@@ -774,17 +786,19 @@ namespace COLBLDG {
             COLONY::full_draw = 1;
             return 0;
         }
-        if (key == 0x0F09) { // Tab: left -> right -> queue, skipping empties
+        if (key == 0x0F09) { // Tab: left -> right -> queue -> no focus
             _g_kbd_delete_confirm = -1;
-            for (int16_t step = 0; step < 3; ++step) {
-                _g_kbd_panel = (_g_kbd_panel == 0) ? (int16_t)1
-                             : (_g_kbd_panel == 1) ? (int16_t)2 : (int16_t)0;
-                if (Kbd_Panel_Count_(_g_kbd_panel) > 0) {
+            int16_t next = _g_kbd_panel;
+            do {
+                next = (int16_t)(next + 1); // from -1 (none) through 2
+                if (next > 2) {
+                    next = -1;
                     break;
                 }
-            }
+            } while (Kbd_Panel_Count_(next) <= 0);
+            _g_kbd_panel = next;
             _g_kbd_index = 0;
-            COLONY::full_draw = 1;
+            Do_Draw_Build_Queue();
             return 0;
         }
         if ((key == 0x48E0 || key == 0x50E0) && _g_kbd_panel >= 0) { // Up/Down
@@ -797,9 +811,21 @@ namespace COLBLDG {
                 _g_kbd_index = (key == 0x48E0)
                     ? (int16_t)((_g_kbd_index + count - 1) % count)
                     : (int16_t)((_g_kbd_index + 1) % count);
-                COLONY::full_draw = 1;
+                Do_Draw_Build_Queue();
             }
             return 0;
+        }
+        if (_g_preset_edit_mode == 0 && _g_kbd_panel == 1 &&
+            MOX::settings.strategic_combat_flag == 0 && key > 0 &&
+            ((key & 0xFF) == 'd' || (key & 0xFF) == 'D')) {
+            // 'D' with a ship design highlighted jumps straight into the
+            // designer for it, via the same path as the which-ship pick.
+            int16_t midx = military_indexes[_g_kbd_index];
+            if (Kbd_Selected_Field_() > 0 &&
+                Colony_Production_Is_Ship_Design(midx)) {
+                field_mode = 1;
+                return military_fields[_g_kbd_index];
+            }
         }
         if (key == 0x1C0D) { // Enter clicks the selected row
             if (_g_kbd_panel == 2 && _g_kbd_delete_confirm == _g_kbd_index &&
@@ -1248,7 +1274,7 @@ namespace COLBLDG {
         // Enhancement: 'O' presses OK and 'A' toggles AUTO, like clicks.
         const bool enhanced_keys = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
 
-        fields[0] = ::fields::Add_Button_Field(493, 447, ESTRINGS::E_Strings(12), anims[1], ESTRINGS::E_Strings(12), 40);
+        fields[0] = ::fields::Add_Button_Field(493, 447, ESTRINGS::E_Strings(12), anims[1], enhanced_keys ? "c" : ESTRINGS::E_Strings(12), 40);
         fields[3] = ::fields::Add_Button_Field(560, 447, ESTRINGS::E_Strings(12), anims[3], enhanced_keys ? "o" : ESTRINGS::E_Strings(12), 40);
 
         fields[1] = ::fields::Add_Hot_Key(ESTRINGS::E_Strings(135));
@@ -1284,7 +1310,11 @@ namespace COLBLDG {
             fields[5] = -1000;
         } else {
             fields[4] = ::fields::Add_Button_Field(492, 379, ESTRINGS::E_Strings(12), anims[4], ESTRINGS::E_Strings(436 /* ESTR_R */), 40);
-            fields[5] = ::fields::Add_Button_Field(561, 379, ESTRINGS::E_Strings(12), anims[5], ESTRINGS::E_Strings(251 /* ESTR_D3 */), 40);
+            // A highlighted non-design row disables Design (button and 'd'),
+            // drawn dimmed instead.
+            fields[5] = Kbd_Blocks_Design_()
+                ? (int16_t)-1000
+                : ::fields::Add_Button_Field(561, 379, ESTRINGS::E_Strings(12), anims[5], ESTRINGS::E_Strings(251 /* ESTR_D3 */), 40);
         }
 
         fields[6] = ::fields::Add_Button_Field(503, 411, ESTRINGS::E_Strings(12), anims[6], (char*)"e", 40);
@@ -1487,8 +1517,12 @@ namespace COLBLDG {
         video::Set_Refresh_Stencil();
 
         const bool enhanced_kbd = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
-        COLBLDG::_g_kbd_panel = -1;
-        COLBLDG::_g_kbd_index = 0;
+        // Coming back from the ship designer keeps the keyboard selection
+        // (the design jumped into stays highlighted); fresh entries reset.
+        if (COLBLDG::return_to_build_popup_from_custom_design == 0) {
+            COLBLDG::_g_kbd_panel = -1;
+            COLBLDG::_g_kbd_index = 0;
+        }
         COLBLDG::_g_kbd_delete_confirm = -1;
 
         int16_t field_id;
@@ -2037,6 +2071,14 @@ namespace COLBLDG {
             if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
                 BILL::Squeeze_Paragraph_Centered(255, 309, 154, 17, buffer, 2);
                 COLBLDG::Draw_Colony_Arrows_();
+                if (COLBLDG::_g_preset_edit_mode == 0 && COLBLDG::Kbd_Blocks_Design_() &&
+                    MOX::settings.strategic_combat_flag == 0) {
+                    animate::Reset_Animation_Frame(COLBLDG::anims[5]);
+                    animate::Draw_(561, 379, COLBLDG::anims[5]);
+                    graphics::Darken_Fill(561, 379,
+                        (int16_t)(560 + animate::Get_Width(COLBLDG::anims[5])),
+                        (int16_t)(378 + animate::Get_Height(COLBLDG::anims[5])));
+                }
                 if (COLBLDG::_g_preset_edit_mode != 0) {
                     animate::Reset_Animation_Frame(COLBLDG::_prev_colony_anim);
                     animate::Remap_Draw(13, 20, COLBLDG::_prev_colony_anim);
