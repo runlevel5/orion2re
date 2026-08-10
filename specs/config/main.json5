@@ -1265,6 +1265,35 @@
       bind_root: { header: "game/mapgen.h", symbol: "MAPGEN::_maximum_star_count" },
     },
 
+    jump_gate_speed_bonus: {
+      title: "Jump Gate speed bonus",
+      description: "Adds this speed to fleets traveling through connected Jump Gates.",
+      examples: ["movement jump_gate_speed_bonus = 3;"],
+      group: "gameplay",
+      namespace: "movement",
+      type: "uint8",
+      default: 3,
+      bind_root: {
+        header: "game/shipmove.h",
+        symbol: "SHIPMOVE::_jump_gate_speed_bonus",
+      },
+    },
+
+    jump_gate_pass_nebula: {
+      title: "Jump Gates bypass nebula slowdown",
+      description: "Prevents nebulae from reducing the speed of fleets using Jump Gates.",
+      remarks: "False preserves classic behavior; Jump Gates still bypass black-hole blockage.",
+      examples: ["movement jump_gate_pass_nebula = true;"],
+      group: "gameplay",
+      namespace: "movement",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/shipmove.h",
+        symbol: "SHIPMOVE::_jump_gate_pass_nebula",
+      },
+    },
+
     autobuild: {
       title: "Experimental autobuild",
       description: "Assigns automatic build queues to individual colonies.",

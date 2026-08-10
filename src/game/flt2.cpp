@@ -782,7 +782,12 @@ void __cdecl Fltscrn_Move_Ships_(int16_t target_star) {
         SHIPMOVE::Ships_Try_To_Move_To_(MOX::_fltscrn_ship_icon_selection_list, target_star, &MOX::_g_ship_move_info);
 
         if (MOX::_g_ship_move_info.moving != 0) {
-            SHIPMOVE::Make_Ships_Move_To_(MOX::_fltscrn_ship_icon_selection_list, target_star, &MOX::_g_ship_move_info);
+            if (!SHIPMOVE::Apply_Player_Movement_Order_(
+                    MOX::_fltscrn_ship_icon_selection_list,
+                    target_star,
+                    &MOX::_g_ship_move_info)) {
+                return;
+            }
             SHIPS::Build_Ship_Icons_();
             FLT::Set_Fltscrn_Small_Ship_Icon_XYs_(0xF, 0x34, 0x131, 0xB6);
             MOX::_draw_fleet_screen_to_back = 1;

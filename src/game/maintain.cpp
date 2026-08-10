@@ -215,6 +215,8 @@ namespace maintain {
         int32_t num_ships = (int32_t)MOX::_NUM_SHIPS;
         s_ship_data* ships = MOX::_ship;
 
+        SHIPMOVE::Recalculate_All_Moving_Fleets_();
+
         for (int16_t i = 0; i < num_ships; ++i) {
             if (ships[i].status == 7 || ships[i].status == 8) {
                 SHIPS::Kill_Ship_(i);

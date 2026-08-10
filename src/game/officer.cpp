@@ -1419,7 +1419,8 @@ namespace OFFICER {
                     mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                     snprintf(final_msg, sizeof(final_msg), format_str, Leader_Name_(MOX::_officer_selected, 1));
 
-                    if (Officer_Screen_User_Box_(final_msg, 1) != 0) {
+                    if (Officer_Screen_User_Box_(final_msg, 1) != 0 &&
+                        SHIPMOVE::Confirm_Officer_Change_(MOX::_officer_selected, -1, 0)) {
                         Dismiss_Officer_(MOX::_officer_selected);
                         MOX::_officer_selected = -1;
                     } else {
@@ -1506,6 +1507,7 @@ namespace OFFICER {
         Get_Officer_Pictures_();
         EVANHELP::Set_Officer_Screen_Help_();
 
+        SHIPMOVE::Recalculate_Moving_Fleet_(location);
         OFFICER::_officer_button_mode = -1;
     }
 
@@ -1646,8 +1648,12 @@ namespace OFFICER {
                     proceed = Officer_Screen_User_Box_(display_buf, 1) != 0;
                 }
 
-                if (proceed) {
+                int16_t source_ship_idx = MOX::_leaders[leader_idx].location;
+                if (proceed &&
+                    SHIPMOVE::Confirm_Officer_Change_(leader_idx, ship_idx, eta)) {
                     Assign_Leader_To_Ship_(&MOX::_player[MOX::_PLAYER_NUM], &MOX::_leaders[leader_idx], target_ship, eta);
+                    SHIPMOVE::Recalculate_Moving_Fleet_(source_ship_idx);
+                    SHIPMOVE::Recalculate_Moving_Fleet_(ship_idx);
                 }
             }
         } else {
@@ -1805,6 +1811,11 @@ namespace OFFICER {
             return;
         }
 
+        if (Is_Fleet_Officer_Screen_() &&
+            !SHIPMOVE::Confirm_Officer_Change_(leader_idx, -1, 0)) {
+            return;
+        }
+
         int16_t location = leader.location;
         int8_t player_idx = leader.player_index;
 
@@ -1824,6 +1835,7 @@ namespace OFFICER {
         leader.location = -1;
         _officer_button_mode = -1;
         MOX::_officer_selected = -1;
+        SHIPMOVE::Recalculate_Moving_Fleet_(location);
     }
 
     void __cdecl Change_Screen_Type_(int8_t* out_flag) {
@@ -2685,6 +2697,8 @@ namespace OFFICER {
 
         if (MOX::_leaders[leader_idx].type == LEADER_TYPE_COLONY) {
             COLCALC::Do_Player_Colony_Calculations_((int16_t)MOX::_leaders[leader_idx].player_index);
+        } else {
+            SHIPMOVE::Recalculate_Moving_Fleet_(location);
         }
     }
 

@@ -497,7 +497,10 @@ namespace MAINSCR {
                         }
                         else {
                             int ships_count = FLEETPOP::Fleet_Buttons_Chosen_();
-                            SHIPMOVE::Make_Ships_Move_To_(ship_ids, selected_target_id, &MOX::_g_ship_move_info);
+                            if (!SHIPMOVE::Apply_Player_Movement_Order_(
+                                    ship_ids, selected_target_id, &MOX::_g_ship_move_info)) {
+                                continue;
+                            }
                             MOX::_eta_star_id = -1;
 
                             int16_t next_icon = 0;

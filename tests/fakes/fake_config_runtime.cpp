@@ -8,6 +8,11 @@ namespace MAPGEN {
     int16_t _maximum_star_count = 99;
 }
 
+namespace SHIPMOVE {
+    uint8_t _jump_gate_speed_bonus = 3;
+    bool _jump_gate_pass_nebula;
+}
+
 namespace CMBTSPEC {
     uint8_t _leader_dies_with_no;
 }

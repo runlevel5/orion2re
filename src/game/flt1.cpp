@@ -1552,6 +1552,14 @@ namespace FLT1 {
             }
         }
 
+        for (int i = 0; i < num_ships; ++i) {
+            int16_t officer_idx = MOX::_ship[ship_indices[i]].officer_index;
+            if (officer_idx != -1 &&
+                !SHIPMOVE::Confirm_Officer_Change_(officer_idx, -1, 0)) {
+                return 0;
+            }
+        }
+
         int32_t scrap_value = Get_Scrap_Ship_Value_();
 
         if (interactive != 0 && scrap_value > 0) {
@@ -1594,6 +1602,7 @@ namespace FLT1 {
             }
         }
 
+        SHIPMOVE::Recalculate_All_Moving_Fleets_();
         COLCALC::Do_Player_Colony_Calculations_(player_idx);
         return 1;
     }

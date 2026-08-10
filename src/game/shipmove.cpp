@@ -2,6 +2,116 @@
 #include <cstring>
 
 namespace SHIPMOVE {
+    uint8_t _jump_gate_speed_bonus = 3;
+    bool _jump_gate_pass_nebula = false;
+
+    namespace {
+        constexpr uint8_t JUMP_GATE_ROUTE_MASK = 1;
+
+        bool Ship_Uses_Jump_Gate_(const s_ship_data* ship) {
+            return (ship->special_device_damage_flags[0] & JUMP_GATE_ROUTE_MASK) != 0;
+        }
+
+        void Set_Ship_Uses_Jump_Gate_(s_ship_data* ship, bool uses_jump_gate) {
+            if (uses_jump_gate) {
+                ship->special_device_damage_flags[0] |= JUMP_GATE_ROUTE_MASK;
+            } else {
+                ship->special_device_damage_flags[0] &= (uint8_t)~JUMP_GATE_ROUTE_MASK;
+            }
+        }
+
+        bool Ship_Is_In_Same_Moving_Fleet_(const s_ship_data* first, const s_ship_data* ship) {
+            return SHIPMOVE::Ship_Is_Moving_(ship) &&
+                   ship->owner == first->owner &&
+                   ship->status == first->status &&
+                   ship->location == first->location &&
+                   ship->x == first->x &&
+                   ship->y == first->y;
+        }
+
+        int Build_Moving_Fleet_List_(int16_t ship_idx, int16_t* ship_list) {
+            if (ship_idx < 0 || ship_idx >= MOX::_NUM_SHIPS ||
+                !SHIPMOVE::Ship_Is_Moving_(&MOX::_ship[ship_idx])) {
+                ship_list[0] = -1;
+                return 0;
+            }
+
+            s_ship_data* first = &MOX::_ship[ship_idx];
+            int count = 0;
+            for (int16_t i = 0; i < MOX::_NUM_SHIPS && count < MAX_SHIPS - 1; ++i) {
+                if (Ship_Is_In_Same_Moving_Fleet_(first, &MOX::_ship[i])) {
+                    ship_list[count++] = i;
+                }
+            }
+            ship_list[count] = -1;
+            return count;
+        }
+
+        bool Ship_Is_In_List_(int16_t ship_idx, const int16_t* ship_list) {
+            for (int i = 0; ship_list[i] != -1; ++i) {
+                if (ship_list[i] == ship_idx) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool Fleet_Uses_Jump_Gate_(const int16_t* ship_list, int16_t target_star_idx) {
+            for (int i = 0; ship_list[i] != -1; ++i) {
+                s_ship_data* ship = &MOX::_ship[ship_list[i]];
+                if (ship->status != 1 ||
+                    SHIPMOVE::Ship_Destination_Star_(ship) != target_star_idx ||
+                    !Ship_Uses_Jump_Gate_(ship)) {
+                    return false;
+                }
+            }
+            return ship_list[0] != -1;
+        }
+
+        bool Confirm_Fleet_Change_(int16_t baseline_ship_idx, const s_ship_move_info* move_info) {
+            if (baseline_ship_idx < 0 || baseline_ship_idx >= MOX::_NUM_SHIPS ||
+                !SHIPMOVE::Ship_Is_Moving_(&MOX::_ship[baseline_ship_idx])) {
+                return true;
+            }
+
+            s_ship_data* ship = &MOX::_ship[baseline_ship_idx];
+            if (move_info->moving == 0) {
+                return GENDRAW::Confirmation_Box_(
+                    "The fleet on course to pass the black hole will have no navigator. "
+                    "If this is not remedied the fleet will be lost at the end of the turn. Continue?") != 0;
+            }
+
+            int delay = (int)(uint8_t)move_info->turns_left - (int)(uint8_t)ship->turns_left;
+            if (delay <= 0) {
+                return true;
+            }
+
+            char message[200];
+            snprintf(
+                message,
+                sizeof(message),
+                "The fleet without navigator will be delayed by %d turn%s. Continue?",
+                delay,
+                delay == 1 ? "" : "s");
+            return GENDRAW::Confirmation_Box_(message) != 0;
+        }
+
+        void Apply_Movement_Result_(int16_t* ship_list, int16_t destination_star_idx, s_ship_move_info* move_info) {
+            if (ship_list[0] == -1) {
+                return;
+            }
+
+            if (move_info->moving != 0) {
+                SHIPMOVE::Make_Ships_Move_To_(ship_list, destination_star_idx, move_info);
+                return;
+            }
+
+            for (int i = 0; ship_list[i] != -1; ++i) {
+                MOX::_ship[ship_list[i]].status = 8;
+            }
+        }
+    }
+
     /**
      * Reserves available ship slots for Antarans and players based on current production demand.
      */
@@ -248,7 +358,7 @@ namespace SHIPMOVE {
      * Returns whether the ship is currently travelling between stars.
      * @param ship Ship record to inspect.
      */
-    bool __cdecl Ship_Is_Moving_(s_ship_data* ship) {
+    bool __cdecl Ship_Is_Moving_(const s_ship_data* ship) {
         if (ship->status >= 1 && ship->status <= 2) {
             return true;
         }
@@ -431,7 +541,10 @@ namespace SHIPMOVE {
                         (uint16_t)(uint8_t)ship->travelling_speed,
                         &ship->x,
                         &ship->y,
-                        (ship->group_has_navigator == 0) ? &unused_navigator_flag : nullptr,
+                        (ship->group_has_navigator == 0 &&
+                         (!_jump_gate_pass_nebula || !Ship_Uses_Jump_Gate_(ship)))
+                            ? &unused_navigator_flag
+                            : nullptr,
                         &unused_direction
                     );
                 }
@@ -485,6 +598,7 @@ namespace SHIPMOVE {
             ship->turns_left = move_info->turns_left;
             ship->group_has_navigator = move_info->has_navigator;
             ship->travelling_speed = move_info->traveling_speed;
+            Set_Ship_Uses_Jump_Gate_(ship, move_info->has_jumpgate_route != 0);
             ship->status = move_status;
 
             if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
@@ -497,6 +611,96 @@ namespace SHIPMOVE {
 
             i++;
         }
+    }
+
+    bool __cdecl Apply_Player_Movement_Order_(int16_t* ship_list, int16_t destination_star_idx, s_ship_move_info* move_info) {
+        if (ship_list == nullptr || move_info == nullptr ||
+            ship_list[0] < 0 || ship_list[0] >= MOX::_NUM_SHIPS ||
+            destination_star_idx < 0 || destination_star_idx > MOX::_NUM_STARS) {
+            return false;
+        }
+
+        s_ship_data first_before = MOX::_ship[ship_list[0]];
+        int16_t target_list[MAX_SHIPS];
+        int target_count = 0;
+        target_list[0] = -1;
+        for (int i = 0; i < MAX_SHIPS - 1 && ship_list[i] != -1; ++i) {
+            int16_t ship_idx = ship_list[i];
+            if (ship_idx < 0 || ship_idx >= MOX::_NUM_SHIPS) {
+                return false;
+            }
+            if (!Ship_Is_In_List_(ship_idx, target_list)) {
+                target_list[target_count++] = ship_idx;
+                target_list[target_count] = -1;
+            }
+        }
+        if (target_count == 0) {
+            return false;
+        }
+
+        int16_t source_list[MAX_SHIPS];
+        int source_count = 0;
+        if (Ship_Is_Moving_(&first_before)) {
+            for (int16_t i = 0; i < MOX::_NUM_SHIPS && source_count < MAX_SHIPS - 1; ++i) {
+                if (Ship_Is_In_Same_Moving_Fleet_(&first_before, &MOX::_ship[i]) &&
+                    !Ship_Is_In_List_(i, target_list)) {
+                    source_list[source_count++] = i;
+                }
+            }
+        }
+        source_list[source_count] = -1;
+
+        int16_t target_baseline = -1;
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS && target_count < MAX_SHIPS - 1; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+            if (!Ship_Is_In_List_(i, target_list) &&
+                Ship_Is_Moving_(ship) &&
+                ship->owner == first_before.owner &&
+                ship->status == first_before.status &&
+                ship->x == first_before.x &&
+                ship->y == first_before.y &&
+                Ship_Destination_Star_(ship) == destination_star_idx) {
+                if (target_baseline == -1) {
+                    target_baseline = i;
+                }
+                target_list[target_count++] = i;
+            }
+        }
+        target_list[target_count] = -1;
+
+        int remaining_source_count = 0;
+        for (int i = 0; i < source_count; ++i) {
+            if (!Ship_Is_In_List_(source_list[i], target_list)) {
+                source_list[remaining_source_count++] = source_list[i];
+            }
+        }
+        source_count = remaining_source_count;
+        source_list[source_count] = -1;
+
+        s_ship_move_info target_info;
+        Ships_Try_To_Move_To_(target_list, destination_star_idx, &target_info);
+        if (target_info.moving == 0) {
+            return false;
+        }
+
+        s_ship_move_info source_info = {};
+        int16_t source_destination = -1;
+        if (source_count > 0) {
+            source_destination = Ship_Destination_Star_(&MOX::_ship[source_list[0]]);
+            Ships_Try_To_Move_To_(source_list, source_destination, &source_info);
+        }
+
+        if (!Confirm_Fleet_Change_(target_baseline, &target_info) ||
+            (source_count > 0 && !Confirm_Fleet_Change_(source_list[0], &source_info))) {
+            return false;
+        }
+
+        Apply_Movement_Result_(target_list, destination_star_idx, &target_info);
+        if (source_count > 0) {
+            Apply_Movement_Result_(source_list, source_destination, &source_info);
+        }
+        *move_info = target_info;
+        return true;
     }
 
     /**
@@ -523,6 +727,7 @@ namespace SHIPMOVE {
      * @param star_idx Destination star index.
      */
     void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx) {
+        Set_Ship_Uses_Jump_Gate_(ship, false);
         ship->location = star_idx;
         ship->status = 0;
         ship->x = MOX::_star[star_idx].x;
@@ -581,7 +786,16 @@ namespace SHIPMOVE {
         player_idx = MOX::_ship[*ship_list].owner;
 
         if (player_idx < MAX_PLAYERS) {
-            ship_speed = (uint8_t)MOX::_player[player_idx].ship_speed;
+            s_ship_data* first_ship = &MOX::_ship[*ship_list];
+            if (first_ship->status == 1) {
+                ship_speed = (uint8_t)first_ship->travelling_speed -
+                             (uint8_t)first_ship->group_has_navigator;
+                if (Ship_Uses_Jump_Gate_(first_ship)) {
+                    ship_speed -= _jump_gate_speed_bonus;
+                }
+            } else {
+                ship_speed = (uint8_t)MOX::_player[player_idx].ship_speed;
+            }
         } else {
             ship_speed = 1;
         }
@@ -590,7 +804,8 @@ namespace SHIPMOVE {
 
         if (MOX::_NUM_STARS != target_star_idx && player_idx < MAX_PLAYERS) {
             if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] == 0) {
-                if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
+                if (EVENTS::Event_Check_Hyperspace_Flux_() != 0 &&
+                    MOX::_ship[*ship_list].status != 1) {
                     move_info->hyperspace_flux = 1;
                     return;
                 }
@@ -628,6 +843,9 @@ namespace SHIPMOVE {
         }
 
         int16_t start_star_id = HAROLD::XY_To_Star_Id_(start_x, start_y);
+        bool continuing_existing_route = MOX::_ship[*ship_list].status == 1 &&
+                                         Ship_Destination_Star_(&MOX::_ship[*ship_list]) == target_star_idx;
+        bool continuing_jump_gate_route = Fleet_Uses_Jump_Gate_(ship_list, target_star_idx);
 
         // Dimensional Portal logic for Antares
         if (MOX::_NUM_STARS == target_star_idx && start_star_id != -1) {
@@ -672,6 +890,9 @@ namespace SHIPMOVE {
                     }
                 }
             } else {
+                if (continuing_jump_gate_route) {
+                    move_info->has_jumpgate_route = 1;
+                }
                 if (GEO::Black_Hole_Blocks_Points_(start_x, start_y, target_star->x, target_star->y)) {
                     move_info->blackhole_blocks = 1;
                 }
@@ -687,7 +908,7 @@ namespace SHIPMOVE {
                 int16_t cur_y = start_y;
                 uint8_t turn_count = 0;
                 if (move_info->has_jumpgate_route != 0) {
-                    base_speed += 3;
+                    base_speed += _jump_gate_speed_bonus;
                 }
 
                 while (cur_x != target_star->x || cur_y != target_star->y) {
@@ -702,7 +923,10 @@ namespace SHIPMOVE {
                         (int16_t)base_speed, 
                         &cur_x, 
                         &cur_y, 
-                        (navigator_bonus == 0) ? &unused_navigator_flag : nullptr,
+                        (navigator_bonus == 0 &&
+                         (!_jump_gate_pass_nebula || move_info->has_jumpgate_route == 0))
+                            ? &unused_navigator_flag
+                            : nullptr,
                         &unused_direction
                     );
                 }
@@ -715,15 +939,17 @@ namespace SHIPMOVE {
             }
         }
 
-        move_info->has_navigator = (navigator_bonus > 0);
+        move_info->has_navigator = (int8_t)navigator_bonus;
         
         // Final validation
         if ((move_info->blackhole_blocks != 0 &&
              move_info->has_jumpgate_route == 0 &&
              move_info->has_stargate_route == 0 &&
              navigator_bonus <= 0) ||
-            move_info->out_of_range != 0 ||
-            (ship_speed == 0 && (target_star->x != start_x || target_star->y != start_y))) {
+            (move_info->out_of_range != 0 && !continuing_existing_route) ||
+            (ship_speed == 0 &&
+             !continuing_existing_route &&
+             (target_star->x != start_x || target_star->y != start_y))) {
             move_info->turns_left = -1;
             move_info->moving = 0;
             return;
@@ -769,7 +995,8 @@ namespace SHIPMOVE {
                     turn_count++;
 
                     int8_t* navigator_ptr = nullptr;
-                    if (ship->group_has_navigator == 0) {
+                    if (ship->group_has_navigator == 0 &&
+                        (!_jump_gate_pass_nebula || !Ship_Uses_Jump_Gate_(ship))) {
                         navigator_ptr = &unused_navigator_flag;
                     }
 
@@ -788,6 +1015,100 @@ namespace SHIPMOVE {
 
                 ship->turns_left = turn_count;
             }
+        }
+    }
+
+    bool __cdecl Confirm_Officer_Change_(int16_t leader_idx, int16_t target_ship_idx, int8_t target_eta) {
+        if (leader_idx < 0 || leader_idx >= MAX_LEADERS ||
+            MOX::_leaders[leader_idx].type != LEADER_TYPE_SHIP) {
+            return true;
+        }
+
+        s_leader_data* leader = &MOX::_leaders[leader_idx];
+        int16_t source_ship_idx = leader->location;
+        int16_t source_officer_idx = -1;
+        int16_t target_officer_idx = -1;
+        if (source_ship_idx >= 0 && source_ship_idx < MOX::_NUM_SHIPS) {
+            source_officer_idx = MOX::_ship[source_ship_idx].officer_index;
+        }
+        if (target_ship_idx >= 0 && target_ship_idx < MOX::_NUM_SHIPS) {
+            target_officer_idx = MOX::_ship[target_ship_idx].officer_index;
+        }
+
+        int16_t old_location = leader->location;
+        int8_t old_eta = leader->eta;
+        if (source_ship_idx >= 0 && source_ship_idx < MOX::_NUM_SHIPS) {
+            MOX::_ship[source_ship_idx].officer_index = -1;
+        }
+        if (target_ship_idx >= 0 && target_ship_idx < MOX::_NUM_SHIPS) {
+            MOX::_ship[target_ship_idx].officer_index = leader_idx;
+            leader->location = target_ship_idx;
+            leader->eta = target_eta;
+        } else {
+            leader->location = -1;
+            leader->eta = 0;
+        }
+
+        int16_t source_list[MAX_SHIPS];
+        int16_t target_list[MAX_SHIPS];
+        int source_count = Build_Moving_Fleet_List_(source_ship_idx, source_list);
+        int target_count = Build_Moving_Fleet_List_(target_ship_idx, target_list);
+        s_ship_move_info source_info = {};
+        s_ship_move_info target_info = {};
+        if (source_count > 0) {
+            Ships_Try_To_Move_To_(source_list, Ship_Destination_Star_(&MOX::_ship[source_list[0]]), &source_info);
+        }
+        if (target_count > 0 &&
+            (source_count == 0 || !Ship_Is_In_List_(target_list[0], source_list))) {
+            Ships_Try_To_Move_To_(target_list, Ship_Destination_Star_(&MOX::_ship[target_list[0]]), &target_info);
+        } else {
+            target_count = 0;
+        }
+
+        if (source_ship_idx >= 0 && source_ship_idx < MOX::_NUM_SHIPS) {
+            MOX::_ship[source_ship_idx].officer_index = source_officer_idx;
+        }
+        if (target_ship_idx >= 0 && target_ship_idx < MOX::_NUM_SHIPS) {
+            MOX::_ship[target_ship_idx].officer_index = target_officer_idx;
+        }
+        leader->location = old_location;
+        leader->eta = old_eta;
+
+        return (source_count == 0 || Confirm_Fleet_Change_(source_list[0], &source_info)) &&
+               (target_count == 0 || Confirm_Fleet_Change_(target_list[0], &target_info));
+    }
+
+    void __cdecl Recalculate_Moving_Fleet_(int16_t ship_idx) {
+        int16_t ship_list[MAX_SHIPS];
+        if (Build_Moving_Fleet_List_(ship_idx, ship_list) == 0) {
+            return;
+        }
+
+        int16_t destination_star_idx = Ship_Destination_Star_(&MOX::_ship[ship_list[0]]);
+        s_ship_move_info move_info;
+        Ships_Try_To_Move_To_(ship_list, destination_star_idx, &move_info);
+        Apply_Movement_Result_(ship_list, destination_star_idx, &move_info);
+    }
+
+    void __cdecl Recalculate_All_Moving_Fleets_() {
+        bool processed[MAX_SHIPS] = {};
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
+            if (processed[i] || !Ship_Is_Moving_(&MOX::_ship[i])) {
+                continue;
+            }
+
+            int16_t ship_list[MAX_SHIPS];
+            if (Build_Moving_Fleet_List_(i, ship_list) == 0) {
+                continue;
+            }
+            for (int j = 0; ship_list[j] != -1; ++j) {
+                processed[ship_list[j]] = true;
+            }
+
+            int16_t destination_star_idx = Ship_Destination_Star_(&MOX::_ship[ship_list[0]]);
+            s_ship_move_info move_info;
+            Ships_Try_To_Move_To_(ship_list, destination_star_idx, &move_info);
+            Apply_Movement_Result_(ship_list, destination_star_idx, &move_info);
         }
     }
 
@@ -897,7 +1218,7 @@ namespace SHIPMOVE {
         // Check jumpgate connectivity (player bitmask)
         if (((start_star->has_jumpgate >> player_bit) & 1) &&
             ((target_star->has_jumpgate >> player_bit) & 1)) {
-            speed += 3;
+            speed += _jump_gate_speed_bonus;
             is_jumpgate_used = true;
         }
 
@@ -931,7 +1252,7 @@ namespace SHIPMOVE {
                 (int16_t)speed,
                 &current_x,
                 &current_y,
-                &unused_navigator_flag,
+                (_jump_gate_pass_nebula && is_jumpgate_used) ? nullptr : &unused_navigator_flag,
                 &unused_direction
             );
         }
