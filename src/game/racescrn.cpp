@@ -1064,7 +1064,7 @@ namespace RACESCRN {
                             fields::Draw_All_Fields_();
                             video::Copy_Off_To_Back_();
                         } else if (key_action == 2 && agent_group.count > 0) {
-                            static char assign_prompt[] = "HOW MANY AGENTS?";
+                            static char assign_prompt[] = "Choose the number of agents to assign:";
                             _g_preview_group = &agent_group;
                             _g_preview_capture_ix = 0;
                             MAINPUPS::_g_slider_preview_cb = Draw_Assign_Agents_Preview_;
@@ -1078,7 +1078,7 @@ namespace RACESCRN {
                         } else if (key_action == 3 && unassign_race >= 0 &&
                                    unassign_race < (int16_t)MOX::_active_count &&
                                    race_display_data[unassign_race].spy_icons_group.count > 0) {
-                            static char return_prompt[] = "HOW MANY AGENTS?";
+                            static char return_prompt[] = "Choose the number of agents to return to re-assign:";
                             _g_preview_group = &race_display_data[unassign_race].spy_icons_group;
                             _g_preview_capture_ix = (int16_t)(1 + unassign_race);
                             MAINPUPS::_g_slider_preview_cb = Draw_Assign_Agents_Preview_;

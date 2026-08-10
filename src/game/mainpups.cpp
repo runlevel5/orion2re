@@ -753,10 +753,10 @@ namespace MAINPUPS {
             synth_input = fields::Activate_Field_Hotkey_(ESTRINGS::E_Strings_(137 /* 0x89 */)[0]);
         } else if (key == 0x4DE0 || ch == '>' || ch == '+') { // increase
             synth_input = fields::Activate_Field_Hotkey_(ESTRINGS::E_Strings_(11 /* 0xb */)[0]);
-        } else if (key == 0x1C0D) { // Enter presses Accept
+        } else if (key == 0x1C0D || ch == 'a' || ch == 'A') { // Enter/'A' press Accept
             Animate_Slider_Button_Press_(_anims[4], (int16_t)(_g_x + 208), (int16_t)(_g_y + 174), _mp_fields[3]);
             return _mp_fields[3];
-        } else if (key == 0x011B) { // Esc presses Cancel
+        } else if (key == 0x011B || ch == 'c' || ch == 'C') { // Esc/'C' press Cancel
             Animate_Slider_Button_Press_(_anims[35], (int16_t)(_g_x + 15), (int16_t)(_g_y + 174), _mp_fields[2]);
             return _mp_fields[2];
         } else if (key != 0) {
