@@ -336,7 +336,20 @@ namespace DESIGN {
         int16_t screen_exit_flag = 0;
         do {
             timer::Mark_Time();
-            int16_t input_field = fields::Get_Input();
+            // Enhancement: Backspace presses the Clear button like a click
+            // (skipped while the design name is being edited).
+            int16_t synth_input = 0;
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                fields::input_field_active == 0 &&
+                fields::active_input_field_number < 0) {
+                int32_t key = key::Read_Key();
+                if (key == 0x0E08 && MOX::design_clear_button > 0) {
+                    synth_input = fields::Activate_Field_(MOX::design_clear_button);
+                } else if (key != 0) {
+                    key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+                }
+            }
+            int16_t input_field = (synth_input != 0) ? synth_input : fields::Get_Input();
             MOX::scanned_field = fields::Scan_Input();
 
             if (changed_design_name == 0) {
@@ -668,8 +681,10 @@ namespace DESIGN {
             special_y += 13;
         }
 
-        MOX::ship_icon_lf_button = fields::Add_Button_Field(0x11, 0x52, "", MOX::design_icon_lf_arrow_seg, "", 0x28 /* ( */);
-        MOX::ship_icon_rt_button = fields::Add_Button_Field(0x5E, 0x52, "", MOX::design_icon_rt_arrow_seg, "", 0x28 /* ( */);
+        // Enhancement: '<' and '>' cycle the ship logo like clicking the
+        // arrow buttons.
+        MOX::ship_icon_lf_button = fields::Add_Button_Field(0x11, 0x52, "", MOX::design_icon_lf_arrow_seg, (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? "<" : "", 0x28 /* ( */);
+        MOX::ship_icon_rt_button = fields::Add_Button_Field(0x5E, 0x52, "", MOX::design_icon_rt_arrow_seg, (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? ">" : "", 0x28 /* ( */);
 
         s_colors colors;
         MISC::Get_Mox_Font_Colors(4, 'U', 'Y', &colors);
@@ -679,7 +694,13 @@ namespace DESIGN {
         int16_t text_h = fonts::Get_Font_Height();
         int16_t name_y = ((0x1B - text_h) / 2) + 0x11;
         MOX::design_name_field = fields::Add_Continuous_String_Input_Field(
-            0x12, name_y, 0x86, input_h, MOX::design->name, 15, 0, 0, 0x29 /* ) */, 0);
+            0x12, name_y, 0x86, input_h,
+            MOX::design->name, 15, 0, 0, 0x29 /* ) */, 0);
+        // Enhancement: 'R' activates the rename via the field system's own
+        // hotkey path, exactly like clicking the name.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            fields::fields[MOX::design_name_field].hotkey = 'R';
+        }
 
         design_shield_replacement_field = fields::Add_Hidden_Field(0x1B5, 0x38, 0x273, 0x5F, "", 0x29 /* ) */);
         design_computer_replacement_field = fields::Add_Hidden_Field(0x1B5, 0x61, 0x273, 0x7B, "", 0x29 /* ) */);

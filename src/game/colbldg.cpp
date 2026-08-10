@@ -859,6 +859,11 @@ namespace COLBLDG {
             Do_Draw_Build_Queue();
             return 0;
         }
+        if (key == 0x4BE0 || key == 0x4DE0) { // Left/Right press < / >
+            // (colony cycle normally, page flip in the preset editor);
+            // routed via the hot key ids so the arrow press animates.
+            return (key == 0x4BE0) ? fields[8] : fields[9];
+        }
         if (_g_preset_edit_mode != 0 && key > 0 && (key & 0xFF) == '0') {
             // '0' clears the whole preset, all pages.
             Remove_Ships(0);
@@ -1691,7 +1696,24 @@ namespace COLBLDG {
         if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_preset_edit_mode != 0) {
             int16_t count = Preset_Left_Count_();
             COLDRAW::Calculate_Squish_Step(13, 443, count, 19);
-            fonts::Set_Font_Style_Shadow_Down(4, &l_font_color_array);
+            // The same font shrink as the vanilla list: squish-driven, then
+            // widened names push it further down.
+            int16_t font_offset = Calc_Font_Off();
+            for (int16_t i = 0; i < count; ++i) {
+                int16_t text_width;
+                do {
+                    fonts::Set_Font_Style_Shadow_Down(4 - font_offset, &l_font_color_array);
+                    text_width = BILL::_Get_Paragraph_Max_Width(
+                        0x280, Selection_Name(Preset_Left_Item_(i)), 0);
+                    if (text_width > 171) {
+                        font_offset++;
+                    }
+                    if (font_offset > 2) {
+                        text_width = 0;
+                    }
+                } while (text_width > 171);
+            }
+            fonts::Set_Font_Style_Shadow_Down(4 - font_offset, &l_font_color_array);
             for (int16_t i = 0; i < count; ++i) {
                 char* name = Selection_Name(Preset_Left_Item_(i));
                 int16_t y_pos = (int16_t)((19 - COLONY::step_squish) * i + 46);
