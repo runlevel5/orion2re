@@ -1003,6 +1003,24 @@ namespace fields {
                     return 0;
                 }
 
+                // Enhancement: a hotkey on a text field starts editing it,
+                // like a click does; the click path skips the press draw for
+                // these, so this does too.
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                    fields[field_idx].field_type == FIELD_TYPE_CONTINUOUS_INPUT) {
+                    s_field_cont_input* cont_input =
+                        Field_Data_Continuous_Input(&fields[field_idx]);
+                    strlcpy(continuous_string, cont_input->buffer, sizeof(continuous_string));
+                    input_field_active = 1;
+                    cursor_on = 0;
+                    cursor_position = 0;
+                    active_input_field_number = field_idx;
+                    active_input_field_first = 1;
+                    Quick_Call_Auto_Function();
+                    down_mouse_button = -1;
+                    return field_idx;
+                }
+
                 Push_Field_Down(field_idx, ptr_x, ptr_y);
                 int16_t field_type = fields[field_idx].field_type;
 
