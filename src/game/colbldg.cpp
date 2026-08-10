@@ -450,6 +450,9 @@ namespace COLBLDG {
             if (!text.empty() && text.back() != '\n') {
                 text += "\n";
             }
+            // Statements are namespaced; a replaced statement keeps the
+            // prefix already in the file.
+            text += "colony ";
             text += statement;
             text += "\n";
         }
