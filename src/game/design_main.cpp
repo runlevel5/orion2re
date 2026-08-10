@@ -615,7 +615,12 @@ namespace DESIGN {
         for (int16_t i = 0; i < SHIP_SIZE_COUNT; ++i) {
             Get_Ship_Size_Button_Field_XY_(i, &field_x1, &field_y1, &field_x2, &field_y2);
             if (_add_size_button_flag[i] == 1) {
-                MOX::_design_ship_size_field[i] = fields::Add_Multi_Button_Field_(field_x1, field_y1, "", MOX::_design_size_button_seg[i], &MOX::_design_size, i, "", 0x29 /* ) */);
+                // Enhancement: digits 1-6 pick the hull size, in the order
+                // the buttons appear (Frigate through Doom Star).
+                const char size_hotkey[2] = {
+                    (ENHANCED_UX::enhanced_ux_settings.enabled != 0)
+                        ? (char)('1' + i) : '\0', '\0' };
+                MOX::_design_ship_size_field[i] = fields::Add_Multi_Button_Field_(field_x1, field_y1, "", MOX::_design_size_button_seg[i], &MOX::_design_size, i, size_hotkey, 0x29 /* ) */);
             }
             else {
                 MOX::_design_ship_size_field[i] = fields::Add_Hidden_Field_(field_x1, field_y1, field_x2, field_y2, "", 0x29 /* ) */);
