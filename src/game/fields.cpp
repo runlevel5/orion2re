@@ -1004,7 +1004,25 @@ namespace fields {
                 if (_fields[field_idx].field_type == FIELD_TYPE_SCROLL) {
                     return 0;
                 }
-                
+
+                // Enhancement: a hotkey on a text field starts editing it,
+                // like a click does; the click path skips the press draw for
+                // these, so this does too.
+                if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                    _fields[field_idx].field_type == FIELD_TYPE_CONTINUOUS_INPUT) {
+                    s_field_cont_input* cont_input =
+                        Field_Data_Continuous_Input_(&_fields[field_idx]);
+                    strlcpy(_continuous_string, cont_input->buffer, sizeof(_continuous_string));
+                    _input_field_active = 1;
+                    _cursor_on = 0;
+                    _cursor_position = 0;
+                    _active_input_field_number = field_idx;
+                    _active_input_field_first = 1;
+                    Quick_Call_Auto_Function_();
+                    _down_mouse_button = -1;
+                    return field_idx;
+                }
+
                 Push_Field_Down_(field_idx, ptr_x, ptr_y);
                 int16_t field_type = _fields[field_idx].field_type;
                 
