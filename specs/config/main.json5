@@ -1461,8 +1461,9 @@
     enhanced_ux: {
       title: "Experimental UX enhancements",
       description: "Enables interface enhancements not present in the original game, such as click-to-select in the Load Game list.",
-      examples: ["enhanced_ux enabled = true;"],
+      examples: ["experiment enhanced_ux enabled = true;"],
       group: "interface",
+      namespace: "experiment",
       type: "enhanced_ux_settings",
       bind_root: { header: "game/settings.h", symbol: "ENHANCED_UX::enhanced_ux_settings" },
       default: { enabled: false },

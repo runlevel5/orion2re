@@ -135,7 +135,7 @@ DOCTEST_TEST_CASE("experimental enhanced ux settings bind and default to disable
     config::s_config_write_set writes;
     config::s_cfg_diagnostic diagnostic;
     DOCTEST_REQUIRE(Append_Decoded_(
-        "enhanced_ux enabled = true;", &writes, &diagnostic));
+        "experiment enhanced_ux enabled = true;", &writes, &diagnostic));
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(ENHANCED_UX::enhanced_ux_settings.enabled == 1);
