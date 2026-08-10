@@ -1375,6 +1375,21 @@
       default: false,
     },
 
+    satellite_uses_torpedoes: {
+      title: "Torpedoes for planetary defenses",
+      description: "Allows orbital defenses and planetary missile bases to select torpedoes when they are the highest-damage researched missile weapon.",
+      remarks: "False preserves classic behavior, where these defenses use missiles only.",
+      examples: ["combat satellite_uses_torpedoes = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/initship.h",
+        symbol: "INITSHIP::_satellite_uses_torpedoes",
+      },
+      default: false,
+    },
+
     crystal_keep: {
       title: "Crystal keeps captured ships",
       description: "Allows a victorious Crystal to retain ships it captured during tactical combat.",

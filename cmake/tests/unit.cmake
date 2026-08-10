@@ -395,6 +395,26 @@ orion2re_add_unit_test(test_bombardment_ammo
         src/game/combat.cpp
 )
 
+orion2re_add_unit_test(test_initship
+    SOURCES
+        tests/unit/test_initship.cpp
+    PRODUCTION_SOURCES
+        src/game/initship.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_initship PRIVATE /Gy)
+    target_link_options(test_initship PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_initship PRIVATE
+        -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_initship PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_initship PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
 orion2re_add_unit_test(test_town_zero
     SOURCES
         tests/unit/test_town_zero.cpp

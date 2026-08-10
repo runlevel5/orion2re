@@ -786,6 +786,10 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Missile_Weapon_NT_(int16_t player_idx) {
+        if (_satellite_uses_torpedoes != 0) {
+            return Best_Missile_Weapon_(player_idx);
+        }
+
         int16_t best_weapon_idx = 14;
         int16_t max_damage = 0;
 
