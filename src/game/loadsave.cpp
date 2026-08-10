@@ -31,6 +31,48 @@ namespace LOADSAVE {
 
     // Enhancement: the Settings popup's keyboard-selected row (-1 = none).
     static int16_t _g_options_selection = -1;
+    // Enhancement: a fourteenth settings row toggles the Enhanced UX flag
+    // itself. It always exists (it is the switch for everything else) and
+    // writes the change back to orion2re.cfg so it survives restarts.
+    static int16_t _g_enhanced_ux_name_field = -1000;
+    static int16_t _g_enhanced_ux_toggle_field = -1000;
+
+    static void Write_Enhanced_Ux_To_Config_() {
+        std::string statement = "enhanced_ux enabled = ";
+        statement += (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? "true" : "false";
+        statement += ";";
+
+        std::string text;
+        if (FILE* f = fopen_case("orion2re.cfg", "rb")) {
+            char chunk[4096];
+            size_t got;
+            while ((got = fread(chunk, 1, sizeof(chunk), f)) > 0) {
+                text.append(chunk, got);
+            }
+            fclose(f);
+        }
+
+        size_t start = text.find("enhanced_ux enabled");
+        if (start != std::string::npos) {
+            size_t end = text.find(';', start);
+            if (end == std::string::npos) {
+                return;
+            }
+            text.replace(start, end - start + 1, statement);
+        } else {
+            if (!text.empty() && text.back() != '\n') {
+                text += "\n";
+            }
+            text += "experiment ";
+            text += statement;
+            text += "\n";
+        }
+
+        if (FILE* f = fopen("orion2re.cfg", "wb")) {
+            fwrite(text.data(), 1, text.size(), f);
+            fclose(f);
+        }
+    }
 
     void __cdecl Allocate_Data_Space_For_Game_Popup() {
         // Allocate space for game animations and clear the block
@@ -209,6 +251,12 @@ namespace LOADSAVE {
                     game_popup_fields->option_toggles[i] = fields::Add_Hidden_Field(MOX::popup_base_x + 0x31, by, MOX::popup_base_x + 0xf3, animate::Get_Height(pic) + by, "", ')');
                     offset_y += 0x11;
                 }
+            {
+                int16_t by = MOX::popup_base_y + 0x29 + 13 * 0x11;
+                s_animation_header* pic = game_anims->pictures[9];
+                _g_enhanced_ux_name_field = fields::Add_Hidden_Field(MOX::popup_base_x + 0x1a, by, animate::Get_Width(pic) + MOX::popup_base_x + 0x1a, animate::Get_Height(pic) + by, "", '(');
+                _g_enhanced_ux_toggle_field = fields::Add_Hidden_Field(MOX::popup_base_x + 0x31, by, MOX::popup_base_x + 0xf3, animate::Get_Height(pic) + by, "", ')');
+            }
                 game_popup_fields->btn_settings_accept_id = fields::Add_Button_Field(MOX::popup_base_x + 0x61, MOX::popup_base_y + 0x152, "", game_anims->pictures[10], "A", '(');
                 break;
             }
@@ -658,11 +706,13 @@ namespace LOADSAVE {
         if (key == 0x48E0 || key == 0x50E0) { // Up/Down
             int16_t dir = (key == 0x48E0) ? (int16_t)-1 : (int16_t)1;
             _g_options_selection = (_g_options_selection < 0)
-                                       ? ((dir > 0) ? (int16_t)0 : (int16_t)12)
-                                       : (int16_t)((_g_options_selection + 13 + dir) % 13);
+                                       ? ((dir > 0) ? (int16_t)0 : (int16_t)13)
+                                       : (int16_t)((_g_options_selection + 14 + dir) % 14);
         } else if (key == 0x1C0D && _g_options_selection >= 0) { // Enter
             sound::Play_Sound(')');
-            return game_popup_fields->option_toggles[_g_options_selection];
+            return (_g_options_selection == 13)
+                       ? _g_enhanced_ux_toggle_field
+                       : game_popup_fields->option_toggles[_g_options_selection];
         } else if (key != 0) {
             key::Push_Key_Code((uint32_t)key, g_last_scan_code);
         }
@@ -692,9 +742,10 @@ namespace LOADSAVE {
         while (true) {
             timer::Mark_Time();
 
-            // Enhancement: Up/Down move the row selection, Enter toggles it.
+            // Enhancement: Up/Down move the row selection, Enter toggles
+            // it (checked live so toggling Enhanced UX applies right away).
             int16_t synth_input = 0;
-            if (enhanced) {
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
                 synth_input = Read_Options_Popup_Keys_();
             }
 
@@ -705,6 +756,12 @@ namespace LOADSAVE {
                     game_popup_fields->options[i] = (game_popup_fields->options[i] == 0) ? 1 : 0;
                     break;
                 }
+            }
+            if (input != 0 && (_g_enhanced_ux_name_field == input ||
+                               _g_enhanced_ux_toggle_field == input)) {
+                ENHANCED_UX::enhanced_ux_settings.enabled =
+                    (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? 0 : 1;
+                Write_Enhanced_Ux_To_Config_();
             }
 
             if (game_popup_fields->screen_cancel_field_id == input) {
@@ -1874,6 +1931,14 @@ namespace LOADSAVE {
                 bitmap::Add_Picture_To_Bitmap(x - MOX::popup_base_x, y - MOX::popup_base_y, MAINSCR::temp_bitmap, bitmap);
             }
         }
+        if (print_data_to_bitmap == 0) {
+            // The Enhanced UX row's toggle button.
+            animate::Set_Animation_Frame(game_anims->pictures[9],
+                (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? 1 : 0);
+            animate::Draw_(MOX::popup_base_x + 0x1A,
+                           MOX::popup_base_y + 0x29 + 13 * 0x11,
+                           game_anims->pictures[9]);
+        }
 
         int16_t draw_x, draw_y;
         if (print_data_to_bitmap == 0) {
@@ -1956,6 +2021,24 @@ namespace LOADSAVE {
                 if (option_rows[i].alt_label != nullptr) {
                     fonts::Print(text_x2, y, option_rows[i].alt_label);
                 }
+                if (highlighted) {
+                    fonts::Set_Font_Style_Outline(2, &outline_colors);
+                    fonts::Set_Outline_Color(0, static_cast<uint16_t>(outline_colors.colors[0]));
+                    fonts::Set_Font_Spacing(1);
+                }
+            }
+            {
+                bool highlighted = (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                                    _g_options_selection == 13);
+                if (highlighted) {
+                    s_colors normal_colors;
+                    s_colors active_colors;
+                    Get_Game_Popup_Colors(2, &normal_colors, &active_colors);
+                    fonts::Set_Font_Style_Outline(2, &active_colors);
+                    fonts::Set_Outline_Color(0, static_cast<uint16_t>(outline_colors.colors[0]));
+                    fonts::Set_Font_Spacing(1);
+                }
+                fonts::Print(text_x1, (int16_t)(draw_y + 0x02 + 13 * 0x11), "Enhanced UX");
                 if (highlighted) {
                     fonts::Set_Font_Style_Outline(2, &outline_colors);
                     fonts::Set_Outline_Color(0, static_cast<uint16_t>(outline_colors.colors[0]));
