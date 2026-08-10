@@ -140,6 +140,43 @@ DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default")
     DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
 }
 
+DOCTEST_TEST_CASE("beam mount damage preserves classic defaults and binds all combinations") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].pd == 50);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].nomod == 100);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].heavy == 150);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].pd == 100);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].nomod == 150);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].heavy == 200);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat mount_dmg nohef pd = 40;"
+        "combat mount_dmg nohef nomod = 90;"
+        "combat mount_dmg nohef heavy = 140;"
+        "combat mount_dmg hef pd = 80;"
+        "combat mount_dmg hef nomod = 130;"
+        "combat mount_dmg hef heavy = 180;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].pd == 40);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].nomod == 90);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].heavy == 140);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].pd == 80);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].nomod == 130);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].heavy == 180);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat mount_dmg hef heavy = 65536;", &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor name") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

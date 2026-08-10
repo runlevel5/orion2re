@@ -16,6 +16,11 @@ namespace TEST_CRYSTAL_FLEET {
     int16_t Cleanup_Source_(int16_t index);
 }
 
+namespace TEST_BEAM_MODIFIERS {
+    void Reset_();
+    void Set_Has_HEF_(bool has_hef);
+}
+
 DOCTEST_TEST_CASE("destroyed Crystal releases captures and invalidates effects") {
     TEST_CRYSTAL_FLEET::Reset_();
 
@@ -60,4 +65,63 @@ DOCTEST_TEST_CASE("missile damage keeps launch armor after source ship capture")
     CMBTFIRE::Apply_Damage_To_Missile_(0, &damage, 0, 0);
 
     DOCTEST_CHECK(TEST_STASIS::Last_Missile_Hits_Owner_() == 1);
+}
+
+DOCTEST_TEST_CASE("beam mount damage defaults match classic HEF combinations") {
+    TEST_BEAM_MODIFIERS::Reset_();
+
+    struct s_case {
+        uint16_t flags;
+        bool has_hef;
+        int16_t expected_hit_bonus;
+        int16_t expected_damage;
+    };
+    const s_case cases[] = {
+        { WEAPON_MOD_FLAG_POINT_DEFENSE, false, 25, 50 },
+        { 0, false, 0, 100 },
+        { WEAPON_MOD_FLAG_HEAVY_MOUNT, false, 0, 150 },
+        { WEAPON_MOD_FLAG_POINT_DEFENSE, true, 25, 100 },
+        { 0, true, 0, 150 },
+        { WEAPON_MOD_FLAG_HEAVY_MOUNT, true, 0, 200 },
+    };
+
+    for (const s_case& value : cases) {
+        TEST_BEAM_MODIFIERS::Set_Has_HEF_(value.has_hef);
+        int16_t hit_bonus = 0;
+        int16_t damage = 0;
+        CMBTFIRE::Get_Beam_Weapon_Modifiers_(
+            0, 0, value.flags, 0, &hit_bonus, &damage);
+        DOCTEST_CHECK(hit_bonus == value.expected_hit_bonus);
+        DOCTEST_CHECK(damage == value.expected_damage);
+    }
+}
+
+DOCTEST_TEST_CASE("beam modifiers use configured mount damage") {
+    TEST_BEAM_MODIFIERS::Reset_();
+    CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].heavy = 175;
+    TEST_BEAM_MODIFIERS::Set_Has_HEF_(true);
+
+    int16_t hit_bonus = 0;
+    int16_t damage = 0;
+    CMBTFIRE::Get_Beam_Weapon_Modifiers_(
+        0, 0, WEAPON_MOD_FLAG_HEAVY_MOUNT, 0,
+        &hit_bonus, &damage);
+
+    DOCTEST_CHECK(hit_bonus == 0);
+    DOCTEST_CHECK(damage == 175);
+}
+
+DOCTEST_TEST_CASE("configured beam mount damage clamps negative modifiers") {
+    TEST_BEAM_MODIFIERS::Reset_();
+    CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].pd = 20;
+    MOX::_ranged_damage_penalty[0] = -30;
+
+    int16_t hit_bonus = 0;
+    int16_t damage = 0;
+    CMBTFIRE::Get_Beam_Weapon_Modifiers_(
+        0, 0, WEAPON_MOD_FLAG_POINT_DEFENSE, 0,
+        &hit_bonus, &damage);
+
+    DOCTEST_CHECK(hit_bonus == 25);
+    DOCTEST_CHECK(damage == 0);
 }

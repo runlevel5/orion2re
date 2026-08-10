@@ -243,7 +243,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 ### Behavior and balance review
 
 - [x] `asm.pl:339` - `missile initiative`: implemented in `CMBTMIS::Fire_Missile_()` with synchronized `combat missile_initiative` configuration, selecting whether initiative-launched missiles begin eligible for current-round movement; direct source initialization replaces the 1.50 writable instruction immediate while preserving the classic `-1` default.
-- [ ] `asm.pl:343` - `HEF/mount`
+- [x] `asm.pl:343` - `HEF/mount`: implemented in `CMBTFIRE::Get_Beam_Weapon_Modifiers_()` with the configurable `combat mount_dmg` table, selecting point-defense, normal, or heavy beam damage by working High Energy Focus state and clamping negative final modifiers to zero; direct source-level selection replaces the 1.50 saved-register helper while preserving its six classic defaults and point-defense accuracy bonus.
 - [ ] `asm.pl:1230` - `torpedoes for satellites`
 - [ ] `asm.pl:1244` - `tractor power table`
 - [ ] `asm.pl:1272` - `pre-warp refit requires just nuclear fission instead of cold fusion`

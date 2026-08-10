@@ -11,6 +11,7 @@ namespace {
     int16_t cleanup_count;
     int16_t last_missile_hits_owner;
     int16_t last_retargeted_missile;
+    bool has_high_energy_focus;
 }
 
 namespace TEST_STASIS {
@@ -55,6 +56,25 @@ namespace TEST_CRYSTAL_FLEET {
     }
 }
 
+namespace TEST_BEAM_MODIFIERS {
+    void Reset_() {
+        has_high_energy_focus = false;
+        memset(MOX::_ranged_to_hit_penalty, 0,
+               sizeof(MOX::_ranged_to_hit_penalty));
+        memset(MOX::_ranged_damage_penalty, 0,
+               sizeof(MOX::_ranged_damage_penalty));
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT] =
+            { 50, 100, 150 };
+        CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT] =
+            { 100, 150, 200 };
+    }
+
+    void Set_Has_HEF_(bool has_hef) {
+        has_high_energy_focus = has_hef;
+    }
+}
+
 namespace MOX {
     s_combat_data* _combat_data = combat_data;
     s_missile* _missile = missiles;
@@ -63,6 +83,20 @@ namespace MOX {
     int16_t _combat_total_ship_count;
     uint16_t _apply_damage_to_planet;
     int16_t _super_fast_flag;
+    int16_t _ranged_to_hit_penalty[9];
+    int16_t _ranged_damage_penalty[9];
+}
+
+namespace TECHDATA {
+    s_tech_weapon_data _weapons[WEAPON_COUNT];
+}
+
+namespace COMBINIT {
+    int16_t __cdecl Does_Combat_Ship_Have_Special_(
+        int16_t, int16_t special_id) {
+        return special_id == SPECIAL_HIGH_ENERGY_FOCUS &&
+            has_high_energy_focus;
+    }
 }
 
 namespace CMBTMIS {

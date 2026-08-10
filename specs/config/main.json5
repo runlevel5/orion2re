@@ -319,6 +319,15 @@
       },
     },
 
+    high_energy_focus_presence: {
+      title: "High Energy Focus presence",
+      description: "Selects whether the firing ship has a working High Energy Focus.",
+      remarks: "Complete two-value table-index domain used only to select the configured beam mount row.",
+      kind: "enum",
+      base_type: "uint8",
+      values: { nohef: 0, hef: 1 },
+    },
+
     // Weapon modification IDs, available flags, natural properties, and arcs
     // have overlapping numbers but intentionally remain separate types.
     weapon_modification_id: {
@@ -752,6 +761,15 @@
     },
   },
   records: {
+    mount_damage: {
+      title: "Beam mount damage modifiers",
+      description: "Damage percentages for Point Defense, normal, and Heavy Mount beams.",
+      fields: [
+        { id: "pd", title: "Point Defense", description: "Damage percentage for a Point Defense beam.", type: "uint16", bind: ["pd"] },
+        { id: "nomod", title: "Normal mount", description: "Damage percentage for a beam without a mount modification.", type: "uint16", bind: ["nomod"] },
+        { id: "heavy", title: "Heavy Mount", description: "Damage percentage for a Heavy Mount beam.", type: "uint16", bind: ["heavy"] },
+      ],
+    },
     miniaturization_settings: {
       title: "Miniaturization curves",
       description: "Cost percentages and category-specific space multipliers for miniaturization levels 0 through 5.",
@@ -1541,6 +1559,34 @@
         element: { type: "civilian_structure_hits" },
       },
       default: [100, 100, 100, 100, 100, 100, 100],
+    },
+
+    mount_dmg: {
+      title: "Beam mount damage modifiers",
+      description: "Configures beam damage percentages by mount and High Energy Focus presence.",
+      remarks: "Defaults reproduce classic mount and High Energy Focus behavior.",
+      examples: [
+        "combat mount_dmg nohef pd = 50;",
+        "combat mount_dmg nohef nomod = 100;",
+        "combat mount_dmg nohef heavy = 150;",
+        "combat mount_dmg hef pd = 100;",
+        "combat mount_dmg hef nomod = 150;",
+        "combat mount_dmg hef heavy = 200;",
+      ],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: { header: "game/cmbtfire.h", symbol: "CMBTFIRE::_mount_dmg" },
+      type: {
+        kind: "array",
+        count: 2,
+        index_base: 0,
+        index_type: "high_energy_focus_presence",
+        element: { type: "mount_damage" },
+      },
+      default: [
+        { pd: 50, nomod: 100, heavy: 150 },
+        { pd: 100, nomod: 150, heavy: 200 },
+      ],
     },
 
     fighters_use_point_defense: {

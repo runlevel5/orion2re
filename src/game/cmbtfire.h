@@ -7,6 +7,20 @@
 #define COMBAT_PLANET_DEFENSE_FIGHTER_GARRISON 0x8
 
 namespace CMBTFIRE {
+    enum e_high_energy_focus_presence : uint8_t {
+        HIGH_ENERGY_FOCUS_ABSENT = 0,
+        HIGH_ENERGY_FOCUS_PRESENT = 1,
+        HIGH_ENERGY_FOCUS_PRESENCE_COUNT = 2,
+    };
+
+    struct s_mount_damage {
+        uint16_t pd;
+        uint16_t nomod;
+        uint16_t heavy;
+    };
+
+    extern s_mount_damage _mount_dmg[HIGH_ENERGY_FOCUS_PRESENCE_COUNT];
+
     inline uint16_t _civilian_armor[ARMOR_COUNT] = {
         100, 100, 100, 100, 100, 100, 100,
     };

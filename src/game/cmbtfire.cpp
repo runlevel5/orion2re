@@ -1,6 +1,11 @@
 #include "pch.h"
 
 namespace CMBTFIRE {
+    s_mount_damage _mount_dmg[HIGH_ENERGY_FOCUS_PRESENCE_COUNT] = {
+        { 50, 100, 150 },
+        { 100, 150, 200 },
+    };
+
     void __cdecl Destroy_Colony_Defense_(int16_t n_to_destroy) {
         int16_t found_count = 0;
         int16_t defense_list[4];
@@ -481,15 +486,27 @@ namespace CMBTFIRE {
         if (_fighters_use_point_defense != 0) {
             chance_to_hit += 25;
 
-            weapon_min_damage = (weapon_min_damage + 1) / 2;
-            if (weapon_min_damage < 1) {
-                weapon_min_damage = 1;
+            const uint32_t modifier =
+                _mount_dmg[HIGH_ENERGY_FOCUS_ABSENT].pd;
+            uint32_t adjusted_min_damage =
+                ((uint32_t)weapon_min_damage * modifier + 50) / 100;
+            if (adjusted_min_damage < 1) {
+                adjusted_min_damage = 1;
             }
+            if (adjusted_min_damage > INT16_MAX) {
+                adjusted_min_damage = INT16_MAX;
+            }
+            weapon_min_damage = (int16_t)adjusted_min_damage;
 
-            weapon_damage = (weapon_damage + 1) / 2;
-            if (weapon_damage < weapon_min_damage) {
-                weapon_damage = weapon_min_damage;
+            uint32_t adjusted_max_damage =
+                ((uint32_t)weapon_damage * modifier + 50) / 100;
+            if (adjusted_max_damage < (uint32_t)weapon_min_damage) {
+                adjusted_max_damage = weapon_min_damage;
             }
+            if (adjusted_max_damage > INT16_MAX) {
+                adjusted_max_damage = INT16_MAX;
+            }
+            weapon_damage = (int16_t)adjusted_max_damage;
         }
 
         int16_t damage_diff = weapon_damage - weapon_min_damage;
@@ -1713,9 +1730,9 @@ namespace CMBTFIRE {
         *dmg_mod_out = 100;
         *hit_bonus_out = 0;
 
-        if (wpn_modifier_flags & 0x2 /* PD */) {
+        if (wpn_modifier_flags & WEAPON_MOD_FLAG_HEAVY_MOUNT) {
             effective_range = range / 2;
-        } else if (wpn_modifier_flags & 0x4 /* HV */) {
+        } else if (wpn_modifier_flags & WEAPON_MOD_FLAG_POINT_DEFENSE) {
             effective_range = range * 2;
             if (effective_range > 8) {
                 effective_range = 8;
@@ -1730,19 +1747,30 @@ namespace CMBTFIRE {
             *hit_bonus_out *= 2;
         }
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HIGH_ENERGY_FOCUS)) {
-            *dmg_mod_out += 50;
-        }
+        const int focus_state =
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                ship_idx, SPECIAL_HIGH_ENERGY_FOCUS)
+            ? HIGH_ENERGY_FOCUS_PRESENT
+            : HIGH_ENERGY_FOCUS_ABSENT;
+        const s_mount_damage* mount_damage = &_mount_dmg[focus_state];
 
         if (!(wpn_modifier_flags & 0x20) && !(TECHDATA::_weapons[wpn_idx].natural_mods & WEAPON_NATURAL_FLAG_NO_RANGE_DISSIPATION)) {
             *dmg_mod_out += MOX::_ranged_damage_penalty[effective_range];
         }
 
-        if (wpn_modifier_flags & 0x4 /* HV */) {
+        uint16_t configured_damage;
+        if (wpn_modifier_flags & WEAPON_MOD_FLAG_POINT_DEFENSE) {
             *hit_bonus_out += 25;
-            *dmg_mod_out -= 50;
-        } else if (wpn_modifier_flags & 0x2 /* PD */) {
-            *dmg_mod_out += 50;
+            configured_damage = mount_damage->pd;
+        } else if (wpn_modifier_flags & WEAPON_MOD_FLAG_HEAVY_MOUNT) {
+            configured_damage = mount_damage->heavy;
+        } else {
+            configured_damage = mount_damage->nomod;
+        }
+
+        *dmg_mod_out = (int16_t)(*dmg_mod_out + configured_damage - 100);
+        if (*dmg_mod_out < 0) {
+            *dmg_mod_out = 0;
         }
     }
 
