@@ -1828,6 +1828,14 @@ namespace COLCALC {
         s_player* surrender_plr = &MOX::_player[surrender_id];
         s_player* receiver_plr = &MOX::_player[receiver_id];
 
+        const uint8_t surrender_bit = (uint8_t)(1u << (uint8_t)surrender_id);
+        const uint8_t receiver_bit = (uint8_t)(1u << (uint8_t)receiver_id);
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            if ((MOX::_star[i].visited & surrender_bit) != 0) {
+                MOX::_star[i].visited |= receiver_bit;
+            }
+        }
+
         for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->owner == (int8_t)surrender_id) {

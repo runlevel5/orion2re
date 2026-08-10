@@ -238,7 +238,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16409` - `home systems min 3 planets default`: already implemented in `HOMEGEN::Enforce_3_Planet_Minimum_()` by directly ensuring each home system contains at least three real planets; the restored source has no legacy `/planets=` parser, so the 1.50 default and parser-byte edits reduce to this source-level invariant.
 - [ ] `asm.pl:16448` - `BH to real star planet generation`
 - [x] `asm.pl:16621` - `orphans fix`: fixed in `HOMEGEN::Guarantee_A_Planet_At_Min_Dist_()` by preserving existing orbit records and reusing the shared add-or-convert operation until the target contains two real planets; this replaces the 1.50 cross-function flag and control-flow diversions with a file-local source invariant.
-- [ ] `asm.pl:17094` - `surrender maps`
+- [x] `asm.pl:17094` - `surrender maps`: fixed in `COLCALC::Do_Surrender_Empire_()` by merging the surrendering empire's visited-system map into the recipient before elimination; this replaces the 1.50 register-preserving call wrapper with a direct source-level surrender invariant.
 
 ### Behavior and balance review
 
