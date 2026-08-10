@@ -347,7 +347,20 @@ namespace DESIGN {
         int16_t screen_exit_flag = 0;
         do {
             timer::Mark_Time_();
-            int16_t input_field = fields::Get_Input_();
+            // Enhancement: Backspace presses the Clear button like a click
+            // (skipped while the design name is being edited).
+            int16_t synth_input = 0;
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                fields::_input_field_active == 0 &&
+                fields::_active_input_field_number < 0) {
+                int32_t key = key::Read_Key_();
+                if (key == 0x0E08 && MOX::_design_clear_button > 0) {
+                    synth_input = fields::Activate_Field_(MOX::_design_clear_button);
+                } else if (key != 0) {
+                    key::Push_Key_Code_((uint32_t)key, g_last_scan_code);
+                }
+            }
+            int16_t input_field = (synth_input != 0) ? synth_input : fields::Get_Input_();
             MOX::_scanned_field = fields::Scan_Input_();
 
             if (_changed_design_name == 0) {
@@ -675,8 +688,10 @@ namespace DESIGN {
             special_y += 13;
         }
 
-        MOX::_ship_icon_lf_button = fields::Add_Button_Field_(0x11, 0x52, "", MOX::_design_icon_lf_arrow_seg, "", 0x28 /* ( */);
-        MOX::_ship_icon_rt_button = fields::Add_Button_Field_(0x5E, 0x52, "", MOX::_design_icon_rt_arrow_seg, "", 0x28 /* ( */);
+        // Enhancement: '<' and '>' cycle the ship logo like clicking the
+        // arrow buttons.
+        MOX::_ship_icon_lf_button = fields::Add_Button_Field_(0x11, 0x52, "", MOX::_design_icon_lf_arrow_seg, (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? "<" : "", 0x28 /* ( */);
+        MOX::_ship_icon_rt_button = fields::Add_Button_Field_(0x5E, 0x52, "", MOX::_design_icon_rt_arrow_seg, (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? ">" : "", 0x28 /* ( */);
 
         s_colors colors;
         MISC::Get_Mox_Font_Colors_(4, 'U', 'Y', &colors);
@@ -689,6 +704,11 @@ namespace DESIGN {
             0x12, name_y, 0x86, input_h,
             MOX::_design->name, 15, 0, 0, 0x29 /* ) */, 0
         );
+        // Enhancement: 'R' activates the rename via the field system's own
+        // hotkey path, exactly like clicking the name.
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+            fields::_fields[MOX::_design_name_field].hotkey = 'R';
+        }
 
         _design_shield_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x38, 0x273, 0x5F, "", 0x29 /* ) */);
         _design_computer_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x61, 0x273, 0x7B, "", 0x29 /* ) */);
