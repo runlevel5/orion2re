@@ -222,6 +222,17 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
         return (int8_t)RUSS::Get_Weighted_Choice_Char_(weights, STAR_CLASS_COUNT);
     }
 
+    int8_t __cdecl Generate_Non_Black_Hole_Spectral_Class_(int16_t star_type_index) {
+        for (int16_t attempt = 0; attempt < 200; ++attempt) {
+            int8_t spectral_class = Generate_Spectral_Class_(star_type_index);
+            if (spectral_class < STAR_CLASS_BLACK_HOLE) {
+                return spectral_class;
+            }
+        }
+
+        return STAR_CLASS_M;
+    }
+
     /**
      * @brief Determines the base food production per farmer for a given planet.
      *
@@ -1300,18 +1311,12 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t galaxy_age,
 
                 if (in_nebula_1 || in_nebula_2 || in_nebula_3 || in_nebula_4 ||
                     in_nebula_5 || in_nebula_6 || in_nebula_7 || in_nebula_8) {
-                    int16_t attempts = 0;
-                    do {
-                        star.spectral_class = MAPGEN::Generate_Spectral_Class_(galaxy_age);
+                    star.spectral_class = Generate_Non_Black_Hole_Spectral_Class_(galaxy_age);
 
-                        // Failsafe: if we can't find a habitable class after 200 attempts, force class M
-                        if (attempts > 200) {
-                            star.spectral_class = STAR_CLASS_M;
-                        }
-                        attempts++;
-                    } while (!HAROLD::Habitable_Spectral_Class_(i));
-
-                    Planet_Generation_(i);
+                    int16_t satellite_count = Generate_Number_Of_Satellites_(i);
+                    for (int16_t satellite = 0; satellite < satellite_count; ++satellite) {
+                        Planet_Generation_(i);
+                    }
                     star.visited = 0;
                 }
             }

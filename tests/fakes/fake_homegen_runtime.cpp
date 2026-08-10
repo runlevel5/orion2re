@@ -20,6 +20,8 @@ namespace {
     int32_t movement_count;
     int32_t orbit_roll_count;
     int32_t satellite_generation_count;
+    int32_t non_black_hole_generation_count;
+    int8_t generated_spectral_class;
 }
 
 namespace TEST_HOMEGEN {
@@ -44,10 +46,20 @@ namespace TEST_HOMEGEN {
         movement_count = 0;
         orbit_roll_count = 0;
         satellite_generation_count = 0;
+        non_black_hole_generation_count = 0;
+        generated_spectral_class = STAR_CLASS_G;
     }
 
     int32_t Satellite_Generation_Count_() {
         return satellite_generation_count;
+    }
+
+    void Set_Generated_Spectral_Class_(int8_t spectral_class) {
+        generated_spectral_class = spectral_class;
+    }
+
+    int32_t Non_Black_Hole_Generation_Count_() {
+        return non_black_hole_generation_count;
     }
 }
 
@@ -58,6 +70,7 @@ namespace MOX {
     int16_t _planet_count = 1;
     s_planet_data* _planet = planets;
     s_star_data* _star = stars;
+    s_settings _settings = {};
 }
 
 namespace allocate {
@@ -81,6 +94,10 @@ namespace GEO {
 }
 
 namespace HAROLD {
+    bool __cdecl Habitable_Spectral_Class_(int16_t star_idx) {
+        return MOX::_star[star_idx].spectral_class < STAR_CLASS_BLACK_HOLE;
+    }
+
     uint8_t __cdecl N_Planets_In_System_(int16_t star_idx) {
         uint8_t count = 0;
         for (int16_t orbit = 0; orbit < 5; ++orbit) {
@@ -95,6 +112,11 @@ namespace HAROLD {
 
 namespace MAPGEN {
     uint8_t _make_food_planet = 0;
+
+    int8_t __cdecl Generate_Non_Black_Hole_Spectral_Class_(int16_t) {
+        non_black_hole_generation_count++;
+        return generated_spectral_class;
+    }
 
     void __cdecl Generate_Satellite_(int16_t star_idx, int16_t orbit, int16_t) {
         MOX::_planet[MOX::_planet_count].star_index = star_idx;

@@ -121,7 +121,10 @@ namespace HOMEGEN {
 
             if (!Star_Has_Planet_(target_star_idx)) {
                 s_star_data* target_star = &MOX::_star[target_star_idx];
-                target_star->spectral_class = STAR_CLASS_M;
+                if (!HAROLD::Habitable_Spectral_Class_(target_star_idx)) {
+                    target_star->spectral_class =
+                        MAPGEN::Generate_Non_Black_Hole_Spectral_Class_(MOX::_settings.galaxy_age);
+                }
 
                 int32_t r_size = game_random::Random_(10) - 1;
                 if (r_size < 3) target_star->size = 0;
@@ -588,7 +591,8 @@ namespace HOMEGEN {
         s_star_data& star = MOX::_star[star_idx];
 
         if (is_food_planet != 0 && star.spectral_class >= STAR_CLASS_DWARF) {
-            star.spectral_class = (int8_t)(game_random::Random_(5) - 1);
+            star.spectral_class =
+                MAPGEN::Generate_Non_Black_Hole_Spectral_Class_(MOX::_settings.galaxy_age);
         }
 
         MAPGEN::_make_food_planet = (uint8_t)is_food_planet;
@@ -1324,7 +1328,8 @@ namespace HOMEGEN {
         memcpy(MOX::_star[0].name, "Orion", sizeof("Orion"));
 
         if (MOX::_star[0].spectral_class == STAR_CLASS_BLACK_HOLE) {
-            MOX::_star[0].spectral_class = (int8_t)game_random::Random_(6) - 1;
+            MOX::_star[0].spectral_class =
+                MAPGEN::Generate_Non_Black_Hole_Spectral_Class_(MOX::_settings.galaxy_age);
         }
 
         s_star_data star_temp;
