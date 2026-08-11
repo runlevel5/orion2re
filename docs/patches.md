@@ -250,7 +250,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1331` - `strategic tech tree corrections`: fixed in `TECHDATA::_technology_applications` by excluding Anti-Missile Rockets, Energy Absorber, Security Stations, and Warp Dissipator from strategic combat while including Warp Interdictor; direct source table corrections replace the five 1.50 binary data-byte edits.
 - [x] `asm.pl:1425` - `crew experience affects capture`: fixed in `CMBTFIR2::Resolve_Capture_()` by adding each participating ship's crew-quality ground-combat bonus to its capture modifiers; this replaces the 1.50 call-site wrappers with direct source-level bonus composition matching the existing raid path.
 - [ ] `asm.pl:1593` - `missile speed table`
-- [ ] `asm.pl:1613` - `TD ftl bonus`
+- [x] `asm.pl:1613` - `TD ftl bonus`: implemented in `INITSHIP::Calc_Player_FTL_Speed_()` and `INITSHIP::Get_FTL_Speed_()` with synchronized `movement td_ftl_bonus` configuration; direct source-level addition replaces the 1.50 helper while the default value of 2 preserves classic behavior.
 - [ ] `asm.pl:1748` - `enforce pop limit`
 - [ ] `asm.pl:1780` - `command points fix OP&CS`
 - [ ] `asm.pl:1828` - `heavy fighter scramble`

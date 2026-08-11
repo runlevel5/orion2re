@@ -1296,6 +1296,20 @@
       },
     },
 
+    td_ftl_bonus: {
+      title: "Trans-Dimensional FTL speed bonus",
+      description: "Adds this strategic travel speed to ships owned by Trans-Dimensional players.",
+      examples: ["movement td_ftl_bonus = 2;"],
+      group: "gameplay",
+      namespace: "movement",
+      type: "uint8",
+      default: 2,
+      bind_root: {
+        header: "game/initship.h",
+        symbol: "INITSHIP::_td_ftl_bonus",
+      },
+    },
+
     jump_gate_pass_nebula: {
       title: "Jump Gates bypass nebula slowdown",
       description: "Prevents nebulae from reducing the speed of fleets using Jump Gates.",

@@ -202,7 +202,7 @@ namespace INITSHIP {
             speed = TECHDATA::_drives[drive_idx].warp_speed;
 
             if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-                speed += 2;
+                speed += _td_ftl_bonus;
             }
         }
 
@@ -216,7 +216,7 @@ namespace INITSHIP {
             speed = TECHDATA::_drives[drive_idx].warp_speed;
 
             if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-                return speed + 2;
+                return speed + _td_ftl_bonus;
             }
         } else if (drive_idx > 0) {
             speed = 1;
