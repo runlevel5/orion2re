@@ -92,9 +92,9 @@ namespace COLBLDG {
         bitmap::Screen_Bitmap_Capture(253, 306, 353, 330, mid);
         bitmap::Create_Blank_Bitmap(35, 25, right);
         bitmap::Screen_Bitmap_Capture(411, 306, 445, 330, right);
-        animate::Draw_(13, 20, left);
-        animate::Draw_(48, 20, mid);
-        animate::Draw_(149, 20, right);
+        animate::Draw_(13, 12, left);
+        animate::Draw_(48, 12, mid);
+        animate::Draw_(149, 12, right);
     }
 
     void Prepare_Arrow_Remap_() {
@@ -105,9 +105,9 @@ namespace COLBLDG {
     void Draw_Colony_Arrows_() {
         Prepare_Arrow_Remap_();
         animate::Set_Animation_Frame(_prev_colony_anim, 0);
-        animate::Remap_Draw(218, 306, _prev_colony_anim);
+        animate::Remap_Draw(218, 307, _prev_colony_anim);
         animate::Set_Animation_Frame(_next_colony_anim, 0);
-        animate::Remap_Draw(411, 306, _next_colony_anim);
+        animate::Remap_Draw(411, 307, _next_colony_anim);
     }
 
     // Shows an arrow pressed and released with the click sound, remap-drawn
@@ -660,7 +660,7 @@ namespace COLBLDG {
         }
         if (page != _g_preset_page) {
             Animate_Colony_Arrow_Press_(direction < 0 ? _prev_colony_anim : _next_colony_anim,
-                                        direction < 0 ? (int16_t)218 : (int16_t)411, 306);
+                                        direction < 0 ? (int16_t)218 : (int16_t)411, 307);
         }
         Load_Preset_Page_(page);
     }
@@ -856,7 +856,7 @@ namespace COLBLDG {
             (key == 0x4BE0 || key == 0x4DE0)) { // Left/Right cycle category
             Animate_Colony_Arrow_Press_(
                 (key == 0x4BE0) ? _prev_colony_anim : _next_colony_anim,
-                (key == 0x4BE0) ? (int16_t)13 : (int16_t)149, 20);
+                (key == 0x4BE0) ? (int16_t)13 : (int16_t)149, 13);
             _g_preset_left_category = (int16_t)(1 - _g_preset_left_category);
             _g_kbd_index = 0;
             Do_Draw_Build_Queue();
@@ -887,7 +887,7 @@ namespace COLBLDG {
             if (target != _g_preset_page) {
                 Animate_Colony_Arrow_Press_(
                     (key == 0x47E0) ? _prev_colony_anim : _next_colony_anim,
-                    (key == 0x47E0) ? (int16_t)218 : (int16_t)411, 306);
+                    (key == 0x47E0) ? (int16_t)218 : (int16_t)411, 307);
             }
             Load_Preset_Page_(target);
             return 0;
@@ -1289,8 +1289,8 @@ namespace COLBLDG {
         fields[8] = ::fields::Add_Hot_Key(ESTRINGS::E_Strings(139));
         fields[9] = ::fields::Add_Hot_Key(ESTRINGS::E_Strings(140));
         if (enhanced_keys) {
-            _prev_colony_click = ::fields::Add_Hidden_Field(218, 306, 252, 326, "", 0);
-            _next_colony_click = ::fields::Add_Hidden_Field(411, 306, 445, 326, "", 0);
+            _prev_colony_click = ::fields::Add_Hidden_Field(218, 307, 252, 327, "", 0);
+            _next_colony_click = ::fields::Add_Hidden_Field(411, 307, 445, 327, "", 0);
         } else {
             _prev_colony_click = -1000;
             _next_colony_click = -1000;
@@ -1300,8 +1300,8 @@ namespace COLBLDG {
             : (int16_t)-1000;
         _preset_hotkey = ::fields::Add_Hot_Key(enhanced_keys ? "p" : "");
         if (enhanced_keys && _g_preset_edit_mode != 0) {
-            _g_left_cat_prev_click = ::fields::Add_Hidden_Field(13, 20, 47, 41, "", 0);
-            _g_left_cat_next_click = ::fields::Add_Hidden_Field(150, 20, 184, 41, "", 0);
+            _g_left_cat_prev_click = ::fields::Add_Hidden_Field(13, 13, 47, 34, "", 0);
+            _g_left_cat_next_click = ::fields::Add_Hidden_Field(150, 13, 184, 34, "", 0);
         } else {
             _g_left_cat_prev_click = -1000;
             _g_left_cat_next_click = -1000;
@@ -2106,11 +2106,11 @@ namespace COLBLDG {
                 }
                 if (COLBLDG::_g_preset_edit_mode != 0) {
                     animate::Reset_Animation_Frame(COLBLDG::_prev_colony_anim);
-                    animate::Remap_Draw(13, 20, COLBLDG::_prev_colony_anim);
+                    animate::Remap_Draw(13, 13, COLBLDG::_prev_colony_anim);
                     animate::Reset_Animation_Frame(COLBLDG::_next_colony_anim);
-                    animate::Remap_Draw(149, 20, COLBLDG::_next_colony_anim);
+                    animate::Remap_Draw(149, 13, COLBLDG::_next_colony_anim);
                     fonts::Set_Font_Style_Shadow_Down(3, &COLBLDG::l_font_color_array);
-                    fonts::Print_Centered(98, 26,
+                    fonts::Print_Centered(98, 18,
                         (COLBLDG::_g_preset_left_category == 0) ? "Buildings" : "Ships");
                 }
                 if (COLBLDG::_g_preset_edit_mode != 0 &&
@@ -2671,7 +2671,7 @@ namespace COLBLDG {
                     (input_field == _g_left_cat_prev_click) ? _prev_colony_anim
                                                             : _next_colony_anim,
                     (input_field == _g_left_cat_prev_click) ? (int16_t)13
-                                                            : (int16_t)149, 20);
+                                                            : (int16_t)149, 13);
                 _g_preset_left_category = (int16_t)(1 - _g_preset_left_category);
                 if (_g_kbd_panel == 0) {
                     _g_kbd_index = 0;
@@ -2769,14 +2769,14 @@ namespace COLBLDG {
         // and both the clicks and the keys animate the arrow press.
         if (_prev_colony_click > 0 &&
             (input_field == _prev_colony_click || input_field == fields[8])) {
-            Animate_Colony_Arrow_Press_(_prev_colony_anim, 218, 306);
+            Animate_Colony_Arrow_Press_(_prev_colony_anim, 218, 307);
             // The outer screen loop re-enters for the new colony only when
             // it sees the < / > hot key id, so rewrite the caller's copy.
             input_field = fields[8];
             *selected_field_id = fields[8];
         } else if (_next_colony_click > 0 &&
                    (input_field == _next_colony_click || input_field == fields[9])) {
-            Animate_Colony_Arrow_Press_(_next_colony_anim, 411, 306);
+            Animate_Colony_Arrow_Press_(_next_colony_anim, 411, 307);
             input_field = fields[9];
             *selected_field_id = fields[9];
         }
@@ -3374,7 +3374,7 @@ namespace COLBLDG {
             }
             if (q_len == -1) {
                 COLBLDG::Store_Preset_Page_();
-                COLBLDG::Animate_Colony_Arrow_Press_(COLBLDG::_next_colony_anim, 411, 306);
+                COLBLDG::Animate_Colony_Arrow_Press_(COLBLDG::_next_colony_anim, 411, 307);
                 COLBLDG::Load_Preset_Page_((int16_t)(COLBLDG::_g_preset_item_count / 7));
                 q_len = COLBLDG::Get_Prod_Queue_Len();
             }
