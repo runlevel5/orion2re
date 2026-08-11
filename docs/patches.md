@@ -248,7 +248,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:1244` - `tractor power table`
 - [ ] `asm.pl:1272` - `pre-warp refit requires just nuclear fission instead of cold fusion`
 - [ ] `asm.pl:1331` - `strategic tech tree corrections`
-- [ ] `asm.pl:1425` - `crew experience affects capture`
+- [x] `asm.pl:1425` - `crew experience affects capture`: fixed in `CMBTFIR2::Resolve_Capture_()` by adding each participating ship's crew-quality ground-combat bonus to its capture modifiers; this replaces the 1.50 call-site wrappers with direct source-level bonus composition matching the existing raid path.
 - [ ] `asm.pl:1593` - `missile speed table`
 - [ ] `asm.pl:1613` - `TD ftl bonus`
 - [ ] `asm.pl:1748` - `enforce pop limit`

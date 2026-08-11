@@ -1579,10 +1579,13 @@ namespace CMBTFIR2 {
         int16_t attacker_marines_start = attacker_marines;
 
         int16_t attacker_commando_bonus = Get_Fleet_Commando_Bonus_((int16_t)attacker->owner);
+        int16_t attacker_boarding_bonus = Crew_Boarding_Combat_Bonus_(attacker_idx);
         int16_t has_dashboards = COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, SPECIAL_SECURITY_STATIONS);
         int16_t defender_commando_bonus = Get_Fleet_Commando_Bonus_((int16_t)defender->owner);
+        int16_t defender_boarding_bonus = Crew_Boarding_Combat_Bonus_(defender_idx);
         int16_t defender_security_bonus = Get_Fleet_Security_Bonus_((int16_t)defender->owner);
-        int16_t defender_total_bonus = has_dashboards * 20 + defender_commando_bonus + defender_security_bonus;
+        int16_t defender_total_bonus =
+            has_dashboards * 20 + defender_commando_bonus + defender_boarding_bonus + defender_security_bonus;
 
         s_invasion_side_info side1;
         s_invasion_side_info side2;
@@ -1590,7 +1593,7 @@ namespace CMBTFIR2 {
         invasion::Get_Boarding_Info_(
             (int16_t)attacker->owner, 
             attacker_marines, 
-            attacker_commando_bonus, 
+            attacker_commando_bonus + attacker_boarding_bonus,
             (int16_t)defender->owner, 
             defender_marines_start, 
             defender_total_bonus, 

@@ -12,6 +12,8 @@ namespace {
     int16_t pooled_officer;
     int16_t raid_choice_idx;
     int16_t combat_shield_max;
+    int16_t boarding_attacker_bonus;
+    int16_t boarding_defender_bonus;
     char last_raid_message[3000];
     char weapon_names[8][80] = {
         "Weapon zero with a deliberately long raid report name",
@@ -51,6 +53,7 @@ namespace TEST_BOARDING {
         memset(ships, 0, sizeof(ships));
         memset(players, 0, sizeof(players));
         memset(leaders, 0, sizeof(leaders));
+        memset(MOX::_crew_data, 0, sizeof(MOX::_crew_data));
         memset(TECHDATA::_hull_data, 0, sizeof(TECHDATA::_hull_data));
         memset(TECHDATA::_specials, 0, sizeof(TECHDATA::_specials));
         memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
@@ -78,6 +81,8 @@ namespace TEST_BOARDING {
         pooled_officer = -1;
         raid_choice_idx = 0;
         combat_shield_max = 0;
+        boarding_attacker_bonus = 0;
+        boarding_defender_bonus = 0;
         last_raid_message[0] = '\0';
         BOARDING::_telepathic_multiple_capture = 0;
         BOARDING::_kill_excess_marines_after_capture = 0;
@@ -125,6 +130,14 @@ namespace TEST_BOARDING {
 
     const char* Last_Raid_Message_() {
         return last_raid_message;
+    }
+
+    int16_t Boarding_Attacker_Bonus_() {
+        return boarding_attacker_bonus;
+    }
+
+    int16_t Boarding_Defender_Bonus_() {
+        return boarding_defender_bonus;
     }
 }
 
@@ -202,15 +215,27 @@ namespace invasion {
     void __cdecl Get_Boarding_Info_(
         int16_t,
         int16_t,
+        int16_t attacker_bonus,
         int16_t,
         int16_t,
-        int16_t,
-        int16_t,
+        int16_t defender_bonus,
         s_invasion_side_info* side_a,
         s_invasion_side_info* side_b) {
+        boarding_attacker_bonus = attacker_bonus;
+        boarding_defender_bonus = defender_bonus;
         memset(side_a, 0, sizeof(*side_a));
         memset(side_b, 0, sizeof(*side_b));
         side_a->unit_strengths[1] = 100;
+    }
+
+    void __cdecl Ground_Combat_Round_(
+        s_invasion_side_info*,
+        s_invasion_side_info*) {
+    }
+}
+
+namespace FMTPARA {
+    void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t, void*) {
     }
 }
 
