@@ -432,7 +432,9 @@ namespace CMBTFIRE {
                 break;
 
             case WEAPON_TYPE_FIGHTER:
-                if (weapon_idx == WEAPON_INTERCEPTOR) {
+                if (weapon_idx == WEAPON_INTERCEPTOR ||
+                    (_heavy_fighter_can_scramble != 0 &&
+                     weapon_idx == WEAPON_HEAVY_FIGHTER)) {
                     result = 1;
                 }
                 // fallthrough

@@ -67,6 +67,27 @@ DOCTEST_TEST_CASE("missile damage keeps launch armor after source ship capture")
     DOCTEST_CHECK(TEST_STASIS::Last_Missile_Hits_Owner_() == 1);
 }
 
+DOCTEST_TEST_CASE("heavy fighter missile targeting follows scramble setting") {
+    TEST_STASIS::Reset_();
+    TECHDATA::_weapons[WEAPON_HEAVY_FIGHTER].type = WEAPON_TYPE_FIGHTER;
+    TECHDATA::_weapons[WEAPON_INTERCEPTOR].type = WEAPON_TYPE_FIGHTER;
+
+    CMBTFIRE::_heavy_fighter_can_scramble = 0;
+    DOCTEST_CHECK(
+        CMBTFIRE::Weapon_Can_Fire_At_Missiles_(
+            WEAPON_HEAVY_FIGHTER, 0) == 0);
+    DOCTEST_CHECK(
+        CMBTFIRE::Weapon_Can_Fire_At_Missiles_(
+            WEAPON_INTERCEPTOR, 0) == 1);
+
+    CMBTFIRE::_heavy_fighter_can_scramble = 1;
+    DOCTEST_CHECK(
+        CMBTFIRE::Weapon_Can_Fire_At_Missiles_(
+            WEAPON_HEAVY_FIGHTER, 0) == 1);
+
+    CMBTFIRE::_heavy_fighter_can_scramble = 0;
+}
+
 DOCTEST_TEST_CASE("beam mount damage defaults match classic HEF combinations") {
     TEST_BEAM_MODIFIERS::Reset_();
 

@@ -25,6 +25,7 @@ namespace CMBTFIRE {
         100, 100, 100, 100, 100, 100, 100,
     };
     inline uint8_t _fighters_use_point_defense = 0;
+    inline uint8_t _heavy_fighter_can_scramble = 0;
 
     /** Applies the supplied weapon damage to the defending planet or colony. */
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t weapon_flags);

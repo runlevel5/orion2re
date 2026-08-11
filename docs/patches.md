@@ -253,7 +253,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1613` - `TD ftl bonus`: implemented in `INITSHIP::Calc_Player_FTL_Speed_()` and `INITSHIP::Get_FTL_Speed_()` with synchronized `movement td_ftl_bonus` configuration; direct source-level addition replaces the 1.50 helper while the default value of 2 preserves classic behavior.
 - [x] `asm.pl:1748` - `enforce pop limit`: fixed in `COLCALC::Planet_Max_Population_For_Player_()` and `COLCALC::Colony_Race_Pop_Limit_()` by capping reported capacities at the supported 42-population colony storage limit; direct source-level return invariants replace the 1.50 global call diversions.
 - [x] `asm.pl:1780` - `command points fix OP&CS`: fixed in `MAINSCR2` and `REPORT::Colonization_()` by recalculating derived player maintenance immediately after colony or outpost ship retirement; direct source-level event updates replace the 1.50 call-site wrappers and also cover the equivalent main-screen colony path.
-- [ ] `asm.pl:1828` - `heavy fighter scramble`
+- [x] `asm.pl:1828` - `heavy fighter scramble`: implemented in `CMBTFIRE::Weapon_Can_Fire_At_Missiles_()` and `CMBTMIS::Resolve_Missile_()` with synchronized `combat heavy_fighter_can_scramble`; enabled Heavy Fighters intercept missiles using beams only and spend one fighter shot per attack, replacing the 1.50 helper calls with direct source-level fighter sequencing.
 - [ ] `asm.pl:1901` - `detach 1.40 growth modifier from /nohousing switch`
 - [ ] `asm.pl:1917` - `unglue CS&TR`
 - [ ] `asm.pl:2579` - `planet non-enveloping`

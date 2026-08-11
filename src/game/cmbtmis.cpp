@@ -287,6 +287,7 @@ namespace CMBTMIS {
         int16_t type = missile->type;
         uint16_t specials = missile->specials;
         int16_t is_anti_missile_rocket = missile->is_anti_missile_rocket;
+        const bool targets_missile = is_anti_missile_rocket != 0;
 
         if (target_unit_idx == source_unit_idx && is_anti_missile_rocket == 0) {
             int16_t reload_count = missile->quantity / 4;
@@ -393,12 +394,14 @@ namespace CMBTMIS {
                     CMBTFIRE::Fire_Fighter_Beam_(missile_idx, shield_idx, is_anti_missile_rocket, &dmg_out, &sys_dmg);
                     dmg_accum = dmg_out;
                     sys_dmg_accum = sys_dmg;
-                    if (type != WEAPON_HEAVY_FIGHTER) {
+                    if (type == WEAPON_INTERCEPTOR || targets_missile) {
                         missile->fighter_count--;
                     }
                 }
 
-                if (missile->fighter_count != 0 && type != WEAPON_INTERCEPTOR) {
+                if (missile->fighter_count != 0 &&
+                    type != WEAPON_INTERCEPTOR &&
+                    !targets_missile) {
                     int16_t dmg_out = 0;
                     int16_t sys_dmg = 0;
                     CMBTFIRE::Fire_Fighter_Bomb_(missile_idx, shield_idx, &dmg_out, &sys_dmg);

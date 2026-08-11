@@ -1720,6 +1720,21 @@
       default: false,
     },
 
+    heavy_fighter_can_scramble: {
+      title: "Heavy Fighters can scramble",
+      description: "Allows Heavy Fighters to intercept missiles and fighters using their beam weapons.",
+      remarks: "False preserves classic behavior. Heavy Fighters spend one fighter shot per interception and do not use bombs against missile targets.",
+      examples: ["combat heavy_fighter_can_scramble = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_heavy_fighter_can_scramble",
+      },
+      default: false,
+    },
+
     lightning_field_ratio: {
       title: "Lightning Field destruction chance",
       description: "Sets the chance for Lightning Field to destroy a missile, torpedo, or fighter.",
