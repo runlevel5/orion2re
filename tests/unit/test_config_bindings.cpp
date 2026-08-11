@@ -260,6 +260,49 @@ DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic d
     DOCTEST_CHECK(COLCALC::_housing_creates_no_farmers == 1);
 }
 
+DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.general_modifier == 0);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.microbiotics_tech == 25);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.antidote_tech == 50);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.boom_event == 100);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.plague_event == -200);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony growth_rate_bonus general_modifier = 10;"
+        "colony growth_rate_bonus microbiotics_tech = 20;"
+        "colony growth_rate_bonus antidote_tech = 30;"
+        "colony growth_rate_bonus boom_event = 127;"
+        "colony growth_rate_bonus plague_event = -300;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.general_modifier == 10);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.microbiotics_tech == 20);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.antidote_tech == 30);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.boom_event == 127);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.plague_event == -300);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony growth_rate_bonus general_modifier = 256;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony growth_rate_bonus boom_event = 128;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony growth_rate_bonus plague_event = 1;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("Food Replicator costs preserve 1.50 defaults and validate their range") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

@@ -7,9 +7,24 @@ namespace TEST_COLONY_POP_GROWTH {
     int32_t Destroy_Colony_Reason_();
     void Set_Add_Spy_Result_(int16_t result);
     int16_t Deleted_Product_();
+    void Set_Population_Boom_(bool enabled);
+    void Set_Plague_(bool enabled);
 }
 
 namespace {
+    s_colony* Prepare_Growth_Modifier_() {
+        TEST_COLONY_POP_GROWTH::Reset_();
+
+        s_colony* colony = &MOX::_colony[0];
+        colony->owner = 0;
+        colony->planet = 0;
+        colony->climate = PLANET_CLIMATE_GAIA;
+        colony->n_pops = 1;
+        colony->pop[0] = 0;
+        MOX::_player[0].objectives = PLAYER_OBJECTIVE_HUMAN;
+        return colony;
+    }
+
     s_colony* Prepare_Housing_Growth_() {
         TEST_COLONY_POP_GROWTH::Reset_();
 
@@ -67,6 +82,59 @@ namespace {
         colony->production_spent = cost;
         return colony;
     }
+}
+
+DOCTEST_TEST_CASE("population growth preserves the classic base modifier") {
+    s_colony* colony = Prepare_Growth_Modifier_();
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->pop_growth[0] == 100);
+}
+
+DOCTEST_TEST_CASE("general population growth modifier is independent of Housing") {
+    s_colony* colony = Prepare_Growth_Modifier_();
+    COLCALC::growth_rate_bonus.general_modifier = 40;
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->producing[0] != COLONY_PRODUCTION_HOUSING);
+    DOCTEST_CHECK(colony->pop_growth[0] == 140);
+}
+
+DOCTEST_TEST_CASE("population growth uses configured technology modifiers") {
+    s_colony* colony = Prepare_Growth_Modifier_();
+    COLCALC::growth_rate_bonus.microbiotics_tech = 7;
+    MOX::_player[0].tech_applications[TECH_APP_MICROBIOTICS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->pop_growth[0] == 107);
+
+    colony = Prepare_Growth_Modifier_();
+    COLCALC::growth_rate_bonus.microbiotics_tech = 7;
+    COLCALC::growth_rate_bonus.antidote_tech = 13;
+    MOX::_player[0].tech_applications[TECH_APP_MICROBIOTICS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    MOX::_player[0].tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->pop_growth[0] == 113);
+}
+
+DOCTEST_TEST_CASE("population growth uses configured event modifiers") {
+    s_colony* colony = Prepare_Growth_Modifier_();
+    COLCALC::growth_rate_bonus.boom_event = 11;
+    COLCALC::growth_rate_bonus.plague_event = -22;
+    TEST_COLONY_POP_GROWTH::Set_Population_Boom_(true);
+    TEST_COLONY_POP_GROWTH::Set_Plague_(true);
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->pop_growth[0] == 89);
 }
 
 DOCTEST_TEST_CASE("classic Housing growth may create a farmer") {

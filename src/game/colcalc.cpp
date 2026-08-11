@@ -746,6 +746,137 @@ namespace COLCALC {
         }
     }
 
+    void __cdecl Colony_Pop_Grows_(s_colony* colony) {
+        int total_pops = static_cast<uint8_t>(colony->n_pops);
+        if (total_pops == 0) {
+            for (int i = 0; i < 10; ++i) {
+                colony->pop_growth[i] = 0;
+                colony->pop_roundoff[i] = 0;
+            }
+            return;
+        }
+
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
+            for (int i = 0; i < 10; ++i) {
+                colony->pop_growth[i] = 0;
+            }
+            return;
+        }
+
+        bool pop_boom = static_cast<bool>(EVENTS::Event_Check_Population_Boom_(colony_idx));
+        bool plague = static_cast<bool>(EVENTS::Event_Check_Plague_(colony_idx));
+
+        int food_pool = (colony->imports[ECON_FOOD] + colony->production[ECON_FOOD]) * 2;
+        int industry_pool = colony->production[ECON_INDUSTRY] * 2;
+
+        int food_needs_empire = (uint8_t)colony->food2_needed_for_our_empire;
+        int food_needs_assimilated = (uint8_t)colony->food2_needed_for_assimilated;
+        int food_needs_conquered = (uint8_t)colony->food2_needed_for_conquered;
+        int food_needs_natives = (uint8_t)colony->food2_needed_for_natives;
+        int ind_needs_empire = (uint8_t)colony->industry2_needed_for_our_empire;
+        int ind_needs_androids = (uint8_t)colony->industry2_needed_for_androids;
+        int ind_needs_assimilated = (uint8_t)colony->industry2_needed_for_assimilated;
+        int ind_needs_conquered = (uint8_t)colony->industry2_needed_for_conquered;
+
+        // Prioritize food needs
+        while (food_pool > 0 && food_needs_empire > 0) { food_pool--; food_needs_empire--; }
+        while (food_pool > 0 && food_needs_assimilated > 0) { food_pool--; food_needs_assimilated--; }
+        while (food_pool > 0 && food_needs_conquered > 0) { food_pool--; food_needs_conquered--; }
+        while (food_pool > 0 && food_needs_natives > 0) { food_pool--; food_needs_natives--; }
+
+        // Prioritize industry needs
+        while (industry_pool > 0 && ind_needs_empire > 0) { industry_pool--; ind_needs_empire--; }
+        while (industry_pool > 1 && ind_needs_androids > 1) { industry_pool -= 2; ind_needs_androids -= 2; }
+        while (industry_pool > 0 && ind_needs_assimilated > 0) { industry_pool--; ind_needs_assimilated--; }
+        while (industry_pool > 0 && ind_needs_conquered > 0) { industry_pool--; ind_needs_conquered--; }
+
+        for (int i = 0; i < 10; ++i) colony->pop_growth[i] = 0;
+
+        int owner_penalty_sum = ind_needs_empire + food_needs_empire;
+        colony->pop_growth[static_cast<uint8_t>(colony->owner)] = (owner_penalty_sum < 1) ? 0 : static_cast<int16_t>(owner_penalty_sum * -25);
+        colony->pop_growth[8] = (ind_needs_androids < 1) ? 0 : static_cast<int16_t>(ind_needs_androids * -500);
+        colony->pop_growth[9] = (food_needs_natives < 1) ? 0 : static_cast<int16_t>(food_needs_natives * -25);
+
+        int conquered_penalty_sum = food_needs_assimilated + ind_needs_conquered + ind_needs_assimilated + food_needs_conquered;
+        int total_lack_denom = static_cast<uint8_t>(colony->industry2_needed_for_conquered) + static_cast<uint8_t>(colony->food2_needed_for_assimilated) + static_cast<uint8_t>(colony->food2_needed_for_conquered) + static_cast<uint8_t>(colony->industry2_needed_for_assimilated);
+
+        if (conquered_penalty_sum > 0 && total_lack_denom > 0) {
+            for (int i = 0; i < static_cast<int>(MOX::_NUM_PLAYERS); ++i) {
+                if (i != static_cast<uint8_t>(colony->owner)) {
+                    int race_needs = static_cast<uint8_t>(colony->food2_needed_for_empire[i]) + static_cast<uint8_t>(colony->industry2_needed_for_empire[i]);
+                    colony->pop_growth[i] += static_cast<int16_t>((race_needs * conquered_penalty_sum * -25) / total_lack_denom);
+                }
+            }
+        }
+
+        uint8_t race_pop_count[10] = { 0 };
+        uint8_t race_conquered_count[10] = { 0 };
+        for (int i = 0; i < total_pops; ++i) {
+            int8_t r = colony->pop[i] & 0x0F;
+            if (r < 10) {
+                race_pop_count[r]++;
+                if (colony->pop[i] & 0x0400) {
+                    race_conquered_count[r]++;
+                }
+            }
+        }
+
+        for (int16_t i = 0; i < static_cast<int>(MOX::_NUM_PLAYERS); ++i) {
+            if (race_pop_count[i] == 0) continue;
+
+            int limit = static_cast<int>(Colony_Race_Pop_Limit_(colony, i));
+            if (total_pops < limit) {
+                int leader_idx = Colony_Officer_(colony);
+                int growth_modifier = MOX::_player[i].traits[TRAIT_POP_GROWTH_BONUS] +
+                    100 + growth_rate_bonus.general_modifier;
+                s_player* owner_ptr = &MOX::_player[static_cast<uint8_t>(colony->owner)];
+
+                if (owner_ptr->tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] == TECH_RESEARCH_STATUS_RESEARCHED) {
+                    growth_modifier += growth_rate_bonus.antidote_tech;
+                }
+                else if (owner_ptr->tech_applications[TECH_APP_MICROBIOTICS] == TECH_RESEARCH_STATUS_RESEARCHED) {
+                    growth_modifier += growth_rate_bonus.microbiotics_tech;
+                }
+
+                if (leader_idx != -1) {
+                    uint32_t skills = MOX::_leaders[leader_idx].special_skills;
+                    if (skills & LEADER_COLONY_SKILL_MEDICINE2) {
+                        int level = OFFICER::Owned_Officer_Level_(leader_idx);
+                        growth_modifier += (level * 3 + 3) * 5;
+                    }
+                    else if (skills & LEADER_COLONY_SKILL_MEDICINE) {
+                        int level = OFFICER::Owned_Officer_Level_(leader_idx);
+                        growth_modifier += (level * 5 + 5) * 2;
+                    }
+                }
+
+                int extra_growth = 0;
+                if (colony->buildings[BUILDING_CLONING_CENTER] != 0) {
+                    extra_growth = (race_pop_count[i] * 100) / total_pops;
+                }
+                if (pop_boom) growth_modifier += growth_rate_bonus.boom_event;
+                if (plague) growth_modifier += growth_rate_bonus.plague_event;
+
+                if (colony->producing[0] == COLONY_PRODUCTION_HOUSING) {
+                    growth_modifier += ((colony->production[ECON_INDUSTRY] - colony->maintenance[ECON_INDUSTRY]) * 40) / total_pops;
+                }
+
+                if (i == static_cast<uint8_t>(colony->owner) || race_conquered_count[i] == 0) {
+                    if (owner_ptr->objectives != PLAYER_OBJECTIVE_HUMAN) {
+                        growth_modifier += static_cast<int>(MOX::_settings.game_difficulty);
+                    }
+                }
+                else if (growth_modifier > 0 && colony->occupation_policy == 0) {
+                    growth_modifier = ((race_pop_count[i] - race_conquered_count[i]) * growth_modifier) / race_pop_count[i];
+                }
+
+                uint32_t base_growth_val_sq = (static_cast<uint32_t>(race_pop_count[i]) * (limit - total_pops) * 2000) / limit;
+                colony->pop_growth[i] += static_cast<int16_t>(((int32_t)special::isqrt_(base_growth_val_sq) * growth_modifier) / 100 + extra_growth);
+            }
+        }
+    }
+
     void __cdecl Post_Import_Computing_(s_colony* colony) {
         COLCALC::Colony_Pop_Grows_(colony);
         COLCALC::Colony_Specialty_(colony);

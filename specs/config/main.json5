@@ -778,6 +778,49 @@
     },
   },
   records: {
+    growth_rate_bonus: {
+      title: "Population growth-rate modifiers",
+      description: "Additional percentage modifiers used by colony population growth.",
+      fields: [
+        {
+          id: "general_modifier",
+          title: "General modifier",
+          description: "Growth percentage added independently of Housing and technology.",
+          type: "uint8",
+          bind: ["general_modifier"],
+        },
+        {
+          id: "microbiotics_tech",
+          title: "Microbiotics",
+          description: "Growth percentage added by Microbiotics.",
+          type: "uint8",
+          bind: ["microbiotics_tech"],
+        },
+        {
+          id: "antidote_tech",
+          title: "Universal Antidote",
+          description: "Growth percentage added by Universal Antidote.",
+          type: "uint8",
+          bind: ["antidote_tech"],
+        },
+        {
+          id: "boom_event",
+          title: "Population Boom",
+          description: "Growth percentage added during a Population Boom.",
+          type: "uint8",
+          constraints: { max: 127 },
+          bind: ["boom_event"],
+        },
+        {
+          id: "plague_event",
+          title: "Plague",
+          description: "Growth penalty applied during a Plague.",
+          type: "int16",
+          constraints: { max: 0 },
+          bind: ["plague_event"],
+        },
+      ],
+    },
     mount_damage: {
       title: "Beam mount damage modifiers",
       description: "Damage percentages for Point Defense, normal, and Heavy Mount beams.",
@@ -926,6 +969,33 @@
   },
 
   parameters: {
+    growth_rate_bonus: {
+      title: "Population growth-rate modifiers",
+      description: "Configures the general, technology, and event modifiers used by colony population growth.",
+      remarks: "The general modifier is independent of Housing. Defaults preserve classic growth behavior and match MOO2 1.50.",
+      examples: [
+        "colony growth_rate_bonus general_modifier = 0;",
+        "colony growth_rate_bonus microbiotics_tech = 25;",
+        "colony growth_rate_bonus antidote_tech = 50;",
+        "colony growth_rate_bonus boom_event = 100;",
+        "colony growth_rate_bonus plague_event = -200;",
+      ],
+      units: "percent",
+      group: "gameplay",
+      namespace: "colony",
+      type: "growth_rate_bonus",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::growth_rate_bonus",
+      },
+      default: {
+        general_modifier: 0,
+        microbiotics_tech: 25,
+        antidote_tech: 50,
+        boom_event: 100,
+        plague_event: -200,
+      },
+    },
     build_queue: {
       title: "Automatic build queues",
       description: "Defines the eleven build lists applied by Q and the digit hotkeys.",

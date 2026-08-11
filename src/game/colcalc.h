@@ -3,6 +3,16 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    struct s_growth_rate_bonus {
+        uint8_t general_modifier;
+        uint8_t microbiotics_tech;
+        uint8_t antidote_tech;
+        uint8_t boom_event;
+        int16_t plague_event;
+    };
+
+    extern s_growth_rate_bonus growth_rate_bonus;
+
     extern uint8_t _housing_creates_no_farmers;
     extern uint8_t _planet_extinction;
     extern uint8_t _zero_colony_lost;
