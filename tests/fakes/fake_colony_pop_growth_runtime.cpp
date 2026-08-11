@@ -44,6 +44,9 @@ namespace TEST_COLONY_POP_GROWTH {
         COLCALC::_planet_extinction = 0;
         COLCALC::_zero_colony_lost = 0;
         COLCALC::_freighters_cash_bonus = 0;
+        COLCALC::lander_ship_cost.colony_ship = 500;
+        COLCALC::lander_ship_cost.outpost_ship = 100;
+        COLCALC::lander_ship_cost.transport_ship = 100;
     }
 
     int32_t Destroy_Colony_Reason_() {

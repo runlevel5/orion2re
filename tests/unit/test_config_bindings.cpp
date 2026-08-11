@@ -260,6 +260,30 @@ DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic d
     DOCTEST_CHECK(COLCALC::_housing_creates_no_farmers == 1);
 }
 
+DOCTEST_TEST_CASE("landing ship costs preserve classic defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.colony_ship == 500);
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.outpost_ship == 100);
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.transport_ship == 100);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony lander_ship_cost colony_ship = 600;"
+        "colony lander_ship_cost outpost_ship = 200;"
+        "colony lander_ship_cost transport_ship = 80;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.colony_ship == 600);
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.outpost_ship == 200);
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.transport_ship == 80);
+}
+
 DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

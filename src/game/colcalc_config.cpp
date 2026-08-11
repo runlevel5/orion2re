@@ -1,6 +1,12 @@
 #include "pch.h"
 
 namespace COLCALC {
+    s_lander_ship_cost lander_ship_cost = {
+        500,
+        100,
+        100,
+    };
+
     s_growth_rate_bonus growth_rate_bonus = {
         0,
         25,

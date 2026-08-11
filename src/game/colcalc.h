@@ -3,6 +3,14 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    struct s_lander_ship_cost {
+        int32_t colony_ship;
+        int32_t outpost_ship;
+        int32_t transport_ship;
+    };
+
+    extern s_lander_ship_cost lander_ship_cost;
+
     struct s_growth_rate_bonus {
         uint8_t general_modifier;
         uint8_t microbiotics_tech;

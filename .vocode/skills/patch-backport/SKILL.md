@@ -65,7 +65,35 @@ Treat connection information already supplied in the conversation as valid input
 ## Environment constraints
 
 - The Orion2 binary open in Ghidra is a slightly different 1.40 version, not the exact executable used as the MOO2 1.50 patch base. It should be very close to that base, but this expected version difference must be recorded rather than treated as exact equivalence.
-- Compilation is allowed and required for validation. After implementation and any required parser-code generation, build the project and run the applicable tests using the repository's current build workflow.
+- Compilation is allowed and required for validation. After implementation and any required parser-code generation, build the project and run the applicable tests using the repository's canonical native Linux Debug test profile.
+
+### Required Linux Debug test profile
+
+Before proposing validation commands, read and analyze the repository's build-profile definitions, including
+`CMakePresets.json` and any directly referenced build/test scripts. Identify the native Linux Debug profile that
+enables tests and record its configure, build, and test presets, generator, binary directory, sanitizer settings,
+and test-output behavior. Do not choose an ad hoc build directory or a different preset for individual runs.
+
+For the current repository, the canonical profile is `linux-debug-asan-tests`. Use it consistently for generation,
+focused builds and tests, the complete build, and the complete test suite:
+
+```bash
+cmake --preset linux-debug-asan-tests
+cmake --build --preset linux-debug-asan-tests
+ctest --preset linux-debug-asan-tests
+```
+
+Focused validation may add `--target` to the build command and `-R` to the test command, but must retain the same
+configure, build, and test preset. If the profile definition changes, follow the profile proven from the current
+repository rather than copying stale settings from this document.
+
+Run only native Linux builds from Linux. Do not configure, build, or use MinGW, mingw64, Windows cross-compilation,
+Wine, or another platform's profile as validation for a backport. A cross-platform build requested separately by the
+user is outside this skill's validation workflow and cannot replace the native Linux Debug build and tests.
+
+Never pass `-j`, `--jobs`, or a numeric `--parallel` limit to a compile command. Let the selected build tool use all
+available cores. A repository script's unrestricted `--parallel` is acceptable, but the canonical preset workflow is
+preferred.
 
 ## Scope
 
@@ -153,6 +181,17 @@ The known 1.40-versus-1.50-base version difference is expected and is not by its
 
 Search `docs/patches.md` and `C:\Projects\MOO2150\src\asm.pl` for the requested change.
 
+Also locate `vars.pl` in the MOO2150 tree and search it for variables related to the topic. Search by more than exact
+references from the selected `asm.pl` block: include the topic words and abbreviations, affected functions and
+symbols, patched offsets and nearby immediates/data, subsystem terminology, and names discovered in comments,
+configuration, and history. A variable can be an inseparable part of the topic even when the selected patch block
+does not name it directly.
+
+If `vars.pl` is absent, search the complete MOO2150 tree for it and record the absence explicitly. Then perform the
+same topic-based variable inventory in the available variable and configuration registries, including `conf.pl`,
+`mtype.pl`, generated configuration declarations, and related non-Lua C definitions. Absence of `vars.pl` is not
+permission to skip variable discovery or to conclude that the topic has no configuration.
+
 Record:
 
 - exact topic name and `asm.pl` line
@@ -161,11 +200,18 @@ Record:
 - expected original chunks (`cchunk`)
 - replacement chunks (`pchunk`)
 - added code/data and diversion targets
-- every configuration variable introduced by 1.50 for the selected topic, including its name, type, default value, parser metadata, and references
+- every variable and configuration variable related to the selected topic, including definitions found in `vars.pl`
+  or its available replacements; record its external and internal names, type, default value, limits, parser metadata,
+  storage or patch offsets, synchronization/save behavior, and every reference or binary write site
 - referenced `src/c/patch.c` functions
 - related later C fixes or history that materially change the final behavior
 
 Do not stop at the first patch block. The complete topic can contain multiple edits, helper procedures, data changes, and call-site diversions.
+
+Do not conclude that no variables exist merely because `asm.pl` has no explicit variable reference. Reconcile every
+patched branch destination and configurable immediate/data location with the variable inventory. If a patch only
+separates previously shared storage or control flow, determine whether a variable registry supplies the value at the
+new destination before reconstructing the resulting behavior.
 
 If the user supplied only a description and multiple topics match, present the candidates and ask which one to use.
 
@@ -249,6 +295,10 @@ If 1.50 introduces configuration variables as part of the selected topic, restor
 
 Identify suitable existing tests. Add a regression test when the project already has an applicable test pattern and the defect can be reproduced deterministically.
 
+Read and analyze the canonical native Linux Debug test profile before selecting any validation command. All focused
+and complete builds and tests proposed for the backport must use that one profile; do not mix an existing ad hoc build
+directory, a release profile, or a cross-compilation profile into the workflow.
+
 ### 6. Mandatory pre-apply review
 
 Do not change any project file yet, including `docs/patches.md`.
@@ -264,6 +314,9 @@ Present the user with:
 7. Focused suggested diffs for every proposed source, test, and documentation edit.
 8. When configuration variables will be added, the repository-defined CMake command or target that will regenerate the C++ parser, plus the expected generated outputs.
 9. Assumptions, compatibility effects, and validation commands.
+
+Validation commands must use the proven native Linux Debug test presets. Do not propose MinGW or other
+cross-platform builds, and do not add compile job limits.
 
 Before the suggested diffs, include two short implementation paragraphs:
 
@@ -288,7 +341,9 @@ After approval:
 - avoid unrelated cleanup
 - add the approved regression tests
 - run formatting and static checks
-- build the project and run all applicable tests using the repository's current build workflow
+- configure, build, and run focused tests with the canonical native Linux Debug test presets
+- build the complete project and run the complete test suite with those same presets
+- never substitute a MinGW or other cross-platform build, and never pass `-j`, `--jobs`, or a numeric parallel limit
 
 If implementation requires a material departure from the approved diffs, stop and obtain approval for the revised proposal before continuing.
 
@@ -320,7 +375,10 @@ Before finishing:
 - confirm every configuration variable added by 1.50 for the topic was restored with the correct definition and use sites
 - when configuration variables changed, confirm CMake regenerated the C++ parser code and that the generated output is current
 - run applicable static checks and formatting
+- confirm the canonical native Linux Debug test profile was used consistently for configure, focused validation, the
+  complete build, and the complete test suite
 - build the project and run the relevant tests; tests are required validation and must not be deferred solely because they compile code
+- confirm no cross-platform build was used as validation and no compile command limited the available build threads
 - verify the catalog entry describes the implemented fix accurately
 - confirm no unrelated files changed
 
@@ -356,15 +414,18 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Specific 1.50 topic selected.
 - [ ] Open Ghidra program confirmed as the expected Orion2 1.40 variant and the difference from the 1.50 patch base recorded.
 - [ ] Every patch block in the topic inventoried.
+- [ ] `vars.pl` located and searched by topic, symbol, function, and offset, or its repository-wide absence recorded and equivalent variable/configuration registries searched instead.
 - [ ] Original locations and bytes/instructions verified.
 - [ ] Patched behavior reconstructed, including C implementation refinements.
 - [ ] The parent agent understood or validated the complete 1.50 semantic change before drawing conclusions.
-- [ ] Every configuration variable introduced by 1.50 for the selected topic inventoried and restored with its proven name, type, default, parser metadata, and use sites.
+- [ ] Every topic-related variable and configuration variable inventoried even when not explicitly referenced by `asm.pl`, with proven names, types, defaults, limits, parser metadata, synchronization behavior, storage or patch offsets, and use sites.
 - [ ] Current semantic source path analyzed.
 - [ ] Existing migration status determined.
 - [ ] Plan and focused suggested diffs shown before modification.
 - [ ] Explicit user approval received.
 - [ ] Approved source and tests implemented.
 - [ ] If configuration variables were added, CMake used to regenerate the C++ parser code and generated changes reviewed.
-- [ ] Static checks, project build, applicable tests, and `git diff --check` passed.
+- [ ] Canonical native Linux Debug test profile read, analyzed, and used for all configure, build, and test commands.
+- [ ] No MinGW or other cross-platform build was used as validation, and no compile command used `-j`, `--jobs`, or a numeric parallel limit.
+- [ ] Static checks, full native Linux Debug project build, focused and complete tests, and `git diff --check` passed.
 - [ ] Matching `docs/patches.md` item completed with a short semantic descriptor.

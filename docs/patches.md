@@ -255,7 +255,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1780` - `command points fix OP&CS`: fixed in `MAINSCR2` and `REPORT::Colonization_()` by recalculating derived player maintenance immediately after colony or outpost ship retirement; direct source-level event updates replace the 1.50 call-site wrappers and also cover the equivalent main-screen colony path.
 - [x] `asm.pl:1828` - `heavy fighter scramble`: implemented in `CMBTFIRE::Weapon_Can_Fire_At_Missiles_()` and `CMBTMIS::Resolve_Missile_()` with synchronized `combat heavy_fighter_can_scramble`; enabled Heavy Fighters intercept missiles using beams only and spend one fighter shot per attack, replacing the 1.50 helper calls with direct source-level fighter sequencing.
 - [x] `asm.pl:1901` - `detach 1.40 growth modifier from /nohousing switch`: implemented in `COLCALC::Colony_Pop_Grows_()` with synchronized `colony growth_rate_bonus` configuration; the general growth modifier is independent of Housing, and classic defaults replace the 1.40 `/nohousing` bonus without reproducing its binary condition.
-- [ ] `asm.pl:1917` - `unglue CS&TR`
+- [x] `asm.pl:1917` - `unglue CS&TR`: implemented with synchronized `colony lander_ship_cost` settings and independent selection in `COLCALC::Ship_Type_Cost_For_Player_()`; this replaces the 1.50 branch retarget and six patched immediates with one shared source-level cost policy while preserving classic 500/100/100 defaults.
 - [ ] `asm.pl:2579` - `planet non-enveloping`
 - [ ] `asm.pl:2632` - `cannon zero`
 - [ ] `asm.pl:2710` - `autodesign`

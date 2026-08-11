@@ -250,6 +250,18 @@ DOCTEST_TEST_CASE("Capitol can be built when the player has no homeworld") {
     DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(colony, BUILDING_CAPITOL) == 1);
 }
 
+DOCTEST_TEST_CASE("landing ship costs are selected independently") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    COLCALC::lander_ship_cost.colony_ship = 600;
+    COLCALC::lander_ship_cost.outpost_ship = 200;
+    COLCALC::lander_ship_cost.transport_ship = 80;
+
+    DOCTEST_CHECK(COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_COLONY, 0) == 600);
+    DOCTEST_CHECK(COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_OUTPOST, 0) == 200);
+    DOCTEST_CHECK(COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_TRANSPORT, 0) == 80);
+}
+
 DOCTEST_TEST_CASE("completed building grants no maintenance cash") {
     s_colony* colony = Prepare_Completed_Product_(BUILDING_MARINE_BARRACKS, 60);
     TECHDATA::_buildings[BUILDING_MARINE_BARRACKS].cost = 60;

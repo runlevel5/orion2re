@@ -1479,9 +1479,11 @@ namespace COLCALC {
         int32_t cost = 0;
 
         if (ship_type == SHIP_TYPE_COLONY) {
-            cost = 500;
-        } else if (ship_type == SHIP_TYPE_TRANSPORT || ship_type == SHIP_TYPE_OUTPOST) {
-            cost = 100;
+            cost = lander_ship_cost.colony_ship;
+        } else if (ship_type == SHIP_TYPE_TRANSPORT) {
+            cost = lander_ship_cost.transport_ship;
+        } else if (ship_type == SHIP_TYPE_OUTPOST) {
+            cost = lander_ship_cost.outpost_ship;
         }
 
         DESIGN::Cost_Reduction_For_Govt_Type_(player_idx, &cost);
