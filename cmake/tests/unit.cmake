@@ -374,12 +374,16 @@ orion2re_add_unit_test(test_missile_defense
         tests/unit/test_missile_defense.cpp
     PRODUCTION_SOURCES
         src/game/cmbtmis.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_exitm.cpp
+        tests/fakes/fake_fields_helpers_runtime.cpp
 )
 
 orion2re_add_unit_test(test_combat_stats
     SOURCES
         tests/unit/test_combat_stats.cpp
     PRODUCTION_SOURCES
+        src/game/combat1.cpp
         src/game/cmbtmov1.cpp
 )
 
@@ -398,6 +402,26 @@ orion2re_add_unit_test(test_bombardment_ammo
     PRODUCTION_SOURCES
         src/game/combat.cpp
 )
+
+orion2re_add_unit_test(test_initship
+    SOURCES
+        tests/unit/test_initship.cpp
+    PRODUCTION_SOURCES
+        src/game/initship.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_initship PRIVATE /Gy)
+    target_link_options(test_initship PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_initship PRIVATE
+        -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_initship PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_initship PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
 
 orion2re_add_unit_test(test_town_zero
     SOURCES
@@ -560,6 +584,7 @@ orion2re_add_unit_test(test_techinit
         tests/unit/test_techinit.cpp
     PRODUCTION_SOURCES
         src/game/techinit.cpp
+        src/game/techdata.cpp
     FAKE_SOURCES
         tests/fakes/fake_techinit_runtime.cpp
 )
@@ -777,6 +802,7 @@ orion2re_add_unit_test(test_netadapter
         tests/unit/test_netadapter.cpp
     PRODUCTION_SOURCES
         src/game/netadapter.cpp
+        src/game/netcode_bootstrap.cpp
         src/network/router_client.cpp
         src/network/router_core.cpp
         src/network/router_protocol.cpp

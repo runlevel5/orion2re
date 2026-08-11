@@ -4,6 +4,26 @@
 namespace CMBTMIS {
     extern int8_t _missile_initiative;
 
+    struct s_missile_speed_base {
+        uint16_t nuclear_missile;
+        uint16_t merculite_missile;
+        uint16_t pulson_missile;
+        uint16_t zeon_missile;
+        uint16_t anti_matter_torpedo;
+        uint16_t proton_torpedo;
+        uint16_t plasma_torpedo;
+        uint16_t plasma_breath;
+        uint16_t interceptor;
+        uint16_t assault_shuttle;
+        uint16_t bomber;
+        uint16_t heavy_fighter;
+    };
+
+    inline s_missile_speed_base speed_base = {
+        12, 12, 12, 12, 20, 20, 24, 24, 10, 6, 8, 8,
+    };
+    inline uint8_t _speed_fast_bonus = 4;
+
     enum e_lightning_field_mode : uint8_t {
         LIGHTNING_FIELD_MODE_CLASSIC,
         LIGHTNING_FIELD_MODE_UNIFORM,

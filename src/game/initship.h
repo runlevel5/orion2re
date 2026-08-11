@@ -5,6 +5,9 @@ struct s_ship_data;
 struct s_ship_design;
 
 namespace INITSHIP {
+    inline uint8_t _satellite_uses_torpedoes = 0;
+    inline uint8_t _td_ftl_bonus = 2;
+
     void __cdecl Repair_Ships_At_Colonies_();
 
     /** Fully repairs a ship and restores its weapon and special-device state.

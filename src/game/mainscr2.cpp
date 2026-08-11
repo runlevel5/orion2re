@@ -360,6 +360,7 @@ namespace MAINSCR2 {
             if (found_outpost_ship) {
                 COLONIZE::Make_New_Outpost_(new_outpost_star_id, MOX::_PLAYER_NUM);
                 MOX::_ship[outpost_ship_id].status = 5;
+                COLCALC::Update_Player_Stats_(&MOX::_player[MOX::_PLAYER_NUM]);
 
                 if (MOX::_fleet_box.count == 1) {
                     skip_draw = true;
@@ -442,6 +443,7 @@ namespace MAINSCR2 {
 
                 COLONIZE::Make_New_Colony_(planet_idx, MOX::_PLAYER_NUM);
                 MOX::_ship[ship_idx].status = 5;
+                COLCALC::Update_Player_Stats_(&MOX::_player[MOX::_PLAYER_NUM]);
 
                 if (MOX::_fleet_box.count == 1) {
                     single_fleet_ship = true;

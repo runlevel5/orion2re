@@ -202,7 +202,7 @@ namespace INITSHIP {
             speed = TECHDATA::_drives[drive_idx].warp_speed;
 
             if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-                speed += 2;
+                speed += _td_ftl_bonus;
             }
         }
 
@@ -216,7 +216,7 @@ namespace INITSHIP {
             speed = TECHDATA::_drives[drive_idx].warp_speed;
 
             if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-                return speed + 2;
+                return speed + _td_ftl_bonus;
             }
         } else if (drive_idx > 0) {
             speed = 1;
@@ -623,7 +623,7 @@ namespace INITSHIP {
             attack_bonus += (int16_t)owner_player->traits[TRAIT_SHIP_ATTACK];
 
             if (owner_player->traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-                defense_bonus += 20;
+                defense_bonus += COMBAT1::_td_combat_speed_bonus * 5;
             }
         }
 
@@ -786,6 +786,10 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Missile_Weapon_NT_(int16_t player_idx) {
+        if (_satellite_uses_torpedoes != 0) {
+            return Best_Missile_Weapon_(player_idx);
+        }
+
         int16_t best_weapon_idx = 14;
         int16_t max_damage = 0;
 

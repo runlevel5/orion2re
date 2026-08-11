@@ -246,6 +246,7 @@ namespace REPORT {
                                         COLONIZE::Make_New_Colony_(planet_idx, player_idx);
                                         if (colony_base == nullptr) {
                                             SHIPS::Kill_Ship_((int16_t)(colony_ship - MOX::_ship));
+                                            COLCALC::Update_Player_Stats_(&MOX::_player[player_idx]);
                                             MAINSCR::Update_Ship_Icons_In_Between_Turns_();
                                             colony_base = nullptr;
                                         } else {
@@ -276,6 +277,7 @@ namespace REPORT {
                                     } else {
                                         COLONIZE::Make_New_Outpost_(planet_idx, player_idx);
                                         SHIPS::Kill_Ship_((int16_t)(outpost_ship - MOX::_ship));
+                                        COLCALC::Update_Player_Stats_(&MOX::_player[player_idx]);
                                         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
                                     }
                                 }

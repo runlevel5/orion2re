@@ -13,6 +13,8 @@ namespace TEST_BOARDING {
     void Set_Combat_Shield_Max_(int16_t value);
     void Prepare_Long_Raid_();
     const char* Last_Raid_Message_();
+    int16_t Boarding_Attacker_Bonus_();
+    int16_t Boarding_Defender_Bonus_();
 }
 
 DOCTEST_TEST_CASE("boarding rejects targets in stasis") {
@@ -99,6 +101,21 @@ DOCTEST_TEST_CASE("generated Antaran ships use normal hull marine capacity") {
     TECHDATA::_hull_data[HULL_STAR_BASE].marines = 20;
 
     DOCTEST_CHECK(BOARDING::Captured_Marine_Count_(1, 30) == 12);
+}
+
+DOCTEST_TEST_CASE("capture includes both ships' crew experience bonuses") {
+    TEST_BOARDING::Reset_();
+    MOX::_combat_data[0].owner = 0;
+    MOX::_combat_data[0].crew_quality = CREW_QUALITY_VETERAN;
+    MOX::_combat_data[1].owner = 1;
+    MOX::_combat_data[1].crew_quality = CREW_QUALITY_ELITE;
+    MOX::_crew_data[CREW_QUALITY_VETERAN].ground = 10;
+    MOX::_crew_data[CREW_QUALITY_ELITE].ground = 15;
+
+    CMBTFIR2::Resolve_Capture_(0, 1, 1, 0, 0);
+
+    DOCTEST_CHECK(TEST_BOARDING::Boarding_Attacker_Bonus_() == 10);
+    DOCTEST_CHECK(TEST_BOARDING::Boarding_Defender_Bonus_() == 15);
 }
 
 DOCTEST_TEST_CASE("classic telepathic recapture retains captured state") {

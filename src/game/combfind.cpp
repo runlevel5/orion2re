@@ -59,6 +59,11 @@ void __cdecl Search_For_Battles_() {
 
     _battle_stars = battle_stars_stack;
 
+    NETMOX::Net_Debug_Log_(
+        "Search_For_Battles_: scratch ready player=%d stardate=%u",
+        (int)MOX::_PLAYER_NUM,
+        (unsigned int)MOX::_stardate);
+
     for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
         int8_t owner = MOX::_colony[i].owner;
         if (owner != -1) {
@@ -174,6 +179,10 @@ void __cdecl Search_For_Battles_() {
     } else if (MOX::_game_type < 4) {
         NETMOX::_net.sync_state = NET_SYNC_STATE_COMBAT_READY;
         Client_Combat_Loop_();
+        NETMOX::Net_Debug_Log_(
+            "Search_For_Battles_: combat loop exited sync=%u pending_stars=%d",
+            (unsigned int)NETMOX::_net.sync_state,
+            (int)_n_battle_stars);
         NETMOX::Mox_Send_Message_((int16_t)netadapter::NETADAPTER_BROADCAST_EXCLUDING_SELF, NET_PACKET_COMBAT_PHASE_COMPLETE, nullptr, 0);
     }
 
@@ -189,6 +198,11 @@ void __cdecl Search_For_Battles_() {
     }
 
     MOX2::Put_Auto_Function_(&saved_auto_fn);
+    NETMOX::Net_Debug_Log_(
+        "Search_For_Battles_: releasing scratch pending_stars=%d sync=%u",
+        (int)_n_battle_stars,
+        (unsigned int)NETMOX::_net.sync_state);
+    _n_battle_stars = 0;
     _star_has_player = nullptr;
     _star_has_nonplayer = nullptr;
     _player_needs_to_attack = nullptr;
@@ -2416,6 +2430,19 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
         return;
     }
 
+    if (_battle_stars == nullptr ||
+        _player_needs_to_attack == nullptr ||
+        _star_has_player == nullptr ||
+        _star_has_nonplayer == nullptr) {
+        if (_n_battle_stars != 0) {
+            NETMOX::Net_Debug_Log_(
+                "Do_Net_Combat_Update_: deferred outside battle search pending_stars=%d sync=%u",
+                (int)_n_battle_stars,
+                (unsigned int)NETMOX::_net.sync_state);
+        }
+        return;
+    }
+
     (void)unused;
     RUSS::Mox_Update_();
 
@@ -2507,7 +2534,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
                 (*_star_has_nonplayer)[NETMOX::_net.player_net_info[i].combat_star_id] &= 0xef;
                 NETMOX::_net.player_net_info[i].player_state = NET_PLAYER_STATE_COMBAT_RESULTS_POPUP;
                 NETMOX::_net.sync_phase_active_flag = 0;
-                NETMOX::_net.field82_0x160 = (undefined)0xff;
+                NETMOX::_net.player_net_info[12].combat_attacker_id = -1;
                 break;
             }
             case NET_PLAYER_STATE_DRAGON_BRIBE_DESTINATION: {
@@ -2519,7 +2546,7 @@ void __cdecl Do_Net_Combat_Update_(bool unused) {
                 NETMOX::_net.player_net_info[i].combat_attacker_id = (undefined)0xff;
                 NETMOX::_net.player_net_info[i].player_state = NET_PLAYER_STATE_COMBAT_READY;
                 NETMOX::_net.sync_phase_active_flag = 0;
-                NETMOX::_net.field82_0x160 = (undefined)0xff;
+                NETMOX::_net.player_net_info[12].combat_attacker_id = -1;
                 break;
             }
             }

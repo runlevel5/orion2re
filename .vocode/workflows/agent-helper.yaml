@@ -11,6 +11,7 @@ workflows:
         confirmation: auto
         start_timeout: 120
         max_rounds: 0
+        hard_error_retries: 3
         preprocessors:
           - name: system_details
           - name: skills

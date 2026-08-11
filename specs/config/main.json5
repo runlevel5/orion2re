@@ -319,6 +319,15 @@
       },
     },
 
+    high_energy_focus_presence: {
+      title: "High Energy Focus presence",
+      description: "Selects whether the firing ship has a working High Energy Focus.",
+      remarks: "Complete two-value table-index domain used only to select the configured beam mount row.",
+      kind: "enum",
+      base_type: "uint8",
+      values: { nohef: 0, hef: 1 },
+    },
+
     // Weapon modification IDs, available flags, natural properties, and arcs
     // have overlapping numbers but intentionally remain separate types.
     weapon_modification_id: {
@@ -510,6 +519,23 @@
       allow_numeric: true,
       reject_unknown_numeric: true,
       values: { frigate: 0, destroyer: 1, cruiser: 2, battleship: 3, titan: 4 },
+    },
+    combat_ship_size_class: {
+      title: "Combat ship size class",
+      description: "Hull size used to select the tactical Tractor Beam stopping threshold.",
+      remarks: "Includes Doom Star because tactical combat uses six size classes.",
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: {
+        frigate: 0,
+        destroyer: 1,
+        cruiser: 2,
+        battleship: 3,
+        titan: 4,
+        doomstar: 5,
+      },
     },
     ship_drive: {
       title: "Ship drive",
@@ -752,6 +778,15 @@
     },
   },
   records: {
+    mount_damage: {
+      title: "Beam mount damage modifiers",
+      description: "Damage percentages for Point Defense, normal, and Heavy Mount beams.",
+      fields: [
+        { id: "pd", title: "Point Defense", description: "Damage percentage for a Point Defense beam.", type: "uint16", bind: ["pd"] },
+        { id: "nomod", title: "Normal mount", description: "Damage percentage for a beam without a mount modification.", type: "uint16", bind: ["nomod"] },
+        { id: "heavy", title: "Heavy Mount", description: "Damage percentage for a Heavy Mount beam.", type: "uint16", bind: ["heavy"] },
+      ],
+    },
     miniaturization_settings: {
       title: "Miniaturization curves",
       description: "Cost percentages and category-specific space multipliers for miniaturization levels 0 through 5.",
@@ -794,6 +829,24 @@
           type: "uint8",
           bind: ["displacement_device_missiles_miss_percent"],
         },
+      ],
+    },
+    missile_speed_base: {
+      title: "Missile and fighter base speeds",
+      description: "Base tactical speed for supported missiles, torpedoes, breath weapons, and fighter craft.",
+      fields: [
+        { id: "nuclear_missile", title: "Nuclear Missile", description: "Base speed of Nuclear Missiles.", type: "uint16", bind: ["nuclear_missile"] },
+        { id: "merculite_missile", title: "Merculite Missile", description: "Base speed of Merculite Missiles.", type: "uint16", bind: ["merculite_missile"] },
+        { id: "pulson_missile", title: "Pulson Missile", description: "Base speed of Pulson Missiles.", type: "uint16", bind: ["pulson_missile"] },
+        { id: "zeon_missile", title: "Zeon Missile", description: "Base speed of Zeon Missiles.", type: "uint16", bind: ["zeon_missile"] },
+        { id: "anti_matter_torpedo", title: "Anti-Matter Torpedo", description: "Base speed of Anti-Matter Torpedoes.", type: "uint16", bind: ["anti_matter_torpedo"] },
+        { id: "proton_torpedo", title: "Proton Torpedo", description: "Base speed of Proton Torpedoes.", type: "uint16", bind: ["proton_torpedo"] },
+        { id: "plasma_torpedo", title: "Plasma Torpedo", description: "Base speed of Plasma Torpedoes.", type: "uint16", bind: ["plasma_torpedo"] },
+        { id: "plasma_breath", title: "Plasma Breath", description: "Base speed of Dragon Breath attacks.", type: "uint16", bind: ["plasma_breath"] },
+        { id: "interceptor", title: "Interceptor", description: "Base speed of Interceptors.", type: "uint16", bind: ["interceptor"] },
+        { id: "assault_shuttle", title: "Assault Shuttle", description: "Base speed of Assault Shuttles.", type: "uint16", bind: ["assault_shuttle"] },
+        { id: "bomber", title: "Bomber", description: "Base speed of Bombers.", type: "uint16", bind: ["bomber"] },
+        { id: "heavy_fighter", title: "Heavy Fighter", description: "Base speed of Heavy Fighters.", type: "uint16", bind: ["heavy_fighter"] },
       ],
     },
     autobuild_settings: {
@@ -1254,6 +1307,49 @@
       bind_root: { header: "game/mapgen.h", symbol: "MAPGEN::_maximum_star_count" },
     },
 
+    jump_gate_speed_bonus: {
+      title: "Jump Gate speed bonus",
+      description: "Adds this speed to fleets traveling through connected Jump Gates.",
+      examples: ["movement jump_gate_speed_bonus = 3;"],
+      group: "gameplay",
+      namespace: "movement",
+      type: "uint8",
+      default: 3,
+      bind_root: {
+        header: "game/shipmove.h",
+        symbol: "SHIPMOVE::_jump_gate_speed_bonus",
+      },
+    },
+
+    td_ftl_bonus: {
+      title: "Trans-Dimensional FTL speed bonus",
+      description: "Adds this strategic travel speed to ships owned by Trans-Dimensional players.",
+      examples: ["movement td_ftl_bonus = 2;"],
+      group: "gameplay",
+      namespace: "movement",
+      type: "uint8",
+      default: 2,
+      bind_root: {
+        header: "game/initship.h",
+        symbol: "INITSHIP::_td_ftl_bonus",
+      },
+    },
+
+    jump_gate_pass_nebula: {
+      title: "Jump Gates bypass nebula slowdown",
+      description: "Prevents nebulae from reducing the speed of fleets using Jump Gates.",
+      remarks: "False preserves classic behavior; Jump Gates still bypass black-hole blockage.",
+      examples: ["movement jump_gate_pass_nebula = true;"],
+      group: "gameplay",
+      namespace: "movement",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/shipmove.h",
+        symbol: "SHIPMOVE::_jump_gate_pass_nebula",
+      },
+    },
+
     autobuild: {
       title: "Experimental autobuild",
       description: "Assigns automatic build queues to individual colonies.",
@@ -1331,6 +1427,21 @@
       bind_root: {
         header: "game/combinit.h",
         symbol: "COMBINIT::_satellite_capture_enabled",
+      },
+      default: false,
+    },
+
+    satellite_uses_torpedoes: {
+      title: "Torpedoes for planetary defenses",
+      description: "Allows orbital defenses and planetary missile bases to select torpedoes when they are the highest-damage researched missile weapon.",
+      remarks: "False preserves classic behavior, where these defenses use missiles only.",
+      examples: ["combat satellite_uses_torpedoes = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/initship.h",
+        symbol: "INITSHIP::_satellite_uses_torpedoes",
       },
       default: false,
     },
@@ -1512,6 +1623,30 @@
       default: false,
     },
 
+    tractors_to_stop: {
+      title: "Tractor Beams required to stop ships",
+      description: "Sets the number of Tractor Beams required to stop each combat ship size class.",
+      remarks: "Values below the threshold proportionally reduce speed. Zero makes the selected size class immobile during speed calculation. Defaults preserve classic behavior.",
+      examples: [
+        "combat tractors_to_stop destroyer = 2;",
+        "combat tractors_to_stop doomstar = 6;",
+      ],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: {
+        header: "game/combat1.h",
+        symbol: "COMBAT1::_tractors_to_stop",
+      },
+      type: {
+        kind: "array",
+        count: 6,
+        index_base: 0,
+        index_type: "combat_ship_size_class",
+        element: { type: "uint8" },
+      },
+      default: [1, 2, 3, 4, 5, 6],
+    },
+
     recloak_next_turn: {
       title: "Recloak without waiting a turn",
       description: "Allows a ship that fired or boarded while cloaked to restore its Cloaking Device at the end of the current turn instead of waiting one turn.",
@@ -1561,6 +1696,34 @@
       default: [100, 100, 100, 100, 100, 100, 100],
     },
 
+    mount_dmg: {
+      title: "Beam mount damage modifiers",
+      description: "Configures beam damage percentages by mount and High Energy Focus presence.",
+      remarks: "Defaults reproduce classic mount and High Energy Focus behavior.",
+      examples: [
+        "combat mount_dmg nohef pd = 50;",
+        "combat mount_dmg nohef nomod = 100;",
+        "combat mount_dmg nohef heavy = 150;",
+        "combat mount_dmg hef pd = 100;",
+        "combat mount_dmg hef nomod = 150;",
+        "combat mount_dmg hef heavy = 200;",
+      ],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: { header: "game/cmbtfire.h", symbol: "CMBTFIRE::_mount_dmg" },
+      type: {
+        kind: "array",
+        count: 2,
+        index_base: 0,
+        index_type: "high_energy_focus_presence",
+        element: { type: "mount_damage" },
+      },
+      default: [
+        { pd: 50, nomod: 100, heavy: 150 },
+        { pd: 100, nomod: 150, heavy: 200 },
+      ],
+    },
+
     fighters_use_point_defense: {
       title: "Fighters use point-defense beams",
       description: "Applies point-defense accuracy and damage modifiers to fighter beam weapons.",
@@ -1571,6 +1734,21 @@
       bind_root: {
         header: "game/cmbtfire.h",
         symbol: "CMBTFIRE::_fighters_use_point_defense",
+      },
+      default: false,
+    },
+
+    heavy_fighter_can_scramble: {
+      title: "Heavy Fighters can scramble",
+      description: "Allows Heavy Fighters to intercept missiles and fighters using their beam weapons.",
+      remarks: "False preserves classic behavior. Heavy Fighters spend one fighter shot per interception and do not use bombs against missile targets.",
+      examples: ["combat heavy_fighter_can_scramble = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_heavy_fighter_can_scramble",
       },
       default: false,
     },
@@ -1624,6 +1802,47 @@
         cloaking_device_missile_miss_percent: 50,
         displacement_device_missiles_miss_percent: 30,
       },
+    },
+
+    speed_base: {
+      title: "Missile and fighter base speeds",
+      description: "Configures the base tactical speed of each supported flyer.",
+      examples: ["combat speed_base plasma_torpedo = 24;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "missile_speed_base",
+      bind_root: { header: "game/cmbtmis.h", symbol: "CMBTMIS::speed_base" },
+      default: {
+        nuclear_missile: 12, merculite_missile: 12,
+        pulson_missile: 12, zeon_missile: 12,
+        anti_matter_torpedo: 20, proton_torpedo: 20,
+        plasma_torpedo: 24, plasma_breath: 24,
+        interceptor: 10, assault_shuttle: 6,
+        bomber: 8, heavy_fighter: 8,
+      },
+    },
+
+    speed_fast_bonus: {
+      title: "Fast flyer speed bonus",
+      description: "Adds this tactical speed to flyers with the Fast modification.",
+      examples: ["combat speed_fast_bonus = 4;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      default: 4,
+      bind_root: { header: "game/cmbtmis.h", symbol: "CMBTMIS::_speed_fast_bonus" },
+    },
+
+    td_combat_speed_bonus: {
+      title: "Trans-Dimensional tactical speed bonus",
+      description: "Adds this speed to Trans-Dimensional ships and fighter craft.",
+      remarks: "Ship defense receives five times this value, matching MOO2 1.50.",
+      examples: ["combat td_combat_speed_bonus = 4;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      default: 4,
+      bind_root: { header: "game/combat1.h", symbol: "COMBAT1::_td_combat_speed_bonus" },
     },
 
     alternative_refit: {

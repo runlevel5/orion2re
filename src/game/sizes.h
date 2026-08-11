@@ -46,8 +46,13 @@ static_assert(sizeof(EVENTS::_event_data) == 36 * sizeof(s_event_data), "EVENTS:
 static_assert(sizeof(MSG_::_msgs) == 100 * sizeof(s_MSG), "MSG_::_msgs size mismatch");
 ORION2RE_STATIC_SIZE_ASSERT(s_palette_entry, 4);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_field, 0x35, 0x51);
-ORION2RE_STATIC_SIZE_ASSERT_PTR(s_network, 0x218, 0x220);
+ORION2RE_STATIC_SIZE_ASSERT_PTR(s_network, 0x21f, 0x227);
 ORION2RE_STATIC_SIZE_ASSERT(s_net_player_info, 0xd);
+static_assert(sizeof(((s_network*)nullptr)->player_net_info) == 15 * sizeof(s_net_player_info),
+              "s_network combat participant records mismatch");
+static_assert(offsetof(s_network, sync_state) ==
+                  offsetof(s_network, player_net_info) + sizeof(((s_network*)nullptr)->player_net_info),
+              "s_network combat participant records overlap sync state");
 ORION2RE_STATIC_SIZE_ASSERT(s_net_tactical_combat_message, 0x10);
 ORION2RE_STATIC_SIZE_ASSERT_PTR(s_battle_results, 0x6d6, 0x6de);
 ORION2RE_STATIC_SIZE_ASSERT(s_load_net_screen_packet, 0x60);

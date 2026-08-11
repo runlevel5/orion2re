@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "game/netcode_bootstrap.h"
+
 namespace netcode {
     uint32_t _thisHost;
     uint32_t _netInitialized;
@@ -167,8 +169,15 @@ namespace netcode {
             return endpoint_configured;
         }
 
-        bool __cdecl Is_Router_Host_Startup_(uint32_t mode, const s_network* network) {
-            return mode == 0 && network != nullptr && network->sync_state == NET_SYNC_STATE_HOST_STARTUP;
+        const char* __cdecl Get_Router_Bootstrap_Mode_Name_(netadapter::e_bootstrap_mode mode) {
+            switch (mode) {
+            case netadapter::BOOTSTRAP_LAN_DISCOVERY:
+                return "LAN discovery";
+            case netadapter::BOOTSTRAP_EMBEDDED_LAN_HOST:
+                return "embedded LAN host";
+            default:
+                return "direct endpoint";
+            }
         }
 
         int32_t __cdecl Connect_Router_With_Retry_(const netadapter::s_config* config) {
@@ -226,14 +235,13 @@ namespace netcode {
 
             netadapter::s_config config;
             Init_Router_Config_(&config, nullptr, network, mode == 1);
-            if (mode == 0 && Is_Router_Host_Startup_(mode, network)) {
-                config.bootstrap_mode = netadapter::BOOTSTRAP_EMBEDDED_LAN_HOST;
-            } else if (mode == 0) {
-                config.bootstrap_mode = netadapter::BOOTSTRAP_LAN_DISCOVERY;
-            } else {
-                config.bootstrap_mode = netadapter::BOOTSTRAP_DIRECT_ENDPOINT;
-            }
-            SDL_Log("Router connecting to %s:%u", config.host, (unsigned)config.tcp_port);
+            config.bootstrap_mode = Get_Router_Bootstrap_Mode_(mode, network != nullptr ? network->sync_state : NET_SYNC_STATE_IDLE);
+            SDL_Log(
+                "Router bootstrap=%s endpoint=%s:%u sync_state=%u",
+                Get_Router_Bootstrap_Mode_Name_(config.bootstrap_mode),
+                config.host,
+                (unsigned)config.tcp_port,
+                network != nullptr ? (unsigned)network->sync_state : (unsigned)NET_SYNC_STATE_IDLE);
             netadapter::Init(&_router_adapter, &config);
             result = Connect_Router_With_Retry_(&config);
             if (result != 0 && netadapter::Is_Connected(&_router_adapter)) {

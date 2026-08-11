@@ -2763,7 +2763,8 @@ namespace COLBLDG {
             mouse::Set_Mouse_List_(&_mouse_list_what, 1);
         } else if (_fields[4] == input_field) {
             int owner = MOX::_colony[COLONY::_colony_handle].owner;
-            if (MOX::_player[owner].tech_fields[0x16] == 3 && MOX::_player[owner].tech_fields[0x17] == 3) {
+            if (MOX::_player[owner].tech_fields[TECH_FIELD_CHEMISTRY] == TECH_RESEARCH_STATUS_RESEARCHED &&
+                MOX::_player[owner].tech_fields[TECH_FIELD_NUCLEAR_FISSION] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
 

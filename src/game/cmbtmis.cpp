@@ -287,6 +287,7 @@ namespace CMBTMIS {
         int16_t type = missile->type;
         uint16_t specials = missile->specials;
         int16_t is_anti_missile_rocket = missile->is_anti_missile_rocket;
+        const bool targets_missile = is_anti_missile_rocket != 0;
 
         if (target_unit_idx == source_unit_idx && is_anti_missile_rocket == 0) {
             int16_t reload_count = missile->quantity / 4;
@@ -393,12 +394,14 @@ namespace CMBTMIS {
                     CMBTFIRE::Fire_Fighter_Beam_(missile_idx, shield_idx, is_anti_missile_rocket, &dmg_out, &sys_dmg);
                     dmg_accum = dmg_out;
                     sys_dmg_accum = sys_dmg;
-                    if (type != WEAPON_HEAVY_FIGHTER) {
+                    if (type == WEAPON_INTERCEPTOR || targets_missile) {
                         missile->fighter_count--;
                     }
                 }
 
-                if (missile->fighter_count != 0 && type != WEAPON_INTERCEPTOR) {
+                if (missile->fighter_count != 0 &&
+                    type != WEAPON_INTERCEPTOR &&
+                    !targets_missile) {
                     int16_t dmg_out = 0;
                     int16_t sys_dmg = 0;
                     CMBTFIRE::Fire_Fighter_Bomb_(missile_idx, shield_idx, &dmg_out, &sys_dmg);
@@ -572,68 +575,86 @@ namespace CMBTMIS {
     }
 
     int16_t __cdecl Missile_Speed_(int16_t type, uint16_t flags, int16_t player_idx) {
-        bool is_warp_affected = true;
+        bool boost_drive = false;
+        bool boost_td = false;
         int16_t missile_speed = 0;
 
         switch (type) {
             case WEAPON_NUCLEAR_MISSILE:
+                missile_speed = speed_base.nuclear_missile;
+                boost_drive = true;
+                break;
             case WEAPON_MERCULITE_MISSILE:
+                missile_speed = speed_base.merculite_missile;
+                boost_drive = true;
+                break;
             case WEAPON_PULSON_MISSILE:
+                missile_speed = speed_base.pulson_missile;
+                boost_drive = true;
+                break;
             case WEAPON_ZEON_MISSILE:
-                missile_speed = 12;
+                missile_speed = speed_base.zeon_missile;
+                boost_drive = true;
                 break;
 
             case WEAPON_ANTI_MATTER_TORP:
+                missile_speed = speed_base.anti_matter_torpedo;
+                break;
             case WEAPON_PROTON_TORPEDO:
-                is_warp_affected = false;
-                missile_speed = 20;
+                missile_speed = speed_base.proton_torpedo;
                 break;
 
             case WEAPON_PLASMA_TORPEDO:
+                missile_speed = speed_base.plasma_torpedo;
+                break;
             case WEAPON_DRAGON_BREATH:
-                is_warp_affected = false;
-                missile_speed = 24;
+                missile_speed = speed_base.plasma_breath;
                 break;
 
             case WEAPON_ASSAULT_SHUTTLE:
-                missile_speed = 6;
-                if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL]) {
-                    missile_speed = 10;
-                }
+                missile_speed = speed_base.assault_shuttle;
+                boost_drive = true;
+                boost_td = true;
                 break;
 
             case WEAPON_HEAVY_FIGHTER:
-                missile_speed = 8;
-                if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL]) {
-                    missile_speed = 12;
-                }
+                missile_speed = speed_base.heavy_fighter;
+                boost_drive = true;
+                boost_td = true;
                 break;
 
             case WEAPON_BOMBER:
-                missile_speed = 8;
-                if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL]) {
-                    missile_speed = 12;
-                }
+                missile_speed = speed_base.bomber;
+                boost_drive = true;
+                boost_td = true;
                 break;
 
             case WEAPON_INTERCEPTOR:
-                missile_speed = 10;
-                if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL]) {
-                    missile_speed = 14;
-                }
+                missile_speed = speed_base.interceptor;
+                boost_drive = true;
+                boost_td = true;
                 break;
 
-            default:
-                break;
+            default: {
+                char message[64];
+                snprintf(message, sizeof(message),
+                         "Missile_Speed_ failed, unknown flyer %d", type);
+                exitm::Exit_With_Message(message);
+            }
         }
 
-        if (is_warp_affected) {
+        if (boost_drive) {
             int16_t drive_level = INITSHIP::Best_Warp_Drive_(player_idx);
             missile_speed += (drive_level * 2) - 2;
         }
 
+        if (boost_td && player_idx >= 0 && player_idx < MAX_PLAYERS &&
+            MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
+            missile_speed += COMBAT1::_td_combat_speed_bonus;
+        }
+
         if (flags & WEAPON_MOD_FLAG_FAST) {
-            missile_speed += 4;
+            missile_speed += _speed_fast_bonus;
         }
 
         return missile_speed;

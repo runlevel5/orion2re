@@ -19,6 +19,7 @@
 #include "game/ericnet.h"
 #include "game/events.h"
 #include "game/invasion.h"
+#include "game/initship.h"
 #include "game/mapgen.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
@@ -154,6 +155,43 @@ DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default")
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
+}
+
+DOCTEST_TEST_CASE("beam mount damage preserves classic defaults and binds all combinations") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].pd == 50);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].nomod == 100);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].heavy == 150);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].pd == 100);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].nomod == 150);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].heavy == 200);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat mount_dmg nohef pd = 40;"
+        "combat mount_dmg nohef nomod = 90;"
+        "combat mount_dmg nohef heavy = 140;"
+        "combat mount_dmg hef pd = 80;"
+        "combat mount_dmg hef nomod = 130;"
+        "combat mount_dmg hef heavy = 180;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].pd == 40);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].nomod == 90);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].heavy == 140);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].pd == 80);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].nomod == 130);
+    DOCTEST_CHECK(CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_PRESENT].heavy == 180);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat mount_dmg hef heavy = 65536;", &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor name") {
@@ -310,6 +348,24 @@ DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COMBINIT::_satellite_capture_enabled == 1);
+}
+
+DOCTEST_TEST_CASE("satellite torpedo setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(INITSHIP::_satellite_uses_torpedoes == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat satellite_uses_torpedoes = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(INITSHIP::_satellite_uses_torpedoes == 1);
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
 }
 
 DOCTEST_TEST_CASE("Crystal fleet retention preserves the classic default") {
@@ -606,6 +662,49 @@ DOCTEST_TEST_CASE("missile defense settings preserve classic defaults") {
     DOCTEST_CHECK(CMBTMIS::missile_defense.cloaking_device_missile_defense == 60);
     DOCTEST_CHECK(CMBTMIS::missile_defense.cloaking_device_missile_miss_percent == 45);
     DOCTEST_CHECK(CMBTMIS::missile_defense.displacement_device_missiles_miss_percent == 35);
+}
+
+DOCTEST_TEST_CASE("missile speed settings preserve and replace 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMIS::speed_base.nuclear_missile == 12);
+    DOCTEST_CHECK(CMBTMIS::speed_base.plasma_torpedo == 24);
+    DOCTEST_CHECK(CMBTMIS::speed_base.interceptor == 10);
+    DOCTEST_CHECK(CMBTMIS::speed_base.assault_shuttle == 6);
+    DOCTEST_CHECK(CMBTMIS::_speed_fast_bonus == 4);
+    DOCTEST_CHECK(COMBAT1::_td_combat_speed_bonus == 4);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat speed_base nuclear_missile = 15;"
+        "combat speed_base interceptor = 13;"
+        "combat speed_fast_bonus = 7;"
+        "combat td_combat_speed_bonus = 6;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMIS::speed_base.nuclear_missile == 15);
+    DOCTEST_CHECK(CMBTMIS::speed_base.interceptor == 13);
+    DOCTEST_CHECK(CMBTMIS::_speed_fast_bonus == 7);
+    DOCTEST_CHECK(COMBAT1::_td_combat_speed_bonus == 6);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat speed_base nuclear_missile = 65536;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat speed_fast_bonus = 256;", &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat td_combat_speed_bonus = 256;", &writes, &diagnostic));
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
 }
 
 DOCTEST_TEST_CASE("alternative refit formula preserves the classic default") {

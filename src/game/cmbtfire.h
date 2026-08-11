@@ -7,10 +7,25 @@
 #define COMBAT_PLANET_DEFENSE_FIGHTER_GARRISON 0x8
 
 namespace CMBTFIRE {
+    enum e_high_energy_focus_presence : uint8_t {
+        HIGH_ENERGY_FOCUS_ABSENT = 0,
+        HIGH_ENERGY_FOCUS_PRESENT = 1,
+        HIGH_ENERGY_FOCUS_PRESENCE_COUNT = 2,
+    };
+
+    struct s_mount_damage {
+        uint16_t pd;
+        uint16_t nomod;
+        uint16_t heavy;
+    };
+
+    extern s_mount_damage _mount_dmg[HIGH_ENERGY_FOCUS_PRESENCE_COUNT];
+
     inline uint16_t _civilian_armor[ARMOR_COUNT] = {
         100, 100, 100, 100, 100, 100, 100,
     };
     inline uint8_t _fighters_use_point_defense = 0;
+    inline uint8_t _heavy_fighter_can_scramble = 0;
 
     /** Applies the supplied weapon damage to the defending planet or colony. */
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t weapon_flags);
