@@ -792,6 +792,7 @@ orion2re_add_unit_test(test_netadapter
         tests/unit/test_netadapter.cpp
     PRODUCTION_SOURCES
         src/game/netadapter.cpp
+        src/game/netcode_bootstrap.cpp
         src/network/router_client.cpp
         src/network/router_core.cpp
         src/network/router_protocol.cpp

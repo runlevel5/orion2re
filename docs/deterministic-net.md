@@ -6,7 +6,7 @@ This document describes the multiplayer state machine as it exists, the ways it 
 
 The analysis covers gameplay synchronization, not the router protocol itself. Transport and session architecture are described in `docs/networking.md`.
 
-The current implementation should be treated as a single-threaded program with logical concurrency. Router I/O is queued, but packet callbacks run synchronously on the game thread when game code pumps the network. A "race" in this document therefore usually means callback ordering, re-entrant dispatch, or observing partially updated state rather than two CPU threads writing the same object. This assumption should be asserted in code; the mutable networking globals are not thread-safe.
+Gameplay and protocol state currently have a single game-thread writer with logical concurrency. Router work may use another thread, but gameplay packet callbacks run synchronously on the game thread when game code pumps the network. A "race" in this document therefore usually means callback ordering, re-entrant dispatch, or observing partially updated state rather than two CPU threads writing the same gameplay object. This single-writer assumption should be asserted in code; the mutable networking globals are not thread-safe.
 
 ## Source map
 
@@ -25,7 +25,7 @@ The important layers are:
 There are two overlapping state machines:
 
 - `s_network::sync_state` is the local process's coarse phase.
-- `s_network::player_net_info[i].player_state` is a local view of each player's combat or diplomacy phase.
+- `s_network::player_net_info[i].player_state` is a local view of each combat participant's phase. The array has 15 records: empire players use IDs 0 through 7, while IDs 8 through 14 represent non-player combat participants.
 
 They are supplemented by counters, bit masks, flags, global pointers, and subsystem-specific latches. Those values are part of the effective state machine even though transitions are not centralized.
 
@@ -92,6 +92,8 @@ The correct long-term contract is:
 - A serializer observes an immutable captured state, not live globals that callbacks can mutate.
 - A send only queues/sends bytes; it never dispatches inbound gameplay callbacks.
 - A handler never waits synchronously for a packet that can only be processed after that handler returns.
+
+Existing calls to `RUSS::Mox_Update_()` remain the public progress points. The refactor does not require adding a new pump call to every wait, screen, or combat loop. The outermost `Mox_Net_Update_()` polls and drains a bounded number of currently available events. A nested call made while a gameplay handler is active is a no-op; after the handler returns, the outermost loop polls and checks its queue again before returning.
 
 ## Reconstructed state machine
 
@@ -180,6 +182,8 @@ COMBAT_READY
 
 Combat readiness is a distributed barrier inferred from each process's local `player_net_info[]`. Tactical combat adds `NET_TACTICAL_COMBAT_SYNC_STATE` and `_combat_done_waiting`. Action reception uses single global pending-message storage. `Client_Combat_Loop_()` and target-search code publish pointers to stack-owned scratch data in globals while repeatedly pumping the network.
 
+`player_net_info[]` must not be treated as an eight-player-only array. Combat selection indexes it with attacker and target IDs up to 14, including monsters and other non-player participants. The storage layout and every bound check must use the full 15-record participant range even when loops over actual empires stop at `MOX::_NUM_PLAYERS`.
+
 The protocol assumes every peer sees target selection, tactical completion, result application, and acknowledgements in the expected order. Packet handlers generally do not verify that order.
 
 ### Diplomacy
@@ -253,6 +257,23 @@ Applying the host snapshot makes many strategic structures equal, but it is not 
 The existing snapshot encoder is a useful source list, but an oracle needs a canonical semantic representation independent of the replication encoding.
 
 ## Findings and failure scenarios
+
+### Critical, confirmed: non-player combat record corrupted coarse synchronization state
+
+A reproduced Hydra combat exposed a restored structure-layout error. `s_network::player_net_info` was declared with only eight records even though combat code indexes participant IDs 0 through 14. The restored record is also 13 bytes because extended maps require a 16-bit `combat_star_id`, while the original executable used a 12-byte record with an 8-bit star ID.
+
+Hydra uses participant ID 14. With only eight restored records, writes through `player_net_info[14]` entered the placeholder region following the declared array. In the failing build, writing the ship-only combat planet ID `-1` overlapped `sync_state` and changed it to `255`. The host then left `Client_Combat_Loop_()` with two pending battle stars, released its stack-backed combat-search storage, and crashed on the following turn when stale `_n_battle_stars` caused `_battle_stars` to be dereferenced after it had been cleared.
+
+The confirming host trace was:
+
+```text
+Search_For_Battles_: combat loop exited sync=255 pending_stars=2
+Search_For_Battles_: releasing scratch pending_stars=2 sync=255
+```
+
+The corrected extended layout provides 15 records at the restored 13-byte width and removes the obsolete placeholder region. Compile-time assertions require the participant array to end exactly where `sync_state` begins. Combat scratch teardown also clears its count, and network combat updates are rejected outside the scratch lifetime. The same save now completes Hydra combat with `sync=35` (`COMBAT_COMPLETE`) and zero pending stars.
+
+This failure was not caused by a delayed `COMBAT_PHASE_COMPLETE` packet or by the existing nested-update guards. It demonstrates why participant-domain bounds, structure-layout assertions, and typed access to formerly anonymous storage are protocol correctness requirements rather than only memory-safety hardening.
 
 ### Critical: re-entrant mutation and call-order dependence
 
@@ -329,7 +350,7 @@ Startup, order collection, combat, diplomacy, tactical synchronization, send com
 Failure scenarios include:
 
 - The expected sender disconnects while the host is receiving that player's orders.
-- A diplomacy accept path waits while dispatch is suppressed by an outer receive callback.
+- A future packet handler calls a helper that synchronously waits for a response, while nested dispatch is suppressed until that handler returns.
 - A tactical action is overwritten in the single pending-message slot.
 - Router/session loss is logged but does not move the gameplay protocol to terminal recovery.
 - One peer rejects an invalid packet while other peers continue, leaving different barriers.
@@ -400,8 +421,9 @@ Send_Message()         submit bytes; never poll or dispatch inbound events
 `Dispatch_Game_Events()` is the only function allowed to invoke `Receive_Message_()`, disconnect handling, or another gameplay network handler. It should have a scoped `dispatch_active` guard:
 
 - An outer `Mox_Net_Update_()` polls and dispatches a bounded batch.
-- A nested `Mox_Net_Update_()` while a handler is active does not dispatch. It may set `dispatch_requested` and return.
-- After the current handler returns, the outer dispatcher may process the next queued event.
+- A nested `Mox_Net_Update_()` while a handler is active is a no-op.
+- After each handler returns, the outer dispatcher polls and checks the queue again, then may process the next queued event.
+- The outer dispatcher returns when no event is currently available or its event budget is exhausted. It never blocks waiting for a future packet.
 - Sound, rendering, and UI updates remain independent of gameplay dispatch.
 
 This boundary does not prevent diplomacy. Incoming diplomacy packets currently update request masks/state and return; the main-screen tick subsequently opens the request UI. If the player accepts, the acceptance wait calls `Mox_Update_()` from ordinary UI/game code, outside a receive handler, so matching responses can be dispatched normally. Any path that actually waits while still inside a receive handler must instead record pending state and return.
@@ -414,6 +436,38 @@ The dispatcher should be called from the existing outer update points rather tha
 - combat and diplomacy wait/UI ticks
 
 Calls from all of those places are safe because the dispatcher itself, rather than every caller, enforces non-reentrancy.
+
+### Existing synchronous waits
+
+The code already contains synchronous waits in startup, turn collection, combat, tactical synchronization, diplomacy UI, final snapshot reception, and send completion. These waits are compatible with the proposed dispatcher when they run from ordinary game or UI code:
+
+```text
+outer game wait
+  -> Mox_Update_()
+    -> outermost Mox_Net_Update_()
+      -> dispatch one or more handlers
+      -> handler changes the state tested by the wait and returns
+  -> wait observes the new state
+```
+
+The current receive families follow that rule:
+
+- `Main_Receive_Message_()` applies bounded state changes or decoding and returns.
+- `Diplomacy_Receive_Message_()` records response flags and returns.
+- `Tactical_Combat_Receive_Message_()` queues an action or updates a completion latch and returns.
+
+Some decode helpers call `Mox_Update_()` while a receive handler is active, but those calls are progress hints rather than network waits. They already cannot dispatch another packet while `_in_receive_message` is set.
+
+A synchronous wait becomes invalid only when entered on a gameplay-handler stack:
+
+```text
+outermost Mox_Net_Update_()
+  -> packet handler
+    -> wait for response
+      -> nested Mox_Net_Update_() is a no-op
+```
+
+The response cannot be dispatched until the current handler returns, while the handler refuses to return until the response is dispatched. This is a logical deadlock. Packet handlers may send or record pending work, but they must not call helpers that wait for another gameplay packet. Any such path found during the refactor must become a state transition or continuation resumed by a later outer update.
 
 ### Sends remain immediate
 
@@ -552,7 +606,7 @@ Dispatch_Game_Events() applies a bounded batch at a safe outer point
 Flush_Outgoing()       submits queued sends without receiving callbacks
 ```
 
-If `Dispatch_Game_Events()` is called while dispatching, set a `dispatch_requested` latch and return. The outer dispatcher can run another bounded pass after the current handler returns. This preserves prompt progress without recursive mutation.
+If `Dispatch_Game_Events()` is called while dispatching, return immediately. The outer dispatcher always polls and checks its queue after the current handler returns, so a separate deferred-dispatch latch is unnecessary. This preserves prompt progress without recursive mutation.
 
 Handlers that currently block while waiting for network state must return a pending result. The UI/main loop resumes them when a matching event advances their transaction. Sound and rendering updates remain callable without dispatching gameplay packets.
 
@@ -750,7 +804,9 @@ This phase must preserve the early-arriving final payload behavior tested in `te
 
 - A handler that requests another update never causes nested handler entry.
 - A handler that sends to the local host observes the same queued ordering as a remote send.
-- Multiple nested update requests set a deferred-work latch and are drained once by the outer dispatcher.
+- Multiple nested update requests are harmless no-ops, and the outer dispatcher still drains events that are currently available after the handler returns.
+- The outer dispatcher returns when no event is currently available rather than waiting for a future packet.
+- A gameplay handler attempting to enter a synchronous network wait fails an assertion in test builds.
 - Serializers can update sound/UI without dispatching a mutating packet.
 - A pending event received during snapshot capture is applied only after capture completes.
 - Dispatch budget exhaustion resumes on the next outer tick without dropping events.
@@ -771,6 +827,9 @@ Cover startup, turn orders, combat, diplomacy, dropout, and terminal session los
 
 Keep the current tests and add:
 
+- Hydra and every other non-player attacker ID through 14 use valid `player_net_info` storage and cannot alter `sync_state` through participant-record writes
+- the combat participant array contains 15 records and ends exactly at `sync_state` in every supported build layout
+- the reproduced Hydra turn reaches `COMBAT_COMPLETE` with zero pending battle stars and leaves no scratch state live after teardown
 - final game data arriving before the client's final wait is retained and consumed once
 - initial client state is decoded before its receive storage is released
 - nested update during snapshot and order encode/decode cannot mutate source/destination state

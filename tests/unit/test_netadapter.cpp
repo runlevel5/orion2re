@@ -1,6 +1,7 @@
 #include "doctest/doctest.h"
 
 #include "game/netadapter.h"
+#include "game/netcode_bootstrap.h"
 #include "network/router_protocol.h"
 #include "network/router_service.h"
 
@@ -123,6 +124,13 @@ bool Wait_For_Event_(netadapter::s_adapter* adapter, netadapter::s_event* event)
 }
 
 DOCTEST_TEST_SUITE("netadapter") {
+
+DOCTEST_TEST_CASE("LAN host bootstrap starts an embedded router for new and loaded games") {
+    DOCTEST_CHECK(netcode::Get_Router_Bootstrap_Mode_(0, NET_SYNC_STATE_HOST_STARTUP) == netadapter::BOOTSTRAP_EMBEDDED_LAN_HOST);
+    DOCTEST_CHECK(netcode::Get_Router_Bootstrap_Mode_(0, NET_SYNC_STATE_LOAD_GAME_HOST_SETUP) == netadapter::BOOTSTRAP_EMBEDDED_LAN_HOST);
+    DOCTEST_CHECK(netcode::Get_Router_Bootstrap_Mode_(0, NET_SYNC_STATE_CLIENT_JOINING) == netadapter::BOOTSTRAP_LAN_DISCOVERY);
+    DOCTEST_CHECK(netcode::Get_Router_Bootstrap_Mode_(1, NET_SYNC_STATE_LOAD_GAME_HOST_SETUP) == netadapter::BOOTSTRAP_DIRECT_ENDPOINT);
+}
 
 DOCTEST_TEST_CASE("adapter creates and joins router sessions and routes game packets") {
     s_router_config service_config;
