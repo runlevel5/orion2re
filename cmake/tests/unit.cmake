@@ -576,6 +576,7 @@ orion2re_add_unit_test(test_techinit
         tests/unit/test_techinit.cpp
     PRODUCTION_SOURCES
         src/game/techinit.cpp
+        src/game/techdata.cpp
     FAKE_SOURCES
         tests/fakes/fake_techinit_runtime.cpp
 )

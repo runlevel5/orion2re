@@ -247,7 +247,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:1230` - `torpedoes for satellites`: implemented in `INITSHIP::Best_Missile_Weapon_NT_()` with synchronized `combat satellite_uses_torpedoes` configuration; enabled defenses reuse the existing missile-and-torpedo selector, replacing the 1.50 global call diversion while preserving the classic default.
 - [ ] `asm.pl:1244` - `tractor power table`
 - [x] `asm.pl:1272` - `pre-warp refit requires just nuclear fission instead of cold fusion`: fixed in `COLBLDG::Evaluate_Input_()` by requiring Chemistry and Nuclear Fission for the colony refit action instead of Chemistry and Cold Fusion; this directly expresses the 1.50 technology-field byte replacement with named source constants.
-- [ ] `asm.pl:1331` - `strategic tech tree corrections`
+- [x] `asm.pl:1331` - `strategic tech tree corrections`: fixed in `TECHDATA::_technology_applications` by excluding Anti-Missile Rockets, Energy Absorber, Security Stations, and Warp Dissipator from strategic combat while including Warp Interdictor; direct source table corrections replace the five 1.50 binary data-byte edits.
 - [x] `asm.pl:1425` - `crew experience affects capture`: fixed in `CMBTFIR2::Resolve_Capture_()` by adding each participating ship's crew-quality ground-combat bonus to its capture modifiers; this replaces the 1.50 call-site wrappers with direct source-level bonus composition matching the existing raid path.
 - [ ] `asm.pl:1593` - `missile speed table`
 - [ ] `asm.pl:1613` - `TD ftl bonus`
