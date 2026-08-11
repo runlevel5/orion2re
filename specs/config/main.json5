@@ -520,6 +520,23 @@
       reject_unknown_numeric: true,
       values: { frigate: 0, destroyer: 1, cruiser: 2, battleship: 3, titan: 4 },
     },
+    combat_ship_size_class: {
+      title: "Combat ship size class",
+      description: "Hull size used to select the tactical Tractor Beam stopping threshold.",
+      remarks: "Includes Doom Star because tactical combat uses six size classes.",
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: {
+        frigate: 0,
+        destroyer: 1,
+        cruiser: 2,
+        battleship: 3,
+        titan: 4,
+        doomstar: 5,
+      },
+    },
     ship_drive: {
       title: "Ship drive",
       description: "FTL drive installed in a predefined ship design.",
@@ -1554,6 +1571,30 @@
         symbol: "COMBAT1::_non_ics_tractor_and_bhg_mode",
       },
       default: false,
+    },
+
+    tractors_to_stop: {
+      title: "Tractor Beams required to stop ships",
+      description: "Sets the number of Tractor Beams required to stop each combat ship size class.",
+      remarks: "Values below the threshold proportionally reduce speed. Zero makes the selected size class immobile during speed calculation. Defaults preserve classic behavior.",
+      examples: [
+        "combat tractors_to_stop destroyer = 2;",
+        "combat tractors_to_stop doomstar = 6;",
+      ],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: {
+        header: "game/combat1.h",
+        symbol: "COMBAT1::_tractors_to_stop",
+      },
+      type: {
+        kind: "array",
+        count: 6,
+        index_base: 0,
+        index_type: "combat_ship_size_class",
+        element: { type: "uint8" },
+      },
+      default: [1, 2, 3, 4, 5, 6],
     },
 
     recloak_next_turn: {

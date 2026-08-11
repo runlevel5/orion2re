@@ -7,6 +7,7 @@ namespace COMBAT1 {
     inline uint8_t _interactive_combat_stats = 0;
     inline uint8_t _continuous_bhg = 0;
     inline uint8_t _non_ics_tractor_and_bhg_mode = 0;
+    inline uint8_t _tractors_to_stop[SHIP_SIZE_COUNT] = {1, 2, 3, 4, 5, 6};
     inline uint8_t _recloak_next_turn = 0;
     inline uint8_t _rephase_cloak_next_turn = 0;
 

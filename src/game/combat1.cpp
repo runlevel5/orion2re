@@ -1209,10 +1209,16 @@ namespace COMBAT1 {
                     }
                 }
                 
-                if (MOX::_combat_data[ship_idx].size_class + 1 <= tractor_beams) {
+                const int8_t size_class = MOX::_combat_data[ship_idx].size_class;
+                int16_t tractors_to_stop = size_class + 1;
+                if (size_class >= 0 && size_class < SHIP_SIZE_COUNT) {
+                    tractors_to_stop = _tractors_to_stop[(uint8_t)size_class];
+                }
+
+                if (tractors_to_stop <= tractor_beams) {
                     speed = 0;
                 } else {
-                    speed += (int16_t)((speed * tractor_beams) / (-1 - MOX::_combat_data[ship_idx].size_class));
+                    speed -= (int16_t)((speed * tractor_beams) / tractors_to_stop);
                     if (speed < 1) {
                         speed = 1;
                     }
