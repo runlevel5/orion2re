@@ -17,7 +17,7 @@ namespace COMBAT1 {
 
         if (ship.owner >= 0 && ship.owner < MAX_PLAYERS &&
             MOX::_player[ship.owner].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-            speed += 4;
+            speed += _td_combat_speed_bonus;
         }
 
         return speed;
@@ -1190,7 +1190,7 @@ namespace COMBAT1 {
             }
             
             if (owner < MAX_PLAYERS && MOX::_player[owner].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-                speed += 4;
+                speed += _td_combat_speed_bonus;
             }
             
             if (speed > 0) {

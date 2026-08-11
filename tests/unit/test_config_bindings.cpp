@@ -648,6 +648,49 @@ DOCTEST_TEST_CASE("missile defense settings preserve classic defaults") {
     DOCTEST_CHECK(CMBTMIS::missile_defense.displacement_device_missiles_miss_percent == 35);
 }
 
+DOCTEST_TEST_CASE("missile speed settings preserve and replace 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMIS::speed_base.nuclear_missile == 12);
+    DOCTEST_CHECK(CMBTMIS::speed_base.plasma_torpedo == 24);
+    DOCTEST_CHECK(CMBTMIS::speed_base.interceptor == 10);
+    DOCTEST_CHECK(CMBTMIS::speed_base.assault_shuttle == 6);
+    DOCTEST_CHECK(CMBTMIS::_speed_fast_bonus == 4);
+    DOCTEST_CHECK(COMBAT1::_td_combat_speed_bonus == 4);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat speed_base nuclear_missile = 15;"
+        "combat speed_base interceptor = 13;"
+        "combat speed_fast_bonus = 7;"
+        "combat td_combat_speed_bonus = 6;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMIS::speed_base.nuclear_missile == 15);
+    DOCTEST_CHECK(CMBTMIS::speed_base.interceptor == 13);
+    DOCTEST_CHECK(CMBTMIS::_speed_fast_bonus == 7);
+    DOCTEST_CHECK(COMBAT1::_td_combat_speed_bonus == 6);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat speed_base nuclear_missile = 65536;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat speed_fast_bonus = 256;", &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat td_combat_speed_bonus = 256;", &writes, &diagnostic));
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+}
+
 DOCTEST_TEST_CASE("alternative refit formula preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

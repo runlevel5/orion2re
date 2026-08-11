@@ -12,6 +12,7 @@ namespace {
     int16_t fleet_defensive_bonus;
     int16_t fleet_defensive_player;
     int16_t fleet_defensive_mode;
+    int16_t best_warp_drive = 1;
 }
 
 namespace TEST_FIGHTER_RETARGETING {
@@ -70,7 +71,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Best_Warp_Drive_(int16_t) {
-        return 1;
+        return best_warp_drive;
     }
 }
 
@@ -100,6 +101,61 @@ DOCTEST_TEST_CASE("fighter defense includes the fleet helmsman bonus") {
     DOCTEST_CHECK(CMBTMIS::Missile_Dcv_(WEAPON_INTERCEPTOR, 3) == 82);
     DOCTEST_CHECK(fleet_defensive_player == 3);
     DOCTEST_CHECK(fleet_defensive_mode == 0);
+}
+
+DOCTEST_TEST_CASE("missile speed table preserves classic flyer speeds") {
+    memset(players, 0, sizeof(players));
+    best_warp_drive = 1;
+    COMBAT1::_td_combat_speed_bonus = 4;
+    CMBTMIS::_speed_fast_bonus = 4;
+
+    struct s_speed_case {
+        int16_t weapon;
+        int16_t expected;
+    };
+    const s_speed_case cases[] = {
+        { WEAPON_NUCLEAR_MISSILE, 12 },
+        { WEAPON_MERCULITE_MISSILE, 12 },
+        { WEAPON_PULSON_MISSILE, 12 },
+        { WEAPON_ZEON_MISSILE, 12 },
+        { WEAPON_ANTI_MATTER_TORP, 20 },
+        { WEAPON_PROTON_TORPEDO, 20 },
+        { WEAPON_PLASMA_TORPEDO, 24 },
+        { WEAPON_DRAGON_BREATH, 24 },
+        { WEAPON_INTERCEPTOR, 10 },
+        { WEAPON_ASSAULT_SHUTTLE, 6 },
+        { WEAPON_BOMBER, 8 },
+        { WEAPON_HEAVY_FIGHTER, 8 },
+    };
+
+    for (const s_speed_case& speed_case : cases) {
+        DOCTEST_CHECK(CMBTMIS::Missile_Speed_(speed_case.weapon, 0, 0) ==
+                      speed_case.expected);
+    }
+}
+
+DOCTEST_TEST_CASE("missile speed uses configured base and bonus values") {
+    memset(players, 0, sizeof(players));
+    const CMBTMIS::s_missile_speed_base original_speed_base = CMBTMIS::speed_base;
+    const uint8_t original_fast_bonus = CMBTMIS::_speed_fast_bonus;
+    const uint8_t original_td_bonus = COMBAT1::_td_combat_speed_bonus;
+
+    CMBTMIS::speed_base.nuclear_missile = 15;
+    CMBTMIS::speed_base.interceptor = 13;
+    CMBTMIS::_speed_fast_bonus = 7;
+    COMBAT1::_td_combat_speed_bonus = 6;
+    best_warp_drive = 3;
+    players[0].traits[TRAIT_TRANS_DIMENSIONAL] = 1;
+
+    DOCTEST_CHECK(CMBTMIS::Missile_Speed_(WEAPON_NUCLEAR_MISSILE, 0, 0) == 19);
+    DOCTEST_CHECK(CMBTMIS::Missile_Speed_(
+                      WEAPON_NUCLEAR_MISSILE, WEAPON_MOD_FLAG_FAST, 0) == 26);
+    DOCTEST_CHECK(CMBTMIS::Missile_Speed_(WEAPON_INTERCEPTOR, 0, 0) == 23);
+
+    CMBTMIS::speed_base = original_speed_base;
+    CMBTMIS::_speed_fast_bonus = original_fast_bonus;
+    COMBAT1::_td_combat_speed_bonus = original_td_bonus;
+    best_warp_drive = 1;
 }
 
 DOCTEST_TEST_CASE("missile defense percentage rolls include their threshold") {

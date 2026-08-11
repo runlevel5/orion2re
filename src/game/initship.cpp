@@ -623,7 +623,7 @@ namespace INITSHIP {
             attack_bonus += (int16_t)owner_player->traits[TRAIT_SHIP_ATTACK];
 
             if (owner_player->traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-                defense_bonus += 20;
+                defense_bonus += COMBAT1::_td_combat_speed_bonus * 5;
             }
         }
 

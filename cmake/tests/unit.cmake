@@ -370,6 +370,9 @@ orion2re_add_unit_test(test_missile_defense
         tests/unit/test_missile_defense.cpp
     PRODUCTION_SOURCES
         src/game/cmbtmis.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_exitm.cpp
+        tests/fakes/fake_fields_helpers_runtime.cpp
 )
 
 orion2re_add_unit_test(test_combat_stats

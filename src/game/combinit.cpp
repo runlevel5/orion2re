@@ -177,7 +177,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     if (MOX::_global_combat_data.owner < MAX_PLAYERS) {
         if (MOX::_player[MOX::_global_combat_data.owner].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
-            MOX::_global_combat_data.current_speed += 4;
+            MOX::_global_combat_data.current_speed += COMBAT1::_td_combat_speed_bonus;
         }
     }
 }

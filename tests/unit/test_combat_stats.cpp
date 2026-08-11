@@ -170,6 +170,18 @@ DOCTEST_TEST_CASE("tractor speed uses the configured hull threshold") {
     DOCTEST_CHECK(COMBAT1::Calc_Current_Speed_(0) == 3);
 }
 
+DOCTEST_TEST_CASE("Trans-Dimensional combat speed uses the configured bonus") {
+    TEST_TRACTOR_POWER::Reset_();
+    MOX::_combat_total_ship_count = 1;
+    MOX::_combat_data[0].owner = 0;
+    MOX::_player[0].traits[TRAIT_TRANS_DIMENSIONAL] = 1;
+    COMBAT1::_td_combat_speed_bonus = 7;
+
+    DOCTEST_CHECK(COMBAT1::Calc_Current_Speed_(0) == 17);
+
+    COMBAT1::_td_combat_speed_bonus = 4;
+}
+
 DOCTEST_TEST_CASE("destroyed cloak devices update combat cloak state") {
     int8_t cloak_state = 1;
     COMBAT1::Handle_Destroyed_Cloak_(&cloak_state, 0, false, false, false);

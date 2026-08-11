@@ -5,6 +5,7 @@ namespace COMBAT1 {
     extern int32_t _end_of_turn_button;
 
     inline uint8_t _interactive_combat_stats = 0;
+    inline uint8_t _td_combat_speed_bonus = 4;
     inline uint8_t _continuous_bhg = 0;
     inline uint8_t _non_ics_tractor_and_bhg_mode = 0;
     inline uint8_t _tractors_to_stop[SHIP_SIZE_COUNT] = {1, 2, 3, 4, 5, 6};

@@ -831,6 +831,24 @@
         },
       ],
     },
+    missile_speed_base: {
+      title: "Missile and fighter base speeds",
+      description: "Base tactical speed for supported missiles, torpedoes, breath weapons, and fighter craft.",
+      fields: [
+        { id: "nuclear_missile", title: "Nuclear Missile", description: "Base speed of Nuclear Missiles.", type: "uint16", bind: ["nuclear_missile"] },
+        { id: "merculite_missile", title: "Merculite Missile", description: "Base speed of Merculite Missiles.", type: "uint16", bind: ["merculite_missile"] },
+        { id: "pulson_missile", title: "Pulson Missile", description: "Base speed of Pulson Missiles.", type: "uint16", bind: ["pulson_missile"] },
+        { id: "zeon_missile", title: "Zeon Missile", description: "Base speed of Zeon Missiles.", type: "uint16", bind: ["zeon_missile"] },
+        { id: "anti_matter_torpedo", title: "Anti-Matter Torpedo", description: "Base speed of Anti-Matter Torpedoes.", type: "uint16", bind: ["anti_matter_torpedo"] },
+        { id: "proton_torpedo", title: "Proton Torpedo", description: "Base speed of Proton Torpedoes.", type: "uint16", bind: ["proton_torpedo"] },
+        { id: "plasma_torpedo", title: "Plasma Torpedo", description: "Base speed of Plasma Torpedoes.", type: "uint16", bind: ["plasma_torpedo"] },
+        { id: "plasma_breath", title: "Plasma Breath", description: "Base speed of Dragon Breath attacks.", type: "uint16", bind: ["plasma_breath"] },
+        { id: "interceptor", title: "Interceptor", description: "Base speed of Interceptors.", type: "uint16", bind: ["interceptor"] },
+        { id: "assault_shuttle", title: "Assault Shuttle", description: "Base speed of Assault Shuttles.", type: "uint16", bind: ["assault_shuttle"] },
+        { id: "bomber", title: "Bomber", description: "Base speed of Bombers.", type: "uint16", bind: ["bomber"] },
+        { id: "heavy_fighter", title: "Heavy Fighter", description: "Base speed of Heavy Fighters.", type: "uint16", bind: ["heavy_fighter"] },
+      ],
+    },
     autobuild_settings: {
       title: "Experimental autobuild settings",
       description: "Controls queue-driven colony autobuild behavior.",
@@ -1751,6 +1769,47 @@
         cloaking_device_missile_miss_percent: 50,
         displacement_device_missiles_miss_percent: 30,
       },
+    },
+
+    speed_base: {
+      title: "Missile and fighter base speeds",
+      description: "Configures the base tactical speed of each supported flyer.",
+      examples: ["combat speed_base plasma_torpedo = 24;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "missile_speed_base",
+      bind_root: { header: "game/cmbtmis.h", symbol: "CMBTMIS::speed_base" },
+      default: {
+        nuclear_missile: 12, merculite_missile: 12,
+        pulson_missile: 12, zeon_missile: 12,
+        anti_matter_torpedo: 20, proton_torpedo: 20,
+        plasma_torpedo: 24, plasma_breath: 24,
+        interceptor: 10, assault_shuttle: 6,
+        bomber: 8, heavy_fighter: 8,
+      },
+    },
+
+    speed_fast_bonus: {
+      title: "Fast flyer speed bonus",
+      description: "Adds this tactical speed to flyers with the Fast modification.",
+      examples: ["combat speed_fast_bonus = 4;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      default: 4,
+      bind_root: { header: "game/cmbtmis.h", symbol: "CMBTMIS::_speed_fast_bonus" },
+    },
+
+    td_combat_speed_bonus: {
+      title: "Trans-Dimensional tactical speed bonus",
+      description: "Adds this speed to Trans-Dimensional ships and fighter craft.",
+      remarks: "Ship defense receives five times this value, matching MOO2 1.50.",
+      examples: ["combat td_combat_speed_bonus = 4;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      default: 4,
+      bind_root: { header: "game/combat1.h", symbol: "COMBAT1::_td_combat_speed_bonus" },
     },
 
     alternative_refit: {
