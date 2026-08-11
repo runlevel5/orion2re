@@ -88,6 +88,31 @@ DOCTEST_TEST_CASE("configured Housing growth bypasses farmer assignment") {
     DOCTEST_CHECK(New_Colonist_Job_(colony) == 1);
 }
 
+DOCTEST_TEST_CASE("reported population capacities do not exceed colony storage") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    const int8_t previous_max_population =
+        MOX::_planet_max_population[PLANET_SIZE_HUGE];
+    MOX::_planet_max_population[PLANET_SIZE_HUGE] = 50;
+
+    s_planet_data* planet = &MOX::_planet[0];
+    planet->colony_index = -1;
+    planet->size = PLANET_SIZE_HUGE;
+    planet->climate = PLANET_CLIMATE_GAIA;
+
+    DOCTEST_CHECK(COLCALC::Planet_Max_Population_For_Player_(planet, 0) == 42);
+
+    s_colony* colony = &MOX::_colony[0];
+    colony->owner = 0;
+    colony->planet = 0;
+    colony->climate = PLANET_CLIMATE_GAIA;
+
+    DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit_(colony, 0) == 42);
+
+    MOX::_planet_max_population[PLANET_SIZE_HUGE] =
+        previous_max_population;
+}
+
 DOCTEST_TEST_CASE("classic starvation preserves the final population") {
     s_colony* colony = Prepare_Starving_Colony_();
 
