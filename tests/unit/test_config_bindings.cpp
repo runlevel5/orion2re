@@ -446,6 +446,30 @@ DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
         &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("Trade Goods ratios preserve 1.50 defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::trade_goods_ratio.normal == 50);
+    DOCTEST_CHECK(COLCALC::trade_goods_ratio.fantastic_traders == 100);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony trade_goods_ratio normal = 40;"
+        "colony trade_goods_ratio fantastic_traders = 175;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::trade_goods_ratio.normal == 40);
+    DOCTEST_CHECK(COLCALC::trade_goods_ratio.fantastic_traders == 175);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony trade_goods_ratio normal = 65536;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("Food Replicator costs preserve 1.50 defaults and validate their range") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

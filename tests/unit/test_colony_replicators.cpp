@@ -54,6 +54,33 @@ DOCTEST_TEST_CASE("government economy bonuses apply generically to every governm
     TEST_GOVERNMENT_BONUS::Cleanup_();
 }
 
+DOCTEST_TEST_CASE("configured Trade Goods ratios apply by Fantastic Traders trait") {
+    TEST_GOVERNMENT_BONUS::Reset_();
+
+    s_colony* colony = &MOX::_colony[0];
+    colony->n_pops = 1;
+    colony->producing[0] = COLONY_PRODUCTION_TRADE_GOODS;
+    colony->production[ECON_INDUSTRY] = 9;
+
+    COLCALC::Colony_BC_Production_(colony, nullptr);
+    DOCTEST_CHECK(colony->production[ECON_BC] == 6);
+
+    MOX::_player[0].traits[TRAIT_FANTASTIC_TRADERS] = 1;
+    COLCALC::Colony_BC_Production_(colony, nullptr);
+    DOCTEST_CHECK(colony->production[ECON_BC] == 10);
+
+    COLCALC::trade_goods_ratio = {40, 175};
+    MOX::_player[0].traits[TRAIT_FANTASTIC_TRADERS] = 0;
+    COLCALC::Colony_BC_Production_(colony, nullptr);
+    DOCTEST_CHECK(colony->production[ECON_BC] == 5);
+
+    MOX::_player[0].traits[TRAIT_FANTASTIC_TRADERS] = 1;
+    COLCALC::Colony_BC_Production_(colony, nullptr);
+    DOCTEST_CHECK(colony->production[ECON_BC] == 17);
+
+    TEST_GOVERNMENT_BONUS::Cleanup_();
+}
+
 DOCTEST_TEST_CASE("Scout Lab research uses the configured bonus for every ship size") {
     for (uint8_t size_class = 0; size_class < SHIP_SIZE_COUNT; ++size_class) {
         TEST_PLAYER_STATS::Reset_();

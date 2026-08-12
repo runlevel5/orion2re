@@ -32,6 +32,11 @@ namespace COLCALC {
         -200,
     };
 
+    s_trade_goods_ratio trade_goods_ratio = {
+        50,
+        100,
+    };
+
     uint8_t _pop_bonus_biospheres = 2;
     uint8_t _housing_creates_no_farmers = 0;
     uint8_t _planet_extinction = 0;

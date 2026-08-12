@@ -1062,10 +1062,10 @@ namespace COLCALC {
             producing == COLONY_PRODUCTION_TRADE_GOODS) {
             int surplus_ind = (int)colony->production[ECON_INDUSTRY] - (int)colony->maintenance[ECON_INDUSTRY];
             if (surplus_ind > 0) {
-                trade_goods_bc = surplus_ind;
-                if (owner_ptr->traits[TRAIT_FANTASTIC_TRADERS] == 0) {
-                    trade_goods_bc = (surplus_ind + 1) / 2;
-                }
+                uint16_t ratio = owner_ptr->traits[TRAIT_FANTASTIC_TRADERS] == 0
+                    ? trade_goods_ratio.normal
+                    : trade_goods_ratio.fantastic_traders;
+                trade_goods_bc = (surplus_ind * (int)ratio + 99) / 100;
             }
         }
 

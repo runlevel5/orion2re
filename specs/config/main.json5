@@ -803,6 +803,14 @@
     },
   },
   records: {
+    trade_goods_ratio: {
+      title: "Trade Goods conversion ratios",
+      description: "Production-to-BC conversion percentages for normal and Fantastic Traders races.",
+      fields: [
+        { id: "normal", title: "Normal", description: "Conversion percentage without Fantastic Traders.", type: "uint16", bind: ["normal"] },
+        { id: "fantastic_traders", title: "Fantastic Traders", description: "Conversion percentage with Fantastic Traders.", type: "uint16", bind: ["fantastic_traders"] },
+      ],
+    },
     government_bonus: {
       title: "Government bonuses",
       description: "Cost and economy modifiers supplied by one government type.",
@@ -1073,6 +1081,24 @@
   },
 
   parameters: {
+    trade_goods_ratio: {
+      title: "Trade Goods conversion ratios",
+      description: "Configures the percentage of positive net industry converted to BC by Trade Goods.",
+      remarks: "Results round upward. Defaults preserve classic behavior and match MOO2 1.50.",
+      examples: [
+        "colony trade_goods_ratio normal = 50;",
+        "colony trade_goods_ratio fantastic_traders = 100;",
+      ],
+      units: "percent",
+      group: "gameplay",
+      namespace: "colony",
+      type: "trade_goods_ratio",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::trade_goods_ratio",
+      },
+      default: { normal: 50, fantastic_traders: 100 },
+    },
     govt_bonus: {
       title: "Government bonuses",
       description: "Configures cost, research, income, food, and production modifiers for every government.",

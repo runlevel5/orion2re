@@ -38,6 +38,13 @@ namespace COLCALC {
     };
 
     extern s_growth_rate_bonus growth_rate_bonus;
+
+    struct s_trade_goods_ratio {
+        uint16_t normal;
+        uint16_t fantastic_traders;
+    };
+
+    extern s_trade_goods_ratio trade_goods_ratio;
     extern uint8_t _pop_bonus_biospheres;
 
     extern uint8_t _housing_creates_no_farmers;

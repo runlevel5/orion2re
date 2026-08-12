@@ -16,6 +16,7 @@ namespace TEST_COLONY_REPLICATORS {
         TECHDATA::_buildings[BUILDING_AUTOMATED_FACTORY].maintenance = 2;
         COLCALC::_replicator_food_pp = 2;
         COLCALC::_replicator_food_bc = 1;
+        COLCALC::trade_goods_ratio = {50, 100};
     }
 }
 

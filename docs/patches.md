@@ -280,7 +280,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:6645` - `command points`
 - [x] `asm.pl:6772` - `feudal cost reduction`: implemented in `DESIGN::Cost_Reduction_For_Govt_Type_()` with synchronized government-indexed cost-reduction ratios; the shared source helper replaces the 1.50 all-call diversion and generalizes the setting to every government while preserving classic defaults.
 - [x] `asm.pl:8411` - `specials repair percent`: implemented in `CMBTFIR2::Repair_Combat_Ship_()` with synchronized `combat systems_repair_percent` configuration; direct source-level scaling replaces the 1.50 arithmetic helper while preserving the classic 50 percent default.
-- [ ] `asm.pl:8433` - `trade goods`
+- [x] `asm.pl:8433` - `trade goods`: implemented in `COLCALC::Colony_BC_Production_()` with synchronized `colony trade_goods_ratio` settings for normal and Fantastic Traders conversion; direct source-level percentage selection replaces the 1.50 register-preserving assembly diversion while preserving classic 50/100 defaults.
 - [ ] `asm.pl:8468` - `rotate warning`
 - [ ] `asm.pl:8604` - `postwarp techtable length`
 - [ ] `asm.pl:9036` - `no engine explosion`
