@@ -11,6 +11,14 @@ namespace COLCALC {
 
     extern s_lander_ship_cost lander_ship_cost;
 
+    struct s_misc_costs {
+        uint16_t android_farmer;
+        uint16_t android_worker;
+        uint16_t android_scientist;
+    };
+
+    extern s_misc_costs misc_costs;
+
     struct s_growth_rate_bonus {
         uint8_t general_modifier;
         uint8_t microbiotics_tech;

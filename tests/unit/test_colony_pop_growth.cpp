@@ -262,6 +262,19 @@ DOCTEST_TEST_CASE("landing ship costs are selected independently") {
     DOCTEST_CHECK(COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_TRANSPORT, 0) == 80);
 }
 
+DOCTEST_TEST_CASE("Android production costs are selected independently") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_colony* colony = &MOX::_colony[0];
+    COLCALC::misc_costs.android_farmer = 30;
+    COLCALC::misc_costs.android_worker = 40;
+    COLCALC::misc_costs.android_scientist = 60;
+
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_FARMER) == 30);
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_WORKER) == 40);
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_SCIENTIST) == 60);
+}
+
 DOCTEST_TEST_CASE("completed building grants no maintenance cash") {
     s_colony* colony = Prepare_Completed_Product_(BUILDING_MARINE_BARRACKS, 60);
     TECHDATA::_buildings[BUILDING_MARINE_BARRACKS].cost = 60;

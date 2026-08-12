@@ -18,7 +18,7 @@ Use the `grpc` skill for all Ghidra access and follow its read-only and assembly
 Use of `agent-helper` is optional. Delegate bounded, read-only evidence collection only when it reduces parent-agent
 work; there is no requirement to invoke it in any phase or at every affected location. Suitable tasks include:
 
-- locating and inventorying the selected topic in `docs/patches.md`, `asm.pl`, `patch.c`, symbols, and history
+- locating and inventorying the selected topic in `docs/patches.md`, `docs/150vars.md`, `asm.pl`, `patch.c`, symbols, and history
 - calculating candidate file-offset-to-address mappings from patcher section metadata
 - collecting Ghidra program metadata, bytes, disassembly, cross-references, callers, callees, and decompiler output
 - locating semantic equivalents, style requirements, configuration definitions, generated-code workflows, and tests
@@ -125,6 +125,11 @@ Use these sources in this order:
 4. MOO2150 history and changelog as supporting evidence.
 5. The current restored source tree as the integration target.
 
+`docs/150vars.md` is the repository's variable migration catalog and a required discovery aid, but it is not a
+substitute for the authoritative `conf.pl` and `asm.pl` definitions. Use it to identify configuration variables,
+patch-owned writable state, and original-executable writable aliases that may belong to the selected topic, then
+verify every relevant entry against the authoritative MOO2150 sources and Ghidra where applicable.
+
 Decompiler output is only a hint. Validate behavior against disassembly, control flow, loads, stores, call setup, extension instructions, and original bytes.
 
 The patcher's `off` value may be an executable file offset rather than a loaded Ghidra address. Never use it as a Ghidra address without proving the mapping. Resolve it through program memory-block source information, known symbols, patch tooling, or a verified file-offset-to-address mapping.
@@ -179,7 +184,12 @@ The known 1.40-versus-1.50-base version difference is expected and is not by its
 
 ### 2. Locate the authoritative patch topic
 
-Search `docs/patches.md` and `C:\Projects\MOO2150\src\asm.pl` for the requested change.
+Search `docs/patches.md`, `docs/150vars.md`, and `C:\Projects\MOO2150\src\asm.pl` for the requested change.
+
+In `docs/150vars.md`, search the topic name, `asm.pl` line range, known configuration names, `var_*` symbols,
+original-executable aliases, affected function and subsystem names, and nearby offsets. Treat its entries and checkbox
+states as catalog hints that must be reconciled with current source and the authoritative MOO2150 files, not as proof
+that a variable is related, fully restored, or no longer needed.
 
 Also locate `conf.pl` in the MOO2150 tree and search it for variables related to the topic. Search by more than exact
 references from the selected `asm.pl` block: include the topic words and abbreviations, affected functions and
@@ -200,6 +210,7 @@ Record:
 - expected original chunks (`cchunk`)
 - replacement chunks (`pchunk`)
 - added code/data and diversion targets
+- every matching or potentially related `docs/150vars.md` entry and its current catalog status
 - every variable and configuration variable related to the selected topic, including definitions found in `conf.pl`
   or its available replacements; record its external and internal names, type, default value, limits, parser metadata,
   storage or patch offsets, synchronization/save behavior, and every reference or binary write site
@@ -325,6 +336,11 @@ Before the suggested diffs, include two short implementation paragraphs:
 
 Suggested diffs must be based on complete current file contents, not summaries. Keep them focused; do not print complete files.
 
+When the implementation resolves entries in `docs/150vars.md`, include the corresponding catalog checkbox updates
+in the proposed documentation diffs. Do not mark a configuration variable complete until an exact same-named
+parameter exists in `specs/config/main.json5`; do not mark patch-owned writable state complete until its owning topic
+has been reviewed and the scratch state has been restored semantically or proven unnecessary.
+
 End by explicitly asking the user to approve, revise, or reject the proposal.
 
 Do not apply changes until the user clearly approves. Analysis requests, clarifying questions, or general agreement with the bug do not count as approval of the proposed diffs.
@@ -347,7 +363,7 @@ After approval:
 
 If implementation requires a material departure from the approved diffs, stop and obtain approval for the revised proposal before continuing.
 
-### 8. Update the migration catalog
+### 8. Update the migration catalogs
 
 If the selected change has an entry in `docs/patches.md`, update that entry only after the source fix is implemented and validated.
 
@@ -367,6 +383,19 @@ If analysis proves the current code already contains an equivalent complete fix,
 
 If the topic is absent from `docs/patches.md`, do not invent a duplicate topic automatically. Mention the absence and propose an entry only if it is needed for catalog completeness.
 
+Also reconcile every topic-related entry in `docs/150vars.md` after implementation and validation:
+
+- For configuration variables, change `[ ]` to `[x]` only when an exact same-named parameter exists in
+  `specs/config/main.json5`, and add or preserve the namespace-qualified current key after `->`.
+- For patch-owned writable state, change `[ ]` to `[x]` when the owning `docs/patches.md` topic has been reviewed and
+  the binary scratch state is no longer pending literal restoration, whether source replaces it with local state,
+  authoritative existing state, or a direct invariant.
+- Original-executable writable aliases have no checkbox. Use them as navigation evidence and do not add completion
+  markers to them.
+
+Do not update unrelated variable entries, infer completion solely from the topic checkbox, or use the catalog to
+avoid verifying definitions, metadata, storage, and use sites in the authoritative sources.
+
 ### 9. Final verification and report
 
 Before finishing:
@@ -380,6 +409,7 @@ Before finishing:
 - build the project and run the relevant tests; tests are required validation and must not be deferred solely because they compile code
 - confirm no cross-platform build was used as validation and no compile command limited the available build threads
 - verify the catalog entry describes the implemented fix accurately
+- verify every related `docs/150vars.md` entry has the correct status and current configuration key, when applicable
 - confirm no unrelated files changed
 
 Report:
@@ -387,7 +417,7 @@ Report:
 - the actual bug and what the patch fixes, or the behavior or feature change when the topic is not a bug fix
 - the restored semantic fix
 - static checks, build, and tests run, including their results
-- catalog status update
+- topic and variable catalog status updates
 - any unresolved uncertainty or follow-up topic
 
 Do not show a final diff after applying; summarize the result concisely.
@@ -414,6 +444,7 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Specific 1.50 topic selected.
 - [ ] Open Ghidra program confirmed as the expected Orion2 1.40 variant and the difference from the 1.50 patch base recorded.
 - [ ] Every patch block in the topic inventoried.
+- [ ] `docs/150vars.md` searched by topic, line range, variable, alias, function, subsystem, and offset, with every potentially related entry reconciled against authoritative sources.
 - [ ] `conf.pl` located and searched by topic, symbol, function, and offset, or its repository-wide absence recorded and equivalent configuration registries searched instead.
 - [ ] Original locations and bytes/instructions verified.
 - [ ] Patched behavior reconstructed, including C implementation refinements.
@@ -429,3 +460,4 @@ Do not weaken a stop condition merely to make progress.
 - [ ] No MinGW or other cross-platform build was used as validation, and no compile command used `-j`, `--jobs`, or a numeric parallel limit.
 - [ ] Static checks, full native Linux Debug project build, focused and complete tests, and `git diff --check` passed.
 - [ ] Matching `docs/patches.md` item completed with a short semantic descriptor.
+- [ ] Matching `docs/150vars.md` configuration and patch-owned-state entries updated according to the catalog's completion rules.

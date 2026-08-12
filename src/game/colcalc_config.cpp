@@ -7,6 +7,12 @@ namespace COLCALC {
         100,
     };
 
+    s_misc_costs misc_costs = {
+        50,
+        50,
+        50,
+    };
+
     s_growth_rate_bonus growth_rate_bonus = {
         0,
         25,

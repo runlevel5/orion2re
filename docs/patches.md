@@ -262,7 +262,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:2948` - `sfx in flics`: implemented in `SMACK::Play_Cinematic_()` and `smckplay::Open_Smacker_Animation_()` by enabling embedded cinematic audio when either music or sound effects are enabled; this replaces the 1.50 call-site wrapper with an explicit source-level audio policy.
 - [ ] `asm.pl:3286` - `teleporters and boarding`
 - [ ] `asm.pl:3935` - `stealth landers`
-- [ ] `asm.pl:4444` - `android cost`
+- [x] `asm.pl:4444` - `android cost`: implemented with synchronized `colony misc_costs` Android settings and independent selection in `COLCALC::Colony_Product_Cost_()`; direct source lookups replace the 1.50 code-cave indexing while preserving classic 50/50/50 defaults.
 - [ ] `asm.pl:4766` - `moving farmer`
 - [ ] `asm.pl:4813` - `absorber, damper`
 - [ ] `asm.pl:4912` - `phasing cloak shwifty`

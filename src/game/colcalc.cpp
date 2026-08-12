@@ -2632,10 +2632,16 @@ namespace COLCALC {
                 return 100;
 
             case COLONY_PRODUCTION_FREIGHTERS:
-            case COLONY_PRODUCTION_SCIENTIST:
-            case COLONY_PRODUCTION_WORKER:
-            case COLONY_PRODUCTION_FARMER:
                 return 50;
+
+            case COLONY_PRODUCTION_FARMER:
+                return misc_costs.android_farmer;
+
+            case COLONY_PRODUCTION_WORKER:
+                return misc_costs.android_worker;
+
+            case COLONY_PRODUCTION_SCIENTIST:
+                return misc_costs.android_scientist;
 
             default:
                 return 0;

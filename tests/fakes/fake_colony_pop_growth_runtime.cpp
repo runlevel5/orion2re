@@ -47,6 +47,9 @@ namespace TEST_COLONY_POP_GROWTH {
         COLCALC::lander_ship_cost.colony_ship = 500;
         COLCALC::lander_ship_cost.outpost_ship = 100;
         COLCALC::lander_ship_cost.transport_ship = 100;
+        COLCALC::misc_costs.android_farmer = 50;
+        COLCALC::misc_costs.android_worker = 50;
+        COLCALC::misc_costs.android_scientist = 50;
     }
 
     int32_t Destroy_Colony_Reason_() {

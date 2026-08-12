@@ -787,6 +787,15 @@
         { id: "transport_ship", title: "Transport", description: "Base production cost of a Transport.", type: "int32", bind: ["transport_ship"] },
       ],
     },
+    misc_costs: {
+      title: "Miscellaneous production costs",
+      description: "Production costs for Android population types.",
+      fields: [
+        { id: "android_farmer", title: "Android Farmer", description: "Production cost of an Android Farmer.", type: "uint16", constraints: { max: 32767 }, bind: ["android_farmer"] },
+        { id: "android_worker", title: "Android Worker", description: "Production cost of an Android Worker.", type: "uint16", constraints: { max: 32767 }, bind: ["android_worker"] },
+        { id: "android_scientist", title: "Android Scientist", description: "Production cost of an Android Scientist.", type: "uint16", constraints: { max: 32767 }, bind: ["android_scientist"] },
+      ],
+    },
     growth_rate_bonus: {
       title: "Population growth-rate modifiers",
       description: "Additional percentage modifiers used by colony population growth.",
@@ -999,6 +1008,29 @@
         colony_ship: 500,
         outpost_ship: 100,
         transport_ship: 100,
+      },
+    },
+    misc_costs: {
+      title: "Miscellaneous production costs",
+      description: "Configures each Android population type's production cost independently.",
+      remarks: "Defaults preserve classic costs and match MOO2 1.50.",
+      examples: [
+        "colony misc_costs android_farmer = 50;",
+        "colony misc_costs android_worker = 50;",
+        "colony misc_costs android_scientist = 50;",
+      ],
+      units: "production points",
+      group: "gameplay",
+      namespace: "colony",
+      type: "misc_costs",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::misc_costs",
+      },
+      default: {
+        android_farmer: 50,
+        android_worker: 50,
+        android_scientist: 50,
       },
     },
     growth_rate_bonus: {
