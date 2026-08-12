@@ -1,6 +1,17 @@
 #include "pch.h"
 
 namespace COLCALC {
+    s_government_bonus government_bonuses[GOVERNMENT_COUNT] = {
+        { { 1, 3 }, -10, 0, 0, 0 },
+        { { 2, 3 }, -5, 0, 0, 0 },
+        { { 0, 1 }, 0, 0, 0, 0 },
+        { { 0, 1 }, 0, 0, 0, 0 },
+        { { 0, 1 }, 10, 10, 0, 0 },
+        { { 0, 1 }, 15, 15, 0, 0 },
+        { { 0, 1 }, 0, 0, 10, 10 },
+        { { 0, 1 }, 0, 0, 20, 20 },
+    };
+
     s_lander_ship_cost lander_ship_cost = {
         500,
         100,

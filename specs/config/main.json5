@@ -69,6 +69,13 @@
         galactic_unification: 7,
       },
     },
+    ratio16: {
+      title: "16-bit ratio",
+      description: "A signed fractional value written as numerator/denominator.",
+      remarks: "Used for exact gameplay fractions whose numerator and denominator fit signed 16-bit storage.",
+      kind: "ratio",
+      component_type: "int16",
+    },
     stock_race_index: {
       title: "Stock race table index",
       description: "Index into the thirteen-entry table of predefined races.",
@@ -796,6 +803,23 @@
     },
   },
   records: {
+    government_bonus: {
+      title: "Government bonuses",
+      description: "Cost and economy modifiers supplied by one government type.",
+      fields: [
+        {
+          id: "cost_reduction",
+          title: "Cost reduction",
+          description: "Fraction subtracted from affected ship and landing-ship costs.",
+          type: "ratio16",
+          bind: ["cost_reduction.numerator", "cost_reduction.denominator"],
+        },
+        { id: "science", title: "Research", description: "Research modifier in five-percent units.", type: "int8", bind: ["science"] },
+        { id: "money", title: "Income", description: "Base income modifier in five-percent units.", type: "int8", bind: ["money"] },
+        { id: "food", title: "Food", description: "Farmer-output modifier in five-percent units.", type: "int8", bind: ["food"] },
+        { id: "production", title: "Production", description: "Worker-output modifier in five-percent units.", type: "int8", bind: ["production"] },
+      ],
+    },
     lander_ship_cost: {
       title: "Landing ship costs",
       description: "Production costs of colony, outpost, and transport ships.",
@@ -1049,6 +1073,38 @@
   },
 
   parameters: {
+    govt_bonus: {
+      title: "Government bonuses",
+      description: "Configures cost, research, income, food, and production modifiers for every government.",
+      remarks: "Integer modifiers use five-percent units. Defaults preserve classic behavior and match the applicable MOO2 1.50 values.",
+      examples: [
+        "government govt_bonus feudal cost_reduction = 1/3;",
+        "government govt_bonus democracy money = 10;",
+      ],
+      group: "gameplay",
+      namespace: "government",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::government_bonuses",
+      },
+      type: {
+        kind: "array",
+        count: 8,
+        index_base: 0,
+        index_type: "government",
+        element: { type: "government_bonus" },
+      },
+      default: [
+        { cost_reduction: "1/3", science: -10, money: 0, food: 0, production: 0 },
+        { cost_reduction: "2/3", science: -5, money: 0, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 0, money: 0, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 0, money: 0, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 10, money: 10, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 15, money: 15, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 0, money: 0, food: 10, production: 10 },
+        { cost_reduction: "0/1", science: 0, money: 0, food: 20, production: 20 },
+      ],
+    },
     lander_ship_cost: {
       title: "Landing ship costs",
       description: "Configures colony, outpost, and transport ship production costs independently.",

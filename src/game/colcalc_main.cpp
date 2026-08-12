@@ -735,13 +735,23 @@ namespace COLCALC {
                 }
                 final.morale_bonus += cur_stat.morale_bonus;
 
+                int8_t government_modifier = 0;
+                if ((uint8_t)govt_type < GOVERNMENT_COUNT) {
+                    const s_government_bonus& government_bonus =
+                        government_bonuses[govt_type];
+                    if (econ_type == ECON_FOOD) {
+                        government_modifier = government_bonus.food;
+                    }
+                    else if (econ_type == ECON_INDUSTRY) {
+                        government_modifier = government_bonus.production;
+                    }
+                    else if (econ_type == ECON_RESEARCH) {
+                        government_modifier = government_bonus.science;
+                    }
+                }
+
                 if (econ_type <= ECON_INDUSTRY /* FOOD or INDUSTRY */) {
-                    if (govt_type == GOVERNMENT_UNIFICATION) {
-                        cur_stat.govt_bonus = (int)pop_base_prod * 10;
-                    }
-                    else if (govt_type == GOVERNMENT_GALACTIC_UNIFICATION) {
-                        cur_stat.govt_bonus = scaled_base;
-                    }
+                    cur_stat.govt_bonus = (int)pop_base_prod * government_modifier;
                     final.govt_bonus += cur_stat.govt_bonus;
 
                     if (is_blockaded) {
@@ -750,12 +760,7 @@ namespace COLCALC {
                     }
                 }
                 else if (econ_type == ECON_RESEARCH) {
-                    switch (govt_type) {
-                    case GOVERNMENT_FEUDAL: cur_stat.govt_bonus = (int)pop_base_prod * -10; break;
-                    case GOVERNMENT_CONFEDERATION: cur_stat.govt_bonus = (int)pop_base_prod * -5; break;
-                    case GOVERNMENT_DEMOCRACY: cur_stat.govt_bonus = (int)pop_base_prod * 10; break;
-                    case GOVERNMENT_FEDERATION: cur_stat.govt_bonus = (int)pop_base_prod * 15; break;
-                    }
+                    cur_stat.govt_bonus = (int)pop_base_prod * government_modifier;
                     final.govt_bonus += cur_stat.govt_bonus;
                 }
 
@@ -1078,11 +1083,11 @@ namespace COLCALC {
             spaceport_bc = income_base / 2;
         }
 
-        if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_DEMOCRACY) {
-            gov_bonus_bc = income_base / 2;
-        }
-        else if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_FEDERATION) {
-            gov_bonus_bc = (income_base * 3 + (income_base * 3 < 0 ? 3 : 0)) / 4;
+        int8_t government = MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT];
+        if ((uint8_t)government < GOVERNMENT_COUNT) {
+            int64_t money_bonus = (int64_t)income_base *
+                government_bonuses[government].money * 5 / 100;
+            gov_bonus_bc = (int)money_bonus;
         }
 
         if (officer_idx != -1) {

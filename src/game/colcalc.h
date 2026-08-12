@@ -3,6 +3,16 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    struct s_government_bonus {
+        s_ratio16 cost_reduction;
+        int8_t science;
+        int8_t money;
+        int8_t food;
+        int8_t production;
+    };
+
+    extern s_government_bonus government_bonuses[GOVERNMENT_COUNT];
+
     struct s_lander_ship_cost {
         int32_t colony_ship;
         int32_t outpost_ship;

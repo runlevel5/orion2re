@@ -207,7 +207,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:8327` - `scout_lab_research_bonus` -> `research.scout_lab_research_bonus`
 - [ ] `conf.pl:8350` - `fungi_climate`
 - [ ] `conf.pl:8404` - `auto_close_board_result_popup`
-- [ ] `conf.pl:8457` - `govt_bonus`
+- [x] `conf.pl:8457` - `govt_bonus` -> `government.govt_bonus`
 - [ ] `conf.pl:8507` - `spy_roll_success_threshold`
 - [ ] `conf.pl:8533` - `pop_bonus_advanced_city_planning`
 - [ ] `conf.pl:8605` - `stock_race`

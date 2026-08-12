@@ -193,6 +193,8 @@ orion2re_add_unit_test(test_refit_cost
         tests/unit/test_refit_cost.cpp
     PRODUCTION_SOURCES
         src/game/aibuild.cpp
+        src/game/colcalc_config.cpp
+        src/game/design.cpp
         src/game/design_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_refit_cost_runtime.cpp
@@ -264,6 +266,7 @@ orion2re_add_unit_test(test_colony_replicators
         tests/unit/test_colony_replicators.cpp
     PRODUCTION_SOURCES
         src/game/colcalc.cpp
+        src/game/colcalc_base.cpp
         src/game/colcalc_config.cpp
         src/game/colcalc_main.cpp
     FAKE_SOURCES

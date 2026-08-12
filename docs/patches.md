@@ -278,7 +278,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:6317` - `side end turn`: fixed in `COMBAT1::Do_Combat_Turn_()` by removing every remaining ship owned by a side from the initiative queue when that side ends its turn; a file-local source transition replaces the 1.50 register-preserving call-site wrappers and binary queue-cleanup helper.
 - [x] `asm.pl:6632` - `scout lab bonus`: implemented in `COLCALC::Update_Player_Stats_()` with synchronized `research scout_lab_research_bonus` values for all six ship size classes; a bounded source-level table lookup replaces the 1.50 instruction-level lookup while preserving classic defaults.
 - [ ] `asm.pl:6645` - `command points`
-- [ ] `asm.pl:6772` - `feudal cost reduction`
+- [x] `asm.pl:6772` - `feudal cost reduction`: implemented in `DESIGN::Cost_Reduction_For_Govt_Type_()` with synchronized government-indexed cost-reduction ratios; the shared source helper replaces the 1.50 all-call diversion and generalizes the setting to every government while preserving classic defaults.
 - [ ] `asm.pl:8411` - `specials repair percent`
 - [ ] `asm.pl:8433` - `trade goods`
 - [ ] `asm.pl:8468` - `rotate warning`
@@ -355,7 +355,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:5137` - `antaran delay`
 - [ ] `asm.pl:5158` - `megafluxers`
 - [ ] `asm.pl:6124` - `newgame screen extensions`
-- [ ] `asm.pl:6339` - `race boni`
+- [x] `asm.pl:6339` - `race boni`: implemented in `COLCALC::Colony_Job_Production_()` and `COLCALC::Colony_BC_Production_()` with synchronized government-indexed science, money, food, and production modifiers; direct source lookups replace the 1.50 immediate writes and arithmetic wrappers while preserving classic defaults.
 - [ ] `asm.pl:6479` - `strict combat sequencing`
 - [ ] `asm.pl:6936` - `starting outpost`
 - [ ] `asm.pl:7058` - `autosave`

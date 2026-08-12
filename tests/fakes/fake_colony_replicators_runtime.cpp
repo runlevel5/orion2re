@@ -19,6 +19,38 @@ namespace TEST_COLONY_REPLICATORS {
     }
 }
 
+namespace TEST_GOVERNMENT_BONUS {
+    void Reset_() {
+        memset(players, 0, sizeof(players));
+        memset(colonies, 0, sizeof(colonies));
+        memset(planets, 0, sizeof(planets));
+        memset(stars, 0, sizeof(stars));
+        for (int player = 0; player < MAX_PLAYERS; ++player) {
+            stars[0].officer_index[player] = -1;
+        }
+        colonies[0].owner = 0;
+        colonies[0].planet = 0;
+        planets[0].star_index = 0;
+        planets[0].gravity_class = PLANET_GRAVITY_NORMAL_G;
+        planets[0].food_per_farmer = 1;
+        planets[0].mineral_class = 0;
+        COLCALC::_minerals_per_mine[0] = 1;
+        players[0].objectives = PLAYER_OBJECTIVE_HUMAN;
+        MOX::_NUM_PLAYERS = 1;
+        MOX::_NUM_COLONIES = 1;
+    }
+
+    void Cleanup_() {
+        memset(players, 0, sizeof(players));
+        memset(colonies, 0, sizeof(colonies));
+        memset(planets, 0, sizeof(planets));
+        memset(stars, 0, sizeof(stars));
+        COLCALC::_minerals_per_mine[0] = 0;
+        MOX::_NUM_PLAYERS = 0;
+        MOX::_NUM_COLONIES = 0;
+    }
+}
+
 namespace TEST_PLAYER_STATS {
     void Reset_() {
         memset(players, 0, sizeof(players));
@@ -49,6 +81,7 @@ namespace MOX {
     int16_t _NUM_PLAYERS = 0;
     int16_t _NUM_COLONIES = 0;
     int16_t _NUM_SHIPS = 0;
+    int8_t _food_per_farmer_table[PLANET_CLIMATE_COUNT] = {};
 }
 
 namespace TECHDATA {
@@ -95,6 +128,9 @@ namespace BILL {
 }
 
 namespace STRBUILD {
+    void Copy(s_builder*, const char*) {
+    }
+
     void Sprintf(s_builder*, const char*, ...) {
     }
 }

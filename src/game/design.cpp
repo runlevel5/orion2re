@@ -471,21 +471,27 @@ namespace DESIGN {
         }
     }
 
-    /**
-     * @brief Applies cost reduction to the provided cost based on the player's government type (trait 0).
-     * 
-     * @param player_idx Index of the player in the global player array.
-     * @param cost Pointer to the cost value to be modified.
-     */
-    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t *cost) {
-        s_player *player = &MOX::_player[player_idx];
-        int8_t govt_trait = player->traits[TRAIT_CURRENT_GOVERNMENT];
-
-        if (govt_trait == GOVERNMENT_FEUDAL) {
-            *cost = (*cost * 2 + 2) / 3;
-        } else if (govt_trait == GOVERNMENT_CONFEDERATION) {
-            *cost = (*cost + 2) / 3;
+    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t* cost) {
+        int8_t government = MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT];
+        if ((uint8_t)government >= GOVERNMENT_COUNT) {
+            return;
         }
+
+        const s_ratio16& reduction = COLCALC::government_bonuses[government].cost_reduction;
+        if (reduction.denominator == 0) {
+            return;
+        }
+
+        int64_t reduction_amount =
+            (int64_t)*cost * reduction.numerator / reduction.denominator;
+        int64_t reduced_cost = (int64_t)*cost - reduction_amount;
+        if (reduced_cost < INT32_MIN) {
+            reduced_cost = INT32_MIN;
+        }
+        else if (reduced_cost > INT32_MAX) {
+            reduced_cost = INT32_MAX;
+        }
+        *cost = (int32_t)reduced_cost;
     }
 
     int16_t __cdecl Current_Design_Structural_Points_() {
