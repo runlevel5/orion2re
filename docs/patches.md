@@ -263,7 +263,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:3286` - `teleporters and boarding`
 - [x] `asm.pl:3935` - `stealth landers`: implemented in the three `INITSHIP` lander design loaders with synchronized `colony lander_ship_uses_stealth` configuration and a file-local best-researched-device selector; direct source selection replaces the 1.50 call-site wrappers and avoids their player-index-dependent register-state defect.
 - [x] `asm.pl:4444` - `android cost`: implemented with synchronized `colony misc_costs` Android settings and independent selection in `COLCALC::Colony_Product_Cost_()`; direct source lookups replace the 1.50 code-cave indexing while preserving classic 50/50/50 defaults.
-- [ ] `asm.pl:4766` - `moving farmer`
+- [x] `asm.pl:4766` - `moving farmer`: fixed in `COLMOVE::Send_Cluster_()` and `COLMOVE::Give_Colonist_New_Job_()` by bypassing source-colony farm capacity only while preparing an inter-colony transfer; explicit transfer context replaces the 1.50 wrapper byte while ordinary and same-colony job changes retain the farm limit.
 - [ ] `asm.pl:4813` - `absorber, damper`
 - [ ] `asm.pl:4912` - `phasing cloak shwifty`
 - [ ] `asm.pl:4939` - `thousands of millions colony ships`

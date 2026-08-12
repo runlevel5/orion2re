@@ -168,7 +168,8 @@ namespace COLMOVE {
                     if (COLMOVE::Give_Colonist_New_Job_(
                                 COLMOVE::_cluster_colony_n,
                                 unemployed_pop_idx,
-                                requested_job) == 0) {
+                                requested_job,
+                                false) == 0) {
                         return;
                     }
                 }
@@ -261,7 +262,8 @@ namespace COLMOVE {
                             if (COLMOVE::Give_Colonist_New_Job_(
                                         COLMOVE::_cluster_colony_n,
                                         unemployed_pop_idx,
-                                        requested_job) == 0) {
+                                        requested_job,
+                                        true) == 0) {
                                 return;
                             }
 
@@ -513,43 +515,45 @@ namespace COLMOVE {
         }
     }
 
-    uint8_t __cdecl Give_Colonist_New_Job_(int16_t colony_idx, int16_t pop_idx, int16_t new_job) {
+    uint8_t __cdecl Give_Colonist_New_Job_(
+            int16_t colony_idx,
+            int16_t pop_idx,
+            int16_t new_job,
+            bool inter_colony_transfer) {
         int16_t pop_state = COLONY::Pop_To_Pop_State_(colony_idx, pop_idx);
 
         if ((pop_state == 3 || pop_state == 6)
                 && (new_job == ECON_RESEARCH || new_job == ECON_INDUSTRY)) {
-            GENDRAW::Help_(ESTRINGS::E_Strings_(0x20A));
+            GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_THIS_COLONIST_IS_A_NATIVE_NATIVES_CAN_ONLY_FARM_OR_MINE));
             return 0;
         }
 
         if (pop_state == 4) {
-            int16_t current_job = (MOX::_colony[colony_idx].pop[pop_idx] & 0x180) >> 7;
+            int16_t current_job = (int16_t)POP::Get_Prof(MOX::_colony[colony_idx].pop[pop_idx]);
             if (current_job != new_job) {
-                GENDRAW::Help_(ESTRINGS::E_Strings_(0x20C));
+                GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_THIS_COLONIST_IS_AN_ANDROID_AND_CANNOT_BE_RECONFIGURED_FOR_ANOTHER_JOB));
                 return 0;
             }
         }
 
         int16_t sum_colonists = COLONY::Sum_Colonists_(colony_idx, new_job, -1, -1, 0, -1);
         if (sum_colonists >= 42) {
-            GENDRAW::Help_(ESTRINGS::E_Strings_(0x187));
+            GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_NO_ROOM_FOR_ANOTHER_COLONIST_IN_THIS_JOB_FIELD));
             return 0;
         }
 
         uint8_t max_farms = MOX::_colony[colony_idx].max_farms;
         int16_t sum_colonists_again = COLONY::Sum_Colonists_(colony_idx, new_job, -1, -1, 0, -1);
 
-        if (max_farms > sum_colonists_again || new_job != ECON_FOOD) {
-            uint32_t pop_val = MOX::_colony[colony_idx].pop[pop_idx];
-            uint32_t job_shifted = (uint32_t)new_job << 7;
-
-            MOX::_colony[colony_idx].pop[pop_idx] = ((job_shifted ^ pop_val) & 0x180) ^ pop_val;
-            MOX::_colony[colony_idx].pop[pop_idx] |= 0x200;
+        if (inter_colony_transfer || max_farms > sum_colonists_again || new_job != ECON_FOOD) {
+            uint32_t* pop = &MOX::_colony[colony_idx].pop[pop_idx];
+            POP::Set_Prof(pop, (POP::e_prof)new_job);
+            POP::Set_Assigned(pop, true);
 
             return 1;
         }
 
-        GENDRAW::Help_(ESTRINGS::E_Strings_(0x187));
+        GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_NO_ROOM_FOR_ANOTHER_COLONIST_IN_THIS_JOB_FIELD));
         return 0;
     }
 

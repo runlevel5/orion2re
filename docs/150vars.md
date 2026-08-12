@@ -445,7 +445,7 @@ These five registrations remain in `conf.pl` for compatibility or generator hist
 - [ ] `asm.pl:4189` - `sixth slot`: `var_slot_seven_stash` (100 bytes)
 - [ ] `asm.pl:4190` - `sixth slot`: `var_slot_seven_flag` (1 byte)
 - [ ] `asm.pl:4248` - `sixth slot`: `var_stashed_slot` (4 bytes)
-- [ ] `asm.pl:4776` - `moving farmer`: `var_need_farm_test` (1 byte)
+- [x] `asm.pl:4776` - `moving farmer`: `var_need_farm_test` (1 byte)
 - [x] `asm.pl:6868` - `starbase capture`: `var_starbase_capture` (1 byte)
 - [x] `asm.pl:6869` - `starbase capture`: `var_starbase_planet_stash` (4 bytes)
 - [x] `asm.pl:6870` - `starbase capture`: `var_starbase_type_stash` (4 bytes)

@@ -49,5 +49,10 @@ namespace COLMOVE {
     // @param colony_idx Colony index containing the pop.
     // @param pop_idx Pop index to update.
     // @param new_job Target job id.
-    uint8_t __cdecl Give_Colonist_New_Job_(int16_t colony_idx, int16_t pop_idx, int16_t new_job);
+    // @param inter_colony_transfer Whether the job is being prepared for a move to another colony.
+    uint8_t __cdecl Give_Colonist_New_Job_(
+            int16_t colony_idx,
+            int16_t pop_idx,
+            int16_t new_job,
+            bool inter_colony_transfer);
 }

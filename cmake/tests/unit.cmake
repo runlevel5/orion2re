@@ -207,6 +207,28 @@ orion2re_add_unit_test(test_settler
         tests/fakes/fake_settler_runtime.cpp
 )
 
+orion2re_add_unit_test(test_colmove
+    SOURCES
+        tests/unit/test_colmove.cpp
+    PRODUCTION_SOURCES
+        src/game/colmove.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colmove_runtime.cpp
+    LINK_SDL
+)
+
+if(MSVC)
+    target_compile_options(test_colmove PRIVATE /Gy)
+    target_link_options(test_colmove PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_colmove PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_colmove PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_colmove PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
 orion2re_add_unit_test(test_colony_production_helpers
     SOURCES
         tests/unit/test_colony_production_helpers.cpp
