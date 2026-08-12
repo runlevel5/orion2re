@@ -704,8 +704,11 @@ namespace CMBTFIRE {
         if (MOX::_combat_data[target_ship_idx].shield_type > 0 &&
             MOX::_combat_data[target_ship_idx].shield_current_hits > 0) {
 
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 13) && (specials & 0x40)) {
-                specials ^= 0x40;
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                    target_ship_idx, SPECIAL_HARD_SHIELDS) &&
+                (specials & WEAPON_MOD_FLAG_SHIELD_PIERCING) != 0 &&
+                (weapon_flags & WEAPON_NATURAL_FLAG_ANTI_SHIELD) == 0) {
+                specials ^= WEAPON_MOD_FLAG_SHIELD_PIERCING;
             }
 
             if (!(specials & 0x40)) {
@@ -991,7 +994,9 @@ namespace CMBTFIRE {
                 colony_hits = *damage - MOX::_combat_data->shield_arc_current[1];
             }
 
-            if (defense_hits > 0 && !(flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE)) {
+            if (defense_hits > 0 &&
+                !(flags & (WEAPON_NATURAL_FLAG_ANTI_SHIELD |
+                           WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE))) {
                 if (flags & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) {
                     defense_hits *= 2;
                 }
@@ -1008,7 +1013,9 @@ namespace CMBTFIRE {
             }
 
             if (colony_hits > 0) {
-                if (MOX::_cmbt_colony_id != -1 && !(flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE)) {
+                if (MOX::_cmbt_colony_id != -1 &&
+                    !(flags & (WEAPON_NATURAL_FLAG_ANTI_SHIELD |
+                               WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE))) {
                     if (flags & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) {
                         colony_hits *= 2;
                     }

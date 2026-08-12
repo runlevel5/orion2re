@@ -1011,8 +1011,13 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
         for (int16_t i = 0; i < 40; ++i) {
             int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
 
-            if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                if ((TECHDATA::_weapons[i].available_mods & 0x4) && (TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM)) {
+            if (MOX::_player[player_idx].tech_applications[tech_app_id] ==
+                    TECH_RESEARCH_STATUS_RESEARCHED &&
+                (TECHDATA::_weapons[i].available_mods &
+                    WEAPON_MOD_FLAG_POINT_DEFENSE) != 0 &&
+                TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM &&
+                (TECHDATA::_weapons[i].natural_mods &
+                    WEAPON_NATURAL_FLAG_ANTI_SHIELD) == 0) {
                     int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, tech_app_id);
                     
                     // Check if miniaturization level meets requirements for point defense mod
@@ -1023,7 +1028,6 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
                             best_weapon_idx = i;
                         }
                     }
-                }
             }
         }
     } else {

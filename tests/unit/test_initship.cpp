@@ -15,6 +15,8 @@ namespace {
         memset(players, 0, sizeof(players));
         memset(TECHDATA::_drives, 0, sizeof(TECHDATA::_drives));
         memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        memset(TECHDATA::_weapon_modifications, 0,
+               sizeof(TECHDATA::_weapon_modifications));
 
         TECHDATA::_drives[kDrive].tech_app_id = TECH_APP_NUCLEAR_DRIVE;
         TECHDATA::_drives[kDrive].warp_speed = 2;
@@ -48,6 +50,13 @@ namespace MOX {
 namespace TECHDATA {
     s_tech_drive_data _drives[DRIVE_COUNT];
     s_tech_weapon_data _weapons[WEAPON_COUNT];
+    s_tech_weapon_mod_data _weapon_modifications[WEAPON_MOD_COUNT];
+}
+
+namespace DESIGN {
+    int16_t __cdecl Miniaturization_Level_(int16_t, int16_t) {
+        return 0;
+    }
 }
 
 DOCTEST_TEST_CASE("Trans-Dimensional FTL speed uses the configured bonus") {
@@ -76,4 +85,25 @@ DOCTEST_TEST_CASE("planetary defenses select torpedoes only when enabled") {
 
     DOCTEST_CHECK(INITSHIP::Best_Missile_Weapon_NT_(kPlayer) ==
                   kTorpedoWeapon);
+}
+
+DOCTEST_TEST_CASE("fighter point defense skips shield-only beams") {
+    Reset_Initship_();
+
+    TECHDATA::_weapon_modifications[WEAPON_MOD_POINT_DEFENSE].level = 0;
+
+    TECHDATA::_weapons[kMissileWeapon].type = WEAPON_TYPE_BEAM;
+    TECHDATA::_weapons[kMissileWeapon].available_mods =
+        WEAPON_MOD_FLAG_POINT_DEFENSE;
+    TECHDATA::_weapons[kMissileWeapon].max_damage = 10;
+
+    TECHDATA::_weapons[kTorpedoWeapon].type = WEAPON_TYPE_BEAM;
+    TECHDATA::_weapons[kTorpedoWeapon].available_mods =
+        WEAPON_MOD_FLAG_POINT_DEFENSE;
+    TECHDATA::_weapons[kTorpedoWeapon].natural_mods =
+        WEAPON_NATURAL_FLAG_ANTI_SHIELD;
+    TECHDATA::_weapons[kTorpedoWeapon].max_damage = 20;
+
+    DOCTEST_CHECK(
+        INITSHIP::Best_Point_Defense_Weapon_(kPlayer) == kMissileWeapon);
 }

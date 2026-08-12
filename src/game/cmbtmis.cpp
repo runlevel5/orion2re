@@ -303,7 +303,7 @@ namespace CMBTMIS {
 
         int16_t shield_idx = 0;
         int16_t evade = 0;
-        uint16_t weapon_flags = 0;
+        uint16_t weapon_flags = TECHDATA::_weapons[type].natural_mods;
         uint16_t applied_hits = 0;
         int16_t shield_hit_dir = 0;
 
