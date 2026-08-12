@@ -1017,6 +1017,26 @@
         { id: "regen", title: "Regeneration", description: "Repair percentage supplied by a working Regeneration special when Amoeba regeneration is enabled.", type: "uint8", bind: ["regen"] },
       ],
     },
+    board_range: {
+      title: "Tactical boarding ranges",
+      description: "Ordinary and transporter boarding reaches in tactical squares.",
+      fields: [
+        {
+          id: "normal",
+          title: "Ordinary boarding",
+          description: "Maximum ordinary boarding distance in tactical squares.",
+          type: "uint8",
+          bind: ["normal"],
+        },
+        {
+          id: "transporters",
+          title: "Transporter boarding",
+          description: "Maximum transporter boarding distance in tactical squares.",
+          type: "uint8",
+          bind: ["transporters"],
+        },
+      ],
+    },
     lander_ship_uses_stealth: {
       title: "Landing ship stealth equipment",
       description: "Controls whether each landing ship type installs the best researched stealth device.",
@@ -1751,6 +1771,53 @@
         symbol: "BOARDING::_board_in_black_hole",
       },
       default: true,
+    },
+
+    round_teleporter: {
+      title: "Octagonal teleporter range",
+      description: "Uses an approximately round octagonal area for tactical teleport movement instead of the classic square area.",
+      examples: ["combat round_teleporter = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtmov1.h",
+        symbol: "CMBTMOV1::_round_teleporter",
+      },
+      default: false,
+    },
+
+    board_range: {
+      title: "Tactical boarding ranges",
+      description: "Configures ordinary and transporter boarding reach in tactical squares.",
+      examples: [
+        "combat board_range normal = 3;",
+        "combat board_range transporters = 12;",
+      ],
+      units: "tactical squares",
+      group: "gameplay",
+      namespace: "combat",
+      type: "board_range",
+      bind_root: {
+        header: "game/boarding.h",
+        symbol: "BOARDING::board_range",
+      },
+      default: { normal: 3, transporters: 12 },
+    },
+
+    sub_space_teleporter_range: {
+      title: "Sub-Space Teleporter range",
+      description: "Sets tactical teleport movement range.",
+      examples: ["combat sub_space_teleporter_range = 20;"],
+      units: "tactical squares",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      bind_root: {
+        header: "game/cmbtmov1.h",
+        symbol: "CMBTMOV1::_sub_space_teleporter_range",
+      },
+      default: 20,
     },
 
     interactive_combat_stats: {

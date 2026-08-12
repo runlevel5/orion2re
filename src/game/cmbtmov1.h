@@ -4,6 +4,13 @@
 struct s_net_tactical_combat_message;
 
 namespace CMBTMOV1 {
+    inline uint8_t _round_teleporter = 0;
+    inline uint8_t _sub_space_teleporter_range = 20;
+
+    /** Returns whether a destination is within configured teleporter reach. */
+    bool __cdecl Teleporter_Destination_In_Range_(
+        int16_t ship_idx, int16_t target_x_px, int16_t target_y_px);
+
     /**
      * @brief Returns whether the combat ship is currently held in stasis.
      * @param ship_idx Combat ship index to inspect.

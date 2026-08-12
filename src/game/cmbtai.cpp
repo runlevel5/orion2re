@@ -346,7 +346,7 @@ int8_t __cdecl Get_Player_Mode_(int16_t player_idx) {
     }
 }
 
-int16_t __cdecl Range_To_Ship_(int16_t ship1_idx, int16_t ship2_idx) {
+int16_t __cdecl Range_To_Ship_Squares_(int16_t ship1_idx, int16_t ship2_idx) {
     int16_t w1, h1, w2, h2;
     int32_t is_large1 = 0;
     int32_t is_huge1 = 0;
@@ -429,8 +429,11 @@ int16_t __cdecl Range_To_Ship_(int16_t ship1_idx, int16_t ship2_idx) {
         }
     }
 
-    int16_t range = special::Range_(x1_adj, y1_adj, x2_adj, y2_adj);
-    return (range + 2) / 3;
+    return special::Range_(x1_adj, y1_adj, x2_adj, y2_adj);
+}
+
+int16_t __cdecl Range_To_Ship_(int16_t ship1_idx, int16_t ship2_idx) {
+    return (Range_To_Ship_Squares_(ship1_idx, ship2_idx) + 2) / 3;
 }
 
 int16_t __cdecl Range_To_Missile_(int16_t unit_idx, int16_t missile_idx) {
@@ -1318,8 +1321,12 @@ int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx) 
         return 0;
     }
 
-    int16_t dist = Range_To_Ship_(attacker_idx, target_idx);
-    int16_t reach = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, SPECIAL_TRANSPORTERS) ? 4 : 1;
+    int16_t dist = Range_To_Ship_Squares_(attacker_idx, target_idx);
+    bool has_transporters = COMBINIT::Does_Combat_Ship_Have_Special_(
+        attacker_idx, SPECIAL_TRANSPORTERS) != 0;
+    int16_t reach = has_transporters
+        ? BOARDING::board_range.transporters
+        : BOARDING::board_range.normal;
 
     if (MOX::_combat_data[target_idx].owner > 8 ||
         attacker_owner > 8 ||
@@ -1331,12 +1338,13 @@ int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx) 
         target_idx == 0 ||
         MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_data[target_idx].owner ||
         dist > reach ||
-        (reach != 4 && COMBAT1::Calc_Current_Speed_(target_idx) > 0) ||
+        (!has_transporters && COMBAT1::Calc_Current_Speed_(target_idx) > 0) ||
         MOX::_combat_data[MOX::_cur_ship].marine_count == 0) {
         
         can_board = false;
-    } else if (reach == 4) {
-        if (dist != 1 || MOX::_combat_data[target_idx].current_speed > 0) {
+    } else if (has_transporters) {
+        if (dist > BOARDING::board_range.normal ||
+            MOX::_combat_data[target_idx].current_speed > 0) {
             int16_t bearing = CMBTDRW1::Relative_Bearing_(target_idx, attacker_idx);
             int16_t shield_idx = CMBTFIRE::Facing_Shield_(bearing);
             if (MOX::_combat_data[target_idx].shield_arc_current[shield_idx] > 0 ||
@@ -1387,7 +1395,7 @@ int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx) 
 
 void __cdecl Resolve_Ai_Boarding_(int16_t attacker_idx, int16_t target_idx, int16_t action_type) {
     if (action_type != 0) {
-        int16_t dist = Range_To_Ship_(attacker_idx, target_idx);
+        int16_t dist = Range_To_Ship_Squares_(attacker_idx, target_idx);
         bool has_transporters = (COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, SPECIAL_TRANSPORTERS) == 1);
 
         s_combat_data* attacker = &MOX::_combat_data[attacker_idx];
@@ -1399,7 +1407,7 @@ void __cdecl Resolve_Ai_Boarding_(int16_t attacker_idx, int16_t target_idx, int1
 
         if (has_transporters) {
             bool skip_displacement = false;
-            if (dist == 1) {
+            if (dist <= BOARDING::board_range.normal) {
                 if (MOX::_combat_data[target_idx].current_speed <= 0) {
                     skip_displacement = true;
                 }
@@ -2380,31 +2388,31 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
         for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
             if (MOX::_combat_data[i].unit_status == 0 && i != ship_idx) {
                 if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0) {
-                    int16_t range = Range_To_Ship_(ship_idx, i);
+                    int16_t range = Range_To_Ship_Squares_(ship_idx, i);
                     strength_attacker += CMBTFIR2::Crew_Boarding_Combat_Bonus_(i);
 
                     if (MOX::_combat_data[i].owner == ship->owner) {
-                        if (range <= 1) {
+                        if (range <= BOARDING::board_range.normal) {
                             dist_friendly += 2;
-                        } else if (range == 2) {
+                        } else if (range == BOARDING::board_range.normal * 2) {
                             dist_friendly += 1;
                         }
                     } else {
-                        int8_t has_security = (int8_t)COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TRANSPORTERS);
+                        int8_t has_transporters = (int8_t)COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TRANSPORTERS);
                         bool add_marines = false;
                         
-                        if (range <= 1) {
+                        if (range <= BOARDING::board_range.normal) {
                             dist_enemy += 2;
-                            if (has_security != 0 || ship->current_speed == 0) {
+                            if (has_transporters != 0 || ship->current_speed == 0) {
                                 add_marines = true;
                             }
-                        } else if (range == 2) {
+                        } else if (range == BOARDING::board_range.normal * 2) {
                             dist_enemy += 1;
-                            if (has_security != 0 || ship->current_speed == 0) {
+                            if (has_transporters != 0 || ship->current_speed == 0) {
                                 add_marines = true;
                             }
-                        } else if (range < 7) {
-                            if (has_security != 0) {
+                        } else if (range < BOARDING::board_range.normal * 7) {
+                            if (has_transporters != 0) {
                                 add_marines = true;
                             }
                         }

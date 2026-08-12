@@ -12,6 +12,10 @@ namespace {
     s_missile missiles[300];
     s_planet_data planets[1];
     s_player players[MAX_PLAYERS];
+    bool has_phase_shifter;
+    bool has_sub_space_teleporter;
+    bool sub_space_teleporter_enabled;
+    int16_t teleporter_used;
 }
 
 namespace TEST_TRACTOR_POWER {
@@ -75,10 +79,23 @@ namespace MOX {
     int16_t _net_flag;
     int16_t _speedx2_flag;
     int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
+    int16_t _fighter_beam_type[9];
+    int16_t _fighter_bomb_type[9];
+}
+
+namespace TECHDATA {
+    s_tech_shield_data _shields[SHIELD_COUNT];
+    s_tech_weapon_data _weapons[WEAPON_COUNT];
 }
 
 namespace COMBINIT {
-    int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t, int16_t) {
+    int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t, int16_t special_idx) {
+        if (special_idx == SPECIAL_PHASE_SHIFTER) {
+            return has_phase_shifter;
+        }
+        if (special_idx == SPECIAL_SUB_SPACE_TELEPORTER) {
+            return has_sub_space_teleporter;
+        }
         return 0;
     }
 
@@ -99,9 +116,15 @@ namespace CMBTMIS {
     }
 }
 
-namespace CMBTAI {
-    int16_t __cdecl Will_Missile_Do_Damage_(int16_t, int16_t) {
-        return 0;
+namespace CMBTFIR2 {
+    int16_t __cdecl Used_Teleporter_(int16_t) {
+        return teleporter_used;
+    }
+}
+
+namespace CMBTFIRE {
+    int8_t __cdecl Special_Is_Turned_On_(int16_t, int16_t) {
+        return sub_space_teleporter_enabled;
     }
 }
 
@@ -122,6 +145,12 @@ namespace angle {
 }
 
 namespace special {
+    int16_t __cdecl Range_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        const int16_t dx = abs(x2 - x1);
+        const int16_t dy = abs(y2 - y1);
+        return dx > dy ? dx + dy / 2 : dy + dx / 2;
+    }
+
     void __cdecl Absolute_Interpolate_Line_(
         int16_t* x_ptr,
         int16_t* y_ptr,
@@ -224,6 +253,84 @@ DOCTEST_TEST_CASE("Trans-Dimensional combat speed uses the configured bonus") {
     DOCTEST_CHECK(COMBAT1::Calc_Current_Speed_(0) == 17);
 
     COMBAT1::_td_combat_speed_bonus = 4;
+}
+
+DOCTEST_TEST_CASE("ship range exposes tactical squares without changing legacy range") {
+    memset(combat_data, 0, sizeof(combat_data));
+    MOX::_combat_data[0].x = 10;
+    MOX::_combat_data[0].y = 10;
+    MOX::_combat_data[1].x = 16;
+    MOX::_combat_data[1].y = 10;
+
+    DOCTEST_CHECK(CMBTAI::Range_To_Ship_Squares_(0, 1) == 6);
+    DOCTEST_CHECK(CMBTAI::Range_To_Ship_(0, 1) == 2);
+}
+
+DOCTEST_TEST_CASE("round teleporter excludes square corners") {
+    memset(combat_data, 0, sizeof(combat_data));
+    MOX::_combat_data[0].x = 20;
+    MOX::_combat_data[0].y = 20;
+    CMBTMOV1::_sub_space_teleporter_range = 20;
+
+    CMBTMOV1::_round_teleporter = 0;
+    DOCTEST_CHECK(CMBTMOV1::Teleporter_Destination_In_Range_(
+        0, 40 * 20, 40 * 20));
+
+    CMBTMOV1::_round_teleporter = 1;
+    DOCTEST_CHECK_FALSE(CMBTMOV1::Teleporter_Destination_In_Range_(
+        0, 40 * 20, 40 * 20));
+    DOCTEST_CHECK(CMBTMOV1::Teleporter_Destination_In_Range_(
+        0, 40 * 20, 20 * 20));
+}
+
+DOCTEST_TEST_CASE("Sub-Space Teleporter range is independent of ship speed") {
+    memset(combat_data, 0, sizeof(combat_data));
+    for (int x = 0; x < COMBAT_GRID_WIDTH; ++x) {
+        for (int y = 0; y < COMBAT_GRID_HEIGHT; ++y) {
+            MOX::_combat_grid[x][y] = -1;
+        }
+    }
+    MOX::_combat_data[0].x = 40;
+    MOX::_combat_data[0].y = 34;
+    has_sub_space_teleporter = true;
+    has_phase_shifter = false;
+    sub_space_teleporter_enabled = true;
+    teleporter_used = 0;
+    CMBTMOV1::_round_teleporter = 0;
+    CMBTMOV1::_sub_space_teleporter_range = 5;
+
+    COMBAT1::Set_Legal_Moves_(0, 30, 0);
+
+    DOCTEST_CHECK(MOX::_combat_grid[45][34] == 2000);
+    DOCTEST_CHECK(MOX::_combat_grid[46][34] == -1);
+
+    has_sub_space_teleporter = false;
+    has_phase_shifter = true;
+    for (int x = 0; x < COMBAT_GRID_WIDTH; ++x) {
+        for (int y = 0; y < COMBAT_GRID_HEIGHT; ++y) {
+            MOX::_combat_grid[x][y] = -1;
+        }
+    }
+
+    COMBAT1::Set_Legal_Moves_(0, 7, 0);
+
+    DOCTEST_CHECK(MOX::_combat_grid[47][34] == 2000);
+    DOCTEST_CHECK(MOX::_combat_grid[48][34] == -1);
+
+    has_sub_space_teleporter = true;
+    for (int x = 0; x < COMBAT_GRID_WIDTH; ++x) {
+        for (int y = 0; y < COMBAT_GRID_HEIGHT; ++y) {
+            MOX::_combat_grid[x][y] = -1;
+        }
+    }
+
+    COMBAT1::Set_Legal_Moves_(0, 7, 0);
+
+    DOCTEST_CHECK(MOX::_combat_grid[47][34] == 2000);
+    DOCTEST_CHECK(MOX::_combat_grid[48][34] == -1);
+
+    has_sub_space_teleporter = false;
+    has_phase_shifter = false;
 }
 
 DOCTEST_TEST_CASE("destroyed cloak devices update combat cloak state") {

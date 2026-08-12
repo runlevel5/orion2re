@@ -170,8 +170,8 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:7095` - `absorber_keep_charge`
 - [x] `conf.pl:7120` - `planet_non_enveloping` -> `combat.planet_non_enveloping`
 - [x] `conf.pl:7133` - `planet_extinction` -> `colony.planet_extinction`
-- [ ] `conf.pl:7149` - `round_teleporter`
-- [ ] `conf.pl:7167` - `board_range`
+- [x] `conf.pl:7149` - `round_teleporter` -> `combat.round_teleporter`
+- [x] `conf.pl:7167` - `board_range` -> `combat.board_range`
 - [x] `conf.pl:7192` - `interactive_combat_stats` -> `combat.interactive_combat_stats`
 - [ ] `conf.pl:7210` - `all_events_delay`
 - [ ] `conf.pl:7224` - `between_events_delay`
@@ -219,7 +219,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:8781` - `shield_hull_multiplier` -> `design.shield_hull_multiplier`
 - [x] `conf.pl:8797` - `lightning_field_ratio` -> `combat.lightning_field_ratio`
 - [x] `conf.pl:8816` - `lightning_field_mode` -> `combat.lightning_field_mode`
-- [ ] `conf.pl:8830` - `sub_space_teleporter_range`
+- [x] `conf.pl:8830` - `sub_space_teleporter_range` -> `combat.sub_space_teleporter_range`
 - [ ] `conf.pl:8843` - `augmented_engines_speed_bonus`
 - [x] `conf.pl:8864` - `repair_rate` -> `combat.repair_rate`
 - [ ] `conf.pl:8893` - `prewarp_techfield`
@@ -441,7 +441,7 @@ These five registrations remain in `conf.pl` for compatibility or generator hist
 - [ ] `asm.pl:2712` - `autodesign`: `var_stashed_speed` (1 byte)
 - [ ] `asm.pl:2775` - `autodesign`: `var_stashed_space` (2 bytes)
 - [ ] `asm.pl:2776` - `autodesign`: `var_stashed_player_autodesign` (4 bytes)
-- [ ] `asm.pl:3318` - `teleporters and boarding`: `var_square` (1 byte)
+- [x] `asm.pl:3318` - `teleporters and boarding`: `var_square` (1 byte)
 - [ ] `asm.pl:4189` - `sixth slot`: `var_slot_seven_stash` (100 bytes)
 - [ ] `asm.pl:4190` - `sixth slot`: `var_slot_seven_flag` (1 byte)
 - [ ] `asm.pl:4248` - `sixth slot`: `var_stashed_slot` (4 bytes)

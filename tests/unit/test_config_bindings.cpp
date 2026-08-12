@@ -11,6 +11,7 @@
 #include "game/boarding.h"
 #include "game/cmbtfire.h"
 #include "game/combinit.h"
+#include "game/cmbtmov1.h"
 #include "game/cmbtmis.h"
 #include "game/combat.h"
 #include "game/combat1.h"
@@ -687,6 +688,33 @@ DOCTEST_TEST_CASE("black-hole boarding setting preserves the classic default") {
     DOCTEST_CHECK(BOARDING::_board_in_black_hole == 0);
 }
 
+DOCTEST_TEST_CASE("teleporter and boarding ranges preserve 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMOV1::_round_teleporter == 0);
+    DOCTEST_CHECK(CMBTMOV1::_sub_space_teleporter_range == 20);
+    DOCTEST_CHECK(BOARDING::board_range.normal == 3);
+    DOCTEST_CHECK(BOARDING::board_range.transporters == 12);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat round_teleporter = true;"
+        "combat sub_space_teleporter_range = 24;"
+        "combat board_range normal = 4;"
+        "combat board_range transporters = 15;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMOV1::_round_teleporter == 1);
+    DOCTEST_CHECK(CMBTMOV1::_sub_space_teleporter_range == 24);
+    DOCTEST_CHECK(BOARDING::board_range.normal == 4);
+    DOCTEST_CHECK(BOARDING::board_range.transporters == 15);
+}
+
 DOCTEST_TEST_CASE("telepathic multiple capture setting preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -788,6 +816,10 @@ DOCTEST_TEST_CASE("Phasing Cloak duration preserves the 1.50 default") {
 DOCTEST_TEST_CASE("combat namespace settings resolve bidirectionally and commit defaults") {
     const char* paths[] = {
         "combat_bonus.phasing_cloak_effective_turns",
+        "combat.round_teleporter",
+        "combat.board_range.normal",
+        "combat.board_range.transporters",
+        "combat.sub_space_teleporter_range",
         "combat.recloak_next_turn",
         "combat.rephase_cloak_next_turn",
         "combat.lightning_field_ratio",

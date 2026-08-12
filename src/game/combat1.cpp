@@ -1999,9 +1999,11 @@ namespace COMBAT1 {
 
     void __cdecl Initiate_Boarding_Action_(int16_t attacker_idx, int16_t defender_idx) {
         bool can_board = true;
-        int16_t range = CMBTAI::Range_To_Ship_(attacker_idx, defender_idx);
+        int16_t range = CMBTAI::Range_To_Ship_Squares_(attacker_idx, defender_idx);
         int16_t has_transporters = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, SPECIAL_TRANSPORTERS);
-        int16_t max_range = (has_transporters == 1) ? 4 : 1;
+        int16_t max_range = has_transporters == 1
+            ? BOARDING::board_range.transporters
+            : BOARDING::board_range.normal;
         s_combat_data* target = &MOX::_combat_data[defender_idx];
         char msg_buffer[80];
         int msg_idx = 0;
@@ -2018,7 +2020,7 @@ namespace COMBAT1 {
         } else if (range > max_range) {
             can_board = false;
             msg_idx = 0x42; // Out of range
-        } else if (max_range != 4 && COMBAT1::Calc_Current_Speed_(defender_idx) > 0) {
+        } else if (has_transporters != 1 && COMBAT1::Calc_Current_Speed_(defender_idx) > 0) {
             can_board = false;
             msg_idx = 0x43; // Ship moving too fast
         } else if (MOX::_combat_data[MOX::_cur_ship].marine_count == 0) {
@@ -2042,8 +2044,9 @@ namespace COMBAT1 {
                     GENDRAW::Warning_Box_(warning);
                     CMBTDRW1::Refresh_Combat_Screen_Full_();
                 }
-            } else if (max_range == 4) {
-                if (range > 1 || MOX::_combat_data[defender_idx].current_speed > 0) {
+            } else if (has_transporters == 1) {
+                if (range > BOARDING::board_range.normal ||
+                    MOX::_combat_data[defender_idx].current_speed > 0) {
                     int16_t bearing = CMBTDRW1::Relative_Bearing_(defender_idx, attacker_idx);
                     int16_t shield_idx = CMBTFIRE::Facing_Shield_(bearing);
                     if (target->shield_arc_current[shield_idx] > 0) {
@@ -2074,7 +2077,9 @@ namespace COMBAT1 {
             if (result != 0) {
                 MOX::_combat_data[MOX::_cur_ship].marine_count -= (int8_t)marines_sent;
 
-                if (max_range == 4 && (range != 1 || MOX::_combat_data[defender_idx].current_speed > 0)) {
+                if (has_transporters == 1 &&
+                    (range > BOARDING::board_range.normal ||
+                     MOX::_combat_data[defender_idx].current_speed > 0)) {
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(defender_idx, SPECIAL_DAMPER_FIELD) != 0) {
                         marines_sent = marines_sent / 3;
                     }
@@ -2278,11 +2283,14 @@ namespace COMBAT1 {
         int16_t x_pixel;
         int16_t y_pixel;
 
-        if (((COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) ||
-              COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_PHASE_SHIFTER)) &&
-             CMBTFIR2::Used_Teleporter_(ship_idx) == 0) &&
-            (range < 20)) {
-            range = 20;
+        const bool unused_sub_space_teleporter =
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) != 0 &&
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                ship_idx, SPECIAL_PHASE_SHIFTER) == 0 &&
+            CMBTFIR2::Used_Teleporter_(ship_idx) == 0;
+        if (unused_sub_space_teleporter) {
+            range = CMBTMOV1::_sub_space_teleporter_range;
         }
 
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
@@ -2349,11 +2357,18 @@ namespace COMBAT1 {
                             }
 
                             if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER)) {
-                                if (*grid_cell == -1 && CMBTFIR2::Used_Teleporter_(ship_idx) == 0) {
-                                    if (CMBTFIRE::Special_Is_Turned_On_(ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) == 1) {
-                                        if (CMBTAI::Range_To_XY_(ship_idx, x_pixel, y_pixel) <= 20) {
-                                            *grid_cell = 2000;
-                                        }
+                                if (CMBTFIR2::Used_Teleporter_(ship_idx) == 0 &&
+                                    CMBTFIRE::Special_Is_Turned_On_(
+                                        ship_idx, SPECIAL_SUB_SPACE_TELEPORTER) == 1) {
+                                    const bool in_teleporter_range =
+                                        CMBTMOV1::Teleporter_Destination_In_Range_(
+                                            ship_idx, x_pixel, y_pixel);
+                                    if (CMBTMOV1::_round_teleporter != 0 &&
+                                        !in_teleporter_range) {
+                                        *grid_cell = -1;
+                                    } else if (*grid_cell == -1 &&
+                                               in_teleporter_range) {
+                                        *grid_cell = 2000;
                                     }
                                 }
                             }

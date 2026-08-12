@@ -1,6 +1,27 @@
 #include "pch.h"
 
 namespace CMBTMOV1 {
+    bool __cdecl Teleporter_Destination_In_Range_(
+        int16_t ship_idx, int16_t target_x_px, int16_t target_y_px
+    ) {
+        const int32_t ship_x_px = MOX::_combat_data[ship_idx].x * 20;
+        const int32_t ship_y_px = MOX::_combat_data[ship_idx].y * 20;
+        const int32_t range_px = _sub_space_teleporter_range * 20;
+
+        if (_round_teleporter == 0) {
+            return abs(ship_x_px - target_x_px) <= range_px &&
+                   abs(ship_y_px - target_y_px) <= range_px;
+        }
+
+        const int16_t distance = special::Range_(
+            (int16_t)ship_x_px,
+            (int16_t)ship_y_px,
+            target_x_px,
+            target_y_px
+        );
+        return distance / 20 <= _sub_space_teleporter_range;
+    }
+
     int16_t __cdecl Turn_Cost_(int16_t ship_idx) {
         int16_t cost = 2;
 
@@ -250,7 +271,8 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
         bool skip_normal_move = false;
 
         if (has_teleporter && !used_teleporter) {
-            if (CMBTAI::Range_To_XY_(ship_idx, dest_x_px, dest_y_px) < 21) {
+            if (Teleporter_Destination_In_Range_(
+                    ship_idx, dest_x_px, dest_y_px)) {
                 CMBTFIR2::Set_Teleporter_Used_(ship_idx);
                 Draw_Teleporting_Ship_(ship_idx, dest_x, dest_y);
                 skip_normal_move = true;
