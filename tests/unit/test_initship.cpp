@@ -2,6 +2,7 @@
 
 #include "doctest/doctest.h"
 #include "game/initship.h"
+#include "game/shipstak.h"
 
 namespace {
     constexpr int16_t kPlayer = 0;
@@ -40,14 +41,19 @@ namespace {
 
         INITSHIP::_satellite_uses_torpedoes = 0;
         INITSHIP::_td_ftl_bonus = 2;
+        INITSHIP::lander_ship_uses_stealth = {};
+        SHIPSTAK::stealth_bonus = { 500, 500, 500, 500 };
     }
 }
 
 namespace MOX {
     s_player* _player = players;
+    s_settings _settings = {};
+    const char _ship_type_names[SHIP_TYPE_COUNT][6][16] = {};
 }
 
 namespace TECHDATA {
+    s_tech_armor_data _armor[ARMOR_COUNT];
     s_tech_drive_data _drives[DRIVE_COUNT];
     s_tech_weapon_data _weapons[WEAPON_COUNT];
     s_tech_weapon_mod_data _weapon_modifications[WEAPON_MOD_COUNT];
@@ -56,6 +62,12 @@ namespace TECHDATA {
 namespace DESIGN {
     int16_t __cdecl Miniaturization_Level_(int16_t, int16_t) {
         return 0;
+    }
+}
+
+namespace COLCALC {
+    int32_t __cdecl Ship_Type_Cost_For_Player_(int32_t, int16_t) {
+        return 100;
     }
 }
 
@@ -106,4 +118,76 @@ DOCTEST_TEST_CASE("fighter point defense skips shield-only beams") {
 
     DOCTEST_CHECK(
         INITSHIP::Best_Point_Defense_Weapon_(kPlayer) == kMissileWeapon);
+}
+
+DOCTEST_TEST_CASE("lander stealth remains disabled by default") {
+    Reset_Initship_();
+    players[kPlayer].tech_applications[TECH_APP_PHASING_CLOAK] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+
+    s_ship_design colony = {};
+    s_ship_design outpost = {};
+    s_ship_design transport = {};
+    INITSHIP::Load_Colony_Ship_Design_(kPlayer, &colony);
+    INITSHIP::Load_Outpost_Ship_Design_(kPlayer, &outpost);
+    INITSHIP::Load_Transport_Ship_Design_(kPlayer, &transport);
+
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        colony.special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS));
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        outpost.special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS));
+    DOCTEST_CHECK_FALSE(struct_::Test_Bit_Field_(
+        colony.special_device_flags, SPECIAL_PHASING_CLOAK));
+    DOCTEST_CHECK_FALSE(struct_::Test_Bit_Field_(
+        outpost.special_device_flags, SPECIAL_PHASING_CLOAK));
+    DOCTEST_CHECK_FALSE(struct_::Test_Bit_Field_(
+        transport.special_device_flags, SPECIAL_PHASING_CLOAK));
+}
+
+DOCTEST_TEST_CASE("enabled landers install the best researched stealth device") {
+    Reset_Initship_();
+    players[kPlayer].tech_applications[TECH_APP_PHASING_CLOAK] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    INITSHIP::lander_ship_uses_stealth = { 1, 1, 1 };
+
+    s_ship_design colony = {};
+    s_ship_design outpost = {};
+    s_ship_design transport = {};
+    INITSHIP::Load_Colony_Ship_Design_(kPlayer, &colony);
+    INITSHIP::Load_Outpost_Ship_Design_(kPlayer, &outpost);
+    INITSHIP::Load_Transport_Ship_Design_(kPlayer, &transport);
+
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        colony.special_device_flags, SPECIAL_PHASING_CLOAK));
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        outpost.special_device_flags, SPECIAL_PHASING_CLOAK));
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        transport.special_device_flags, SPECIAL_PHASING_CLOAK));
+}
+
+DOCTEST_TEST_CASE("lander stealth selection works for nonzero players") {
+    Reset_Initship_();
+    constexpr int16_t player_idx = 1;
+    players[player_idx].tech_applications[TECH_APP_CLOAKING_DEVICE] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    players[player_idx].tech_applications[TECH_APP_PHASING_CLOAK] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    INITSHIP::lander_ship_uses_stealth.colony_ship = 1;
+    SHIPSTAK::stealth_bonus.cloaking_device = 600;
+
+    s_ship_design design = {};
+    INITSHIP::Load_Colony_Ship_Design_(player_idx, &design);
+
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        design.special_device_flags, SPECIAL_CLOAKING_DEVICE));
+    DOCTEST_CHECK_FALSE(struct_::Test_Bit_Field_(
+        design.special_device_flags, SPECIAL_PHASING_CLOAK));
+
+    SHIPSTAK::stealth_bonus.phasing_cloak = 600;
+    INITSHIP::Load_Colony_Ship_Design_(player_idx, &design);
+
+    DOCTEST_CHECK_FALSE(struct_::Test_Bit_Field_(
+        design.special_device_flags, SPECIAL_CLOAKING_DEVICE));
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        design.special_device_flags, SPECIAL_PHASING_CLOAK));
 }

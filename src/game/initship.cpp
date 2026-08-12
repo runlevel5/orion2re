@@ -1,8 +1,48 @@
 #include "pch.h"
 #include "game/ship_config.h"
+#include "game/shipstak.h"
 
 namespace INITSHIP {
     namespace {
+        namespace stealth_landers {
+            struct s_device_lookup {
+                uint16_t tech_application;
+                uint16_t special;
+                const int16_t* bonus;
+            };
+
+            constexpr s_device_lookup device_lookup[] = {
+                { TECH_APP_STEALTH_FIELD, SPECIAL_STEALTH_FIELD,
+                  &SHIPSTAK::stealth_bonus.stealth_field },
+                { TECH_APP_CLOAKING_DEVICE, SPECIAL_CLOAKING_DEVICE,
+                  &SHIPSTAK::stealth_bonus.cloaking_device },
+                { TECH_APP_PHASING_CLOAK, SPECIAL_PHASING_CLOAK,
+                  &SHIPSTAK::stealth_bonus.phasing_cloak },
+            };
+        }
+
+        void Equip_Best_Stealth_Device_(int16_t player_idx,
+                                        s_ship_design* design) {
+            int16_t best_bonus = INT16_MIN;
+            uint16_t best_special = 0;
+
+            for (const stealth_landers::s_device_lookup& device :
+                 stealth_landers::device_lookup) {
+                if (MOX::_player[player_idx]
+                            .tech_applications[device.tech_application] ==
+                        TECH_RESEARCH_STATUS_RESEARCHED &&
+                    *device.bonus >= best_bonus) {
+                    best_bonus = *device.bonus;
+                    best_special = device.special;
+                }
+            }
+
+            if (best_special != 0) {
+                struct_::Set_Bit_Field_(design->special_device_flags,
+                                        best_special);
+            }
+        }
+
         void Complete_Configured_Design_(s_ship_design* design, const char* name,
                                          uint8_t owner, int16_t cost,
                                          int8_t speed, int16_t fallback_drive,
@@ -447,6 +487,9 @@ namespace INITSHIP {
         design->armor_type = (int8_t)Best_Armor_(player_idx);
 
         struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
+        if (lander_ship_uses_stealth.colony_ship != 0) {
+            Equip_Best_Stealth_Device_(player_idx, design);
+        }
         design->picture_num = 45;
 
         design->speed = (int8_t)TECHDATA::_drives[design->ftl_type].warp_speed;
@@ -469,6 +512,9 @@ namespace INITSHIP {
         design->armor_type = (int8_t)Best_Armor_(player_idx);
 
         struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
+        if (lander_ship_uses_stealth.outpost_ship != 0) {
+            Equip_Best_Stealth_Device_(player_idx, design);
+        }
 
         design->picture_num = 46 /* '.' */;
 
@@ -1743,6 +1789,10 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     for (int16_t i = 0; i < 8; ++i) {
         design->ship_weapon[i].type = 0;
         design->ship_weapon[i].count = 0;
+    }
+
+    if (lander_ship_uses_stealth.transport_ship != 0) {
+        Equip_Best_Stealth_Device_(player_idx, design);
     }
 
     design->picture_num = 47 /* '/' */;

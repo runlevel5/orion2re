@@ -261,7 +261,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:2710` - `autodesign`: fixed in `aidesign::Auto_Design_Ship_()` and `DESIGN::Calculate_Design_()` by deriving component space, shield cost, and base combat speed from the same authoritative per-hull design data used by manual design; direct source calculations replace the 1.50 stash globals and wrappers, with synchronized tactical Megafluxers and Augmented Engines bonuses.
 - [x] `asm.pl:2948` - `sfx in flics`: implemented in `SMACK::Play_Cinematic_()` and `smckplay::Open_Smacker_Animation_()` by enabling embedded cinematic audio when either music or sound effects are enabled; this replaces the 1.50 call-site wrapper with an explicit source-level audio policy.
 - [ ] `asm.pl:3286` - `teleporters and boarding`
-- [ ] `asm.pl:3935` - `stealth landers`
+- [x] `asm.pl:3935` - `stealth landers`: implemented in the three `INITSHIP` lander design loaders with synchronized `colony lander_ship_uses_stealth` configuration and a file-local best-researched-device selector; direct source selection replaces the 1.50 call-site wrappers and avoids their player-index-dependent register-state defect.
 - [x] `asm.pl:4444` - `android cost`: implemented with synchronized `colony misc_costs` Android settings and independent selection in `COLCALC::Colony_Product_Cost_()`; direct source lookups replace the 1.50 code-cave indexing while preserving classic 50/50/50 defaults.
 - [ ] `asm.pl:4766` - `moving farmer`
 - [ ] `asm.pl:4813` - `absorber, damper`

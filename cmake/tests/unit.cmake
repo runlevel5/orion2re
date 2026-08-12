@@ -404,6 +404,9 @@ orion2re_add_unit_test(test_initship
         tests/unit/test_initship.cpp
     PRODUCTION_SOURCES
         src/game/initship.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_memory.cpp
+    LINK_SDL
 )
 
 if(MSVC)

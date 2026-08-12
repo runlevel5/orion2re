@@ -984,6 +984,15 @@
         { id: "regen", title: "Regeneration", description: "Repair percentage supplied by a working Regeneration special when Amoeba regeneration is enabled.", type: "uint8", bind: ["regen"] },
       ],
     },
+    lander_ship_uses_stealth: {
+      title: "Landing ship stealth equipment",
+      description: "Controls whether each landing ship type installs the best researched stealth device.",
+      fields: [
+        { id: "colony_ship", title: "Colony Ship", description: "Equip Colony Ships with the best researched stealth device.", type: "bool", bind: ["colony_ship"] },
+        { id: "outpost_ship", title: "Outpost Ship", description: "Equip Outpost Ships with the best researched stealth device.", type: "bool", bind: ["outpost_ship"] },
+        { id: "transport_ship", title: "Transport", description: "Equip Transports with the best researched stealth device.", type: "bool", bind: ["transport_ship"] },
+      ],
+    },
   },
 
   parameters: {
@@ -2384,6 +2393,29 @@
       bind_root: {
         header: "game/science.h",
         symbol: "SCIENCE::_finds_presented_by_scientist",
+      },
+    },
+
+    lander_ship_uses_stealth: {
+      title: "Landing ship stealth equipment",
+      description: "Controls whether colony, outpost, and transport ships install the best researched stealth device.",
+      remarks: "All fields default to false, preserving classic behavior and matching MOO2 1.50.",
+      examples: [
+        "colony lander_ship_uses_stealth colony_ship = true;",
+        "colony lander_ship_uses_stealth outpost_ship = true;",
+        "colony lander_ship_uses_stealth transport_ship = true;",
+      ],
+      group: "gameplay",
+      namespace: "colony",
+      type: "lander_ship_uses_stealth",
+      bind_root: {
+        header: "game/initship.h",
+        symbol: "INITSHIP::lander_ship_uses_stealth",
+      },
+      default: {
+        colony_ship: false,
+        outpost_ship: false,
+        transport_ship: false,
       },
     },
   },

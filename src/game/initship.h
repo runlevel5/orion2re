@@ -5,8 +5,15 @@ struct s_ship_data;
 struct s_ship_design;
 
 namespace INITSHIP {
+    struct s_lander_ship_uses_stealth {
+        uint8_t colony_ship;
+        uint8_t outpost_ship;
+        uint8_t transport_ship;
+    };
+
     inline uint8_t _satellite_uses_torpedoes = 0;
     inline uint8_t _td_ftl_bonus = 2;
+    inline s_lander_ship_uses_stealth lander_ship_uses_stealth = {};
 
     void __cdecl Repair_Ships_At_Colonies_();
 
