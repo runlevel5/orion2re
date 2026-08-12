@@ -1042,6 +1042,21 @@
         android_scientist: 50,
       },
     },
+    pop_bonus_biospheres: {
+      title: "Biospheres population bonus",
+      description: "Sets the population-capacity bonus provided by Biospheres.",
+      remarks: "The default of two preserves classic behavior and matches MOO2 1.50.",
+      examples: ["colony pop_bonus_biospheres = 2;"],
+      units: "population",
+      group: "gameplay",
+      namespace: "colony",
+      type: "uint8",
+      default: 2,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_pop_bonus_biospheres",
+      },
+    },
     growth_rate_bonus: {
       title: "Population growth-rate modifiers",
       description: "Configures the general, technology, and event modifiers used by colony population growth.",

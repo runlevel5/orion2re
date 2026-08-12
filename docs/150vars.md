@@ -215,7 +215,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:8705` - `spherical_range_to_ship`
 - [ ] `conf.pl:8736` - `spherical_range_to_missile`
 - [ ] `conf.pl:8757` - `defensive_range_bonus`
-- [ ] `conf.pl:8769` - `pop_bonus_biospheres`
+- [x] `conf.pl:8769` - `pop_bonus_biospheres` -> `colony.pop_bonus_biospheres`
 - [ ] `conf.pl:8781` - `shield_hull_multiplier`
 - [x] `conf.pl:8797` - `lightning_field_ratio` -> `combat.lightning_field_ratio`
 - [x] `conf.pl:8816` - `lightning_field_mode` -> `combat.lightning_field_mode`

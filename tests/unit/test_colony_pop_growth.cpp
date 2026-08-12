@@ -181,6 +181,22 @@ DOCTEST_TEST_CASE("reported population capacities do not exceed colony storage")
         previous_max_population;
 }
 
+DOCTEST_TEST_CASE("Biospheres population bonus is configurable") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_colony* colony = &MOX::_colony[0];
+    colony->owner = 0;
+    colony->planet = 0;
+    colony->climate = PLANET_CLIMATE_GAIA;
+    colony->buildings[BUILDING_BIOSPHERES] = 1;
+
+    DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit_(colony, 0) == 27);
+
+    COLCALC::_pop_bonus_biospheres = 7;
+
+    DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit_(colony, 0) == 32);
+}
+
 DOCTEST_TEST_CASE("classic starvation preserves the final population") {
     s_colony* colony = Prepare_Starving_Colony_();
 

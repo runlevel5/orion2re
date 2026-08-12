@@ -40,6 +40,7 @@ namespace TEST_COLONY_POP_GROWTH {
             100,
             -200,
         };
+        COLCALC::_pop_bonus_biospheres = 2;
         COLCALC::_housing_creates_no_farmers = 0;
         COLCALC::_planet_extinction = 0;
         COLCALC::_zero_colony_lost = 0;

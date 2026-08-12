@@ -272,7 +272,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:5616` - `planet visuals`: fixed in `CMBTDRW1::Get_Draw_Ship_Offsets_()` by selecting tactical planet sprite offsets from the actual planet size and correcting the Antares offset; this replaces the 1.50 all-call assembly wrapper with a direct owner-level draw-alignment invariant.
 - [ ] `asm.pl:5634` - `strategic visuals`
 - [x] `asm.pl:5917` - `report cheaters`: fixed in `MAINSCR::Do_Next_Turn_()` and `MAINSCR::Warn_About_Cheating_Players_()` by arming every player's warning slot and retaining the cheat marker until each observer's persistent warning mask consumes it; this directly expresses the three 1.50 instruction edits in source.
-- [ ] `asm.pl:5940` - `biospheres`
+- [x] `asm.pl:5940` - `biospheres`: implemented in `COLCALC::Colony_Race_Pop_Limit_()` with synchronized `colony pop_bonus_biospheres` configuration; direct source-level addition replaces the 1.50 assembly helper while preserving the classic default of two.
 - [ ] `asm.pl:5968` - `correct food output`
 - [ ] `asm.pl:6017` - `shield table`
 - [ ] `asm.pl:6317` - `side end turn`

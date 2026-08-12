@@ -1013,7 +1013,7 @@ namespace COLCALC {
 
         // Building bonus: Biospheres
         if (colony->buildings[BUILDING_BIOSPHERES] != 0) {
-            pop_limit += 2;
+            pop_limit += _pop_bonus_biospheres;
         }
 
         if (pop_limit > 42) {

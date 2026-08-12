@@ -28,6 +28,7 @@ namespace COLCALC {
     };
 
     extern s_growth_rate_bonus growth_rate_bonus;
+    extern uint8_t _pop_bonus_biospheres;
 
     extern uint8_t _housing_creates_no_farmers;
     extern uint8_t _planet_extinction;
