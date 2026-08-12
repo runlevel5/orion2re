@@ -773,6 +773,34 @@ DOCTEST_TEST_CASE("missile speed settings preserve and replace 1.50 defaults") {
     DOCTEST_REQUIRE(config::Commit_State(&state));
 }
 
+DOCTEST_TEST_CASE("ship design technology bonuses preserve 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(DESIGN::_megafluxers_tactical_bonus == 25);
+    DOCTEST_CHECK(DESIGN::_augmented_engines_speed_bonus == 5);
+    DOCTEST_CHECK(DESIGN::Apply_Megafluxers_Tactical_Bonus_(120) == 150);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "design megafluxers_tactical_bonus = 40;"
+        "design augmented_engines_speed_bonus = 12;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(DESIGN::_megafluxers_tactical_bonus == 40);
+    DOCTEST_CHECK(DESIGN::_augmented_engines_speed_bonus == 12);
+    DOCTEST_CHECK(DESIGN::Apply_Megafluxers_Tactical_Bonus_(120) == 168);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "design augmented_engines_speed_bonus = 128;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("alternative refit formula preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

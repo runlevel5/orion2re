@@ -103,8 +103,13 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Cost_Of_Design_(int16_t player_idx, s_ship_design* ship_design) {
+        return Calculate_Design_(player_idx, ship_design, nullptr);
+    }
+
+    int16_t __cdecl Calculate_Design_(int16_t player_idx, s_ship_design* ship_design, uint8_t* combat_speed) {
         // TODO: Pass player_idx through the design-cost helpers instead of relying on a global.
         int16_t previous_player_idx = MOX::_PLAYER_NUM;
+        s_current_design* previous_design = MOX::_design;
         MOX::_PLAYER_NUM = player_idx;
 
         s_current_design current_design;
@@ -120,6 +125,7 @@ namespace DESIGN {
         current_design.ship_size = static_cast<int16_t>(ship_design->size);
 
         current_design.hull_space = DESIGN::Total_Design_Space_();
+        current_design.shield = (int16_t)ship_design->shield_type;
         current_design.computer_type = static_cast<int16_t>(ship_design->computer_type);
         current_design.picture_type = static_cast<int16_t>(ship_design->picture_num);
         current_design.armor_type = static_cast<int16_t>(ship_design->armor_type);
@@ -152,10 +158,14 @@ namespace DESIGN {
             }
         }
 
-        current_design.base_combat_speed = Current_Design_Combat_Speed_(MOX::_design);
         Update_Calculated_Design_Data_(player_idx);
+        current_design.base_combat_speed = Current_Design_Base_Combat_Speed_(MOX::_design);
+        if (combat_speed != nullptr) {
+            *combat_speed = (uint8_t)current_design.base_combat_speed;
+        }
 
         int16_t cost = static_cast<int16_t>(current_design.total_cost);
+        MOX::_design = previous_design;
         MOX::_PLAYER_NUM = previous_player_idx;
         return cost;
     }
@@ -181,7 +191,7 @@ namespace DESIGN {
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_AUGMENTED_ENGINES) != 0) {
             if (_use_augmented_engines != 0) {
-                speed += 5;
+                speed += _augmented_engines_speed_bonus;
             }
         }
 
@@ -273,7 +283,7 @@ namespace DESIGN {
         int32_t hull_size = TECHDATA::_hull_data[ship_size].size;
 
         if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            hull_size = (hull_size * 125) / 100;
+            hull_size = Apply_Megafluxers_Tactical_Bonus_(hull_size);
         }
 
         return hull_size;

@@ -21,6 +21,7 @@ namespace DESIGN {
     extern s_animation_header* _dark_build_design_button_seg;
 
     int16_t __cdecl Cost_Of_Design_(int16_t player_idx, struct s_ship_design* ship_design);
+    int16_t __cdecl Calculate_Design_(int16_t player_idx, struct s_ship_design* ship_design, uint8_t* combat_speed);
 
     uint8_t __cdecl Current_Design_Size_(int16_t player_idx, int16_t design_idx);
 

@@ -1291,7 +1291,7 @@ void __cdecl Get_Design_Combat_Bonuses_(s_ship_design design, int16_t* attack_bo
 
     int16_t current_speed = design.combat_speed;
     if (struct_::Test_Bit_Field_(design.special_device_flags, 2)) {
-        current_speed += 5;
+        current_speed += DESIGN::_augmented_engines_speed_bonus;
     }
 
     int16_t defense_rating = current_speed * 5;

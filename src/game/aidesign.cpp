@@ -1469,9 +1469,12 @@ namespace aidesign {
         design->armor_type = (int8_t)INITSHIP::Best_Armor_(player_idx);
 
         remaining_space = TECHDATA::_hull_data[hull_idx].size;
+        if (player->tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
+            remaining_space = (int16_t)DESIGN::Apply_Megafluxers_Tactical_Bonus_(remaining_space);
+        }
 
         if (player->tech_applications[TECH_APP_BATTLE_PODS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            remaining_space += remaining_space / 2;
+            remaining_space -= (int16_t)TECHDATA::_specials[SPECIAL_BATTLE_PODS].space_per_ship_type[hull_idx];
             struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_BATTLE_PODS);
         }
 
@@ -1639,7 +1642,7 @@ namespace aidesign {
                     struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
                     int8_t cat = DESIGN::Miniaturization_Category_(TECH_APP_EXTENDED_FUEL_TANKS);
                     int16_t m_level = DESIGN::Miniaturization_Level_(player_idx, TECH_APP_EXTENDED_FUEL_TANKS);
-                    int16_t fuel_tank_base_space = TECHDATA::_specials[SPECIAL_EXTENDED_FUEL_TANKS].space_per_ship_type[0];
+                    int16_t fuel_tank_base_space = (int16_t)TECHDATA::_specials[SPECIAL_EXTENDED_FUEL_TANKS].space_per_ship_type[hull_idx];
                     remaining_space -= DESIGN::Space_Given_M_Level_(fuel_tank_base_space, m_level, cat);
                 }
                 /* fallthrough */
@@ -1676,9 +1679,8 @@ namespace aidesign {
             Add_Bomb_Weapon_To_Design_(player_idx, design, &weapon_slot_idx, current_budget + (int16_t)((remaining_space * table->bombs) / 100));
         }
 
-        design->combat_speed = (int8_t)TECHDATA::_drives[design->ftl_type].combat_speed_min[hull_idx];
         design->previous_owner = (uint8_t)player_idx;
-        design->cost = DESIGN::Cost_Of_Design_(player_idx, design);
+        design->cost = DESIGN::Calculate_Design_(player_idx, design, &design->combat_speed);
         design->date_of_design = (uint16_t)MOX::_stardate;
     }
 

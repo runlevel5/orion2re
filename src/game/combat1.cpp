@@ -12,7 +12,7 @@ namespace COMBAT1 {
 
         if (struct_::Test_Bit_Field_(
                 ship.special_device_flags, SPECIAL_AUGMENTED_ENGINES) != 0) {
-            speed += 5;
+            speed += DESIGN::_augmented_engines_speed_bonus;
         }
 
         if (ship.owner >= 0 && ship.owner < MAX_PLAYERS &&
@@ -1167,7 +1167,7 @@ namespace COMBAT1 {
             
             if (struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_flags, SPECIAL_AUGMENTED_ENGINES) == 1 &&
                 struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_damage_flags, SPECIAL_AUGMENTED_ENGINES) == 0) {
-                combat_speed += 5;
+                combat_speed += DESIGN::_augmented_engines_speed_bonus;
             }
             
             int owner = MOX::_combat_data[ship_idx].owner;

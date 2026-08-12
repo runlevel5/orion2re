@@ -1944,6 +1944,37 @@
       bind_root: { header: "game/combat1.h", symbol: "COMBAT1::_td_combat_speed_bonus" },
     },
 
+    megafluxers_tactical_bonus: {
+      title: "Megafluxers tactical space bonus",
+      description: "Increases tactical ship and orbital-defense space when Megafluxers are researched.",
+      examples: ["design megafluxers_tactical_bonus = 25;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "design",
+      type: "uint16",
+      default: 25,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_megafluxers_tactical_bonus",
+      },
+    },
+
+    augmented_engines_speed_bonus: {
+      title: "Augmented Engines speed bonus",
+      description: "Adds tactical combat speed while working Augmented Engines are installed.",
+      examples: ["design augmented_engines_speed_bonus = 5;"],
+      units: "combat speed",
+      group: "gameplay",
+      namespace: "design",
+      type: "uint8",
+      constraints: { max: 127 },
+      default: 5,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_augmented_engines_speed_bonus",
+      },
+    },
+
     alternative_refit: {
       title: "Alternative refit cost",
       description: "Uses the alternative ship-refit cost formula.",

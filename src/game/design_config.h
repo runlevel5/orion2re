@@ -30,7 +30,12 @@ namespace DESIGN {
     extern uint8_t _alternative_refit;
     extern uint8_t _design_button_computer;
     extern uint8_t _design_button_shield;
+    inline uint16_t _megafluxers_tactical_bonus = 25;
+    inline uint8_t _augmented_engines_speed_bonus = 5;
 
+    inline int32_t Apply_Megafluxers_Tactical_Bonus_(int32_t space) {
+        return (space * (100 + _megafluxers_tactical_bonus)) / 100;
+    }
     uint16_t Miniaturization_Cost_Multiplier_(int16_t level);
     uint16_t Miniaturization_Space_Multiplier_(int16_t level, int8_t category);
     int16_t Missile_Rack_Quantity_(int16_t rack_index);

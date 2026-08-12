@@ -162,7 +162,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
     if (struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, SPECIAL_AUGMENTED_ENGINES)) {
         if (!struct_::Test_Bit_Field_(MOX::_ship[ship_idx].special_device_damage_flags, SPECIAL_AUGMENTED_ENGINES)) {
-            MOX::_global_combat_data.current_speed += 5;
+            MOX::_global_combat_data.current_speed += DESIGN::_augmented_engines_speed_bonus;
         }
     }
 
@@ -1787,7 +1787,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
 
         int16_t size = TECHDATA::_hull_data[HULL_STAR_BASE].size;
         if (MOX::_player[defender].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            size = (size * 5) / 4;
+            size = (int16_t)DESIGN::Apply_Megafluxers_Tactical_Bonus_(size);
         }
         int16_t half_size = size / 2;
         space = size - half_size;
@@ -1801,7 +1801,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
 
         int16_t size = TECHDATA::_hull_data[HULL_BATTLESTATION].size;
         if (MOX::_player[defender].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            size = (size * 5) / 4;
+            size = (int16_t)DESIGN::Apply_Megafluxers_Tactical_Bonus_(size);
         }
         int16_t half_size = size / 2;
         space = size - half_size;
@@ -1815,7 +1815,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
 
         int16_t size = TECHDATA::_hull_data[HULL_STAR_FORTRESS].size;
         if (MOX::_player[defender].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            size = (size * 5) / 4;
+            size = (int16_t)DESIGN::Apply_Megafluxers_Tactical_Bonus_(size);
         }
         int16_t half_size = size / 2;
         space = size - half_size;
