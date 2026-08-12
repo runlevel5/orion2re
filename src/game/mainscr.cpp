@@ -2231,8 +2231,6 @@ namespace MAINSCR {
                 local_player->warned_about_cheating_player |= (1 << (i & 0x1F));
             }
         }
-
-        MOX::_player[MOX::_PLAYER_NUM].cheated_this_turn = 0;
     }
 
     void __cdecl Change_Home_Star_Name_() {
@@ -2683,7 +2681,7 @@ namespace MAINSCR {
         MOX::_just_moved_stack = 0;
         MOX::_animated_star = -1;
 
-        _warn_about_cheaters = static_cast<uint8_t>(1 << (MOX::_PLAYER_NUM & 0x1F));
+        _warn_about_cheaters = 0xFF;
 
         if (MOX::_game_type == 1 /* Hotseat */) {
             Save_Hotseat_Map_Info_();
