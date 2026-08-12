@@ -28,6 +28,10 @@ namespace CMBTFIRE {
     };
 }
 
+namespace CMBTFIR2 {
+    uint16_t _systems_repair_percent = 50;
+}
+
 namespace TECHDATA {
     s_tech_shield_data _shields[SHIELD_COUNT] = {};
     uint16_t _shield_hull_multiplier[HULL_CLASS_COUNT] = {};

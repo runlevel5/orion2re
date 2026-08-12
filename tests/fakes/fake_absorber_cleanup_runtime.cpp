@@ -17,6 +17,7 @@ namespace TEST_ABSORBER_CLEANUP {
         combat_data[1].ftl_type = 1;
         combat_data[1].size_class = HULL_CRUISER;
         TECHDATA::_hull_data[HULL_CRUISER].drive_hp = 30;
+        CMBTFIR2::_systems_repair_percent = 50;
         MOX::_apply_damage_to_planet = 0;
         warning_count = 0;
         combat_refresh_count = 0;
@@ -48,6 +49,7 @@ namespace MOX {
 
 namespace TECHDATA {
     s_tech_hull_data _hull_data[HULL_CLASS_COUNT];
+    s_tech_armor_data _armor[ARMOR_COUNT];
     s_tech_specials_data _specials[SPECIAL_COUNT];
 }
 
@@ -63,6 +65,11 @@ namespace struct_ {
         const uint8_t* bytes = static_cast<const uint8_t*>(bit_field);
         return (bytes[bit_index / 8] >> (bit_index % 8)) & 1;
     }
+
+    void __cdecl Clear_Bit_Field_(void* bit_field, uint16_t bit_index) {
+        uint8_t* bytes = static_cast<uint8_t*>(bit_field);
+        bytes[bit_index / 8] &= (uint8_t)~(1u << (bit_index % 8));
+    }
 }
 
 namespace COMBINIT {
@@ -72,6 +79,16 @@ namespace COMBINIT {
         s_combat_data* ship = &combat_data[ship_idx];
         return (ship->special_device_flags[special_id / 8] & mask) != 0 &&
                (ship->special_device_damage_flags[special_id / 8] & mask) == 0;
+    }
+
+    int16_t __cdecl Calc_Combat_Shield_Max_(int16_t) {
+        return 0;
+    }
+}
+
+namespace INITSHIP {
+    int16_t __cdecl Get_Ship_Armor_Hits_(int16_t) {
+        return 0;
     }
 }
 

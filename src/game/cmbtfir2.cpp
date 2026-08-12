@@ -21,6 +21,7 @@ namespace CMBTFIR2 {
     }
 
     int16_t _artemis_net_chance[6] = { 20, 30, 40, 50, 80, 100 };
+    uint16_t _systems_repair_percent = 50;
 
     int16_t __cdecl Helmsman_Bonus_(int16_t leader_idx) {
         int16_t bonus = 0;
@@ -666,7 +667,9 @@ namespace CMBTFIR2 {
             }
         }
 
-        int32_t pool = (amount * Max_Total_Internal_Space_(ship_idx)) / 200;
+        int64_t pool =
+            (int64_t)amount * Max_Total_Internal_Space_(ship_idx) *
+            _systems_repair_percent / 10000;
         if (pool < 2) pool = 1;
 
         if (ship->drive_current_hits < ship->drive_max_hits && pool > 0) {

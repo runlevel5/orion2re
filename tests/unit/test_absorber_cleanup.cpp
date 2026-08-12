@@ -67,3 +67,17 @@ DOCTEST_TEST_CASE("computerless ships have no damageable computer subsystem") {
     DOCTEST_CHECK(ship->computer_max_hits == 5);
     DOCTEST_CHECK(ship->computer_current_hits == 5);
 }
+
+DOCTEST_TEST_CASE("configured systems repair percentage scales internal repair") {
+    TEST_ABSORBER_CLEANUP::Reset_();
+    s_combat_data* ship = &MOX::_combat_data[1];
+    ship->ship_idx = 0;
+    ship->structure_damage = 100;
+    ship->drive_max_hits = 200;
+    ship->drive_current_hits = 0;
+    CMBTFIR2::_systems_repair_percent = 25;
+
+    CMBTFIR2::Repair_Combat_Ship_(1, 20);
+
+    DOCTEST_CHECK(ship->drive_current_hits == 5);
+}

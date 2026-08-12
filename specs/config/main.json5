@@ -2655,6 +2655,22 @@
       default: { cyber: 10, aru: 20, regen: 20 },
     },
 
+    systems_repair_percent: {
+      title: "Internal-system repair percentage",
+      description: "Sets repaired internal-system hit points as a percentage of the proportional structure repair pool.",
+      remarks: "The default of 50 preserves classic behavior and matches MOO2 1.50.",
+      examples: ["combat systems_repair_percent = 50;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint16",
+      default: 50,
+      bind_root: {
+        header: "game/cmbtfir2.h",
+        symbol: "CMBTFIR2::_systems_repair_percent",
+      },
+    },
+
     missile_initiative: {
       title: "Missile initiative",
       description: "Controls when newly fired missiles first move while ship initiative is enabled.",

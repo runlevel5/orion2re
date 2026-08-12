@@ -279,7 +279,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:6632` - `scout lab bonus`: implemented in `COLCALC::Update_Player_Stats_()` with synchronized `research scout_lab_research_bonus` values for all six ship size classes; a bounded source-level table lookup replaces the 1.50 instruction-level lookup while preserving classic defaults.
 - [ ] `asm.pl:6645` - `command points`
 - [x] `asm.pl:6772` - `feudal cost reduction`: implemented in `DESIGN::Cost_Reduction_For_Govt_Type_()` with synchronized government-indexed cost-reduction ratios; the shared source helper replaces the 1.50 all-call diversion and generalizes the setting to every government while preserving classic defaults.
-- [ ] `asm.pl:8411` - `specials repair percent`
+- [x] `asm.pl:8411` - `specials repair percent`: implemented in `CMBTFIR2::Repair_Combat_Ship_()` with synchronized `combat systems_repair_percent` configuration; direct source-level scaling replaces the 1.50 arithmetic helper while preserving the classic 50 percent default.
 - [ ] `asm.pl:8433` - `trade goods`
 - [ ] `asm.pl:8468` - `rotate warning`
 - [ ] `asm.pl:8604` - `postwarp techtable length`

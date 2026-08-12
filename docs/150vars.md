@@ -251,7 +251,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:9698` - `growth_formula_factor`
 - [ ] `conf.pl:9714` - `housing_formula_factor`
 - [ ] `conf.pl:9728` - `cloners_growth_bonus`
-- [ ] `conf.pl:9741` - `systems_repair_percent`
+- [x] `conf.pl:9741` - `systems_repair_percent` -> `combat.systems_repair_percent`
 - [ ] `conf.pl:9763` - `trade_goods_ratio`
 - [ ] `conf.pl:9777` - `confirm_battle_message_timeout`
 - [ ] `conf.pl:9793` - `broken_engine_explodes`

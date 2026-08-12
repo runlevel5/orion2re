@@ -4,6 +4,7 @@
 
 namespace CMBTFIR2 {
     extern int16_t _artemis_net_chance[6];
+    extern uint16_t _systems_repair_percent;
 
     /** Returns the helmsman combat bonus granted by the specified leader. */
     int16_t __cdecl Helmsman_Bonus_(int16_t leader_idx);
