@@ -85,6 +85,8 @@ namespace COLCALC {
 
     bool __cdecl Room_For_Another_Dude_(s_colony* colony, int race_idx);
 
+    void Format_Food2(uint16_t food2, char* buffer, uint32_t buffer_size);
+
     int32_t __cdecl Production_Cost_To_Buy_(int32_t product_cost, int32_t production_spent);
 
     int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent);

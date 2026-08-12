@@ -1,6 +1,15 @@
 #include "pch.h"
 
 namespace COLCALC {
+    void Format_Food2(uint16_t food2, char* buffer, uint32_t buffer_size) {
+        snprintf(
+            buffer,
+            buffer_size,
+            "%u%s",
+            (unsigned int)(food2 / 2),
+            food2 % 2 != 0 ? ".5" : "");
+    }
+
     int32_t __cdecl Production_Cost_To_Buy_(int32_t product_cost, int32_t production_spent) {
         if (production_spent >= product_cost) {
             return 0;
