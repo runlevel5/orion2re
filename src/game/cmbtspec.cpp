@@ -1675,7 +1675,7 @@ namespace CMBTSPEC {
                 if (MOX::_combat_data[i].unit_status == 0 &&
                     CMBTMOV1::Ship_Is_In_Stasis_(i) == 0 &&
                     i != source_ship_idx &&
-                    MOX::_combat_data[i].unit_status != 5)
+                    MOX::_combat_data[i].special_status_flag != 4)
                 {
                     int16_t cx, cy;
                     CMBTDRW1::Get_Ship_Center_Draw_XY_(i, &cx, &cy);
