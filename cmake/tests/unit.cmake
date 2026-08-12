@@ -402,6 +402,7 @@ orion2re_add_unit_test(test_combat_stats
         tests/unit/test_combat_stats.cpp
     PRODUCTION_SOURCES
         src/game/combat1.cpp
+        src/game/cmbtdrw1.cpp
         src/game/cmbtmov1.cpp
 )
 

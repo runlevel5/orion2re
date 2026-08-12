@@ -1908,21 +1908,29 @@ skip_cursor:
         *out_y = 0;
 
         if (ship_idx == 0) {
-            *out_x = 0;
-            *out_y = 0;
-
             if (MOX::_cmbt_colony_id == -1) {
-                *out_x = 9;
+                *out_x = 7;
                 *out_y = 7;
                 return;
             }
 
-            if (MOX::_planet[MOX::_colony[MOX::_cmbt_colony_id].planet].size != 2) {
+            static const int16_t planet_offsets[PLANET_SIZE_COUNT][2] = {
+                {2, 2},
+                {0, 1},
+                {7, 7},
+                {4, 4},
+                {6, 6},
+            };
+
+            int16_t planet_size =
+                MOX::_planet[MOX::_colony[MOX::_cmbt_colony_id].planet].size;
+            if (planet_size < PLANET_SIZE_TINY ||
+                planet_size >= PLANET_SIZE_COUNT) {
                 return;
             }
 
-            *out_x = 9;
-            *out_y = 7;
+            *out_x = planet_offsets[planet_size][0];
+            *out_y = planet_offsets[planet_size][1];
             return;
         }
 

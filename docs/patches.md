@@ -269,7 +269,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:4939` - `thousands of millions colony ships`: fixed in `SYS::Do_Print_System_Ship_Data_()` by supplying the colony-ship count to both singular and plural format strings; this replaces the 1.50 jump into the shared assembly formatting tail with one direct source-level formatting call.
 - [ ] `asm.pl:5286` - `starbases`
 - [ ] `asm.pl:5553` - `bombing range`
-- [ ] `asm.pl:5616` - `planet visuals`
+- [x] `asm.pl:5616` - `planet visuals`: fixed in `CMBTDRW1::Get_Draw_Ship_Offsets_()` by selecting tactical planet sprite offsets from the actual planet size and correcting the Antares offset; this replaces the 1.50 all-call assembly wrapper with a direct owner-level draw-alignment invariant.
 - [ ] `asm.pl:5634` - `strategic visuals`
 - [ ] `asm.pl:5917` - `report cheaters`
 - [ ] `asm.pl:5940` - `biospheres`

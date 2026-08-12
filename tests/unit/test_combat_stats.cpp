@@ -1,13 +1,16 @@
 #include "pch.h"
 
 #include "doctest/doctest.h"
+#include "game/cmbtdrw1.h"
 #include "game/cmbtmov1.h"
 #include "game/combat1.h"
 #include "game/combinit.h"
 
 namespace {
     s_combat_data combat_data[2];
+    s_colony colonies[1];
     s_missile missiles[300];
+    s_planet_data planets[1];
     s_player players[MAX_PLAYERS];
 }
 
@@ -62,8 +65,11 @@ namespace TEST_MISSILE_BEARING {
 
 namespace MOX {
     s_combat_data* _combat_data = combat_data;
+    s_colony* _colony = colonies;
     s_missile* _missile = missiles;
+    s_planet_data* _planet = planets;
     s_player* _player = players;
+    int16_t _cmbt_colony_id;
     int16_t _combat_total_ship_count;
     int16_t _cur_ship;
     int16_t _net_flag;
@@ -127,6 +133,44 @@ namespace special {
         *x_ptr = x2;
         *y_ptr = y2;
     }
+}
+
+DOCTEST_TEST_CASE("tactical planets use size-specific draw offsets") {
+    struct s_planet_draw_offset_case {
+        int8_t size;
+        int16_t x;
+        int16_t y;
+    };
+
+    const s_planet_draw_offset_case cases[] = {
+        {PLANET_SIZE_TINY, 2, 2},
+        {PLANET_SIZE_SMALL, 0, 1},
+        {PLANET_SIZE_MEDIUM, 7, 7},
+        {PLANET_SIZE_LARGE, 4, 4},
+        {PLANET_SIZE_HUGE, 6, 6},
+    };
+
+    MOX::_cmbt_colony_id = 0;
+    MOX::_colony[0].planet = 0;
+
+    for (const s_planet_draw_offset_case test_case : cases) {
+        MOX::_planet[0].size = test_case.size;
+
+        int16_t x = -1;
+        int16_t y = -1;
+        CMBTDRW1::Get_Draw_Ship_Offsets_(0, &x, &y);
+
+        DOCTEST_CHECK(x == test_case.x);
+        DOCTEST_CHECK(y == test_case.y);
+    }
+
+    MOX::_cmbt_colony_id = -1;
+    int16_t x = -1;
+    int16_t y = -1;
+    CMBTDRW1::Get_Draw_Ship_Offsets_(0, &x, &y);
+
+    DOCTEST_CHECK(x == 7);
+    DOCTEST_CHECK(y == 7);
 }
 
 DOCTEST_TEST_CASE("interactive speed loss preserves movement already spent") {
