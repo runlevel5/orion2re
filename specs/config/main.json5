@@ -593,6 +593,24 @@
       reject_unknown_numeric: true,
       values: { none: 0, class_i: 1, class_iii: 2, class_v: 3, class_vii: 4, class_x: 5 },
     },
+    shield_hull: {
+      title: "Shield hull class",
+      description: "Selects a ship or orbital-defense hull for shield capacity.",
+      remarks: "The order and names preserve the MOO2 1.50 shield_hull_multiplier table.",
+      kind: "enum",
+      base_type: "uint8",
+      values: {
+        frigate: 0,
+        destroyer: 1,
+        cruiser: 2,
+        battleship: 3,
+        titan: 4,
+        doomstar: 5,
+        star_base: 6,
+        battlestation: 7,
+        star_fortress: 8,
+      },
+    },
     ship_computer: {
       title: "Ship computer",
       description: "Targeting computer installed in a predefined ship design.",
@@ -846,6 +864,21 @@
         { id: "pd", title: "Point Defense", description: "Damage percentage for a Point Defense beam.", type: "uint16", bind: ["pd"] },
         { id: "nomod", title: "Normal mount", description: "Damage percentage for a beam without a mount modification.", type: "uint16", bind: ["nomod"] },
         { id: "heavy", title: "Heavy Mount", description: "Damage percentage for a Heavy Mount beam.", type: "uint16", bind: ["heavy"] },
+      ],
+    },
+    shield_data: {
+      title: "Ship shield data",
+      description: "Space, cost, and blocking strength for one ship shield.",
+      fields: [
+        {
+          id: "space", title: "Space", description: "Base space requirement for each combat ship size.", bind: ["space_per_ship_type"],
+          type: { kind: "array", count: 6, index_base: 0, index_type: "combat_ship_size_class", element: { type: "uint16" } },
+        },
+        {
+          id: "cost", title: "Cost", description: "Base production cost for each combat ship size.", bind: ["cost_per_ship_type"],
+          type: { kind: "array", count: 6, index_base: 0, index_type: "combat_ship_size_class", element: { type: "uint16" } },
+        },
+        { id: "shield_class", title: "Shield class", description: "Damage blocked by the shield.", type: "uint16", bind: ["shield_class"] },
       ],
     },
     miniaturization_settings: {
@@ -2032,6 +2065,65 @@
       type: "uint8",
       default: 4,
       bind_root: { header: "game/combat1.h", symbol: "COMBAT1::_td_combat_speed_bonus" },
+    },
+
+    shield: {
+      title: "Ship shield table",
+      description: "Configures shield space, cost, and blocking strength.",
+      remarks: "Conversion from MOO2 1.50 CFG syntax uses named nested arrays and the restored shield names. For example, `shield class_v_shield space_ca = 20;` becomes `design shield class_v space cruiser = 20;`, and `cost_ff` becomes `cost frigate`. The `none` row is exposed as the native empty sentinel and should normally remain zero.",
+      examples: [
+        "design shield class_v shield_class = 5;",
+        "design shield class_v space cruiser = 20;",
+        "design shield class_v cost battleship = 25;",
+      ],
+      group: "gameplay",
+      namespace: "design",
+      bind_root: { header: "game/techdata.h", symbol: "TECHDATA::_shields" },
+      type: {
+        kind: "array",
+        count: 6,
+        index_base: 0,
+        index_type: "ship_shield",
+        element: { type: "shield_data" },
+      },
+      default: [
+        { space: [0, 0, 0, 0, 0, 0], cost: [0, 0, 0, 0, 0, 0], shield_class: 0 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 1 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 3 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 5 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 7 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 10 },
+      ],
+    },
+
+    shield_hull_multiplier: {
+      title: "Shield capacity by hull",
+      description: "Sets the shield-capacity multiplier for each ship and orbital-defense hull.",
+      remarks: "Defaults preserve classic capacity, including the Doom Star and three orbital defenses.",
+      examples: ["design shield_hull_multiplier frigate = 5;"],
+      group: "gameplay",
+      namespace: "design",
+      bind_root: { header: "game/techdata.h", symbol: "TECHDATA::_shield_hull_multiplier" },
+      type: {
+        kind: "array",
+        count: 9,
+        index_base: 0,
+        index_type: "shield_hull",
+        element: { type: "uint16" },
+      },
+      default: [5, 10, 15, 20, 25, 35, 15, 20, 25],
+    },
+
+    hard_shields_damage_reduction: {
+      title: "Hard Shields damage reduction",
+      description: "Sets the additional damage blocked by working Hard Shields.",
+      examples: ["combat hard_shields_damage_reduction = 3;"],
+      units: "damage points",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      default: 3,
+      bind_root: { header: "game/techdata.h", symbol: "TECHDATA::_hard_shields_damage_reduction" },
     },
 
     megafluxers_tactical_bonus: {

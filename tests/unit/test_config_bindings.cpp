@@ -253,6 +253,51 @@ DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor 
         "combat civilian_armor titanium = 0;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("shield tables preserve classic defaults and bind by name") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD].shield_class == 5);
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD]
+                      .space_per_ship_type[SHIP_SIZE_LARGE] == 20);
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD]
+                      .cost_per_ship_type[SHIP_SIZE_HUGE] == 25);
+    DOCTEST_CHECK(TECHDATA::_shield_hull_multiplier[HULL_FRIGATE] == 5);
+    DOCTEST_CHECK(TECHDATA::_shield_hull_multiplier[HULL_DOOM_STAR] == 35);
+    DOCTEST_CHECK(TECHDATA::_shield_hull_multiplier[HULL_STAR_FORTRESS] == 25);
+    DOCTEST_CHECK(TECHDATA::_hard_shields_damage_reduction == 3);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "design shield class_v shield_class = 9;"
+        "design shield class_v space cruiser = 33;"
+        "design shield class_v cost battleship = 44;"
+        "design shield_hull_multiplier doomstar = 41;"
+        "combat hard_shields_damage_reduction = 7;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD].shield_class == 9);
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD]
+                      .space_per_ship_type[SHIP_SIZE_LARGE] == 33);
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD]
+                      .cost_per_ship_type[SHIP_SIZE_HUGE] == 44);
+    DOCTEST_CHECK(TECHDATA::_shield_hull_multiplier[HULL_DOOM_STAR] == 41);
+    DOCTEST_CHECK(TECHDATA::_hard_shields_damage_reduction == 7);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "design shield class_i shield_class = 65536;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat hard_shields_damage_reduction = 256;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("Scout Lab research bonuses preserve classic defaults and bind by ship size") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

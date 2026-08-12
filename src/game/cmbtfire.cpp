@@ -726,7 +726,7 @@ namespace CMBTFIRE {
                 if (!MOX::_in_nebula_flag || COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 13)) {
                     *dmg_out -= TECHDATA::_shields[MOX::_combat_data[target_ship_idx].shield_type].shield_class;
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 13)) {
-                        *dmg_out -= 3;
+                        *dmg_out -= TECHDATA::_hard_shields_damage_reduction;
                     }
                 }
             }

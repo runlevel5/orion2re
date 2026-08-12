@@ -28,6 +28,12 @@ namespace CMBTFIRE {
     };
 }
 
+namespace TECHDATA {
+    s_tech_shield_data _shields[SHIELD_COUNT] = {};
+    uint16_t _shield_hull_multiplier[HULL_CLASS_COUNT] = {};
+    uint8_t _hard_shields_damage_reduction;
+}
+
 namespace SCIENCE {
     uint8_t _finds_presented_by_scientist;
 }

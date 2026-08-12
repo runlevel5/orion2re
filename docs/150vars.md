@@ -33,8 +33,8 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:526` - `research_colony_bonus`
 - [ ] `conf.pl:579` - `armor`
 - [x] `conf.pl:606` - `civilian_armor` -> `combat.civilian_armor`
-- [ ] `conf.pl:661` - `shield`
-- [ ] `conf.pl:683` - `hard_shields_damage_reduction`
+- [x] `conf.pl:661` - `shield` -> `design.shield`
+- [x] `conf.pl:683` - `hard_shields_damage_reduction` -> `combat.hard_shields_damage_reduction`
 - [ ] `conf.pl:723` - `computer`
 - [ ] `conf.pl:792` - `drive`
 - [ ] `conf.pl:836` - `fuel_cells`
@@ -216,7 +216,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:8736` - `spherical_range_to_missile`
 - [ ] `conf.pl:8757` - `defensive_range_bonus`
 - [x] `conf.pl:8769` - `pop_bonus_biospheres` -> `colony.pop_bonus_biospheres`
-- [ ] `conf.pl:8781` - `shield_hull_multiplier`
+- [x] `conf.pl:8781` - `shield_hull_multiplier` -> `design.shield_hull_multiplier`
 - [x] `conf.pl:8797` - `lightning_field_ratio` -> `combat.lightning_field_ratio`
 - [x] `conf.pl:8816` - `lightning_field_mode` -> `combat.lightning_field_mode`
 - [ ] `conf.pl:8830` - `sub_space_teleporter_range`
@@ -531,8 +531,8 @@ These five registrations remain in `conf.pl` for compatibility or generator hist
 ## Completeness check
 
 - Effective active configuration variables: **391**.
-- Exact same-named current registry parameters: **56**.
-- Configuration variables still requiring restoration review: **335**.
+- Exact same-named current registry parameters: **59**.
+- Configuration variables still requiring restoration review: **332**.
 - Superseded `expired` configuration registrations: **5**.
 - Patch-owned writable `var_*` allocations: **47**.
 - Original writable `va_symbol` aliases: **34**.

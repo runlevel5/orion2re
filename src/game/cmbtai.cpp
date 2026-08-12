@@ -70,7 +70,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
                     blocked = TECHDATA::_shields[shield_type].shield_class;
                 }
                 if (COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) != 0) {
-                    blocked += 3;
+                    blocked += TECHDATA::_hard_shields_damage_reduction;
                 }
                 if ((TECHDATA::_weapons[weapon_id].natural_mods & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) != 0 ||
                     ((specials & 0x40) != 0 && COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) == 0)) {
@@ -1919,7 +1919,7 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_HARD_SHIELDS) != 0) {
-            shield_reduction += 3;
+            shield_reduction += TECHDATA::_hard_shields_damage_reduction;
         }
     }
 

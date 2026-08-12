@@ -150,12 +150,20 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     if (MOX::_global_combat_data.shield_type <= 0) {
         MOX::_global_combat_data.shield_arc_max = 0;
     } else {
-        int16_t shield_hull_mult = MOX::_global_combat_data.size_class < 5
-            ? MOX::_global_combat_data.size_class + 1
-            : MOX::_global_combat_data.size_class + 2;
-
-        MOX::_global_combat_data.shield_arc_max =
-            TECHDATA::_shields[MOX::_global_combat_data.shield_type].shield_class * shield_hull_mult * 5;
+        if (strategic_combat) {
+            MOX::_global_combat_data.shield_arc_max =
+                TECHDATA::_shields[MOX::_global_combat_data.shield_type].shield_class;
+            if (SHIPSTAK::Ship_Has_Special_(
+                    ship_idx, SPECIAL_HARD_SHIELDS) != 0) {
+                MOX::_global_combat_data.shield_arc_max +=
+                    TECHDATA::_hard_shields_damage_reduction;
+            }
+        } else {
+            MOX::_global_combat_data.shield_arc_max =
+                (int16_t)TECHDATA::Shield_Strength_(
+                    MOX::_global_combat_data.size_class,
+                    MOX::_global_combat_data.shield_type);
+        }
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_MULTI_PHASED_SHIELDS)) {
             if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage_flags, SPECIAL_MULTI_PHASED_SHIELDS)) {
@@ -445,17 +453,13 @@ int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx) {
     int8_t shield_type = ship->shield_type;
 
     if (shield_type > 0) {
-        int16_t multiplier;
         int8_t size_class = ship->size_class;
 
-        if (size_class < 5) {
-            multiplier = (int16_t)size_class + 1;
-        } else {
-            multiplier = (int16_t)size_class + 2;
+        if (ship->ship_idx == -1) {
+            size_class += 4;
         }
 
-        // Calculation uses base shield blocking points multiplied by ship size factor and global multiplier 5
-        max_shield = TECHDATA::_shields[shield_type].shield_class * multiplier * 5;
+        max_shield = (int16_t)TECHDATA::Shield_Strength_(size_class, shield_type);
 
         // Shields are suppressed in a nebula unless the ship has specific warp/shield stabilization (Special 13)
         if (MOX::_in_nebula_flag != 0) {
