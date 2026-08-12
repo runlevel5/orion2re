@@ -276,7 +276,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:5968` - `correct food output`: fixed in `COLCALC::Format_Food2()`, `PLNTSUM::Summary_Screen_Print_Data_()`, and `SYS::Potential_Colony_Info_Popup_()` by formatting shared half-food units as whole values with an optional `.5`; this replaces the 1.50 call-site diversions and formatting helpers with one source-level formatter.
 - [ ] `asm.pl:6017` - `shield table`
 - [x] `asm.pl:6317` - `side end turn`: fixed in `COMBAT1::Do_Combat_Turn_()` by removing every remaining ship owned by a side from the initiative queue when that side ends its turn; a file-local source transition replaces the 1.50 register-preserving call-site wrappers and binary queue-cleanup helper.
-- [ ] `asm.pl:6632` - `scout lab bonus`
+- [x] `asm.pl:6632` - `scout lab bonus`: implemented in `COLCALC::Update_Player_Stats_()` with synchronized `research scout_lab_research_bonus` values for all six ship size classes; a bounded source-level table lookup replaces the 1.50 instruction-level lookup while preserving classic defaults.
 - [ ] `asm.pl:6645` - `command points`
 - [ ] `asm.pl:6772` - `feudal cost reduction`
 - [ ] `asm.pl:8411` - `specials repair percent`

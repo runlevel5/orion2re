@@ -522,8 +522,8 @@
     },
     combat_ship_size_class: {
       title: "Combat ship size class",
-      description: "Hull size used to select the tactical Tractor Beam stopping threshold.",
-      remarks: "Includes Doom Star because tactical combat uses six size classes.",
+      description: "Six-class combat ship hull domain used by size-indexed gameplay tables.",
+      remarks: "Includes Doom Star because combat ships use six size classes.",
       kind: "enum",
       base_type: "uint8",
       allow_numeric: true,
@@ -2227,6 +2227,31 @@
         header: "game/cmbtspec.h",
         symbol: "CMBTSPEC::_leader_dies_with_no",
       },
+    },
+
+    scout_lab_research_bonus: {
+      title: "Scout Lab research bonus",
+      description: "Sets the research produced by a working Scout Lab on each ship size class.",
+      remarks: "Defaults preserve classic behavior and match MOO2 1.50.",
+      examples: [
+        "research scout_lab_research_bonus destroyer = 2;",
+        "research scout_lab_research_bonus doomstar = 32;",
+      ],
+      units: "research points per turn",
+      group: "gameplay",
+      namespace: "research",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::scout_lab_research_bonus",
+      },
+      type: {
+        kind: "array",
+        count: 6,
+        index_base: 0,
+        index_type: "combat_ship_size_class",
+        element: { type: "uint8" },
+      },
+      default: [1, 2, 4, 8, 16, 32],
     },
 
     keep_research_on_breakthrough: {

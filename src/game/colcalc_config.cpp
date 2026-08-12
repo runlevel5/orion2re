@@ -27,6 +27,9 @@ namespace COLCALC {
     uint8_t _zero_colony_lost = 0;
     uint8_t _keep_research_on_breakthrough = 0;
     uint8_t _keep_research_on_finds = 0;
+    uint8_t scout_lab_research_bonus[SHIP_SIZE_COUNT] = {
+        1, 2, 4, 8, 16, 32,
+    };
     uint8_t _replicator_food_pp = 2;
     uint8_t _replicator_food_bc = 1;
     uint8_t _freighters_cash_bonus = 0;

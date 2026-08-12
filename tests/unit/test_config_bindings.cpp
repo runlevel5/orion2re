@@ -253,6 +253,33 @@ DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor 
         "combat civilian_armor titanium = 0;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("Scout Lab research bonuses preserve classic defaults and bind by ship size") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const uint8_t expected[SHIP_SIZE_COUNT] = {1, 2, 4, 8, 16, 32};
+    DOCTEST_CHECK(std::memcmp(COLCALC::scout_lab_research_bonus, expected,
+                              sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "research scout_lab_research_bonus destroyer = 7;"
+        "research scout_lab_research_bonus doomstar = 41;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::scout_lab_research_bonus[SHIP_SIZE_MEDIUM] == 7);
+    DOCTEST_CHECK(COLCALC::scout_lab_research_bonus[SHIP_SIZE_DOOM_STAR] == 41);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "research scout_lab_research_bonus frigate = 256;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

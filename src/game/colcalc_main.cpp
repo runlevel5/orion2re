@@ -484,7 +484,10 @@ namespace COLCALC {
             if (ship->owner == player_idx) {
                 // Check for Scout Lab bit.
                 if (struct_::Test_Bit_Field_(ship->d.special_device_flags, SPECIAL_SCOUT_LAB) && ship->status < 4) {
-                    total_research += (1 << (ship->d.size & 0x1F));
+                    uint8_t size_class = (uint8_t)ship->d.size;
+                    if (size_class < SHIP_SIZE_COUNT) {
+                        total_research += scout_lab_research_bonus[size_class];
+                    }
                 }
             }
         }

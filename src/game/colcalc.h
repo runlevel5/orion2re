@@ -35,6 +35,7 @@ namespace COLCALC {
     extern uint8_t _zero_colony_lost;
     extern uint8_t _keep_research_on_breakthrough;
     extern uint8_t _keep_research_on_finds;
+    extern uint8_t scout_lab_research_bonus[SHIP_SIZE_COUNT];
     extern uint8_t _replicator_food_pp;
     extern uint8_t _replicator_food_bc;
     extern uint8_t _freighters_cash_bonus;

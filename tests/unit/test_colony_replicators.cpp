@@ -6,6 +6,29 @@ namespace TEST_COLONY_REPLICATORS {
     void Reset_();
 }
 
+namespace TEST_PLAYER_STATS {
+    void Reset_();
+}
+
+DOCTEST_TEST_CASE("Scout Lab research uses the configured bonus for every ship size") {
+    for (uint8_t size_class = 0; size_class < SHIP_SIZE_COUNT; ++size_class) {
+        TEST_PLAYER_STATS::Reset_();
+        uint8_t expected = (uint8_t)(40 + size_class);
+        COLCALC::scout_lab_research_bonus[size_class] = expected;
+
+        s_ship_data* ship = &MOX::_ship[0];
+        ship->owner = 0;
+        ship->status = 0;
+        ship->d.size = size_class;
+        ship->d.special_device_flags[SPECIAL_SCOUT_LAB >> 3] |=
+            (uint8_t)(1U << (SPECIAL_SCOUT_LAB & 7));
+
+        COLCALC::Update_Player_Stats_(&MOX::_player[0]);
+
+        DOCTEST_CHECK(MOX::_player[0].research_produced == expected);
+    }
+}
+
 DOCTEST_TEST_CASE("configured Food Replicator PP costs cap spending without negative production") {
     struct s_case {
         uint8_t pp_cost;
