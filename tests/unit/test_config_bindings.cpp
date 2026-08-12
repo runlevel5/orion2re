@@ -141,6 +141,21 @@ DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default")
     DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
 }
 
+DOCTEST_TEST_CASE("planet non-enveloping setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_planet_non_enveloping == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat planet_non_enveloping = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_planet_non_enveloping == 1);
+}
+
 DOCTEST_TEST_CASE("beam mount damage preserves classic defaults and binds all combinations") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

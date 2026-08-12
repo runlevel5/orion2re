@@ -26,6 +26,10 @@ namespace CMBTFIRE {
     };
     inline uint8_t _fighters_use_point_defense = 0;
     inline uint8_t _heavy_fighter_can_scramble = 0;
+    inline uint8_t _planet_non_enveloping = 0;
+
+    /** Returns whether Enveloping damage should use all four directions for this target. */
+    bool Enveloping_Applies_To_Target_(int16_t target_ship_idx);
 
     /** Applies the supplied weapon damage to the defending planet or colony. */
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t weapon_flags);

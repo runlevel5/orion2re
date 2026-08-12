@@ -88,6 +88,18 @@ DOCTEST_TEST_CASE("heavy fighter missile targeting follows scramble setting") {
     CMBTFIRE::_heavy_fighter_can_scramble = 0;
 }
 
+DOCTEST_TEST_CASE("planet non-enveloping setting only suppresses planetary multiplier") {
+    CMBTFIRE::_planet_non_enveloping = 0;
+    DOCTEST_CHECK(CMBTFIRE::Enveloping_Applies_To_Target_(0));
+    DOCTEST_CHECK(CMBTFIRE::Enveloping_Applies_To_Target_(1));
+
+    CMBTFIRE::_planet_non_enveloping = 1;
+    DOCTEST_CHECK_FALSE(CMBTFIRE::Enveloping_Applies_To_Target_(0));
+    DOCTEST_CHECK(CMBTFIRE::Enveloping_Applies_To_Target_(1));
+
+    CMBTFIRE::_planet_non_enveloping = 0;
+}
+
 DOCTEST_TEST_CASE("beam mount damage defaults match classic HEF combinations") {
     TEST_BEAM_MODIFIERS::Reset_();
 

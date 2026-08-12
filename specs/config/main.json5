@@ -1837,6 +1837,21 @@
       default: false,
     },
 
+    planet_non_enveloping: {
+      title: "Disable Enveloping against planets",
+      description: "Prevents beam and missile Enveloping modifiers from multiplying damage against planets.",
+      remarks: "False preserves classic behavior. Stellar Converters are unaffected.",
+      examples: ["combat planet_non_enveloping = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_planet_non_enveloping",
+      },
+      default: false,
+    },
+
     lightning_field_ratio: {
       title: "Lightning Field destruction chance",
       description: "Sets the chance for Lightning Field to destroy a missile, torpedo, or fighter.",

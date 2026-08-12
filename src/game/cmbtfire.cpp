@@ -6,6 +6,10 @@ namespace CMBTFIRE {
         { 100, 150, 200 },
     };
 
+    bool Enveloping_Applies_To_Target_(int16_t target_ship_idx) {
+        return _planet_non_enveloping == 0 || target_ship_idx != 0;
+    }
+
     void __cdecl Destroy_Colony_Defense_(int16_t n_to_destroy) {
         int16_t found_count = 0;
         int16_t defense_list[4];
@@ -1237,7 +1241,7 @@ namespace CMBTFIRE {
                                             beam_fx_entries[beam_fx_count].specials = base_specials;
 
                                             if ((TECHDATA::_weapons[weapon->weapon_id].natural_mods & WEAPON_NATURAL_FLAG_ENVELOPING) != 0) {
-                                                beam_fx_entries[beam_fx_count].specials = base_specials | 0x100;
+                                                beam_fx_entries[beam_fx_count].specials = base_specials | WEAPON_MOD_FLAG_ENVELOPING;
                                             }
 
                                             beam_fx_entries[beam_fx_count].is_damage_entry = 0;
@@ -1512,7 +1516,7 @@ namespace CMBTFIRE {
             specials |= 0x40;
         }
         if (weapon_flags_00 & WEAPON_NATURAL_FLAG_ENVELOPING) {
-            specials |= 0x100;
+            specials |= WEAPON_MOD_FLAG_ENVELOPING;
         }
         if (weapon_flags_00 & WEAPON_NATURAL_FLAG_CONTINUOUS) {
             specials |= 0x10;
@@ -1622,7 +1626,8 @@ namespace CMBTFIRE {
                 }
 
                 if (current_damage > 0) {
-                    if ((specials & 0x100) != 0) {
+                    if ((specials & WEAPON_MOD_FLAG_ENVELOPING) != 0 &&
+                        Enveloping_Applies_To_Target_(target)) {
                         for (int16_t shield_idx = 0; shield_idx < 4; ++shield_idx) {
                             int16_t dmg_val = current_damage;
                             int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_ACHILLES_TARGETING_UNIT);
@@ -1641,7 +1646,8 @@ namespace CMBTFIRE {
                 }
             } else {
                 return_flags = 2;
-                int16_t missile_hits = (specials & 0x100) ? 4 : 1;
+                int16_t missile_hits =
+                    (specials & WEAPON_MOD_FLAG_ENVELOPING) ? 4 : 1;
                 for (int16_t i = 0; i < missile_hits; ++i) {
                     int16_t dmg_val = current_damage;
                     CMBTFIRE::Apply_Damage_To_Missile_(target, &dmg_val, specials, weapon_flags_00);
