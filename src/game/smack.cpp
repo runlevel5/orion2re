@@ -72,7 +72,9 @@ namespace SMACK {
         video::Clip_On_();
         sound::Stop_Stream_();
 
-        smckplay::Open_Smacker_Animation_(smacker_name, MOX::_settings.music_on, play_flags);
+        const char audio_enabled =
+            (MOX::_settings.music_on != 0 || MOX::_settings.sound_fx_on != 0) ? 1 : 0;
+        smckplay::Open_Smacker_Animation_(smacker_name, audio_enabled, play_flags);
 
         animation_width = smckplay::Get_Smacker_Animation_Width_();
         SMACK::_smack_x = (int16_t)((0x280 - animation_width) / 2);

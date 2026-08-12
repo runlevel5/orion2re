@@ -11,10 +11,10 @@ namespace smckplay {
 
     /* Opens a Smacker animation using the requested file and Smacker open flags.
      * file_name: Path to the Smacker file to open.
-     * mode: When equal to 1, includes the 0xFE000 Smacker open flags.
+     * audio_enabled: When nonzero, enables embedded animation audio.
      * options: Additional Smacker open flags.
      */
-    int8_t __cdecl Open_Smacker_Animation_(const char* file_name, char mode, uint32_t options);
+    int8_t __cdecl Open_Smacker_Animation_(const char* file_name, char audio_enabled, uint32_t options);
 
     /* Returns the width of the currently opened Smacker animation in pixels. */
     int32_t __cdecl Get_Smacker_Animation_Width_();

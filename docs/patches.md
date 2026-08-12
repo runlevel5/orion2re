@@ -259,7 +259,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:2579` - `planet non-enveloping`
 - [ ] `asm.pl:2632` - `cannon zero`
 - [ ] `asm.pl:2710` - `autodesign`
-- [ ] `asm.pl:2948` - `sfx in flics`
+- [x] `asm.pl:2948` - `sfx in flics`: implemented in `SMACK::Play_Cinematic_()` and `smckplay::Open_Smacker_Animation_()` by enabling embedded cinematic audio when either music or sound effects are enabled; this replaces the 1.50 call-site wrapper with an explicit source-level audio policy.
 - [ ] `asm.pl:3286` - `teleporters and boarding`
 - [ ] `asm.pl:3935` - `stealth landers`
 - [ ] `asm.pl:4444` - `android cost`

@@ -87,8 +87,8 @@ namespace smckplay {
         }
     }
 
-    bool Init_Smacker_Audio_Streams_() {
-        if ((MOX::_settings.music_on == 0) || (_smacker_state.audio_track_mask == 0)) {
+    bool Init_Smacker_Audio_Streams_(char audio_enabled) {
+        if ((audio_enabled == 0) || (_smacker_state.audio_track_mask == 0)) {
             return true;
         }
 
@@ -148,8 +148,7 @@ namespace smckplay {
         _smacker_state.last_frame = (_smacker_state.current_frame + 1 >= _smacker_state.frame_count);
     }
 
-    int8_t __cdecl Open_Smacker_Animation_(const char* file_name, char mode, uint32_t options) {
-        (void)mode;
+    int8_t __cdecl Open_Smacker_Animation_(const char* file_name, char audio_enabled, uint32_t options) {
         (void)options;
 
         Reset_Smacker_State_();
@@ -176,7 +175,7 @@ namespace smckplay {
             return 0;
         }
 
-        if (!Init_Smacker_Audio_Streams_()) {
+        if (!Init_Smacker_Audio_Streams_(audio_enabled)) {
             Close_Smacker_Audio_Streams_();
         }
 

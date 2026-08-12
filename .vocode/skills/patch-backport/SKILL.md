@@ -181,16 +181,16 @@ The known 1.40-versus-1.50-base version difference is expected and is not by its
 
 Search `docs/patches.md` and `C:\Projects\MOO2150\src\asm.pl` for the requested change.
 
-Also locate `vars.pl` in the MOO2150 tree and search it for variables related to the topic. Search by more than exact
+Also locate `conf.pl` in the MOO2150 tree and search it for variables related to the topic. Search by more than exact
 references from the selected `asm.pl` block: include the topic words and abbreviations, affected functions and
 symbols, patched offsets and nearby immediates/data, subsystem terminology, and names discovered in comments,
 configuration, and history. A variable can be an inseparable part of the topic even when the selected patch block
 does not name it directly.
 
-If `vars.pl` is absent, search the complete MOO2150 tree for it and record the absence explicitly. Then perform the
-same topic-based variable inventory in the available variable and configuration registries, including `conf.pl`,
-`mtype.pl`, generated configuration declarations, and related non-Lua C definitions. Absence of `vars.pl` is not
-permission to skip variable discovery or to conclude that the topic has no configuration.
+If `conf.pl` is absent from its expected location, search the complete MOO2150 tree for it and record the absence
+explicitly. Then perform the same topic-based variable inventory in the available configuration registries,
+including `mtype.pl`, generated configuration declarations, and related non-Lua C definitions. Absence of `conf.pl`
+is not permission to skip variable discovery or to conclude that the topic has no configuration.
 
 Record:
 
@@ -200,7 +200,7 @@ Record:
 - expected original chunks (`cchunk`)
 - replacement chunks (`pchunk`)
 - added code/data and diversion targets
-- every variable and configuration variable related to the selected topic, including definitions found in `vars.pl`
+- every variable and configuration variable related to the selected topic, including definitions found in `conf.pl`
   or its available replacements; record its external and internal names, type, default value, limits, parser metadata,
   storage or patch offsets, synchronization/save behavior, and every reference or binary write site
 - referenced `src/c/patch.c` functions
@@ -414,7 +414,7 @@ Do not weaken a stop condition merely to make progress.
 - [ ] Specific 1.50 topic selected.
 - [ ] Open Ghidra program confirmed as the expected Orion2 1.40 variant and the difference from the 1.50 patch base recorded.
 - [ ] Every patch block in the topic inventoried.
-- [ ] `vars.pl` located and searched by topic, symbol, function, and offset, or its repository-wide absence recorded and equivalent variable/configuration registries searched instead.
+- [ ] `conf.pl` located and searched by topic, symbol, function, and offset, or its repository-wide absence recorded and equivalent configuration registries searched instead.
 - [ ] Original locations and bytes/instructions verified.
 - [ ] Patched behavior reconstructed, including C implementation refinements.
 - [ ] The parent agent understood or validated the complete 1.50 semantic change before drawing conclusions.
