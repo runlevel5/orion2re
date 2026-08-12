@@ -294,6 +294,39 @@ namespace COLBLDG {
         return 0;
     }
 
+    // True when the product already appears in the preset — the visible
+    // page plus the stored rows outside its window — so the left list can
+    // highlight it the way the vanilla list highlights queued buildings.
+    static bool Preset_Contains_Product_(int16_t product) {
+        uint8_t instr = Instruction_For_Product_(product);
+        if (instr == 0) {
+            return false;
+        }
+        for (int i = 0; i < 7; ++i) {
+            if (current_item[i] != COLONY_PRODUCTION_NONE &&
+                Instruction_For_Product_(current_item[i]) == instr) {
+                return true;
+            }
+        }
+        int start = _g_preset_page * 7;
+        if (start > _g_preset_item_count) {
+            start = _g_preset_item_count;
+        }
+        int end = start + 7;
+        if (end > _g_preset_item_count) {
+            end = _g_preset_item_count;
+        }
+        for (int i = 0; i < _g_preset_item_count; ++i) {
+            if (i >= start && i < end) {
+                continue; // the visible page, checked above
+            }
+            if (_g_preset_items[i] == instr) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Maps a preset instruction to a displayable queue product, creating a
     // draft ship for ship instructions; COLONY_PRODUCTION_NONE when the
     // instruction has no queue representation (modes, buy, clear, ...).
@@ -1629,30 +1662,11 @@ namespace COLBLDG {
         buffer = (uint8_t*)allocate::Allocate_Next_Block(MOX::screen_seg, 0xAF6);
     }
 
-    void __cdecl Draw_Militarys_List() {
-        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_preset_edit_mode != 0) {
-            COLDRAW::Calculate_Squish_Step(13, 308, N_PRESET_COMMANDS, 19);
-            fonts::Set_Font_Style_Shadow_Down(4, &l_font_color_array);
-            for (int16_t i = 0; i < N_PRESET_COMMANDS; ++i) {
-                char* name = Preset_Row_Name_(
-                    (int16_t)(PRESET_CMD_PRODUCT_BASE - k_preset_commands[i]));
-                int16_t y_pos = (int16_t)((19 - COLONY::step_squish) * i + 20);
-                BILL::Squeeze_Print(485, y_pos, name, 138);
-            }
-            return;
-        }
-
-        int16_t font_offset;
-
-        COLDRAW::Calculate_Squish_Step(13, 308, n_military_indexes, 19);
-        font_offset = Calc_Font_Off();
-        Get_Font_Off_For_Military(&font_offset);
-
-        int16_t style_y_offset = 4 - font_offset;
-        fonts::Set_Font_Style_Shadow_Down(style_y_offset, &l_font_color_array);
-
-        for (int16_t i = 0; i < n_military_indexes; ++i) {
-            int16_t mil_idx = military_indexes[i];
+    // The military list's row color: dim when the colony cannot build the
+    // entry (no dock for a large hull, missing tech, no auto design), plus
+    // the pick-a-ship cycler blink. Shared with the preset editor's ships
+    // category so it reads the same there.
+    s_colors* Military_Row_Colors_(int16_t mil_idx) {
             s_colors* current_palette = &l_font_color_array;
 
             if (COLBLDG::Colony_Production_Is_Ship_Design(mil_idx)) {
@@ -1686,6 +1700,35 @@ namespace COLBLDG {
                 }
             }
 
+        return current_palette;
+    }
+
+    void __cdecl Draw_Militarys_List() {
+        if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_preset_edit_mode != 0) {
+            COLDRAW::Calculate_Squish_Step(13, 308, N_PRESET_COMMANDS, 19);
+            fonts::Set_Font_Style_Shadow_Down(4, &l_font_color_array);
+            for (int16_t i = 0; i < N_PRESET_COMMANDS; ++i) {
+                char* name = Preset_Row_Name_(
+                    (int16_t)(PRESET_CMD_PRODUCT_BASE - k_preset_commands[i]));
+                int16_t y_pos = (int16_t)((19 - COLONY::step_squish) * i + 20);
+                BILL::Squeeze_Print(485, y_pos, name, 138);
+            }
+            return;
+        }
+
+        int16_t font_offset;
+
+        COLDRAW::Calculate_Squish_Step(13, 308, n_military_indexes, 19);
+        font_offset = Calc_Font_Off();
+        Get_Font_Off_For_Military(&font_offset);
+
+        int16_t style_y_offset = 4 - font_offset;
+        fonts::Set_Font_Style_Shadow_Down(style_y_offset, &l_font_color_array);
+
+        for (int16_t i = 0; i < n_military_indexes; ++i) {
+            int16_t mil_idx = military_indexes[i];
+            s_colors* current_palette = Military_Row_Colors_(mil_idx);
+
             fonts::Set_Font_Style_Shadow_Down(style_y_offset, current_palette);
 
             char* selection_name = Selection_Name(mil_idx);
@@ -1716,11 +1759,16 @@ namespace COLBLDG {
                     }
                 } while (text_width > 171);
             }
-            fonts::Set_Font_Style_Shadow_Down(4 - font_offset, &l_font_color_array);
             for (int16_t i = 0; i < count; ++i) {
-                char* name = Selection_Name(Preset_Left_Item_(i));
+                int16_t product = Preset_Left_Item_(i);
+                s_colors* colors =
+                    (_g_preset_left_category == 0)
+                        ? (Preset_Contains_Product_(product) ? &l_font_color_array
+                                                             : &l_font_dim_color_array)
+                        : Military_Row_Colors_(product);
+                fonts::Set_Font_Style_Shadow_Down(4 - font_offset, colors);
                 int16_t y_pos = (int16_t)((19 - COLONY::step_squish) * i + 46);
-                BILL::Squeeze_Print(13, y_pos, name, 171);
+                BILL::Squeeze_Print(13, y_pos, Selection_Name(product), 171);
             }
             return;
         }
