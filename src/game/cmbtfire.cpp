@@ -10,6 +10,14 @@ namespace CMBTFIRE {
         return _planet_non_enveloping == 0 || target_ship_idx != 0;
     }
 
+    int32_t Energy_Absorber_Blocked_Damage_(int32_t damage) {
+        return (int32_t)(((int64_t)damage * _absorber_damage_reduction) / 100);
+    }
+
+    int32_t Damper_Field_Remaining_Damage_(int32_t damage) {
+        return (int32_t)(((int64_t)damage * _damper_field_ratio) / 100);
+    }
+
     void __cdecl Destroy_Colony_Defense_(int16_t n_to_destroy) {
         int16_t found_count = 0;
         int16_t defense_list[4];
@@ -675,7 +683,8 @@ namespace CMBTFIRE {
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_ENERGY_ABSORBER)) {
-            int16_t reflected = *dmg_out / 4;
+            int16_t reflected =
+                (int16_t)Energy_Absorber_Blocked_Damage_(*dmg_out);
             if (reflected < 2) {
                 reflected = 1;
             }
@@ -690,8 +699,10 @@ namespace CMBTFIRE {
                 (int16_t)absorber_charge;
         }
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 7 /* Hard Shields */)) {
-            *dmg_out /= 4;
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                target_ship_idx, SPECIAL_DAMPER_FIELD)) {
+            *dmg_out = (int16_t)Damper_Field_Remaining_Damage_(
+                (uint16_t)*dmg_out);
         }
 
         int16_t remaining_shield_hits = MOX::_combat_data[target_ship_idx].shield_arc_current[shield_arc];
@@ -976,7 +987,8 @@ namespace CMBTFIRE {
                     if (defense_hits < 0) {
                         defense_hits = 0;
                     }
-                    defense_hits /= 4;
+                    defense_hits = (int16_t)Damper_Field_Remaining_Damage_(
+                        (uint16_t)defense_hits);
                 } else {
                     defense_hits =
                         *damage - MOX::_combat_data->shield_arc_current[0];

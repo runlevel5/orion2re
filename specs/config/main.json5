@@ -1893,6 +1893,40 @@
       default: false,
     },
 
+    absorber_damage_reduction: {
+      title: "Energy Absorber damage reduction",
+      description: "Sets the percentage of incoming damage blocked and stored by an Energy Absorber.",
+      remarks: "The 25 percent default preserves classic behavior. Actual combat retains the classic minimum blocked charge of one damage.",
+      examples: ["combat absorber_damage_reduction = 25;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      constraints: { min: 0, max: 100 },
+      default: 25,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_absorber_damage_reduction",
+      },
+    },
+
+    damper_field_ratio: {
+      title: "Damper Field remaining damage",
+      description: "Sets the percentage of incoming damage remaining after a Damper Field reduction.",
+      remarks: "The 25 percent default preserves classic behavior.",
+      examples: ["combat damper_field_ratio = 25;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      constraints: { min: 0, max: 100 },
+      default: 25,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_damper_field_ratio",
+      },
+    },
+
     lightning_field_ratio: {
       title: "Lightning Field destruction chance",
       description: "Sets the chance for Lightning Field to destroy a missile, torpedo, or fighter.",

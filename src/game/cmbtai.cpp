@@ -245,7 +245,8 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
     }
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_DAMPER_FIELD)) {
-        expected_damage >>= 2;
+        expected_damage =
+            CMBTFIRE::Damper_Field_Remaining_Damage_(expected_damage);
     }
 
     uint8_t weapon_type_class = TECHDATA::_weapons[weapon_id].type;
@@ -2067,7 +2068,9 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     }
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(unit_idx, SPECIAL_DAMPER_FIELD)) {
-        effective_missile_hits /= 4;
+        effective_missile_hits =
+            (int16_t)CMBTFIRE::Damper_Field_Remaining_Damage_(
+                effective_missile_hits);
     }
 
     int32_t final_value = (int16_t)(uint16_t)((weapon_damage - shield_blocked) * effective_missile_hits);

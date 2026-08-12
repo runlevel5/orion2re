@@ -100,6 +100,21 @@ DOCTEST_TEST_CASE("planet non-enveloping setting only suppresses planetary multi
     CMBTFIRE::_planet_non_enveloping = 0;
 }
 
+DOCTEST_TEST_CASE("absorber and damper percentage calculations preserve classic behavior") {
+    CMBTFIRE::_absorber_damage_reduction = 25;
+    CMBTFIRE::_damper_field_ratio = 25;
+    DOCTEST_CHECK(CMBTFIRE::Energy_Absorber_Blocked_Damage_(103) == 25);
+    DOCTEST_CHECK(CMBTFIRE::Damper_Field_Remaining_Damage_(103) == 25);
+
+    CMBTFIRE::_absorber_damage_reduction = 40;
+    CMBTFIRE::_damper_field_ratio = 60;
+    DOCTEST_CHECK(CMBTFIRE::Energy_Absorber_Blocked_Damage_(103) == 41);
+    DOCTEST_CHECK(CMBTFIRE::Damper_Field_Remaining_Damage_(103) == 61);
+
+    CMBTFIRE::_absorber_damage_reduction = 25;
+    CMBTFIRE::_damper_field_ratio = 25;
+}
+
 DOCTEST_TEST_CASE("beam mount damage defaults match classic HEF combinations") {
     TEST_BEAM_MODIFIERS::Reset_();
 

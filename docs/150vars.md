@@ -202,8 +202,8 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:8213` - `android_morale`
 - [ ] `conf.pl:8255` - `morale_bonus`
 - [ ] `conf.pl:8287` - `postwarp_tech`
-- [ ] `conf.pl:8302` - `absorber_damage_reduction`
-- [ ] `conf.pl:8314` - `damper_field_ratio`
+- [x] `conf.pl:8302` - `absorber_damage_reduction` -> `combat.absorber_damage_reduction`
+- [x] `conf.pl:8314` - `damper_field_ratio` -> `combat.damper_field_ratio`
 - [ ] `conf.pl:8327` - `scout_lab_research_bonus`
 - [ ] `conf.pl:8350` - `fungi_climate`
 - [ ] `conf.pl:8404` - `auto_close_board_result_popup`

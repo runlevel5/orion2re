@@ -27,9 +27,17 @@ namespace CMBTFIRE {
     inline uint8_t _fighters_use_point_defense = 0;
     inline uint8_t _heavy_fighter_can_scramble = 0;
     inline uint8_t _planet_non_enveloping = 0;
+    inline uint8_t _absorber_damage_reduction = 25;
+    inline uint8_t _damper_field_ratio = 25;
 
     /** Returns whether Enveloping damage should use all four directions for this target. */
     bool Enveloping_Applies_To_Target_(int16_t target_ship_idx);
+
+    /** Returns the incoming damage blocked and stored by an Energy Absorber. */
+    int32_t Energy_Absorber_Blocked_Damage_(int32_t damage);
+
+    /** Returns the damage remaining after applying a Damper Field. */
+    int32_t Damper_Field_Remaining_Damage_(int32_t damage);
 
     /** Applies the supplied weapon damage to the defending planet or colony. */
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t weapon_flags);

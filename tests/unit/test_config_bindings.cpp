@@ -156,6 +156,37 @@ DOCTEST_TEST_CASE("planet non-enveloping setting preserves the classic default")
     DOCTEST_CHECK(CMBTFIRE::_planet_non_enveloping == 1);
 }
 
+DOCTEST_TEST_CASE("absorber and damper ratios preserve classic defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_absorber_damage_reduction == 25);
+    DOCTEST_CHECK(CMBTFIRE::_damper_field_ratio == 25);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat absorber_damage_reduction = 40;"
+        "combat damper_field_ratio = 60;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_absorber_damage_reduction == 40);
+    DOCTEST_CHECK(CMBTFIRE::_damper_field_ratio == 60);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat absorber_damage_reduction = 101;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat damper_field_ratio = 101;",
+        &writes, &diagnostic));
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+}
+
 DOCTEST_TEST_CASE("beam mount damage preserves classic defaults and binds all combinations") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
