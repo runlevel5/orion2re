@@ -266,7 +266,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:4766` - `moving farmer`: fixed in `COLMOVE::Send_Cluster_()` and `COLMOVE::Give_Colonist_New_Job_()` by bypassing source-colony farm capacity only while preparing an inter-colony transfer; explicit transfer context replaces the 1.50 wrapper byte while ordinary and same-colony job changes retain the farm limit.
 - [ ] `asm.pl:4813` - `absorber, damper`
 - [x] `asm.pl:4912` - `phasing cloak shwifty`: fixed in `CMBTSPEC::Do_Spherical_SFX_()` by excluding active phased-out ships from spherical-effect redraw and damage collection; this replaces the 1.50 flag-producing assembly helper with a direct source-level cloak-state check.
-- [ ] `asm.pl:4939` - `thousands of millions colony ships`
+- [x] `asm.pl:4939` - `thousands of millions colony ships`: fixed in `SYS::Do_Print_System_Ship_Data_()` by supplying the colony-ship count to both singular and plural format strings; this replaces the 1.50 jump into the shared assembly formatting tail with one direct source-level formatting call.
 - [ ] `asm.pl:5286` - `starbases`
 - [ ] `asm.pl:5553` - `bombing range`
 - [ ] `asm.pl:5616` - `planet visuals`

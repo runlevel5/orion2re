@@ -1255,11 +1255,12 @@ namespace SYS {
             }
 
             if (group_a_count > 0) {
-                if (group_a_count == 1) {
-                    snprintf(line_buffer, sizeof(line_buffer), HAROLD::H_Message_(0x164), static_cast<int32_t>(group_a_count));
-                } else {
-                    strlcpy(line_buffer, HAROLD::H_Message_(0x165), sizeof(line_buffer));
-                }
+                snprintf(
+                    line_buffer,
+                    sizeof(line_buffer),
+                    HAROLD::H_Message_(group_a_count == 1 ? 0x164 : 0x165),
+                    static_cast<int32_t>(group_a_count)
+                );
 
                 print_y = static_cast<int16_t>(print_y + static_cast<int16_t>(line_step));
 
