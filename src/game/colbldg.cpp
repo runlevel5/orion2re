@@ -288,6 +288,39 @@ namespace COLBLDG {
         return 0;
     }
 
+    // True when the product already appears in the preset — the visible
+    // page plus the stored rows outside its window — so the left list can
+    // highlight it the way the vanilla list highlights queued buildings.
+    static bool Preset_Contains_Product_(int16_t product) {
+        uint8_t instr = Instruction_For_Product_(product);
+        if (instr == 0) {
+            return false;
+        }
+        for (int i = 0; i < 7; ++i) {
+            if (_current_item[i] != COLONY_PRODUCTION_NONE &&
+                Instruction_For_Product_(_current_item[i]) == instr) {
+                return true;
+            }
+        }
+        int start = _g_preset_page * 7;
+        if (start > _g_preset_item_count) {
+            start = _g_preset_item_count;
+        }
+        int end = start + 7;
+        if (end > _g_preset_item_count) {
+            end = _g_preset_item_count;
+        }
+        for (int i = 0; i < _g_preset_item_count; ++i) {
+            if (i >= start && i < end) {
+                continue; // the visible page, checked above
+            }
+            if (_g_preset_items[i] == instr) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Maps a preset instruction to a displayable queue product, creating a
     // draft ship for ship instructions; COLONY_PRODUCTION_NONE when the
     // instruction has no queue representation (modes, buy, clear, ...).
@@ -1540,6 +1573,47 @@ namespace COLBLDG {
         _buffer = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xAF6);
     }
 
+    // The military list's row color: dim when the colony cannot build the
+    // entry (no dock for a large hull, missing tech, no auto design), plus
+    // the pick-a-ship cycler blink. Shared with the preset editor's ships
+    // category so it reads the same there.
+    s_colors* Military_Row_Colors_(int16_t mil_idx) {
+        s_colors* current_palette = &_l_font_color_array;
+
+        if (COLBLDG::Colony_Production_Is_Ship_Design_(mil_idx)) {
+            s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
+
+            if (colony->buildings[BUILDING_STAR_BASE] == 0 &&
+                colony->buildings[BUILDING_STAR_FORTRESS] == 0 &&
+                colony->buildings[BUILDING_BATTLESTATION] == 0 &&
+                MOX::_player[MOX::_PLAYER_NUM].ship_designs[COLBLDG::Colony_Production_Ship_Design_Index_(mil_idx)].size >= SHIP_SIZE_LARGE &&
+                _field_mode != 1) {
+                current_palette = &_l_font_dim_color_array;
+            } else if (_field_mode == 1 && mil_idx == _scanned_prod) {
+                if (ERIC::Global_Cycler_(30, 2) != 0) {
+                    current_palette = &_l_font_dim_color_array;
+                }
+            } else if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], mil_idx)) {
+                if (_field_mode != 1) {
+                    current_palette = &_l_font_dim_color_array;
+                }
+            }
+        } else if (mil_idx == COLONY_PRODUCTION_TRANSPORT_SHIP ||
+                   mil_idx == COLONY_PRODUCTION_COLONY_SHIP ||
+                   mil_idx == COLONY_PRODUCTION_CUSTOM_DESIGN ||
+                   mil_idx == COLONY_PRODUCTION_OUTPOST_SHIP ||
+                   mil_idx == COLONY_PRODUCTION_DOOM_STAR) {
+            if (Auto_Design_Type_(mil_idx) == 0) {
+                if (mil_idx != COLONY_PRODUCTION_DOOM_STAR ||
+                    !COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], COLBLDG::Colony_Production_From_Ship_Design_Index_(SHIP_SIZE_DOOM_STAR))) {
+                    current_palette = &_l_font_dim_color_array;
+                }
+            }
+        }
+
+        return current_palette;
+    }
+
     void __cdecl Draw_Militarys_List_() {
         if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 && _g_preset_edit_mode != 0) {
             COLDRAW::Calculate_Squish_Step_(13, 308, N_PRESET_COMMANDS, 19);
@@ -1564,38 +1638,7 @@ namespace COLBLDG {
 
         for (int16_t i = 0; i < _n_military_indexes; ++i) {
             int16_t mil_idx = _military_indexes[i];
-            s_colors* current_palette = &_l_font_color_array;
-
-            if (COLBLDG::Colony_Production_Is_Ship_Design_(mil_idx)) {
-                s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
-
-                if (colony->buildings[BUILDING_STAR_BASE] == 0 &&
-                    colony->buildings[BUILDING_STAR_FORTRESS] == 0 &&
-                    colony->buildings[BUILDING_BATTLESTATION] == 0 &&
-                    MOX::_player[MOX::_PLAYER_NUM].ship_designs[COLBLDG::Colony_Production_Ship_Design_Index_(mil_idx)].size >= SHIP_SIZE_LARGE &&
-                    _field_mode != 1) {
-                    current_palette = &_l_font_dim_color_array;
-                } else if (_field_mode == 1 && mil_idx == _scanned_prod) {
-                    if (ERIC::Global_Cycler_(30, 2) != 0) {
-                        current_palette = &_l_font_dim_color_array;
-                    }
-                } else if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], mil_idx)) {
-                    if (_field_mode != 1) {
-                        current_palette = &_l_font_dim_color_array;
-                    }
-                }
-            } else if (mil_idx == COLONY_PRODUCTION_TRANSPORT_SHIP ||
-                       mil_idx == COLONY_PRODUCTION_COLONY_SHIP ||
-                       mil_idx == COLONY_PRODUCTION_CUSTOM_DESIGN ||
-                       mil_idx == COLONY_PRODUCTION_OUTPOST_SHIP ||
-                       mil_idx == COLONY_PRODUCTION_DOOM_STAR) {
-                if (Auto_Design_Type_(mil_idx) == 0) {
-                    if (mil_idx != COLONY_PRODUCTION_DOOM_STAR ||
-                        !COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], COLBLDG::Colony_Production_From_Ship_Design_Index_(SHIP_SIZE_DOOM_STAR))) {
-                        current_palette = &_l_font_dim_color_array;
-                    }
-                }
-            }
+            s_colors* current_palette = Military_Row_Colors_(mil_idx);
 
             fonts::Set_Font_Style_Shadow_Down_(style_y_offset, current_palette);
 
@@ -1627,11 +1670,16 @@ namespace COLBLDG {
                     }
                 } while (text_width > 171);
             }
-            fonts::Set_Font_Style_Shadow_Down_(4 - font_offset, &_l_font_color_array);
             for (int16_t i = 0; i < count; ++i) {
-                char* name = Selection_Name_(Preset_Left_Item_(i));
+                int16_t product = Preset_Left_Item_(i);
+                s_colors* colors =
+                    (_g_preset_left_category == 0)
+                        ? (Preset_Contains_Product_(product) ? &_l_font_color_array
+                                                             : &_l_font_dim_color_array)
+                        : Military_Row_Colors_(product);
+                fonts::Set_Font_Style_Shadow_Down_(4 - font_offset, colors);
                 int16_t y_pos = (int16_t)((19 - COLONY::_step_squish) * i + 46);
-                BILL::Squeeze_Print_(13, y_pos, name, 171);
+                BILL::Squeeze_Print_(13, y_pos, Selection_Name_(product), 171);
             }
             return;
         }
