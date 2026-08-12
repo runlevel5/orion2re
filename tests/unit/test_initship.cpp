@@ -7,14 +7,21 @@
 namespace {
     constexpr int16_t kPlayer = 0;
     constexpr int16_t kDrive = DRIVE_NUCLEAR_DRIVE;
+    constexpr int16_t kStrategicDrive = DRIVE_ANTI_MATTER_DRIVE;
     constexpr int16_t kMissileWeapon = 15;
     constexpr int16_t kTorpedoWeapon = 18;
 
     s_player players[MAX_PLAYERS];
+    s_ship_data ships[1];
 
     void Reset_Initship_() {
         memset(players, 0, sizeof(players));
+        memset(ships, 0, sizeof(ships));
+        memset(MOX::_crew_data, 0, sizeof(MOX::_crew_data));
+        memset(TECHDATA::_computers, 0, sizeof(TECHDATA::_computers));
         memset(TECHDATA::_drives, 0, sizeof(TECHDATA::_drives));
+        memset(TECHDATA::_hull_data, 0, sizeof(TECHDATA::_hull_data));
+        memset(TECHDATA::_specials, 0, sizeof(TECHDATA::_specials));
         memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
         memset(TECHDATA::_weapon_modifications, 0,
                sizeof(TECHDATA::_weapon_modifications));
@@ -43,20 +50,36 @@ namespace {
         INITSHIP::_td_ftl_bonus = 2;
         INITSHIP::lander_ship_uses_stealth = {};
         SHIPSTAK::stealth_bonus = { 500, 500, 500, 500 };
+        MOX::_settings = {};
     }
 }
 
 namespace MOX {
     s_player* _player = players;
+    s_ship_data* _ship = ships;
+    s_crew_data _crew_data[CREW_QUALITY_COUNT];
     s_settings _settings = {};
     const char _ship_type_names[SHIP_TYPE_COUNT][6][16] = {};
 }
 
 namespace TECHDATA {
     s_tech_armor_data _armor[ARMOR_COUNT];
+    s_tech_computer_data _computers[COMPUTER_COUNT];
     s_tech_drive_data _drives[DRIVE_COUNT];
+    s_tech_hull_data _hull_data[HULL_CLASS_COUNT];
+    s_tech_specials_data _specials[SPECIAL_COUNT];
     s_tech_weapon_data _weapons[WEAPON_COUNT];
     s_tech_weapon_mod_data _weapon_modifications[WEAPON_MOD_COUNT];
+}
+
+namespace CMBTFIR2 {
+    int16_t __cdecl Helmsman_Bonus_(int16_t) {
+        return 0;
+    }
+
+    int16_t __cdecl Weaponry_Bonus_(int16_t) {
+        return 0;
+    }
 }
 
 namespace DESIGN {
@@ -118,6 +141,48 @@ DOCTEST_TEST_CASE("fighter point defense skips shield-only beams") {
 
     DOCTEST_CHECK(
         INITSHIP::Best_Point_Defense_Weapon_(kPlayer) == kMissileWeapon);
+}
+
+DOCTEST_TEST_CASE("strategic ship bonuses use hull defense and suppress lander defense") {
+    Reset_Initship_();
+    s_ship_data& ship = ships[0];
+    ship.owner = kPlayer;
+    ship.d.ship_type = SHIP_TYPE_COMBAT;
+    ship.d.size = SHIP_SIZE_SMALL;
+    ship.d.combat_speed = 4;
+    ship.d.computer_type = COMPUTER_ELECTRONIC_COMPUTER;
+    ship.crew_quality = CREW_QUALITY_GREEN;
+    ship.officer_index = -1;
+
+    TECHDATA::_drives[kStrategicDrive].tech_app_id =
+        TECH_APP_NUCLEAR_DRIVE;
+    TECHDATA::_computers[COMPUTER_ELECTRONIC_COMPUTER].bonus = 10;
+    TECHDATA::_hull_data[SHIP_SIZE_SMALL].strat_def_bonus = 50;
+    players[kPlayer].traits[TRAIT_TRANS_DIMENSIONAL] = 1;
+
+    int16_t defense;
+    int16_t missile_defense;
+    int16_t attack;
+
+    MOX::_settings.strategic_combat_flag = 1;
+    INITSHIP::Get_Ship_Combat_Bonuses_(
+        0, &defense, &missile_defense, &attack);
+    DOCTEST_CHECK(defense == 100);
+    DOCTEST_CHECK(missile_defense == 0);
+    DOCTEST_CHECK(attack == 10);
+
+    MOX::_settings.strategic_combat_flag = 0;
+    INITSHIP::Get_Ship_Combat_Bonuses_(
+        0, &defense, &missile_defense, &attack);
+    DOCTEST_CHECK(defense == 40);
+
+    MOX::_settings.strategic_combat_flag = 1;
+    ship.d.ship_type = SHIP_TYPE_COLONY;
+    INITSHIP::Get_Ship_Combat_Bonuses_(
+        0, &defense, &missile_defense, &attack);
+    DOCTEST_CHECK(defense == 0);
+    DOCTEST_CHECK(missile_defense == 0);
+    DOCTEST_CHECK(attack == 10);
 }
 
 DOCTEST_TEST_CASE("lander stealth remains disabled by default") {

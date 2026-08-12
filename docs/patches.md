@@ -270,7 +270,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:5286` - `starbases`
 - [ ] `asm.pl:5553` - `bombing range`
 - [x] `asm.pl:5616` - `planet visuals`: fixed in `CMBTDRW1::Get_Draw_Ship_Offsets_()` by selecting tactical planet sprite offsets from the actual planet size and correcting the Antares offset; this replaces the 1.50 all-call assembly wrapper with a direct owner-level draw-alignment invariant.
-- [ ] `asm.pl:5634` - `strategic visuals`
+- [x] `asm.pl:5634` - `strategic visuals`: fixed in `COMBINIT::Load_Display_Combat_Ship_()`, `CMBTDRW1::Combat_Draw_View_Ship_()`, and `INITSHIP::Get_Ship_Combat_Bonuses_()` by displaying combined strategic hits without tactical armor or marines and applying hull and drive strategic defense; direct source conditions replace the 1.50 wrappers and diversions.
 - [x] `asm.pl:5917` - `report cheaters`: fixed in `MAINSCR::Do_Next_Turn_()` and `MAINSCR::Warn_About_Cheating_Players_()` by arming every player's warning slot and retaining the cheat marker until each observer's persistent warning mask consumes it; this directly expresses the three 1.50 instruction edits in source.
 - [x] `asm.pl:5940` - `biospheres`: implemented in `COLCALC::Colony_Race_Pop_Limit_()` with synchronized `colony pop_bonus_biospheres` configuration; direct source-level addition replaces the 1.50 assembly helper while preserving the classic default of two.
 - [ ] `asm.pl:5968` - `correct food output`

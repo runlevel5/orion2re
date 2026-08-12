@@ -33,7 +33,9 @@ int16_t __cdecl Take_Captured_Satellite_(int16_t colony_idx) {
 void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     struct_::Clear_Structure_(&MOX::_global_combat_data, sizeof(MOX::_global_combat_data));
 
-    if (MOX::_settings.strategic_combat_flag == 1) {
+    const bool strategic_combat =
+        MOX::_settings.strategic_combat_flag == 1;
+    if (strategic_combat) {
         INITSHIP::Update_Strategic_Ship_(ship_idx);
     }
 
@@ -97,7 +99,9 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     MOX::_global_combat_data.crew_quality = MOX::_ship[ship_idx].crew_quality;
     MOX::_global_combat_data.officer_idx = MOX::_ship[ship_idx].officer_index;
 
-    if (MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_COMBAT && MOX::_ship[ship_idx].owner <= MAX_PLAYERS) {
+    if (!strategic_combat &&
+        MOX::_ship[ship_idx].d.ship_type == SHIP_TYPE_COMBAT &&
+        MOX::_ship[ship_idx].owner <= MAX_PLAYERS) {
         MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.size_class].marines;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_TROOP_PODS)) {
@@ -109,8 +113,17 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
         MOX::_global_combat_data.marine_count = -1;
     }
 
-    MOX::_global_combat_data.structure_max = INITSHIP::Get_Ship_Structure_(ship_idx);
-    MOX::_global_combat_data.armor_remaining = INITSHIP::Get_Ship_Armor_Hits_(ship_idx) - MOX::_ship[ship_idx].armor_damage;
+    if (strategic_combat) {
+        MOX::_global_combat_data.structure_max =
+            AIPOWER::Max_Ship_Hits_(ship_idx);
+        MOX::_global_combat_data.armor_remaining = 0;
+    } else {
+        MOX::_global_combat_data.structure_max =
+            INITSHIP::Get_Ship_Structure_(ship_idx);
+        MOX::_global_combat_data.armor_remaining =
+            INITSHIP::Get_Ship_Armor_Hits_(ship_idx) -
+            MOX::_ship[ship_idx].armor_damage;
+    }
     MOX::_global_combat_data.armor_type = MOX::_ship[ship_idx].d.armor_type;
 
     if (MOX::_global_combat_data.size_class == SHIP_SIZE_DOOM_STAR) {

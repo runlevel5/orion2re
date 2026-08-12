@@ -668,7 +668,16 @@ namespace INITSHIP {
 
             attack_bonus += (int16_t)owner_player->traits[TRAIT_SHIP_ATTACK];
 
-            if (owner_player->traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
+            if (ship->d.ship_type != SHIP_TYPE_COMBAT) {
+                defense_bonus = 0;
+                missile_defense_bonus = 0;
+            } else if (MOX::_settings.strategic_combat_flag != 0) {
+                defense_bonus +=
+                    (Best_Warp_Drive_(ship->owner) -
+                     DRIVE_NUCLEAR_DRIVE) *
+                        10 +
+                    TECHDATA::_hull_data[ship->d.size].strat_def_bonus;
+            } else if (owner_player->traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
                 defense_bonus += COMBAT1::_td_combat_speed_bonus * 5;
             }
         }

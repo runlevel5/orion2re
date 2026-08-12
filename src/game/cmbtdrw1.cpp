@@ -3488,14 +3488,17 @@ skip_cursor:
                     hull_index = MOX::_global_combat_data.size_class;
                 }
 
-                int32_t armor_total = TECHDATA::_hull_data[hull_index].armor_hp;
-                armor_total +=
-                    (static_cast<int32_t>(TECHDATA::_armor[MOX::_global_combat_data.armor_type].ships_bonus) *
-                     armor_total) /
-                    100;
+                int32_t armor_total = 0;
+                if (MOX::_settings.strategic_combat_flag == 0) {
+                    armor_total = TECHDATA::_hull_data[hull_index].armor_hp;
+                    armor_total +=
+                        (static_cast<int32_t>(TECHDATA::_armor[MOX::_global_combat_data.armor_type].ships_bonus) *
+                         armor_total) /
+                        100;
 
-                if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_HEAVY_ARMOR) != 0) {
-                    armor_total *= 3;
+                    if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_HEAVY_ARMOR) != 0) {
+                        armor_total *= 3;
+                    }
                 }
 
                 KEN::Ken_Get_Text_Message_(0x5B, message_text, 0x50);
