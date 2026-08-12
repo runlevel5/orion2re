@@ -271,6 +271,25 @@ namespace COMBAT1 {
         }
     }
 
+    static void End_Side_Turn_() {
+        const int8_t owner = MOX::_combat_data[MOX::_cur_ship].owner;
+
+        for (int16_t i = 0; i < kMaxCombatShips; ++i) {
+            const int16_t ship_idx = MOX::_ship_turn_order[i];
+            if (ship_idx == -10) {
+                break;
+            }
+            if (ship_idx >= 0 &&
+                ship_idx < MOX::_combat_total_ship_count &&
+                MOX::_combat_data[ship_idx].owner == owner) {
+                MOX::_ship_turn_order[i] = -1;
+            }
+        }
+
+        MOX::_side_end_of_turn[owner] = 1;
+        MOX::_cur_ship = -1;
+    }
+
     static void Advance_After_Ship_Action_(
         int8_t original_owner,
         int16_t active_player_id,
@@ -801,7 +820,7 @@ namespace COMBAT1 {
                                         if (MOX::_combat_init == 0) {
                                             next_ship_flag = 1;
                                         } else {
-                                            MOX::_side_end_of_turn[MOX::_combat_data[MOX::_cur_ship].owner] = 1;
+                                            End_Side_Turn_();
                                             next_ship_flag = Next_Ship_(active_player_id);
                                         }
                                         if (MOX::_net_flag != 0) {
@@ -1013,7 +1032,7 @@ namespace COMBAT1 {
                                                     if (MOX::_combat_init == 0) {
                                                         next_ship_flag = 1;
                                                     } else {
-                                                        MOX::_side_end_of_turn[MOX::_combat_data[MOX::_cur_ship].owner] = 1;
+                                                        End_Side_Turn_();
                                                         next_ship_flag = Next_Ship_(active_player_id);
                                                     }
                                                     break;

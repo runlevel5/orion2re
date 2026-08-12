@@ -275,7 +275,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:5940` - `biospheres`: implemented in `COLCALC::Colony_Race_Pop_Limit_()` with synchronized `colony pop_bonus_biospheres` configuration; direct source-level addition replaces the 1.50 assembly helper while preserving the classic default of two.
 - [ ] `asm.pl:5968` - `correct food output`
 - [ ] `asm.pl:6017` - `shield table`
-- [ ] `asm.pl:6317` - `side end turn`
+- [x] `asm.pl:6317` - `side end turn`: fixed in `COMBAT1::Do_Combat_Turn_()` by removing every remaining ship owned by a side from the initiative queue when that side ends its turn; a file-local source transition replaces the 1.50 register-preserving call-site wrappers and binary queue-cleanup helper.
 - [ ] `asm.pl:6632` - `scout lab bonus`
 - [ ] `asm.pl:6645` - `command points`
 - [ ] `asm.pl:6772` - `feudal cost reduction`
