@@ -1538,6 +1538,7 @@ namespace COLBLDG {
 
     int16_t __cdecl Star_N_Uncolonized_Worlds_(int16_t star_index) {
         int16_t uncolonized_count = 0;
+        const int8_t current_owner = MOX::_colony[COLONY::_colony_handle].owner;
         const s_star_data& star = MOX::_star[star_index];
 
         for (int16_t i = 0; i < 5; ++i) {
@@ -1550,7 +1551,7 @@ namespace COLBLDG {
                     is_available = true;
                 } else {
                     const s_colony& colony = MOX::_colony[planet.colony_index];
-                    if (colony.outpost_flag != 0) {
+                    if (colony.outpost_flag != 0 && colony.owner == current_owner) {
                         is_available = true;
                     }
                 }

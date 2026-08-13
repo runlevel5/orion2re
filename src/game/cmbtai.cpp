@@ -6,6 +6,24 @@ namespace CMBTAI {
 
 int16_t _fleet_target;
 
+namespace {
+    int16_t Range_To_XY_With_Offset_(
+        int16_t ship_idx,
+        int16_t target_x_px,
+        int16_t target_y_px,
+        int16_t offset_x_px,
+        int16_t offset_y_px
+    ) {
+        const int16_t ship_x_px =
+            (int16_t)(MOX::_combat_data[ship_idx].x * 20 + offset_x_px);
+        const int16_t ship_y_px =
+            (int16_t)(MOX::_combat_data[ship_idx].y * 20 + offset_y_px);
+        const int16_t distance_squares = special::Range_(
+            ship_x_px, ship_y_px, target_x_px, target_y_px) / 20;
+        return (distance_squares + 2) / 3;
+    }
+}
+
 /**
  * Checks if all active enemy ships are currently in stasis.
  * If so, releases the smallest enemy ship from stasis to prevent a combat deadlock.
@@ -70,7 +88,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
                     blocked = TECHDATA::_shields[shield_type].shield_class;
                 }
                 if (COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) != 0) {
-                    blocked += 3;
+                    blocked += TECHDATA::_hard_shields_damage_reduction;
                 }
                 if ((TECHDATA::_weapons[weapon_id].natural_mods & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) != 0 ||
                     ((specials & 0x40) != 0 && COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) == 0)) {
@@ -245,7 +263,8 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
     }
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_DAMPER_FIELD)) {
-        expected_damage >>= 2;
+        expected_damage =
+            CMBTFIRE::Damper_Field_Remaining_Damage_(expected_damage);
     }
 
     uint8_t weapon_type_class = TECHDATA::_weapons[weapon_id].type;
@@ -345,7 +364,7 @@ int8_t __cdecl Get_Player_Mode_(int16_t player_idx) {
     }
 }
 
-int16_t __cdecl Range_To_Ship_(int16_t ship1_idx, int16_t ship2_idx) {
+int16_t __cdecl Range_To_Ship_Squares_(int16_t ship1_idx, int16_t ship2_idx) {
     int16_t w1, h1, w2, h2;
     int32_t is_large1 = 0;
     int32_t is_huge1 = 0;
@@ -428,8 +447,11 @@ int16_t __cdecl Range_To_Ship_(int16_t ship1_idx, int16_t ship2_idx) {
         }
     }
 
-    int16_t range = special::Range_(x1_adj, y1_adj, x2_adj, y2_adj);
-    return (range + 2) / 3;
+    return special::Range_(x1_adj, y1_adj, x2_adj, y2_adj);
+}
+
+int16_t __cdecl Range_To_Ship_(int16_t ship1_idx, int16_t ship2_idx) {
+    return (Range_To_Ship_Squares_(ship1_idx, ship2_idx) + 2) / 3;
 }
 
 int16_t __cdecl Range_To_Missile_(int16_t unit_idx, int16_t missile_idx) {
@@ -1317,8 +1339,12 @@ int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx) 
         return 0;
     }
 
-    int16_t dist = Range_To_Ship_(attacker_idx, target_idx);
-    int16_t reach = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, SPECIAL_TRANSPORTERS) ? 4 : 1;
+    int16_t dist = Range_To_Ship_Squares_(attacker_idx, target_idx);
+    bool has_transporters = COMBINIT::Does_Combat_Ship_Have_Special_(
+        attacker_idx, SPECIAL_TRANSPORTERS) != 0;
+    int16_t reach = has_transporters
+        ? BOARDING::board_range.transporters
+        : BOARDING::board_range.normal;
 
     if (MOX::_combat_data[target_idx].owner > 8 ||
         attacker_owner > 8 ||
@@ -1330,12 +1356,13 @@ int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx) 
         target_idx == 0 ||
         MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_data[target_idx].owner ||
         dist > reach ||
-        (reach != 4 && COMBAT1::Calc_Current_Speed_(target_idx) > 0) ||
+        (!has_transporters && COMBAT1::Calc_Current_Speed_(target_idx) > 0) ||
         MOX::_combat_data[MOX::_cur_ship].marine_count == 0) {
         
         can_board = false;
-    } else if (reach == 4) {
-        if (dist != 1 || MOX::_combat_data[target_idx].current_speed > 0) {
+    } else if (has_transporters) {
+        if (dist > BOARDING::board_range.normal ||
+            MOX::_combat_data[target_idx].current_speed > 0) {
             int16_t bearing = CMBTDRW1::Relative_Bearing_(target_idx, attacker_idx);
             int16_t shield_idx = CMBTFIRE::Facing_Shield_(bearing);
             if (MOX::_combat_data[target_idx].shield_arc_current[shield_idx] > 0 ||
@@ -1386,7 +1413,7 @@ int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx) 
 
 void __cdecl Resolve_Ai_Boarding_(int16_t attacker_idx, int16_t target_idx, int16_t action_type) {
     if (action_type != 0) {
-        int16_t dist = Range_To_Ship_(attacker_idx, target_idx);
+        int16_t dist = Range_To_Ship_Squares_(attacker_idx, target_idx);
         bool has_transporters = (COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, SPECIAL_TRANSPORTERS) == 1);
 
         s_combat_data* attacker = &MOX::_combat_data[attacker_idx];
@@ -1398,7 +1425,7 @@ void __cdecl Resolve_Ai_Boarding_(int16_t attacker_idx, int16_t target_idx, int1
 
         if (has_transporters) {
             bool skip_displacement = false;
-            if (dist == 1) {
+            if (dist <= BOARDING::board_range.normal) {
                 if (MOX::_combat_data[target_idx].current_speed <= 0) {
                     skip_displacement = true;
                 }
@@ -1470,52 +1497,23 @@ int16_t __cdecl Is_Ship_Targeted_By_Missile_(int16_t ship_idx) {
 }
 
 int16_t __cdecl Range_To_XY_(int16_t ship_idx, int16_t target_x_px, int16_t target_y_px) {
-    int16_t off_x, off_y;
-    COMBINIT::Ship_Center_Offsets_(ship_idx, &off_x, &off_y);
+    int16_t center_x_offset;
+    int16_t center_y_offset;
+    COMBINIT::Ship_Center_Offsets_(
+        ship_idx, &center_x_offset, &center_y_offset);
+    return Range_To_XY_With_Offset_(
+        ship_idx,
+        target_x_px,
+        target_y_px,
+        center_x_offset,
+        center_y_offset);
+}
 
-    int16_t off_gx = off_x / 20;
-    int16_t off_gy = off_y / 20;
-
-    int16_t ship_gx = MOX::_combat_data[ship_idx].x;
-    int16_t ship_gy = MOX::_combat_data[ship_idx].y;
-
-    int16_t target_gx = target_x_px / 20;
-    int16_t target_gy = target_y_px / 20;
-
-    int16_t best_ship_x;
-    if (target_gx < ship_gx) {
-        best_ship_x = ship_gx - off_gx;
-        if (best_ship_x <= target_gx) {
-            best_ship_x = target_gx;
-        }
-    } else {
-        best_ship_x = ship_gx + off_gx;
-        if (best_ship_x >= target_gx) {
-            best_ship_x = target_gx;
-        }
-    }
-
-    int16_t best_ship_y;
-    if (target_gy < ship_gy) {
-        best_ship_y = ship_gy - off_gy;
-        if (best_ship_y <= target_gy) {
-            best_ship_y = target_gy;
-        }
-    } else {
-        best_ship_y = ship_gy + off_gy;
-        if (best_ship_y >= target_gy) {
-            best_ship_y = target_gy;
-        }
-    }
-
-    // The following comparisons are present in the disassembly as identity assignments
-    if (target_gx == best_ship_x) { target_gx = best_ship_x; }
-    if (target_gy == best_ship_y) { target_gy = best_ship_y; }
-
-    int16_t dist = special::Range_(best_ship_x, best_ship_y, target_gx, target_gy);
-
-    // Result is rounded up and scaled down
-    return (dist + 2) / 3;
+int16_t __cdecl Range_To_XY_From_Corner_(
+    int16_t ship_idx, int16_t target_x_px, int16_t target_y_px
+) {
+    return Range_To_XY_With_Offset_(
+        ship_idx, target_x_px, target_y_px, 0, 0);
 }
 
 /**
@@ -1918,7 +1916,7 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_HARD_SHIELDS) != 0) {
-            shield_reduction += 3;
+            shield_reduction += TECHDATA::_hard_shields_damage_reduction;
         }
     }
 
@@ -2067,7 +2065,9 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     }
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(unit_idx, SPECIAL_DAMPER_FIELD)) {
-        effective_missile_hits /= 4;
+        effective_missile_hits =
+            (int16_t)CMBTFIRE::Damper_Field_Remaining_Damage_(
+                effective_missile_hits);
     }
 
     int32_t final_value = (int16_t)(uint16_t)((weapon_damage - shield_blocked) * effective_missile_hits);
@@ -2377,31 +2377,31 @@ int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx) {
         for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
             if (MOX::_combat_data[i].unit_status == 0 && i != ship_idx) {
                 if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0) {
-                    int16_t range = Range_To_Ship_(ship_idx, i);
+                    int16_t range = Range_To_Ship_Squares_(ship_idx, i);
                     strength_attacker += CMBTFIR2::Crew_Boarding_Combat_Bonus_(i);
 
                     if (MOX::_combat_data[i].owner == ship->owner) {
-                        if (range <= 1) {
+                        if (range <= BOARDING::board_range.normal) {
                             dist_friendly += 2;
-                        } else if (range == 2) {
+                        } else if (range == BOARDING::board_range.normal * 2) {
                             dist_friendly += 1;
                         }
                     } else {
-                        int8_t has_security = (int8_t)COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TRANSPORTERS);
+                        int8_t has_transporters = (int8_t)COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_TRANSPORTERS);
                         bool add_marines = false;
                         
-                        if (range <= 1) {
+                        if (range <= BOARDING::board_range.normal) {
                             dist_enemy += 2;
-                            if (has_security != 0 || ship->current_speed == 0) {
+                            if (has_transporters != 0 || ship->current_speed == 0) {
                                 add_marines = true;
                             }
-                        } else if (range == 2) {
+                        } else if (range == BOARDING::board_range.normal * 2) {
                             dist_enemy += 1;
-                            if (has_security != 0 || ship->current_speed == 0) {
+                            if (has_transporters != 0 || ship->current_speed == 0) {
                                 add_marines = true;
                             }
-                        } else if (range < 7) {
-                            if (has_security != 0) {
+                        } else if (range < BOARDING::board_range.normal * 7) {
+                            if (has_transporters != 0) {
                                 add_marines = true;
                             }
                         }

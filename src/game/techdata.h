@@ -195,6 +195,8 @@ namespace TECHDATA {
     extern s_tech_armor_data _armor[ARMOR_COUNT];
     extern s_tech_building_data _buildings[BUILDING_COUNT];
     extern s_tech_hull_data _hull_data[HULL_CLASS_COUNT];
+    extern uint16_t _shield_hull_multiplier[HULL_CLASS_COUNT];
+    extern uint8_t _hard_shields_damage_reduction;
     extern s_tech_fuel_data _fuel[FUEL_COUNT];
     extern s_tech_app_data _technology_applications[TECH_APP_COUNT];
     extern s_tech_field_data _technology_fields[TECH_FIELD_COUNT];
@@ -212,6 +214,8 @@ namespace TECHDATA {
     extern s_tech_data_rifle _rifles[6];
 
     extern s_tech_data_personal_shield _personal_shields[2];
+
+    int32_t Shield_Strength_(int16_t hull_class, int16_t shield_type);
 
     /**
      * Returns a reference to the ship-range value for a fuel technology entry.

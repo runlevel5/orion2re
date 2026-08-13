@@ -15,6 +15,7 @@ namespace SHIPMOVE {
 
 namespace CMBTSPEC {
     uint8_t _leader_dies_with_no;
+    uint8_t _compressor_per_size_class_damage;
 }
 
 namespace CMBTMIS {
@@ -26,6 +27,16 @@ namespace CMBTFIRE {
         { 50, 100, 150 },
         { 100, 150, 200 },
     };
+}
+
+namespace CMBTFIR2 {
+    uint16_t _systems_repair_percent = 50;
+}
+
+namespace TECHDATA {
+    s_tech_shield_data _shields[SHIELD_COUNT] = {};
+    uint16_t _shield_hull_multiplier[HULL_CLASS_COUNT] = {};
+    uint8_t _hard_shields_damage_reduction;
 }
 
 namespace SCIENCE {

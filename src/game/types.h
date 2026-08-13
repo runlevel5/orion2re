@@ -12,3 +12,8 @@ typedef unsigned long long undefined7;
 typedef unsigned long long undefined8;
 
 typedef char sbyte;
+
+struct s_ratio16 {
+    int16_t numerator;
+    int16_t denominator;
+};

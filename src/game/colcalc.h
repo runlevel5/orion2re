@@ -3,11 +3,57 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    struct s_government_bonus {
+        s_ratio16 cost_reduction;
+        int8_t science;
+        int8_t money;
+        int8_t food;
+        int8_t production;
+    };
+
+    extern s_government_bonus government_bonuses[GOVERNMENT_COUNT];
+
+    struct s_lander_ship_cost {
+        int32_t colony_ship;
+        int32_t outpost_ship;
+        int32_t transport_ship;
+    };
+
+    extern s_lander_ship_cost lander_ship_cost;
+
+    struct s_misc_costs {
+        uint16_t android_farmer;
+        uint16_t android_worker;
+        uint16_t android_scientist;
+    };
+
+    extern s_misc_costs misc_costs;
+
+    struct s_growth_rate_bonus {
+        uint8_t general_modifier;
+        uint8_t microbiotics_tech;
+        uint8_t antidote_tech;
+        uint8_t boom_event;
+        int16_t plague_event;
+    };
+
+    extern s_growth_rate_bonus growth_rate_bonus;
+
+    struct s_trade_goods_ratio {
+        uint16_t normal;
+        uint16_t fantastic_traders;
+    };
+
+    extern s_trade_goods_ratio trade_goods_ratio;
+    extern uint8_t _pop_bonus_biospheres;
+
+    extern uint8_t _federation_no_mixed_races_penalty;
     extern uint8_t _housing_creates_no_farmers;
     extern uint8_t _planet_extinction;
     extern uint8_t _zero_colony_lost;
     extern uint8_t _keep_research_on_breakthrough;
     extern uint8_t _keep_research_on_finds;
+    extern uint8_t scout_lab_research_bonus[SHIP_SIZE_COUNT];
     extern uint8_t _replicator_food_pp;
     extern uint8_t _replicator_food_bc;
     extern uint8_t _freighters_cash_bonus;
@@ -57,6 +103,8 @@ namespace COLCALC {
     uint8_t __cdecl Colony_Can_Build_Product_(s_colony* colony, int16_t product);
 
     bool __cdecl Room_For_Another_Dude_(s_colony* colony, int race_idx);
+
+    void Format_Food2(uint16_t food2, char* buffer, uint32_t buffer_size);
 
     int32_t __cdecl Production_Cost_To_Buy_(int32_t product_cost, int32_t production_spent);
 

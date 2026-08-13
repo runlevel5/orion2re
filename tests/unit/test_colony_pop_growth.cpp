@@ -7,9 +7,24 @@ namespace TEST_COLONY_POP_GROWTH {
     int32_t Destroy_Colony_Reason_();
     void Set_Add_Spy_Result_(int16_t result);
     int16_t Deleted_Product_();
+    void Set_Population_Boom_(bool enabled);
+    void Set_Plague_(bool enabled);
 }
 
 namespace {
+    s_colony* Prepare_Growth_Modifier_() {
+        TEST_COLONY_POP_GROWTH::Reset_();
+
+        s_colony* colony = &MOX::_colony[0];
+        colony->owner = 0;
+        colony->planet = 0;
+        colony->climate = PLANET_CLIMATE_GAIA;
+        colony->n_pops = 1;
+        colony->pop[0] = 0;
+        MOX::_player[0].objectives = PLAYER_OBJECTIVE_HUMAN;
+        return colony;
+    }
+
     s_colony* Prepare_Housing_Growth_() {
         TEST_COLONY_POP_GROWTH::Reset_();
 
@@ -40,6 +55,18 @@ namespace {
         return colony;
     }
 
+    s_colony* Prepare_Mixed_Race_Colony_() {
+        TEST_COLONY_POP_GROWTH::Reset_();
+
+        s_colony* colony = &MOX::_colony[0];
+        colony->owner = 0;
+        colony->n_pops = 2;
+        colony->pop[0] = 0;
+        colony->pop[1] = 1;
+        MOX::_player[0].traits[TRAIT_CURRENT_GOVERNMENT] = GOVERNMENT_FEDERATION;
+        return colony;
+    }
+
     uint32_t New_Colonist_Job_(const s_colony* colony) {
         return (colony->pop[1] & 0x180u) >> 7;
     }
@@ -67,6 +94,94 @@ namespace {
         colony->production_spent = cost;
         return colony;
     }
+}
+
+DOCTEST_TEST_CASE("Federation mixed-race morale preserves the classic default") {
+    s_colony* colony = Prepare_Mixed_Race_Colony_();
+
+    DOCTEST_CHECK(COLCALC::Mixed_Race_Morale_Penalty_(colony) == -4);
+
+    COLCALC::_federation_no_mixed_races_penalty = 1;
+
+    DOCTEST_CHECK(COLCALC::Mixed_Race_Morale_Penalty_(colony) == 0);
+
+    MOX::_player[0].traits[TRAIT_CURRENT_GOVERNMENT] = GOVERNMENT_DEMOCRACY;
+
+    DOCTEST_CHECK(COLCALC::Mixed_Race_Morale_Penalty_(colony) == -4);
+}
+
+DOCTEST_TEST_CASE("Federation mixed-race rule restricts Alien Control Center") {
+    s_colony* colony = Prepare_Mixed_Race_Colony_();
+    TECHDATA::_buildings[BUILDING_ALIEN_CONTROL_CENTER].tech_app =
+        TECH_APP_ALIEN_MANAGEMENT_CENTER;
+    MOX::_player[0].tech_applications[TECH_APP_ALIEN_MANAGEMENT_CENTER] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_ALIEN_CONTROL_CENTER) == 1);
+
+    COLCALC::_federation_no_mixed_races_penalty = 1;
+
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_ALIEN_CONTROL_CENTER) == 2);
+
+    colony->pop[1] |= 0x400;
+
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_ALIEN_CONTROL_CENTER) == 1);
+}
+
+DOCTEST_TEST_CASE("population growth preserves the classic base modifier") {
+    s_colony* colony = Prepare_Growth_Modifier_();
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->pop_growth[0] == 100);
+}
+
+DOCTEST_TEST_CASE("general population growth modifier is independent of Housing") {
+    s_colony* colony = Prepare_Growth_Modifier_();
+    COLCALC::growth_rate_bonus.general_modifier = 40;
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->producing[0] != COLONY_PRODUCTION_HOUSING);
+    DOCTEST_CHECK(colony->pop_growth[0] == 140);
+}
+
+DOCTEST_TEST_CASE("population growth uses configured technology modifiers") {
+    s_colony* colony = Prepare_Growth_Modifier_();
+    COLCALC::growth_rate_bonus.microbiotics_tech = 7;
+    MOX::_player[0].tech_applications[TECH_APP_MICROBIOTICS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->pop_growth[0] == 107);
+
+    colony = Prepare_Growth_Modifier_();
+    COLCALC::growth_rate_bonus.microbiotics_tech = 7;
+    COLCALC::growth_rate_bonus.antidote_tech = 13;
+    MOX::_player[0].tech_applications[TECH_APP_MICROBIOTICS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    MOX::_player[0].tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->pop_growth[0] == 113);
+}
+
+DOCTEST_TEST_CASE("population growth uses configured event modifiers") {
+    s_colony* colony = Prepare_Growth_Modifier_();
+    COLCALC::growth_rate_bonus.boom_event = 11;
+    COLCALC::growth_rate_bonus.plague_event = -22;
+    TEST_COLONY_POP_GROWTH::Set_Population_Boom_(true);
+    TEST_COLONY_POP_GROWTH::Set_Plague_(true);
+
+    COLCALC::Colony_Pop_Grows_(colony);
+
+    DOCTEST_CHECK(colony->pop_growth[0] == 89);
 }
 
 DOCTEST_TEST_CASE("classic Housing growth may create a farmer") {
@@ -111,6 +226,22 @@ DOCTEST_TEST_CASE("reported population capacities do not exceed colony storage")
 
     MOX::_planet_max_population[PLANET_SIZE_HUGE] =
         previous_max_population;
+}
+
+DOCTEST_TEST_CASE("Biospheres population bonus is configurable") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_colony* colony = &MOX::_colony[0];
+    colony->owner = 0;
+    colony->planet = 0;
+    colony->climate = PLANET_CLIMATE_GAIA;
+    colony->buildings[BUILDING_BIOSPHERES] = 1;
+
+    DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit_(colony, 0) == 27);
+
+    COLCALC::_pop_bonus_biospheres = 7;
+
+    DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit_(colony, 0) == 32);
 }
 
 DOCTEST_TEST_CASE("classic starvation preserves the final population") {
@@ -180,6 +311,31 @@ DOCTEST_TEST_CASE("Capitol can be built when the player has no homeworld") {
     player->tech_applications[TECH_APP_CAPITOL] = TECH_RESEARCH_STATUS_RESEARCHED;
 
     DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(colony, BUILDING_CAPITOL) == 1);
+}
+
+DOCTEST_TEST_CASE("landing ship costs are selected independently") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    COLCALC::lander_ship_cost.colony_ship = 600;
+    COLCALC::lander_ship_cost.outpost_ship = 200;
+    COLCALC::lander_ship_cost.transport_ship = 80;
+
+    DOCTEST_CHECK(COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_COLONY, 0) == 600);
+    DOCTEST_CHECK(COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_OUTPOST, 0) == 200);
+    DOCTEST_CHECK(COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_TRANSPORT, 0) == 80);
+}
+
+DOCTEST_TEST_CASE("Android production costs are selected independently") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_colony* colony = &MOX::_colony[0];
+    COLCALC::misc_costs.android_farmer = 30;
+    COLCALC::misc_costs.android_worker = 40;
+    COLCALC::misc_costs.android_scientist = 60;
+
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_FARMER) == 30);
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_WORKER) == 40);
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_SCIENTIST) == 60);
 }
 
 DOCTEST_TEST_CASE("completed building grants no maintenance cash") {

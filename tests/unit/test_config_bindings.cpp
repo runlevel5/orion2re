@@ -11,7 +11,9 @@
 #include "doctest/doctest.h"
 #include "game/boarding.h"
 #include "game/cmbtfire.h"
+#include "game/cmbtspec.h"
 #include "game/combinit.h"
+#include "game/cmbtmov1.h"
 #include "game/cmbtmis.h"
 #include "game/combat.h"
 #include "game/combat1.h"
@@ -23,6 +25,7 @@
 #include "game/mapgen.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
+#include "game/techinit.h"
 
 namespace {
     bool Append_Decoded_(const char* source, config::s_config_write_set* write_set,
@@ -157,6 +160,71 @@ DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default")
     DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
 }
 
+DOCTEST_TEST_CASE("planet non-enveloping setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_planet_non_enveloping == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat planet_non_enveloping = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_planet_non_enveloping == 1);
+}
+
+DOCTEST_TEST_CASE("Spatial Compressor size scaling preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTSPEC::_compressor_per_size_class_damage == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat compressor_per_size_class_damage = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTSPEC::_compressor_per_size_class_damage == 1);
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+}
+
+DOCTEST_TEST_CASE("absorber and damper ratios preserve classic defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_absorber_damage_reduction == 25);
+    DOCTEST_CHECK(CMBTFIRE::_damper_field_ratio == 25);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat absorber_damage_reduction = 40;"
+        "combat damper_field_ratio = 60;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_absorber_damage_reduction == 40);
+    DOCTEST_CHECK(CMBTFIRE::_damper_field_ratio == 60);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat absorber_damage_reduction = 101;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat damper_field_ratio = 101;",
+        &writes, &diagnostic));
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+}
+
 DOCTEST_TEST_CASE("beam mount damage preserves classic defaults and binds all combinations") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -223,6 +291,78 @@ DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor 
         "combat civilian_armor titanium = 0;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("shield tables preserve classic defaults and bind by name") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD].shield_class == 5);
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD]
+                      .space_per_ship_type[SHIP_SIZE_LARGE] == 20);
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD]
+                      .cost_per_ship_type[SHIP_SIZE_HUGE] == 25);
+    DOCTEST_CHECK(TECHDATA::_shield_hull_multiplier[HULL_FRIGATE] == 5);
+    DOCTEST_CHECK(TECHDATA::_shield_hull_multiplier[HULL_DOOM_STAR] == 35);
+    DOCTEST_CHECK(TECHDATA::_shield_hull_multiplier[HULL_STAR_FORTRESS] == 25);
+    DOCTEST_CHECK(TECHDATA::_hard_shields_damage_reduction == 3);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "design shield class_v shield_class = 9;"
+        "design shield class_v space cruiser = 33;"
+        "design shield class_v cost battleship = 44;"
+        "design shield_hull_multiplier doomstar = 41;"
+        "combat hard_shields_damage_reduction = 7;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD].shield_class == 9);
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD]
+                      .space_per_ship_type[SHIP_SIZE_LARGE] == 33);
+    DOCTEST_CHECK(TECHDATA::_shields[SHIELD_CLASS_V_SHIELD]
+                      .cost_per_ship_type[SHIP_SIZE_HUGE] == 44);
+    DOCTEST_CHECK(TECHDATA::_shield_hull_multiplier[HULL_DOOM_STAR] == 41);
+    DOCTEST_CHECK(TECHDATA::_hard_shields_damage_reduction == 7);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "design shield class_i shield_class = 65536;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat hard_shields_damage_reduction = 256;",
+        &writes, &diagnostic));
+}
+
+DOCTEST_TEST_CASE("Scout Lab research bonuses preserve classic defaults and bind by ship size") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const uint8_t expected[SHIP_SIZE_COUNT] = {1, 2, 4, 8, 16, 32};
+    DOCTEST_CHECK(std::memcmp(COLCALC::scout_lab_research_bonus, expected,
+                              sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "research scout_lab_research_bonus destroyer = 7;"
+        "research scout_lab_research_bonus doomstar = 41;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::scout_lab_research_bonus[SHIP_SIZE_MEDIUM] == 7);
+    DOCTEST_CHECK(COLCALC::scout_lab_research_bonus[SHIP_SIZE_DOOM_STAR] == 41);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "research scout_lab_research_bonus frigate = 256;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -240,6 +380,36 @@ DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COLCALC::_keep_research_on_breakthrough == 1);
     DOCTEST_CHECK(COLCALC::_keep_research_on_finds == 1);
+}
+
+DOCTEST_TEST_CASE("Post-warp technology defaults and indexed bindings match 1.50") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const int16_t expected[TECHINIT::POSTWARP_TECH_COUNT] = {
+        56, 20, 192, 25, 82, 13, 13, 22, 132, 26,
+        179, 71, 72, 51, 191, 163, 46, 122, 155, 61,
+        87, 70, 73, 33, 57, 104, 180, 181, 66,
+    };
+    DOCTEST_CHECK(std::memcmp(
+        TECHINIT::postwarp_tech, expected, sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "research postwarp_tech 1 = 82;"
+        "research postwarp_tech 29 = 83;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(TECHINIT::postwarp_tech[0] == 82);
+    DOCTEST_CHECK(TECHINIT::postwarp_tech[28] == 83);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "research postwarp_tech 1 = 32768;",
+        &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("ground Commando settings preserve classic defaults") {
@@ -261,6 +431,22 @@ DOCTEST_TEST_CASE("ground Commando settings preserve classic defaults") {
     DOCTEST_CHECK(invasion::_ground_commando_attacker_x2 == 1);
 }
 
+DOCTEST_TEST_CASE("Federation mixed-race setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::_federation_no_mixed_races_penalty == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony federation_no_mixed_races_penalty = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::_federation_no_mixed_races_penalty == 1);
+}
+
 DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -274,6 +460,97 @@ DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic d
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COLCALC::_housing_creates_no_farmers == 1);
+}
+
+DOCTEST_TEST_CASE("landing ship costs preserve classic defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.colony_ship == 500);
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.outpost_ship == 100);
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.transport_ship == 100);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony lander_ship_cost colony_ship = 600;"
+        "colony lander_ship_cost outpost_ship = 200;"
+        "colony lander_ship_cost transport_ship = 80;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.colony_ship == 600);
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.outpost_ship == 200);
+    DOCTEST_CHECK(COLCALC::lander_ship_cost.transport_ship == 80);
+}
+
+DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.general_modifier == 0);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.microbiotics_tech == 25);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.antidote_tech == 50);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.boom_event == 100);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.plague_event == -200);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony growth_rate_bonus general_modifier = 10;"
+        "colony growth_rate_bonus microbiotics_tech = 20;"
+        "colony growth_rate_bonus antidote_tech = 30;"
+        "colony growth_rate_bonus boom_event = 127;"
+        "colony growth_rate_bonus plague_event = -300;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.general_modifier == 10);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.microbiotics_tech == 20);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.antidote_tech == 30);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.boom_event == 127);
+    DOCTEST_CHECK(COLCALC::growth_rate_bonus.plague_event == -300);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony growth_rate_bonus general_modifier = 256;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony growth_rate_bonus boom_event = 128;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony growth_rate_bonus plague_event = 1;",
+        &writes, &diagnostic));
+}
+
+DOCTEST_TEST_CASE("Trade Goods ratios preserve 1.50 defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::trade_goods_ratio.normal == 50);
+    DOCTEST_CHECK(COLCALC::trade_goods_ratio.fantastic_traders == 100);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony trade_goods_ratio normal = 40;"
+        "colony trade_goods_ratio fantastic_traders = 175;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::trade_goods_ratio.normal == 40);
+    DOCTEST_CHECK(COLCALC::trade_goods_ratio.fantastic_traders == 175);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony trade_goods_ratio normal = 65536;",
+        &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("Food Replicator costs preserve 1.50 defaults and validate their range") {
@@ -518,6 +795,33 @@ DOCTEST_TEST_CASE("black-hole boarding setting preserves the classic default") {
     DOCTEST_CHECK(BOARDING::_board_in_black_hole == 0);
 }
 
+DOCTEST_TEST_CASE("teleporter and boarding ranges preserve 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMOV1::_round_teleporter == 0);
+    DOCTEST_CHECK(CMBTMOV1::_sub_space_teleporter_range == 20);
+    DOCTEST_CHECK(BOARDING::board_range.normal == 3);
+    DOCTEST_CHECK(BOARDING::board_range.transporters == 12);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat round_teleporter = true;"
+        "combat sub_space_teleporter_range = 24;"
+        "combat board_range normal = 4;"
+        "combat board_range transporters = 15;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTMOV1::_round_teleporter == 1);
+    DOCTEST_CHECK(CMBTMOV1::_sub_space_teleporter_range == 24);
+    DOCTEST_CHECK(BOARDING::board_range.normal == 4);
+    DOCTEST_CHECK(BOARDING::board_range.transporters == 15);
+}
+
 DOCTEST_TEST_CASE("telepathic multiple capture setting preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -619,6 +923,10 @@ DOCTEST_TEST_CASE("Phasing Cloak duration preserves the 1.50 default") {
 DOCTEST_TEST_CASE("combat namespace settings resolve bidirectionally and commit defaults") {
     const char* paths[] = {
         "combat_bonus.phasing_cloak_effective_turns",
+        "combat.round_teleporter",
+        "combat.board_range.normal",
+        "combat.board_range.transporters",
+        "combat.sub_space_teleporter_range",
         "combat.recloak_next_turn",
         "combat.rephase_cloak_next_turn",
         "combat.lightning_field_ratio",
@@ -705,6 +1013,34 @@ DOCTEST_TEST_CASE("missile speed settings preserve and replace 1.50 defaults") {
 
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
     DOCTEST_REQUIRE(config::Commit_State(&state));
+}
+
+DOCTEST_TEST_CASE("ship design technology bonuses preserve 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(DESIGN::_megafluxers_tactical_bonus == 25);
+    DOCTEST_CHECK(DESIGN::_augmented_engines_speed_bonus == 5);
+    DOCTEST_CHECK(DESIGN::Apply_Megafluxers_Tactical_Bonus_(120) == 150);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "design megafluxers_tactical_bonus = 40;"
+        "design augmented_engines_speed_bonus = 12;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(DESIGN::_megafluxers_tactical_bonus == 40);
+    DOCTEST_CHECK(DESIGN::_augmented_engines_speed_bonus == 12);
+    DOCTEST_CHECK(DESIGN::Apply_Megafluxers_Tactical_Bonus_(120) == 168);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "design augmented_engines_speed_bonus = 128;",
+        &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("alternative refit formula preserves the classic default") {

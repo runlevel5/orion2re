@@ -86,6 +86,12 @@ s_tech_hull_data _hull_data[HULL_CLASS_COUNT] = {
     { 2500, 1200, 80, 120, 120, 20, 0, 30, 10, 10, 0, 0, -10, 500, kEmptyName, kEmptyName }
 };
 
+uint16_t _shield_hull_multiplier[HULL_CLASS_COUNT] = {
+    5, 10, 15, 20, 25, 35, 15, 20, 25
+};
+
+uint8_t _hard_shields_damage_reduction = 3;
+
 s_tech_fuel_data _fuel[FUEL_COUNT] = {
     { kEmptyName, 0, 0, 0 },
     { kEmptyName, 1, 167, 4 },
@@ -414,6 +420,11 @@ s_tech_shield_data _shields[SHIELD_COUNT] = {
     { kEmptyName, 4, 36, { 5, 10, 20, 50, 100, 200 }, { 3, 5, 10, 25, 50, 100 }, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 200 },
     { kEmptyName, 5, 37, { 5, 10, 20, 50, 100, 200 }, { 3, 5, 10, 25, 50, 100 }, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250 }
 };
+
+int32_t Shield_Strength_(int16_t hull_class, int16_t shield_type) {
+    return (int32_t)_shield_hull_multiplier[hull_class] *
+           _shields[shield_type].shield_class;
+}
 
 s_tech_computer_data _computers[COMPUTER_COUNT] = {
     { kEmptyName, 0, 0, { 0, 0, 0, 0, 0, 0 }, 0 },

@@ -6,9 +6,12 @@ namespace {
     s_player players[1];
     s_star_data stars[1];
     s_ship_data ships[1];
+    s_leader_data leaders[1];
     int32_t destroy_colony_reason;
     int16_t add_spy_result;
     int16_t deleted_product;
+    bool population_boom;
+    bool plague;
 }
 
 namespace TEST_COLONY_POP_GROWTH {
@@ -18,17 +21,37 @@ namespace TEST_COLONY_POP_GROWTH {
         memset(players, 0, sizeof(players));
         memset(stars, 0, sizeof(stars));
         memset(ships, 0, sizeof(ships));
+        memset(leaders, 0, sizeof(leaders));
         memset(TECHDATA::_buildings, 0, sizeof(TECHDATA::_buildings));
         planet_storage[0].colony_index = 1;
+        planet_storage[1].size = PLANET_SIZE_HUGE;
         colonies[1].buildings[BUILDING_CAPITOL] = 1;
+        stars[0].officer_index[0] = -1;
         TECHDATA::_buildings[BUILDING_CAPITOL].tech_app = TECH_APP_CAPITOL;
         destroy_colony_reason = -1;
         add_spy_result = 1;
         deleted_product = COLONY_PRODUCTION_NONE;
+        population_boom = false;
+        plague = false;
+        COLCALC::growth_rate_bonus = {
+            0,
+            25,
+            50,
+            100,
+            -200,
+        };
+        COLCALC::_pop_bonus_biospheres = 2;
+        COLCALC::_federation_no_mixed_races_penalty = 0;
         COLCALC::_housing_creates_no_farmers = 0;
         COLCALC::_planet_extinction = 0;
         COLCALC::_zero_colony_lost = 0;
         COLCALC::_freighters_cash_bonus = 0;
+        COLCALC::lander_ship_cost.colony_ship = 500;
+        COLCALC::lander_ship_cost.outpost_ship = 100;
+        COLCALC::lander_ship_cost.transport_ship = 100;
+        COLCALC::misc_costs.android_farmer = 50;
+        COLCALC::misc_costs.android_worker = 50;
+        COLCALC::misc_costs.android_scientist = 50;
     }
 
     int32_t Destroy_Colony_Reason_() {
@@ -42,6 +65,14 @@ namespace TEST_COLONY_POP_GROWTH {
     int16_t Deleted_Product_() {
         return deleted_product;
     }
+
+    void Set_Population_Boom_(bool enabled) {
+        population_boom = enabled;
+    }
+
+    void Set_Plague_(bool enabled) {
+        plague = enabled;
+    }
 }
 
 namespace MOX {
@@ -52,6 +83,8 @@ namespace MOX {
     s_player* _player = players;
     s_star_data* _star = stars;
     s_ship_data* _ship = ships;
+    s_leader_data* _leaders = leaders;
+    s_settings _settings = {};
     s_crew_data _crew_data[CREW_QUALITY_COUNT] = {};
     int8_t _planet_max_population[PLANET_SIZE_COUNT] = {5, 10, 15, 20, 25};
 }
@@ -68,6 +101,26 @@ namespace EVENTS {
 
     int16_t __cdecl Event_Check_Colony_Researching_(int16_t) {
         return 0;
+    }
+
+    int16_t __cdecl Event_Check_Population_Boom_(int16_t) {
+        return population_boom;
+    }
+
+    int16_t __cdecl Event_Check_Plague_(int16_t) {
+        return plague;
+    }
+}
+
+namespace OFFICER {
+    int16_t __cdecl Owned_Officer_Level_(int16_t) {
+        return 0;
+    }
+}
+
+namespace special {
+    uint32_t __cdecl isqrt_(uint32_t) {
+        return 100;
     }
 }
 

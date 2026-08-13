@@ -1,0 +1,540 @@
+# MOO2 1.50 variable restoration TODOs
+
+This file inventories variables declared by the inspected MOO2 1.50 patch and tracks their restoration in the current source tree. It complements `docs/patches.md`: that catalog tracks patch topics, while this catalog tracks the variable surface that must not be missed when a topic is restored.
+
+## Scope and source of truth
+
+The inventory was generated from the MOO2150 working tree at commit `e5d3857f1d30456b5e4b4abd734dc81e4ba1ff8f`. The inspected files have SHA-256 values:
+
+- `src/conf.pl`: `cbbf78537732f7f35b2f3e941abfaadbfec3f47cecdc69c199aee3bb54bce3a5`
+- `src/asm.pl`: `f7b7054269565414973d51d7a873fca094f98581fed0b663092bff3791bb87bb`
+
+`conf.pl` is authoritative for configuration variables. It has 388 syntactic `add_config_key` registrations: five are marked `expired`, 382 active registrations define concrete keys, and one active factory registration expands into nine configurable name tables. The resulting effective inventory contains 391 configuration variables. `mtype.pl` and `conf_template.pl` define metadata and output templates but add no keys.
+
+`asm.pl` is authoritative for binary patch state. It contains 47 `patch_add("var_*", ...)` writable allocations and 43 symbols that alias writable storage in the original executable. Aliases are inventoried separately because they name existing game state rather than storage introduced by 1.50.
+
+The configuration generator could not be executed in this environment because its Perl `File::Slurp` dependency is unavailable. Effective-key expansion was therefore verified statically from `add_config_key`, `add_name_table`, and `gen_name_tables`.
+
+## Status and workflow
+
+For configuration variables, `[x]` means an exact same-named parameter exists in the current `specs/config/main.json5` registry; the current namespace-qualified key is shown after the arrow. It does not replace a topic-level audit of type, default, limits, parser metadata, synchronization, persistence, bindings, and every use site. `[ ]` means no exact current registry parameter was found and the variable remains to be evaluated with its owning `docs/patches.md` topic.
+
+For patch-owned writable state, `[x]` means the owning patch topic has been reviewed in `docs/patches.md` and the binary scratch state is no longer a pending literal restoration. `[ ]` means the topic remains open. Prefer source-local state, authoritative existing state, or a direct invariant over reproducing a binary global.
+
+Original-executable aliases have no checkboxes because they are navigation evidence, not independent restoration tasks. Audit them with their owning topic to identify the corresponding named source state.
+
+## Effective configuration variables
+
+- [ ] `conf.pl:378` - `number_of_race_picks`
+- [ ] `conf.pl:404` - `hyper_advanced_tech_field_cost_increment_value`
+- [ ] `conf.pl:424` - `food_colony_bonus`
+- [ ] `conf.pl:457` - `production_colony_bonus`
+- [ ] `conf.pl:492` - `planet_no_pollution_prod`
+- [ ] `conf.pl:526` - `research_colony_bonus`
+- [ ] `conf.pl:579` - `armor`
+- [x] `conf.pl:606` - `civilian_armor` -> `combat.civilian_armor`
+- [x] `conf.pl:661` - `shield` -> `design.shield`
+- [x] `conf.pl:683` - `hard_shields_damage_reduction` -> `combat.hard_shields_damage_reduction`
+- [ ] `conf.pl:723` - `computer`
+- [ ] `conf.pl:792` - `drive`
+- [ ] `conf.pl:836` - `fuel_cells`
+- [ ] `conf.pl:892` - `weapon_mod`
+- [ ] `conf.pl:922` - `mods_available`
+- [ ] `conf.pl:946` - `food_farmer_base`
+- [ ] `conf.pl:994` - `production_worker_base`
+- [ ] `conf.pl:1011` - `planet_maintenance`
+- [ ] `conf.pl:1054` - `bc_planet_bonus`
+- [ ] `conf.pl:1087` - `map_generation`
+- [x] `conf.pl:1187` - `miniaturization` -> `design.miniaturization`
+- [ ] `conf.pl:1256` - `rifle_bonus`
+- [ ] `conf.pl:1286` - `troop_type`
+- [ ] `conf.pl:1325` - `troop_bonus`
+- [ ] `conf.pl:1363` - `max_combat_turns`
+- [ ] `conf.pl:1394` - `combat_bonus`
+- [ ] `conf.pl:1438` - `exploding_ship_damage_base_drive_multiplier`
+- [ ] `conf.pl:1451` - `exploding_ship_damage_quantum_detonator_multiplier`
+- [ ] `conf.pl:1464` - `quantum_detonator_explode_chance`
+- [ ] `conf.pl:1494` - `missile_space_and_cost`
+- [ ] `conf.pl:1536` - `flyer_hit_points`
+- [x] `conf.pl:1591` - `missile_defense` -> `combat.missile_defense`
+- [ ] `conf.pl:1645` - `ship_communication_range`
+- [ ] `conf.pl:1686` - `planetary_shield`
+- [ ] `conf.pl:1719` - `misc_costs`
+- [x] `conf.pl:1742` - `jump_gate_speed_bonus` -> `movement.jump_gate_speed_bonus`
+- [ ] `conf.pl:1755` - `warp_interdictor_range`
+- [ ] `conf.pl:1788` - `crew_data`
+- [ ] `conf.pl:1903` - `artemis_system_net`
+- [ ] `conf.pl:1975` - `starbase_special`
+- [ ] `conf.pl:2049` - `ai_ship_design_bio_weapons_theme`
+- [ ] `conf.pl:2075` - `ai_ship_design_capture_theme`
+- [ ] `conf.pl:2101` - `ai_ship_design_cloaking_theme`
+- [ ] `conf.pl:2127` - `ai_ship_design_beam_defense_theme`
+- [ ] `conf.pl:2154` - `ai_ship_design_missile_defense_theme`
+- [ ] `conf.pl:2181` - `ai_ship_design_armor_theme`
+- [ ] `conf.pl:2207` - `ai_ship_design_shield_theme`
+- [ ] `conf.pl:2233` - `ai_ship_design_beam_offense_specials`
+- [ ] `conf.pl:2259` - `ai_ship_design_missile_offense_specials`
+- [ ] `conf.pl:2285` - `ai_ship_design_special_weapon_specials`
+- [ ] `conf.pl:2311` - `ai_ship_design_special_device_specials`
+- [ ] `conf.pl:2337` - `ai_ship_design_defense_specials_a`
+- [ ] `conf.pl:2363` - `ai_ship_design_defense_specials_b`
+- [ ] `conf.pl:2400` - `monster_hit_points`
+- [ ] `conf.pl:2441` - `monster_drive`
+- [ ] `conf.pl:2485` - `event_amoeba`
+- [ ] `conf.pl:2532` - `system_amoeba`
+- [ ] `conf.pl:2574` - `system_and_event_amoeba_special`
+- [ ] `conf.pl:2597` - `system_and_event_eel`
+- [ ] `conf.pl:2633` - `event_eel`
+- [ ] `conf.pl:2668` - `system_eel`
+- [ ] `conf.pl:2751` - `event_crystal`
+- [ ] `conf.pl:2794` - `system_crystal`
+- [ ] `conf.pl:2843` - `system_and_event_hydra`
+- [ ] `conf.pl:2880` - `event_hydra`
+- [ ] `conf.pl:2913` - `system_hydra`
+- [ ] `conf.pl:2952` - `system_and_event_dragon`
+- [ ] `conf.pl:2997` - `event_dragon`
+- [ ] `conf.pl:3045` - `system_dragon`
+- [x] `conf.pl:3136` - `guardian` -> `ships.guardian`
+- [x] `conf.pl:3276` - `avenger` -> `ships.avenger`
+- [ ] `conf.pl:3412` - `antaran_fleet`
+- [ ] `conf.pl:3524` - `antaran_frigate___defensive`
+- [ ] `conf.pl:3605` - `antaran_frigate___offensive`
+- [ ] `conf.pl:3692` - `antaran_destroyer___defensive`
+- [ ] `conf.pl:3791` - `antaran_destroyer___offensive`
+- [ ] `conf.pl:3902` - `antaran_cruiser___defensive`
+- [ ] `conf.pl:4036` - `antaran_cruiser___offensive`
+- [ ] `conf.pl:4176` - `antaran_battleship___defensive`
+- [ ] `conf.pl:4329` - `antaran_battleship___offensive`
+- [ ] `conf.pl:4493` - `antaran_titan___defensive`
+- [ ] `conf.pl:4678` - `antaran_titan___offensive`
+- [ ] `conf.pl:4839` - `antaran_star_fortress`
+- [ ] `conf.pl:4960` - `ai_ship_design`
+- [ ] `conf.pl:5058` - `mapgen`
+- [x] `conf.pl:5102` - `mount_dmg` -> `combat.mount_dmg`
+- [x] `conf.pl:5122` - `missile_initiative` -> `combat.missile_initiative`
+- [ ] `conf.pl:5140` - `missile_glue_old`
+- [ ] `conf.pl:5153` - `fighter_beam_no_plus_one`
+- [ ] `conf.pl:5166` - `fighter_uses_pd`
+- [x] `conf.pl:5178` - `heavy_fighter_can_scramble` -> `combat.heavy_fighter_can_scramble`
+- [ ] `conf.pl:5264` - `special`
+- [ ] `conf.pl:5353` - `weapon`
+- [ ] `conf.pl:5458` - `building`
+- [ ] `conf.pl:5650` - `tech_field`
+- [ ] `conf.pl:5900` - `tech`
+- [ ] `conf.pl:5979` - `tech_name` (generated by `add_name_table`)
+- [ ] `conf.pl:5980` - `tech_field_name` (generated by `add_name_table`)
+- [ ] `conf.pl:5981` - `weapon_name` (generated by `add_name_table`)
+- [ ] `conf.pl:5982` - `weapon_name2` (generated by `add_name_table`)
+- [ ] `conf.pl:5983` - `special_name` (generated by `add_name_table`)
+- [ ] `conf.pl:5984` - `building_name` (generated by `add_name_table`)
+- [ ] `conf.pl:5985` - `shield_name` (generated by `add_name_table`)
+- [ ] `conf.pl:5986` - `armor_name` (generated by `add_name_table`)
+- [ ] `conf.pl:5987` - `computer_name` (generated by `add_name_table`)
+- [ ] `conf.pl:6017` - `/noreport`
+- [ ] `conf.pl:6032` - `/noscan`
+- [ ] `conf.pl:6045` - `/nohousing`
+- [ ] `conf.pl:6058` - `/droids`
+- [ ] `conf.pl:6072` - `damper_kill_ratio`
+- [x] `conf.pl:6089` - `satellite_uses_torpedoes` -> `combat.satellite_uses_torpedoes`
+- [x] `conf.pl:6111` - `lander_ship_cost` -> `colony.lander_ship_cost`
+- [ ] `conf.pl:6150` - `pop_max`
+- [ ] `conf.pl:6168` - `pop_climate`
+- [x] `conf.pl:6199` - `tractors_to_stop` -> `combat.tractors_to_stop`
+- [ ] `conf.pl:6217` - `satellite_racial_defense_bonus`
+- [x] `conf.pl:6239` - `board_in_black_hole` -> `combat.board_in_black_hole`
+- [ ] `conf.pl:6260` - `steal_mode`
+- [ ] `conf.pl:6306` - `ai_race_variants`
+- [x] `conf.pl:6340` - `speed_base` -> `combat.speed_base`
+- [x] `conf.pl:6358` - `speed_fast_bonus` -> `combat.speed_fast_bonus`
+- [x] `conf.pl:6370` - `td_combat_speed_bonus` -> `combat.td_combat_speed_bonus`
+- [x] `conf.pl:6386` - `td_ftl_bonus` -> `movement.td_ftl_bonus`
+- [x] `conf.pl:6468` - `stealth_bonus` -> `detection.stealth_bonus`
+- [ ] `conf.pl:6496` - `plasma_web_dissipation_step`
+- [ ] `conf.pl:6563` - `hull`
+- [ ] `conf.pl:6631` - `spy_govt_bonus`
+- [ ] `conf.pl:6664` - `ground_defense`
+- [ ] `conf.pl:6723` - `clear_button_shield`
+- [ ] `conf.pl:6772` - `clear_button_computer`
+- [x] `conf.pl:6808` - `alternative_refit` -> `design.alternative_refit`
+- [ ] `conf.pl:6824` - `scan_mods`
+- [ ] `conf.pl:6840` - `build.cfg`
+- [ ] `conf.pl:6854` - `main.lua`
+- [ ] `conf.pl:6868` - `mod_id`
+- [ ] `conf.pl:6885` - `mod_class`
+- [ ] `conf.pl:6912` - `mod_name`
+- [ ] `conf.pl:6928` - `mod_desc`
+- [ ] `conf.pl:6943` - `mod_order`
+- [ ] `conf.pl:6984` - `format`
+- [ ] `conf.pl:7032` - `$fname.lbx`
+- [ ] `conf.pl:7078` - `scroll_interval`
+- [ ] `conf.pl:7095` - `absorber_keep_charge`
+- [x] `conf.pl:7120` - `planet_non_enveloping` -> `combat.planet_non_enveloping`
+- [x] `conf.pl:7133` - `planet_extinction` -> `colony.planet_extinction`
+- [x] `conf.pl:7149` - `round_teleporter` -> `combat.round_teleporter`
+- [x] `conf.pl:7167` - `board_range` -> `combat.board_range`
+- [x] `conf.pl:7192` - `interactive_combat_stats` -> `combat.interactive_combat_stats`
+- [ ] `conf.pl:7210` - `all_events_delay`
+- [ ] `conf.pl:7224` - `between_events_delay`
+- [ ] `conf.pl:7246` - `event_roll`
+- [ ] `conf.pl:7280` - `shield_recharge_rate`
+- [ ] `conf.pl:7309` - `info_lbx_menu`
+- [ ] `conf.pl:7342` - `hi_score`
+- [ ] `conf.pl:7366` - `mind_control_ship_class`
+- [ ] `conf.pl:7389` - `lander_ship_uses_stealth`
+- [ ] `conf.pl:7425` - `event_duration`
+- [ ] `conf.pl:7467` - `flyer_combat_modifier`
+- [ ] `conf.pl:7503` - `defeat_orion_reward_tech`
+- [ ] `conf.pl:7535` - `planet_special_chance`
+- [ ] `conf.pl:7556` - `stealthy_race_uses_stealth_field`
+- [ ] `conf.pl:7645` - `ai_race_variant_table`
+- [ ] `conf.pl:7966` - `race_pick`
+- [ ] `conf.pl:8040` - `spy_telepathic_bonus`
+- [ ] `conf.pl:8063` - `starting_condition`
+- [ ] `conf.pl:8087` - `plasma_torpedo_dissipation`
+- [ ] `conf.pl:8099` - `nano_disassemblers_coeff`
+- [ ] `conf.pl:8113` - `pollution_processor_ratio`
+- [ ] `conf.pl:8126` - `atmospheric_renewer_ratio`
+- [ ] `conf.pl:8139` - `multi_phased_shields_bonus`
+- [ ] `conf.pl:8151` - `analyzer_bonus`
+- [ ] `conf.pl:8163` - `esd_bonus`
+- [ ] `conf.pl:8175` - `megafluxers_tactical_bonus`
+- [ ] `conf.pl:8187` - `megafluxers_strategic_bonus`
+- [ ] `conf.pl:8213` - `android_morale`
+- [ ] `conf.pl:8255` - `morale_bonus`
+- [x] `conf.pl:8287` - `postwarp_tech` -> `research.postwarp_tech`
+- [x] `conf.pl:8302` - `absorber_damage_reduction` -> `combat.absorber_damage_reduction`
+- [x] `conf.pl:8314` - `damper_field_ratio` -> `combat.damper_field_ratio`
+- [x] `conf.pl:8327` - `scout_lab_research_bonus` -> `research.scout_lab_research_bonus`
+- [ ] `conf.pl:8350` - `fungi_climate`
+- [ ] `conf.pl:8404` - `auto_close_board_result_popup`
+- [x] `conf.pl:8457` - `govt_bonus` -> `government.govt_bonus`
+- [ ] `conf.pl:8507` - `spy_roll_success_threshold`
+- [ ] `conf.pl:8533` - `pop_bonus_advanced_city_planning`
+- [ ] `conf.pl:8605` - `stock_race`
+- [ ] `conf.pl:8659` - `weapon_range`
+- [ ] `conf.pl:8705` - `spherical_range_to_ship`
+- [ ] `conf.pl:8736` - `spherical_range_to_missile`
+- [x] `conf.pl:8757` - `defensive_range_bonus` -> `combat.defensive_range_bonus`
+- [x] `conf.pl:8769` - `pop_bonus_biospheres` -> `colony.pop_bonus_biospheres`
+- [x] `conf.pl:8781` - `shield_hull_multiplier` -> `design.shield_hull_multiplier`
+- [x] `conf.pl:8797` - `lightning_field_ratio` -> `combat.lightning_field_ratio`
+- [x] `conf.pl:8816` - `lightning_field_mode` -> `combat.lightning_field_mode`
+- [x] `conf.pl:8830` - `sub_space_teleporter_range` -> `combat.sub_space_teleporter_range`
+- [ ] `conf.pl:8843` - `augmented_engines_speed_bonus`
+- [x] `conf.pl:8864` - `repair_rate` -> `combat.repair_rate`
+- [ ] `conf.pl:8893` - `prewarp_techfield`
+- [ ] `conf.pl:8920` - `ship_initiative`
+- [x] `conf.pl:8945` - `continuous_bhg` -> `combat.continuous_bhg`
+- [ ] `conf.pl:8973` - `command_points`
+- [ ] `conf.pl:9083` - `skill_cost`
+- [ ] `conf.pl:9106` - `skill_cost_commando`
+- [ ] `conf.pl:9125` - `megawealth_no_double_cost`
+- [ ] `conf.pl:9200` - `star_class_chance`
+- [ ] `conf.pl:9215` - `class_to_num_satellites`
+- [ ] `conf.pl:9245` - `satellite_orbit_chance`
+- [ ] `conf.pl:9260` - `orbit_to_satellite_type`
+- [ ] `conf.pl:9278` - `planet_size_chance`
+- [ ] `conf.pl:9299` - `class_to_mineral`
+- [ ] `conf.pl:9317` - `planet_size_to_gravity`
+- [ ] `conf.pl:9333` - `orbit_to_climate_group`
+- [ ] `conf.pl:9376` - `climate_chance_young_avg_gal`
+- [ ] `conf.pl:9393` - `climate_chance_old_gal`
+- [x] `conf.pl:9410` - `satellite_capture` -> `combat.satellite_capture`
+- [ ] `conf.pl:9425` - `starting_outpost_ship`
+- [x] `conf.pl:9439` - `freighters_cash_bonus` -> `colony.freighters_cash_bonus`
+- [ ] `conf.pl:9457` - `warn_blockers`
+- [x] `conf.pl:9488` - `tech_mini` -> `design.tech_mini`
+- [ ] `conf.pl:9607` - `stars_in_galaxy`
+- [ ] `conf.pl:9636` - `disable_vsync`
+- [ ] `conf.pl:9666` - `screen_fade_speed`
+- [x] `conf.pl:9682` - `planet_damper` -> `combat.planet_damper`
+- [ ] `conf.pl:9698` - `growth_formula_factor`
+- [ ] `conf.pl:9714` - `housing_formula_factor`
+- [ ] `conf.pl:9728` - `cloners_growth_bonus`
+- [x] `conf.pl:9741` - `systems_repair_percent` -> `combat.systems_repair_percent`
+- [x] `conf.pl:9763` - `trade_goods_ratio` -> `colony.trade_goods_ratio`
+- [ ] `conf.pl:9777` - `confirm_battle_message_timeout`
+- [x] `conf.pl:9793` - `broken_engine_explodes` -> `combat.broken_engine_explodes`
+- [ ] `conf.pl:9806` - `ai_surrender_delay`
+- [x] `conf.pl:9820` - `compressor_per_size_class_damage` -> `combat.compressor_per_size_class_damage`
+- [ ] `conf.pl:9833` - `defensive_fire`
+- [ ] `conf.pl:9866` - `starting_techfield`
+- [ ] `conf.pl:9889` - `initial_building`
+- [ ] `conf.pl:9907` - `wormhole_color`
+- [ ] `conf.pl:9923` - `raid_items_per_marine`
+- [ ] `conf.pl:9937` - `defensive_fire_max_range`
+- [x] `conf.pl:9950` - `keep_research_on_breakthrough` -> `research.keep_research_on_breakthrough`
+- [x] `conf.pl:9964` - `keep_research_on_finds` -> `research.keep_research_on_finds`
+- [ ] `conf.pl:9978` - `ship_command_points_usage`
+- [ ] `conf.pl:9996` - `landers_size_class`
+- [ ] `conf.pl:10010` - `raid_damage_per_marine`
+- [x] `conf.pl:10023` - `finds_presented_by_scientist` -> `research.finds_presented_by_scientist`
+- [ ] `conf.pl:10039` - `barracks_morale_bonus`
+- [ ] `conf.pl:10057` - `govt_morale_penalty`
+- [ ] `conf.pl:10083` - `no_capitol_morale_penalty`
+- [ ] `conf.pl:10100` - `ai_productivity_bonus`
+- [ ] `conf.pl:10118` - `ai_income_bonus`
+- [x] `conf.pl:10136` - `federation_no_mixed_races_penalty` -> `colony.federation_no_mixed_races_penalty`
+- [ ] `conf.pl:10149` - `battle_pods_speed_bonus`
+- [ ] `conf.pl:10162` - `minimum_combat_speed`
+- [ ] `conf.pl:10190` - `bc_bonus`
+- [ ] `conf.pl:10223` - `food_farmer_bonus`
+- [ ] `conf.pl:10268` - `research_scientist_bonus`
+- [ ] `conf.pl:10313` - `production_worker_bonus`
+- [ ] `conf.pl:10339` - `weather_control_climate`
+- [ ] `conf.pl:10362` - `alternate_defensive_fire_range`
+- [ ] `conf.pl:10385` - `alternate_defensive_fire`
+- [ ] `conf.pl:10398` - `leaders_no_limit`
+- [ ] `conf.pl:10457` - `arc_cost_and_space`
+- [ ] `conf.pl:10474` - `monsters_stay`
+- [ ] `conf.pl:10496` - `monsters_stay_chance`
+- [ ] `conf.pl:10592` - `force_event_type`
+- [x] `conf.pl:10609` - `event_delay` -> `events.event_delay`
+- [ ] `conf.pl:10653` - `no_outpost_prompt`
+- [x] `conf.pl:10669` - `crystal_keep` -> `combat.crystal_keep`
+- [x] `conf.pl:10683` - `satellite_warlord_bonus` -> `combat.satellite_warlord_bonus`
+- [ ] `conf.pl:10696` - `leader_warlord_bonus`
+- [ ] `conf.pl:10709` - `alternate_diplomacy`
+- [ ] `conf.pl:10723` - `rebel_display`
+- [ ] `conf.pl:10769` - `defenses_allowed_mods`
+- [ ] `conf.pl:10799` - `satellite_space_allocation`
+- [ ] `conf.pl:10822` - `newgame_postprocessor_script`
+- [ ] `conf.pl:10839` - `pregame_script`
+- [ ] `conf.pl:10855` - `proton_torpedo_apply_speed_base`
+- [ ] `conf.pl:10899` - `satellite_ammo_basis`
+- [ ] `conf.pl:10913` - `missile_base_ammo_basis`
+- [ ] `conf.pl:10927` - `2x_range_accuracy_penalty`
+- [ ] `conf.pl:10940` - `2x_range_damage_penalty`
+- [ ] `conf.pl:10953` - `antaran_star_fortress_space`
+- [ ] `conf.pl:10967` - `simplified_beam_formula`
+- [ ] `conf.pl:11001` - `ai_hypertech_threshold`
+- [ ] `conf.pl:11027` - `terraform_toxic_building`
+- [ ] `conf.pl:11040` - `combat_ships_without_ammo_stay`
+- [ ] `conf.pl:11062` - `human_player_fleet_auto_retreat`
+- [x] `conf.pl:11094` - `growth_rate_bonus` -> `colony.growth_rate_bonus`
+- [ ] `conf.pl:11126` - `microbiotics_and_antidote_cumulative`
+- [ ] `conf.pl:11156` - `fighter_shots`
+- [ ] `conf.pl:11181` - `no_designs_update_for_laser`
+- [x] `conf.pl:11208` - `design_button_computer` -> `design.design_button_computer`
+- [x] `conf.pl:11225` - `design_button_shield` -> `design.design_button_shield`
+- [x] `conf.pl:11242` - `jump_gate_pass_nebula` -> `movement.jump_gate_pass_nebula`
+- [ ] `conf.pl:11255` - `ai_builds_colony_bases_prewarp`
+- [ ] `conf.pl:11285` - `lab_and_lore_against_antarans`
+- [ ] `conf.pl:11314` - `pop_bonus_subterranean`
+- [ ] `conf.pl:11327` - `pop_bonus_tolerant`
+- [ ] `conf.pl:11349` - `reinforced_hull_multiplier`
+- [ ] `conf.pl:11371` - `marine_kill_damage`
+- [ ] `conf.pl:11387` - `ground_defense_armor_multiplier`
+- [ ] `conf.pl:11401` - `spies_can_frame_anyone`
+- [ ] `conf.pl:11423` - `no_starting_ships`
+- [ ] `conf.pl:11445` - `no_initial_tech_prompt`
+- [ ] `conf.pl:11470` - `crew_no_turn_xp`
+- [ ] `conf.pl:11492` - `multibuild`
+- [ ] `conf.pl:11507` - `all_planet_shields_block_bioweapons`
+- [ ] `conf.pl:11529` - `lithovore_has_fungi_in_tech_tree`
+- [ ] `conf.pl:11568` - `race_personality`
+- [ ] `conf.pl:11605` - `ranged_to_hit_penalty`
+- [ ] `conf.pl:11621` - `ranged_damage_penalty`
+- [ ] `conf.pl:11637` - `first_council_delay`
+- [ ] `conf.pl:11652` - `council_frequency`
+- [ ] `conf.pl:11668` - `elite_offensive_ants`
+- [ ] `conf.pl:11699` - `democracy_gets_psionics_morale`
+- [ ] `conf.pl:11726` - `stealth_no_size_penalty`
+- [ ] `conf.pl:11741` - `menlo_research_points`
+- [ ] `conf.pl:11761` - `bc_system_discovery`
+- [ ] `conf.pl:11784` - `dragon_bribe_bc`
+- [ ] `conf.pl:11806` - `donation_bc`
+- [ ] `conf.pl:11837` - `pirate_raid`
+- [ ] `conf.pl:11859` - `nova_minimum_research_per_turn`
+- [ ] `conf.pl:11882` - `computer_virus`
+- [ ] `conf.pl:11905` - `govt_assimilation_points`
+- [ ] `conf.pl:11923` - `aquatic_treats_tundra_as_swamp`
+- [ ] `conf.pl:11936` - `non_ics_phasing_cloak_mode`
+- [x] `conf.pl:11949` - `non_ics_tractor_and_bhg_mode` -> `combat.non_ics_tractor_and_bhg_mode`
+- [x] `conf.pl:11963` - `satellite_size_class_plus_one` -> `combat.satellite_size_class_plus_one`
+- [ ] `conf.pl:11997` - `new_farmer_food_threshold`
+- [x] `conf.pl:12013` - `housing_creates_no_farmers` -> `colony.housing_creates_no_farmers`
+- [x] `conf.pl:12027` - `kill_excess_marines_after_capture` -> `combat.kill_excess_marines_after_capture`
+- [x] `conf.pl:12040` - `amoeba_regeneration` -> `combat.amoeba_regeneration`
+- [ ] `conf.pl:12070` - `first_pop_to_production`
+- [ ] `conf.pl:12101` - `transport_ship_extended_range`
+- [x] `conf.pl:12114` - `recloak_next_turn` -> `combat.recloak_next_turn`
+- [x] `conf.pl:12136` - `rephase_cloak_next_turn` -> `combat.rephase_cloak_next_turn`
+- [x] `conf.pl:12149` - `zero_colony_lost` -> `colony.zero_colony_lost`
+- [ ] `conf.pl:12165` - `feudal_affects_freighters`
+- [ ] `conf.pl:12187` - `ai_tech_prio`
+- [ ] `conf.pl:12214` - `planet_rangemaster`
+- [ ] `conf.pl:12227` - `planet_achilles`
+- [ ] `conf.pl:12240` - `planet_analyzer`
+- [ ] `conf.pl:12253` - `planet_hef`
+- [ ] `conf.pl:12266` - `double_ship_scrap_value`
+- [ ] `conf.pl:12288` - `no_graph_smoothing`
+- [ ] `conf.pl:12312` - `no_center_on_next_ship`
+- [x] `conf.pl:12338` - `replicator_food_pp` -> `colony.replicator_food_pp`
+- [x] `conf.pl:12352` - `replicator_food_bc` -> `colony.replicator_food_bc`
+- [ ] `conf.pl:12366` - `death_spore_list_damage`
+- [ ] `conf.pl:12390` - `bio_terminator_list_damage`
+- [x] `conf.pl:12414` - `ground_commando_defender_x5` -> `leaders.ground_commando_defender_x5`
+- [x] `conf.pl:12427` - `ground_commando_attacker_x2` -> `leaders.ground_commando_attacker_x2`
+- [ ] `conf.pl:12449` - `ai_ship_design_bhg_chance`
+- [ ] `conf.pl:12467` - `ai_ship_design_stellar_chance`
+- [ ] `conf.pl:12485` - `housing_no_popagg`
+- [ ] `conf.pl:12535` - `font_color_group`
+- [ ] `conf.pl:12590` - `prod_format`
+- [x] `conf.pl:12613` - `strategic_xp_bonus` -> `combat.strategic_xp_bonus`
+- [ ] `conf.pl:12626` - `send_last_pop`
+- [ ] `conf.pl:12654` - `max_pop_freighted`
+- [ ] `conf.pl:12666` - `no_future_tech_peek`
+- [ ] `conf.pl:12701` - `system_and_event_crystal`
+- [ ] `conf.pl:12722` - `capitol_can_be_bombed`
+- [ ] `conf.pl:12756` - `spy_tech_bonus`
+- [ ] `conf.pl:12779` - `loaded_config_prompt`
+- [x] `conf.pl:12794` - `telepathic_multiple_capture` -> `combat.telepathic_multiple_capture`
+- [ ] `conf.pl:12809` - `marine_kill_damage_blocker`
+- [ ] `conf.pl:12824` - `loknar_gives_no_tech`
+- [x] `conf.pl:12851` - `missile_x3_shot` -> `design.missile_x3_shot`
+- [ ] `conf.pl:12988` - `keep_eotw_setting`
+- [x] `conf.pl:13013` - `leader_dies_with_no` -> `leaders.leader_dies_with_no`
+- [ ] `conf.pl:13039` - `invasion_tech_chance`
+- [ ] `conf.pl:13086` - `fixed_research_cost`
+- [ ] `conf.pl:13116` - `n_spies_bonus`
+- [ ] `conf.pl:13150` - `spy_random_bonus`
+- [ ] `conf.pl:13180` - `spy_roll_random_success`
+- [ ] `conf.pl:13203` - `missile_ammo_x2`
+- [ ] `conf.pl:13236` - `send_native`
+- [ ] `conf.pl:13268` - `ai_planet_value`
+- [ ] `conf.pl:13297` - `wait_movement_cost`
+- [x] `conf.pl:13328` - `scan_bonus` -> `detection.scan_bonus`
+- [ ] `conf.pl:13364` - `antaran_attack_chance_lucky_divisor`
+- [ ] `conf.pl:13391` - `satellite_ship_class`
+- [ ] `conf.pl:13426` - `leader_data`
+- [ ] `conf.pl:13466` - `print_research_value`
+- [ ] `conf.pl:13495` - `anti_missile_rocket_chance_to_hit`
+- [ ] `conf.pl:13520` - `star_special_chance`
+- [ ] `conf.pl:13542` - `anim_speed_cloak`
+- [ ] `conf.pl:13567` - `hit_threshold_fixed_value`
+- [ ] `conf.pl:13581` - `ion_affects_antarans`
+- [ ] `conf.pl:13604` - `eel_spawn_frequency`
+- [ ] `conf.pl:13619` - `max_eels`
+
+## Superseded configuration declarations
+
+These five registrations remain in `conf.pl` for compatibility or generator history but are marked `expired => 1`; their later active replacements are included above.
+
+- `conf.pl:1829` - `leader_data` / `conf_leader_data_expired1`
+- `conf.pl:2710` - `system_and_event_crystal` / `conf_system_and_event_crystal1`
+- `conf.pl:6415` - `scan_bonus` / `conf_scan_bonus1`
+- `conf.pl:6588` - `spy_tech_bonus` / `conf_spy_tech_bonus1`
+- `conf.pl:10891` - `missile_ammo_x2` / `conf_missile_ammo_x2_expired1`
+
+## Patch-owned writable state
+
+- [ ] `asm.pl:610` - `shortcuts`: `var_shortcut_prev` (`"##,\0"`)
+- [ ] `asm.pl:611` - `shortcuts`: `var_shortcut_next` (`"##.\0"`)
+- [ ] `asm.pl:648` - `shortcuts`: `var_shortcut_space` (`"## \0"`)
+- [ ] `asm.pl:666` - `shortcuts`: `var_shortcut_cheat` (`"##'\0"`)
+- [ ] `asm.pl:2082` - `names in config`: `var_do_load_tech_names` (1 byte)
+- [ ] `asm.pl:2134` - `subst LBX`: `var_file_buffer` (261 bytes)
+- [x] `asm.pl:2480` - `town Zero`: `var_zero_owner` (4 bytes)
+- [x] `asm.pl:2481` - `town Zero`: `var_destroy_zero` (1 byte)
+- [x] `asm.pl:2567` - `town Zero`: `var_extinction_stash` (4 bytes)
+- [ ] `asm.pl:2712` - `autodesign`: `var_stashed_speed` (1 byte)
+- [ ] `asm.pl:2775` - `autodesign`: `var_stashed_space` (2 bytes)
+- [ ] `asm.pl:2776` - `autodesign`: `var_stashed_player_autodesign` (4 bytes)
+- [x] `asm.pl:3318` - `teleporters and boarding`: `var_square` (1 byte)
+- [ ] `asm.pl:4189` - `sixth slot`: `var_slot_seven_stash` (100 bytes)
+- [ ] `asm.pl:4190` - `sixth slot`: `var_slot_seven_flag` (1 byte)
+- [ ] `asm.pl:4248` - `sixth slot`: `var_stashed_slot` (4 bytes)
+- [x] `asm.pl:4776` - `moving farmer`: `var_need_farm_test` (1 byte)
+- [x] `asm.pl:6868` - `starbase capture`: `var_starbase_capture` (1 byte)
+- [x] `asm.pl:6869` - `starbase capture`: `var_starbase_planet_stash` (4 bytes)
+- [x] `asm.pl:6870` - `starbase capture`: `var_starbase_type_stash` (4 bytes)
+- [ ] `asm.pl:7317` - `turn structure`: `var_twf_turn` (1 byte)
+- [ ] `asm.pl:7340` - `turn structure`: `var_initiative_tmp` (1 byte)
+- [ ] `asm.pl:7508` - `turn structure`: `var_fighters_turn` (1 byte)
+- [x] `asm.pl:8116` - `mark stack overflow`: `var_stashed_stack_pos` (4 bytes)
+- [x] `asm.pl:8472` - `rotate warning`: `var_stash_angle` (4 bytes, initialized to `0xfffffc18`)
+- [x] `asm.pl:8473` - `rotate warning`: `var_warning_flag` (1 byte)
+- [x] `asm.pl:8899` - `absorber cleanup`: `var_energy` (1 byte)
+- [ ] `asm.pl:9193` - `defence fire`: `var_DFR_stash` (4 bytes)
+- [ ] `asm.pl:9955` - `i18n`: `var_jimtext73_buffer` (42 bytes)
+- [x] `asm.pl:10197` - `curship visuals`: `var_in_seeking` (1 byte)
+- [x] `asm.pl:10378` - `show arti tech`: `var_discovery_star` (4 bytes, initialized to `-1`)
+- [x] `asm.pl:10438` - `show arti tech`: `var_arti_planet` (4 bytes, initialized to `-1`)
+- [ ] `asm.pl:11826` - `events`: `var_monster_hotseat_stash` (4 bytes, initialized to `-1`)
+- [ ] `asm.pl:11883` - `events`: `var_amoeba_toxic` (1 byte)
+- [ ] `asm.pl:12085` - `events`: `var_monster_planet_message` (1 byte)
+- [x] `asm.pl:13297` - `wrong missile bearing`: `var_missile_bearing_stash` (300 bytes)
+- [x] `asm.pl:14055` - `overmap speed recalc`: `var_stash_leader_at_scrap` (2 bytes, initialized to `-1`)
+- [x] `asm.pl:14154` - `scrap stuff maintenance`: `var_leader_in_distress` (1 byte)
+- [x] `asm.pl:14212` - `Loknar message`: `var_loknar_techs` (6 bytes)
+- [x] `asm.pl:14214` - `Loknar message`: `var_orion_techs_buffer` (12 bytes)
+- [ ] `asm.pl:15430` - `satellite heavy beams`: `var_heavy_mod_check` (1 byte)
+- [x] `asm.pl:16623` - `orphans fix`: `var_orphans` (1 byte)
+- [x] `asm.pl:18439` - `net nested combat`: `var_inside_do_1` (1 byte)
+- [ ] `asm.pl:18482` - `leader xp`: `var_leader_xp_dy` (4 bytes)
+- [ ] `asm.pl:18483` - `leader xp`: `var_leader_xp_id` (2 bytes)
+- [ ] `asm.pl:18610` - `orders hooks`: `var_orders_decode_buf_stash` (4 bytes)
+- [x] `asm.pl:19282` - `artemis desync`: `var_stashed_seed` (4 bytes)
+
+## Original-executable writable aliases
+
+### `va_symbol` aliases
+
+- `asm.pl:3028` - `var_drawn_ship_builder_byte_199B4A` at VA `0x199B4A`
+- `asm.pl:3029` - `var_drawn_ship_player_byte_199A32` at VA `0x199A32`
+- `asm.pl:3030` - `var_drawn_ship_drive_byte_199A43` at VA `0x199A43`
+- `asm.pl:3031` - `var_ship_id_word_199A30` at VA `0x199A30`
+- `asm.pl:3032` - `var_strategic_flag_byte_199CB4` at VA `0x199CB4`
+- `asm.pl:3033` - `var_drawn_ship_combat_speed_word_199A4D` at VA `0x199A4D`
+- `asm.pl:3034` - `var_drawn_ship_lander_word_199A3B` at VA `0x199A3B`
+- `asm.pl:3035` - `var_drawn_shield_byte_199A38` at VA `0x199A38`
+- `asm.pl:6042` - `var_temp_hull_size_b` at VA `0x199A37`
+- `asm.pl:6267` - `var_settings_lang_b` at VA `0x199CAE`
+- `asm.pl:6268` - `var_settings_difficulty_b` at VA `0x199CB0`
+- `asm.pl:6269` - `var_settings_num_opp_b` at VA `0x199CB1`
+- `asm.pl:6270` - `var_settings_galaxy_size_b` at VA `0x199CB2`
+- `asm.pl:6271` - `var_settings_galaxy_age_b` at VA `0x199CB3`
+- `asm.pl:6272` - `var_settings_strat_b` at VA `0x199CB4`
+- `asm.pl:6273` - `var_settings_civ_b` at VA `0x199CB5`
+- `asm.pl:7315` - `var_settings_initiative_b` at VA `0x199BE9`
+- `asm.pl:8082` - `var_settings_auto_delete_blockers` at VA `0x199BE6`
+- `asm.pl:9093` - `var_current_star_byte_1AAF8C` at VA `0x1AAF8C`
+- `asm.pl:10907` - `var_179FB5` at VA `0x179FB5`
+- `asm.pl:10908` - `var_179F95` at VA `0x179F95`
+- `asm.pl:10909` - `var_179FBF` at VA `0x179FBF`
+- `asm.pl:12092` - `var_event_result_19ABA5` at VA `0x19ABA5`
+- `asm.pl:12093` - `var_event_state_19ABA6` at VA `0x19ABA6`
+- `asm.pl:12094` - `var_event_target_19ABA7` at VA `0x19ABA7`
+- `asm.pl:14456` - `var_event_strength_19ABA9` at VA `0x19ABA9`
+- `asm.pl:16522` - `var_galaxy_age_byte_199CB3` at VA `0x199CB3`
+- `asm.pl:17227` - `var_dword_183568` at VA `0x183568`
+- `asm.pl:17228` - `var_swamp_food_byte_17D822` at VA `0x17D822`
+- `asm.pl:17413` - `settings_enemy_moves_byte_199BDF` at VA `0x199BDF`
+- `asm.pl:18647` - `var_decode_buffer` at VA `0x1AAF72`
+- `asm.pl:18759` - `nebula_image_headers` at VA `0x1902A4`
+- `asm.pl:19479` - `var_unk_1f8494` at VA `0x179E00`
+- `asm.pl:19480` - `var_unk_1f8497` at VA `0x179E03`
+
+### `add_symbol` data aliases
+
+- `asm.pl:341` - `conf_missile_initiative` at executable offset `0xC2085`
+- `asm.pl:1474` - `var_review_equipment_old` at executable offset `0x202102`
+- `asm.pl:1475` - `var_review_equipment_new` at executable offset `0x202104`
+- `asm.pl:4062` - `var_pick_value_table` at executable offset `0x1FB891`
+- `asm.pl:4486` - `var_postwarp` at executable offset `0x1F6B72`
+- `asm.pl:4487` - `var_cluster` at executable offset `0x1F6B73`
+- `asm.pl:5059` - `var_stats_help_y_step_1` at executable offset `0x18E03A`
+- `asm.pl:5060` - `var_stats_help_y_step_2` at executable offset `0x18E03E`
+- `asm.pl:12671` - `var_leader_exp_end` at executable offset `0x117C40`
+
+## Completeness check
+
+- Effective active configuration variables: **391**.
+- Exact same-named current registry parameters: **60**.
+- Configuration variables still requiring restoration review: **331**.
+- Superseded `expired` configuration registrations: **5**.
+- Patch-owned writable `var_*` allocations: **47**.
+- Original writable `va_symbol` aliases: **34**.
+- Original writable `add_symbol` data aliases: **9**.
+- Total binary writable aliases: **43**.

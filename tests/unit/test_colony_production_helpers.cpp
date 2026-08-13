@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <cstring>
+
 #include "game/build_queue.h"
 #include "doctest/doctest.h"
 
@@ -10,6 +12,26 @@ namespace TEST_COLCALC_BASE {
 }
 
 DOCTEST_TEST_SUITE("colony production helpers") {
+
+DOCTEST_TEST_CASE("food half-units retain fractional output") {
+    struct s_food_case {
+        uint16_t food2;
+        const char* expected;
+    };
+
+    const s_food_case cases[] = {
+        {0, "0"},
+        {1, "0.5"},
+        {2, "1"},
+        {3, "1.5"},
+    };
+
+    for (const s_food_case& test_case : cases) {
+        char text[16];
+        COLCALC::Format_Food2(test_case.food2, text, sizeof(text));
+        DOCTEST_CHECK(std::strcmp(text, test_case.expected) == 0);
+    }
+}
 
 DOCTEST_TEST_CASE("production purchase cost follows the original tiered curve") {
     DOCTEST_CHECK(COLCALC::Production_Cost_To_Buy_(100, 0) == 400);

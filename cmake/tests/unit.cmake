@@ -197,6 +197,8 @@ orion2re_add_unit_test(test_refit_cost
         tests/unit/test_refit_cost.cpp
     PRODUCTION_SOURCES
         src/game/aibuild.cpp
+        src/game/colcalc_config.cpp
+        src/game/design.cpp
         src/game/design_config.cpp
     FAKE_SOURCES
         tests/fakes/fake_refit_cost_runtime.cpp
@@ -210,6 +212,28 @@ orion2re_add_unit_test(test_settler
     FAKE_SOURCES
         tests/fakes/fake_settler_runtime.cpp
 )
+
+orion2re_add_unit_test(test_colmove
+    SOURCES
+        tests/unit/test_colmove.cpp
+    PRODUCTION_SOURCES
+        src/game/colmove.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colmove_runtime.cpp
+    LINK_SDL
+)
+
+if(MSVC)
+    target_compile_options(test_colmove PRIVATE /Gy)
+    target_link_options(test_colmove PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_colmove PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_colmove PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_colmove PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
 
 orion2re_add_unit_test(test_colony_production_helpers
     SOURCES
@@ -246,6 +270,7 @@ orion2re_add_unit_test(test_colony_replicators
         tests/unit/test_colony_replicators.cpp
     PRODUCTION_SOURCES
         src/game/colcalc.cpp
+        src/game/colcalc_base.cpp
         src/game/colcalc_config.cpp
         src/game/colcalc_main.cpp
     FAKE_SOURCES
@@ -260,6 +285,27 @@ orion2re_add_unit_test(test_build_queue
     FAKE_SOURCES
         tests/fakes/fake_build_queue_runtime.cpp
 )
+
+orion2re_add_unit_test(test_colbldg
+    SOURCES
+        tests/unit/test_colbldg.cpp
+    PRODUCTION_SOURCES
+        src/game/colbldg.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_colbldg_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_colbldg PRIVATE /Gy)
+    target_link_options(test_colbldg PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_colbldg PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_colbldg PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_colbldg PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
 
 orion2re_add_unit_test(test_colonize
     SOURCES
@@ -383,7 +429,9 @@ orion2re_add_unit_test(test_combat_stats
     SOURCES
         tests/unit/test_combat_stats.cpp
     PRODUCTION_SOURCES
+        src/game/cmbtai.cpp
         src/game/combat1.cpp
+        src/game/cmbtdrw1.cpp
         src/game/cmbtmov1.cpp
 )
 
@@ -394,6 +442,17 @@ orion2re_add_unit_test(test_combat_repair
         src/game/combinit.cpp
     FAKE_SOURCES
         tests/fakes/fake_combat_repair_runtime.cpp
+)
+
+orion2re_add_unit_test(test_shield_table
+    SOURCES
+        tests/unit/test_shield_table.cpp
+    PRODUCTION_SOURCES
+        src/game/combinit.cpp
+        src/game/design.cpp
+        src/game/techdata.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_shield_table_runtime.cpp
 )
 
 orion2re_add_unit_test(test_bombardment_ammo
@@ -408,6 +467,9 @@ orion2re_add_unit_test(test_initship
         tests/unit/test_initship.cpp
     PRODUCTION_SOURCES
         src/game/initship.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_memory.cpp
+    LINK_SDL
 )
 
 if(MSVC)
@@ -511,6 +573,8 @@ if(MSVC)
     target_link_options(test_ground_commando PRIVATE /OPT:REF)
     target_compile_options(test_combat_repair PRIVATE /Gy)
     target_link_options(test_combat_repair PRIVATE /OPT:REF)
+    target_compile_options(test_shield_table PRIVATE /Gy)
+    target_link_options(test_shield_table PRIVATE /OPT:REF)
     target_compile_options(test_cmbtfire PRIVATE /Gy)
     target_link_options(test_cmbtfire PRIVATE /OPT:REF)
     target_compile_options(test_stasis_area_effects PRIVATE /Gy)
@@ -534,6 +598,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(test_combat_stats PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_ground_commando PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_combat_repair PRIVATE -ffunction-sections -fdata-sections)
+    target_compile_options(test_shield_table PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_cmbtfire PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_stasis_area_effects PRIVATE -ffunction-sections -fdata-sections)
     target_compile_options(test_colony_pop_growth PRIVATE -ffunction-sections -fdata-sections)
@@ -553,6 +618,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_combat_stats PRIVATE -Wl,-dead_strip)
         target_link_options(test_ground_commando PRIVATE -Wl,-dead_strip)
         target_link_options(test_combat_repair PRIVATE -Wl,-dead_strip)
+        target_link_options(test_shield_table PRIVATE -Wl,-dead_strip)
         target_link_options(test_cmbtfire PRIVATE -Wl,-dead_strip)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,-dead_strip)
         target_link_options(test_colony_pop_growth PRIVATE -Wl,-dead_strip)
@@ -572,6 +638,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_link_options(test_combat_stats PRIVATE -Wl,--gc-sections)
         target_link_options(test_ground_commando PRIVATE -Wl,--gc-sections)
         target_link_options(test_combat_repair PRIVATE -Wl,--gc-sections)
+        target_link_options(test_shield_table PRIVATE -Wl,--gc-sections)
         target_link_options(test_cmbtfire PRIVATE -Wl,--gc-sections)
         target_link_options(test_stasis_area_effects PRIVATE -Wl,--gc-sections)
         target_link_options(test_colony_pop_growth PRIVATE -Wl,--gc-sections)

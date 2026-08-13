@@ -12,6 +12,13 @@ namespace {
     int16_t last_missile_hits_owner;
     int16_t last_retargeted_missile;
     bool has_high_energy_focus;
+    bool has_transporters;
+    int16_t ship_center_offsets[4];
+    int16_t destroy_fx_type;
+    int16_t explosion_damage_source;
+    int16_t spherical_effect_type;
+    int16_t spherical_damage;
+    int16_t missile_hits;
 }
 
 namespace TEST_STASIS {
@@ -22,6 +29,11 @@ namespace TEST_STASIS {
         cleanup_count = 0;
         last_missile_hits_owner = -1;
         last_retargeted_missile = -1;
+        missile_hits = 4;
+        has_transporters = false;
+        for (int16_t& offset : ship_center_offsets) {
+            offset = 10;
+        }
     }
 
     int16_t Last_Cleanup_Source_() {
@@ -34,6 +46,46 @@ namespace TEST_STASIS {
 
     int16_t Last_Retargeted_Missile_() {
         return last_retargeted_missile;
+    }
+}
+
+namespace TEST_ENGINE_EXPLOSION {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        MOX::_combat_attacker_player = 0;
+        MOX::_combat_defender_player = 1;
+        MOX::_combat_total_ship_count = 2;
+        MOX::_apply_damage_to_planet = 1;
+        MOX::_super_fast_flag = 0;
+        CMBTFIRE::_broken_engine_explodes = 1;
+        destroy_fx_type = -1;
+        explosion_damage_source = -1;
+        spherical_effect_type = -1;
+        spherical_damage = -1;
+    }
+
+    int16_t Destroy_FX_Type_() {
+        return destroy_fx_type;
+    }
+
+    int16_t Explosion_Damage_Source_() {
+        return explosion_damage_source;
+    }
+
+    int16_t Spherical_Effect_Type_() {
+        return spherical_effect_type;
+    }
+
+    int16_t Spherical_Damage_() {
+        return spherical_damage;
+    }
+}
+
+namespace TEST_WEAPON_RANGE {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        CMBTFIRE::_defensive_range_bonus = 0;
     }
 }
 
@@ -75,34 +127,95 @@ namespace TEST_BEAM_MODIFIERS {
     }
 }
 
+namespace TEST_BOMBING_RANGE {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        BOARDING::board_range = {3, 12};
+    }
+
+    void Set_Has_Transporters_(bool value) {
+        has_transporters = value;
+    }
+}
+
+namespace TEST_FIGHTER_ORDNANCE {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        memset(MOX::_ordnance_bonus, 0, sizeof(MOX::_ordnance_bonus));
+        memset(MOX::_fighter_beam_type, 0,
+               sizeof(MOX::_fighter_beam_type));
+        missile_hits = 20;
+    }
+}
+
 namespace MOX {
     s_combat_data* _combat_data = combat_data;
     s_missile* _missile = missiles;
+    s_colony* _colony;
+    s_player* _player;
+    int16_t _ordnance_bonus[15];
+    int16_t _fighter_beam_type[9];
     int16_t _combat_attacker_player;
     int16_t _combat_defender_player;
     int16_t _combat_total_ship_count;
+    int16_t _cmbt_colony_id;
+    int16_t _in_nebula_flag;
+    int16_t _bio_weapon_flag;
     uint16_t _apply_damage_to_planet;
     int16_t _super_fast_flag;
     int16_t _ranged_to_hit_penalty[9];
     int16_t _ranged_damage_penalty[9];
+    s_combat_bomb_result _combat_bomb_result;
 }
 
 namespace TECHDATA {
     s_tech_weapon_data _weapons[WEAPON_COUNT];
+    s_tech_armor_data _armor[ARMOR_COUNT];
+    s_techdata_planetary_shield _planetary_shields[PLANETARY_SHIELD_COUNT];
+    s_tech_shield_data _shields[SHIELD_COUNT];
+    uint8_t _hard_shields_damage_reduction;
 }
 
 namespace COMBINIT {
     int16_t __cdecl Does_Combat_Ship_Have_Special_(
         int16_t, int16_t special_id) {
+        if (special_id == SPECIAL_TRANSPORTERS) {
+            return has_transporters;
+        }
         return special_id == SPECIAL_HIGH_ENERGY_FOCUS &&
             has_high_energy_focus;
+    }
+
+    void __cdecl Ship_Center_Offsets_(
+        int16_t ship_idx,
+        int16_t* out_x,
+        int16_t* out_y
+    ) {
+        *out_x = ship_center_offsets[ship_idx];
+        *out_y = ship_center_offsets[ship_idx];
     }
 }
 
 namespace CMBTMIS {
     int16_t __cdecl Get_Missile_Hits_(int16_t, int16_t owner, uint16_t) {
         last_missile_hits_owner = owner;
-        return 4;
+        return missile_hits;
+    }
+
+    int16_t __cdecl Is_Missile_Target_Alive_(int16_t missile_idx) {
+        const s_missile* target =
+            &missiles[missiles[missile_idx].target_unit_idx];
+        return target->type > 0 && target->quantity > 0;
+    }
+
+    int16_t __cdecl Fighter_Ocv_(int16_t) {
+        return 0;
+    }
+
+    int16_t __cdecl Missile_Dcv_(int16_t, int16_t) {
+        return 0;
     }
 
     void __cdecl Retarget_Missile_(int16_t missile_idx) {
@@ -113,13 +226,90 @@ namespace CMBTMIS {
     }
 }
 
+namespace game_random {
+    uint32_t __cdecl Random_(uint32_t) {
+        return 100;
+    }
+}
+
 namespace COMBAT1 {
     void __cdecl Remove_Continuing_Effect_Specials_(int16_t source_idx) {
         cleanup_sources[cleanup_count++] = source_idx;
     }
 }
 
+namespace CMBTAI {
+    int16_t __cdecl Range_To_Ship_(int16_t, int16_t) {
+        return 9;
+    }
+
+    int16_t __cdecl Range_To_Missile_(int16_t, int16_t) {
+        return 9;
+    }
+}
+
+namespace CMBTFIR2 {
+    int16_t __cdecl Damage_From_Ship_Exploding_(int16_t ship_idx) {
+        explosion_damage_source = ship_idx;
+        return 42;
+    }
+
+    void __cdecl Kill_Crew_(int16_t, int16_t) {
+    }
+
+    void __cdecl Select_Internal_(
+        int16_t, int16_t* hit_type, int16_t*, int16_t, int16_t,
+        int16_t, int16_t
+    ) {
+        *hit_type = -1;
+    }
+
+    void __cdecl Apply_Internal_Damage_(
+        int16_t, int16_t*, int16_t, int16_t, int16_t
+    ) {
+    }
+}
+
+namespace INITSHIP {
+    int16_t __cdecl Best_Armor_(int16_t) {
+        return 0;
+    }
+}
+
+namespace BOMB {
+    void __cdecl Apply_Bomb_Hits_(s_combat_bomb_result*) {
+    }
+}
+
+namespace ERICNET {
+    void __cdecl Remove_Building_(int16_t, int16_t) {
+    }
+}
+
+namespace struct_ {
+    void __cdecl Clear_Structure_(void* dest, uint32_t size) {
+        memset(dest, 0, size);
+    }
+
+    void __cdecl Clear_Bit_Field_(void*, uint16_t) {
+    }
+}
+
+namespace strings {
+    void __cdecl Delete_Structure_(int32_t, void*, uint32_t, uint32_t) {
+    }
+}
+
 namespace CMBTSPEC {
-    void __cdecl Destroy_Ship_FX_(int16_t, int16_t, int16_t, int16_t) {
+    void __cdecl Destroy_Ship_FX_(
+        int16_t ship_idx, int16_t, int16_t, int16_t explosion_type) {
+        destroy_fx_type = explosion_type;
+        MOX::_combat_data[ship_idx].unit_status = 5;
+    }
+
+    void __cdecl Do_Spherical_SFX_(
+        int16_t, int16_t, int16_t, int16_t effect_type, int16_t damage) {
+        spherical_effect_type = effect_type;
+        spherical_damage = damage;
     }
 }

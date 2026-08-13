@@ -64,9 +64,15 @@ namespace CMBTAI {
 
     int8_t __cdecl Ai_Self_Destruct_Check_(int16_t ship_idx);
 
+    /** Returns ship edge-to-edge distance in tactical squares. */
+    int16_t __cdecl Range_To_Ship_Squares_(int16_t ship1_idx, int16_t ship2_idx);
+
     int16_t __cdecl Range_To_Ship_(int16_t ship1_idx, int16_t ship2_idx);
 
     int16_t __cdecl Range_To_XY_(int16_t ship_idx, int16_t target_x_px, int16_t target_y_px);
+
+    /** Returns corner-origin ship-to-point distance in legacy tactical range units. */
+    int16_t __cdecl Range_To_XY_From_Corner_(int16_t ship_idx, int16_t target_x_px, int16_t target_y_px);
 
     int16_t __cdecl Range_To_Missile_(int16_t unit_idx, int16_t missile_idx);
 

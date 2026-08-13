@@ -1,10 +1,73 @@
 #include "pch.h"
 
+namespace {
+    int16_t Apply_Ordnance_Bonus_(int16_t damage, int16_t owner) {
+        return (int16_t)(
+            ((int32_t)damage * MOX::_ordnance_bonus[owner]) / 100);
+    }
+
+    bool Can_Bomb_Planet_(
+        int16_t ship_idx,
+        int16_t planet_idx,
+        uint8_t bombing_range
+    ) {
+        int16_t ship_offset_x;
+        int16_t ship_offset_y;
+        int16_t planet_offset_x;
+        int16_t planet_offset_y;
+        COMBINIT::Ship_Center_Offsets_(
+            ship_idx, &ship_offset_x, &ship_offset_y);
+        COMBINIT::Ship_Center_Offsets_(
+            planet_idx, &planet_offset_x, &planet_offset_y);
+
+        int32_t distance_x =
+            MOX::_combat_data[ship_idx].x * 20 + ship_offset_x -
+            (MOX::_combat_data[planet_idx].x * 20 + planet_offset_x);
+        int32_t distance_y =
+            MOX::_combat_data[ship_idx].y * 20 + ship_offset_y -
+            (MOX::_combat_data[planet_idx].y * 20 + planet_offset_y);
+        if (distance_x < 0) {
+            distance_x = -distance_x;
+        }
+        if (distance_y < 0) {
+            distance_y = -distance_y;
+        }
+
+        const int32_t combined_offset_x =
+            ship_offset_x + planet_offset_x;
+        const int32_t combined_offset_y =
+            ship_offset_y + planet_offset_y;
+        distance_x = distance_x > combined_offset_x
+            ? distance_x - combined_offset_x
+            : 0;
+        distance_y = distance_y > combined_offset_y
+            ? distance_y - combined_offset_y
+            : 0;
+
+        const int32_t point_distance = distance_x > distance_y
+            ? distance_x + distance_y / 2
+            : distance_y + distance_x / 2;
+        return point_distance <= 20 * (bombing_range - 1);
+    }
+}
+
 namespace CMBTFIRE {
     s_mount_damage _mount_dmg[HIGH_ENERGY_FOCUS_PRESENCE_COUNT] = {
         { 50, 100, 150 },
         { 100, 150, 200 },
     };
+
+    bool Enveloping_Applies_To_Target_(int16_t target_ship_idx) {
+        return _planet_non_enveloping == 0 || target_ship_idx != 0;
+    }
+
+    int32_t Energy_Absorber_Blocked_Damage_(int32_t damage) {
+        return (int32_t)(((int64_t)damage * _absorber_damage_reduction) / 100);
+    }
+
+    int32_t Damper_Field_Remaining_Damage_(int32_t damage) {
+        return (int32_t)(((int64_t)damage * _damper_field_ratio) / 100);
+    }
 
     void __cdecl Destroy_Colony_Defense_(int16_t n_to_destroy) {
         int16_t found_count = 0;
@@ -140,7 +203,10 @@ namespace CMBTFIRE {
             else if (ship->structure_damage >= ship->structure_max) {
                 result = 1;
             }
-            else if (ship->drive_current_hits == 0 && ship->owner <= 9 && ship->ftl_type > 0) {
+            else if (_broken_engine_explodes != 0 &&
+                     ship->drive_current_hits == 0 &&
+                     ship->owner <= 9 &&
+                     ship->ftl_type > 0) {
                 result = 3;
             }
 
@@ -213,9 +279,22 @@ namespace CMBTFIRE {
         Retarget_Missiles_Aimed_At_(ship_idx);
         COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
 
-        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+        if (MOX::_apply_damage_to_planet == 1) {
             if (ship.unit_status == 0) {
-                CMBTSPEC::Destroy_Ship_FX_(ship_idx, draw_x, draw_y, death_state);
+                int16_t destruction_type = death_state > 1 ? death_state : 1;
+                if (MOX::_super_fast_flag == 0) {
+                    CMBTSPEC::Destroy_Ship_FX_(
+                        ship_idx, draw_x, draw_y, destruction_type);
+                } else {
+                    ship.unit_status = 5;
+                    if (destruction_type > 1 && ship.previous_owner < 10) {
+                        int16_t damage =
+                            CMBTFIR2::Damage_From_Ship_Exploding_(ship_idx);
+                        CMBTSPEC::Do_Spherical_SFX_(
+                            ship_idx, draw_x, draw_y,
+                            destruction_type, damage);
+                    }
+                }
             }
         } else {
             ship.unit_status = 5;
@@ -336,12 +415,35 @@ namespace CMBTFIRE {
             return 0;
         }
 
+        const int8_t weapon_type = TECHDATA::_weapons[weapon_id].type;
+        if (weapon_type == WEAPON_TYPE_BOMB) {
+            if (target_idx != 0) {
+                return 0;
+            }
+
+            uint8_t bombing_range = 3;
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                    ship_idx, SPECIAL_TRANSPORTERS) != 0) {
+                bombing_range = BOARDING::board_range.transporters;
+            }
+            return Can_Bomb_Planet_(
+                ship_idx, target_idx, bombing_range);
+        }
+
         if (range == 0) {
             if (target_type == 1) {
                 range = CMBTAI::Range_To_Missile_(ship_idx, target_idx);
             }
             else {
                 range = CMBTAI::Range_To_Ship_(ship_idx, target_idx);
+            }
+        }
+
+        const s_combat_data* source = &MOX::_combat_data[ship_idx];
+        if (ship_idx == 0 || COMBINIT::Is_Combat_Satellite_(source)) {
+            range -= _defensive_range_bonus;
+            if (range < 0) {
+                range = 0;
             }
         }
 
@@ -356,7 +458,7 @@ namespace CMBTFIRE {
         }
 
         in_range = 0;
-        switch (TECHDATA::_weapons[weapon_id].type) {
+        switch (weapon_type) {
         case 0: // Standard Beam / Direct fire
             if (range <= 8) {
                 return 1;
@@ -375,22 +477,7 @@ namespace CMBTFIRE {
             }
             break;
 
-        case 3: // Fighters / Shuttles
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x23 /* SPEC_CARRIER_GARRISON */)) {
-                if (range <= 4) {
-                    in_range = 1;
-                }
-            }
-            else if (range <= 1) {
-                in_range = 1;
-            }
-
-            if (target_idx != 0) {
-                return 0;
-            }
-            break;
-
-        case 5: // Specials and Bombs
+        case 5: // Specials
             if (weapon_id == WEAPON_TRACTOR_BEAM && range <= 4) return 1;
             if (weapon_id == WEAPON_STASIS_FIELD && range <= 1) return 1;
             if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET && range <= 5) return 1;
@@ -474,6 +561,10 @@ namespace CMBTFIRE {
 
         int16_t weapon_damage = TECHDATA::_weapons[weapon_id].max_damage;
         int16_t weapon_min_damage = TECHDATA::_weapons[weapon_id].min_damage;
+        weapon_damage =
+            Apply_Ordnance_Bonus_(weapon_damage, source_owner);
+        weapon_min_damage =
+            Apply_Ordnance_Bonus_(weapon_min_damage, source_owner);
 
         int16_t chance_to_hit;
         if (target_is_missile == 0) {
@@ -603,7 +694,9 @@ namespace CMBTFIRE {
         uint16_t weapon_flags;
         uint16_t damage_special_flags;
         int16_t min_damage;
+        int16_t max_damage;
         int16_t damage_range;
+        int16_t ordnance_owner;
         int16_t roll;
         int16_t damage;
         int16_t internal_damage;
@@ -625,7 +718,11 @@ namespace CMBTFIRE {
         }
 
         min_damage = TECHDATA::_weapons[weapon_id].min_damage;
-        damage_range = TECHDATA::_weapons[weapon_id].max_damage - min_damage;
+        max_damage = TECHDATA::_weapons[weapon_id].max_damage;
+        ordnance_owner = MOX::_missile[missile_idx].owner;
+        min_damage = Apply_Ordnance_Bonus_(min_damage, ordnance_owner);
+        max_damage = Apply_Ordnance_Bonus_(max_damage, ordnance_owner);
+        damage_range = max_damage - min_damage;
 
         for (int16_t i = 0; i < MOX::_missile[missile_idx].quantity; ++i) {
             roll = (int16_t)game_random::Random_(100);
@@ -671,7 +768,8 @@ namespace CMBTFIRE {
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_ENERGY_ABSORBER)) {
-            int16_t reflected = *dmg_out / 4;
+            int16_t reflected =
+                (int16_t)Energy_Absorber_Blocked_Damage_(*dmg_out);
             if (reflected < 2) {
                 reflected = 1;
             }
@@ -686,8 +784,10 @@ namespace CMBTFIRE {
                 (int16_t)absorber_charge;
         }
 
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 7 /* Hard Shields */)) {
-            *dmg_out /= 4;
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                target_ship_idx, SPECIAL_DAMPER_FIELD)) {
+            *dmg_out = (int16_t)Damper_Field_Remaining_Damage_(
+                (uint16_t)*dmg_out);
         }
 
         int16_t remaining_shield_hits = MOX::_combat_data[target_ship_idx].shield_arc_current[shield_arc];
@@ -700,15 +800,18 @@ namespace CMBTFIRE {
         if (MOX::_combat_data[target_ship_idx].shield_type > 0 &&
             MOX::_combat_data[target_ship_idx].shield_current_hits > 0) {
 
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 13) && (specials & 0x40)) {
-                specials ^= 0x40;
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                    target_ship_idx, SPECIAL_HARD_SHIELDS) &&
+                (specials & WEAPON_MOD_FLAG_SHIELD_PIERCING) != 0 &&
+                (weapon_flags & WEAPON_NATURAL_FLAG_ANTI_SHIELD) == 0) {
+                specials ^= WEAPON_MOD_FLAG_SHIELD_PIERCING;
             }
 
             if (!(specials & 0x40)) {
                 if (!MOX::_in_nebula_flag || COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 13)) {
                     *dmg_out -= TECHDATA::_shields[MOX::_combat_data[target_ship_idx].shield_type].shield_class;
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 13)) {
-                        *dmg_out -= 3;
+                        *dmg_out -= TECHDATA::_hard_shields_damage_reduction;
                     }
                 }
             }
@@ -969,7 +1072,8 @@ namespace CMBTFIRE {
                     if (defense_hits < 0) {
                         defense_hits = 0;
                     }
-                    defense_hits /= 4;
+                    defense_hits = (int16_t)Damper_Field_Remaining_Damage_(
+                        (uint16_t)defense_hits);
                 } else {
                     defense_hits =
                         *damage - MOX::_combat_data->shield_arc_current[0];
@@ -987,7 +1091,9 @@ namespace CMBTFIRE {
                 colony_hits = *damage - MOX::_combat_data->shield_arc_current[1];
             }
 
-            if (defense_hits > 0 && !(flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE)) {
+            if (defense_hits > 0 &&
+                !(flags & (WEAPON_NATURAL_FLAG_ANTI_SHIELD |
+                           WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE))) {
                 if (flags & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) {
                     defense_hits *= 2;
                 }
@@ -1004,7 +1110,9 @@ namespace CMBTFIRE {
             }
 
             if (colony_hits > 0) {
-                if (MOX::_cmbt_colony_id != -1 && !(flags & WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE)) {
+                if (MOX::_cmbt_colony_id != -1 &&
+                    !(flags & (WEAPON_NATURAL_FLAG_ANTI_SHIELD |
+                               WEAPON_NATURAL_FLAG_IGNORES_ARMOR_STRUCTURE))) {
                     if (flags & WEAPON_NATURAL_FLAG_EXTRA_STRUCTURAL_DAMAGE) {
                         colony_hits *= 2;
                     }
@@ -1237,7 +1345,7 @@ namespace CMBTFIRE {
                                             beam_fx_entries[beam_fx_count].specials = base_specials;
 
                                             if ((TECHDATA::_weapons[weapon->weapon_id].natural_mods & WEAPON_NATURAL_FLAG_ENVELOPING) != 0) {
-                                                beam_fx_entries[beam_fx_count].specials = base_specials | 0x100;
+                                                beam_fx_entries[beam_fx_count].specials = base_specials | WEAPON_MOD_FLAG_ENVELOPING;
                                             }
 
                                             beam_fx_entries[beam_fx_count].is_damage_entry = 0;
@@ -1512,7 +1620,7 @@ namespace CMBTFIRE {
             specials |= 0x40;
         }
         if (weapon_flags_00 & WEAPON_NATURAL_FLAG_ENVELOPING) {
-            specials |= 0x100;
+            specials |= WEAPON_MOD_FLAG_ENVELOPING;
         }
         if (weapon_flags_00 & WEAPON_NATURAL_FLAG_CONTINUOUS) {
             specials |= 0x10;
@@ -1622,7 +1730,8 @@ namespace CMBTFIRE {
                 }
 
                 if (current_damage > 0) {
-                    if ((specials & 0x100) != 0) {
+                    if ((specials & WEAPON_MOD_FLAG_ENVELOPING) != 0 &&
+                        Enveloping_Applies_To_Target_(target)) {
                         for (int16_t shield_idx = 0; shield_idx < 4; ++shield_idx) {
                             int16_t dmg_val = current_damage;
                             int16_t special1 = COMBINIT::Does_Combat_Ship_Have_Special_(source, SPECIAL_ACHILLES_TARGETING_UNIT);
@@ -1641,7 +1750,8 @@ namespace CMBTFIRE {
                 }
             } else {
                 return_flags = 2;
-                int16_t missile_hits = (specials & 0x100) ? 4 : 1;
+                int16_t missile_hits =
+                    (specials & WEAPON_MOD_FLAG_ENVELOPING) ? 4 : 1;
                 for (int16_t i = 0; i < missile_hits; ++i) {
                     int16_t dmg_val = current_damage;
                     CMBTFIRE::Apply_Damage_To_Missile_(target, &dmg_val, specials, weapon_flags_00);

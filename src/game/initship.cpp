@@ -1,8 +1,48 @@
 #include "pch.h"
 #include "game/ship_config.h"
+#include "game/shipstak.h"
 
 namespace INITSHIP {
     namespace {
+        namespace stealth_landers {
+            struct s_device_lookup {
+                uint16_t tech_application;
+                uint16_t special;
+                const int16_t* bonus;
+            };
+
+            constexpr s_device_lookup device_lookup[] = {
+                { TECH_APP_STEALTH_FIELD, SPECIAL_STEALTH_FIELD,
+                  &SHIPSTAK::stealth_bonus.stealth_field },
+                { TECH_APP_CLOAKING_DEVICE, SPECIAL_CLOAKING_DEVICE,
+                  &SHIPSTAK::stealth_bonus.cloaking_device },
+                { TECH_APP_PHASING_CLOAK, SPECIAL_PHASING_CLOAK,
+                  &SHIPSTAK::stealth_bonus.phasing_cloak },
+            };
+        }
+
+        void Equip_Best_Stealth_Device_(int16_t player_idx,
+                                        s_ship_design* design) {
+            int16_t best_bonus = INT16_MIN;
+            uint16_t best_special = 0;
+
+            for (const stealth_landers::s_device_lookup& device :
+                 stealth_landers::device_lookup) {
+                if (MOX::_player[player_idx]
+                            .tech_applications[device.tech_application] ==
+                        TECH_RESEARCH_STATUS_RESEARCHED &&
+                    *device.bonus >= best_bonus) {
+                    best_bonus = *device.bonus;
+                    best_special = device.special;
+                }
+            }
+
+            if (best_special != 0) {
+                struct_::Set_Bit_Field_(design->special_device_flags,
+                                        best_special);
+            }
+        }
+
         void Complete_Configured_Design_(s_ship_design* design, const char* name,
                                          uint8_t owner, int16_t cost,
                                          int8_t speed, int16_t fallback_drive,
@@ -447,6 +487,9 @@ namespace INITSHIP {
         design->armor_type = (int8_t)Best_Armor_(player_idx);
 
         struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
+        if (lander_ship_uses_stealth.colony_ship != 0) {
+            Equip_Best_Stealth_Device_(player_idx, design);
+        }
         design->picture_num = 45;
 
         design->speed = (int8_t)TECHDATA::_drives[design->ftl_type].warp_speed;
@@ -469,6 +512,9 @@ namespace INITSHIP {
         design->armor_type = (int8_t)Best_Armor_(player_idx);
 
         struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
+        if (lander_ship_uses_stealth.outpost_ship != 0) {
+            Equip_Best_Stealth_Device_(player_idx, design);
+        }
 
         design->picture_num = 46 /* '.' */;
 
@@ -622,7 +668,16 @@ namespace INITSHIP {
 
             attack_bonus += (int16_t)owner_player->traits[TRAIT_SHIP_ATTACK];
 
-            if (owner_player->traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
+            if (ship->d.ship_type != SHIP_TYPE_COMBAT) {
+                defense_bonus = 0;
+                missile_defense_bonus = 0;
+            } else if (MOX::_settings.strategic_combat_flag != 0) {
+                defense_bonus +=
+                    (Best_Warp_Drive_(ship->owner) -
+                     DRIVE_NUCLEAR_DRIVE) *
+                        10 +
+                    TECHDATA::_hull_data[ship->d.size].strat_def_bonus;
+            } else if (owner_player->traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
                 defense_bonus += COMBAT1::_td_combat_speed_bonus * 5;
             }
         }
@@ -1011,8 +1066,13 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
         for (int16_t i = 0; i < 40; ++i) {
             int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
 
-            if (MOX::_player[player_idx].tech_applications[tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                if ((TECHDATA::_weapons[i].available_mods & 0x4) && (TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM)) {
+            if (MOX::_player[player_idx].tech_applications[tech_app_id] ==
+                    TECH_RESEARCH_STATUS_RESEARCHED &&
+                (TECHDATA::_weapons[i].available_mods &
+                    WEAPON_MOD_FLAG_POINT_DEFENSE) != 0 &&
+                TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM &&
+                (TECHDATA::_weapons[i].natural_mods &
+                    WEAPON_NATURAL_FLAG_ANTI_SHIELD) == 0) {
                     int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, tech_app_id);
                     
                     // Check if miniaturization level meets requirements for point defense mod
@@ -1023,7 +1083,6 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
                             best_weapon_idx = i;
                         }
                     }
-                }
             }
         }
     } else {
@@ -1287,7 +1346,7 @@ void __cdecl Get_Design_Combat_Bonuses_(s_ship_design design, int16_t* attack_bo
 
     int16_t current_speed = design.combat_speed;
     if (struct_::Test_Bit_Field_(design.special_device_flags, 2)) {
-        current_speed += 5;
+        current_speed += DESIGN::_augmented_engines_speed_bonus;
     }
 
     int16_t defense_rating = current_speed * 5;
@@ -1739,6 +1798,10 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     for (int16_t i = 0; i < 8; ++i) {
         design->ship_weapon[i].type = 0;
         design->ship_weapon[i].count = 0;
+    }
+
+    if (lander_ship_uses_stealth.transport_ship != 0) {
+        Equip_Best_Stealth_Device_(player_idx, design);
     }
 
     design->picture_num = 47 /* '/' */;

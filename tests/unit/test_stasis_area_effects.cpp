@@ -26,14 +26,41 @@ DOCTEST_TEST_CASE("stasis disables wide area jammer") {
 
 DOCTEST_TEST_CASE("stasis disables satellite attack bonus") {
     TEST_STASIS_AREA_EFFECTS::Reset_();
-    MOX::_combat_data[0].owner = 0;
-    MOX::_combat_data[0].ftl_type = 0;
-    MOX::_combat_data[0].size_class = 3;
+    s_combat_data& station = MOX::_combat_data[1];
+    station.owner = 0;
+    station.ship_idx = -1;
+    station.ftl_type = DRIVE_NO_DRIVE;
+    station.size_class = SHIP_SIZE_HUGE;
 
     DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 10);
 
-    TEST_STASIS_AREA_EFFECTS::Set_In_Stasis_(0, true);
+    TEST_STASIS_AREA_EFFECTS::Set_In_Stasis_(1, true);
     DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 0);
+}
+
+DOCTEST_TEST_CASE("ordinary no-drive ships do not receive satellite attack bonuses") {
+    TEST_STASIS_AREA_EFFECTS::Reset_();
+    s_combat_data& ship = MOX::_combat_data[1];
+    ship.owner = 0;
+    ship.ship_idx = 4;
+    ship.ftl_type = DRIVE_NO_DRIVE;
+    ship.size_class = SHIP_SIZE_HUGE;
+
+    DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 0);
+}
+
+DOCTEST_TEST_CASE("satellite attack bonuses remain tied to station tier") {
+    TEST_STASIS_AREA_EFFECTS::Reset_();
+    s_combat_data& station = MOX::_combat_data[1];
+    station.owner = 0;
+    station.ship_idx = -1;
+    station.ftl_type = DRIVE_NO_DRIVE;
+    station.size_class = SHIP_SIZE_TITAN;
+    COMBINIT::_satellite_size_class_plus_one = 1;
+
+    DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 10);
+
+    COMBINIT::_satellite_size_class_plus_one = 0;
 }
 
 DOCTEST_TEST_CASE("stasis disables scout lab") {

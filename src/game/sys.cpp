@@ -232,6 +232,7 @@ namespace SYS {
         char fmt_text[200];
         char line_text[100];
         char val_text[32];
+        char food_text[16];
         char title_text[80];
         char main_text[1000];
         s_potential_colony_info info;
@@ -254,12 +255,11 @@ namespace SYS {
         snprintf(main_text, sizeof(main_text), fmt_text, (int)max_pop);
 
         /* fmtpara: \x1A control code prefixes the following alignment digit. */
-        if (info.food == 0) {
-            snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "10\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER));
-        } else {
-            int food_val = (int)info.food / 2;
-            snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER), food_val);
-        }
+        COLCALC::Format_Food2(
+            (uint16_t)info.food,
+            food_text,
+            sizeof(food_text));
+        snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1%s\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER), food_text);
         strlcat(main_text, line_text, sizeof(main_text));
 
         snprintf(line_text, sizeof(line_text), "\x1A" "0%s" "\x1A" "1%d\n", HAROLD::H_Message_(HESTR_172_INDUSTRY_PER_WORKER), (int)info.industry);
@@ -1255,11 +1255,12 @@ namespace SYS {
             }
 
             if (group_a_count > 0) {
-                if (group_a_count == 1) {
-                    snprintf(line_buffer, sizeof(line_buffer), HAROLD::H_Message_(0x164), static_cast<int32_t>(group_a_count));
-                } else {
-                    strlcpy(line_buffer, HAROLD::H_Message_(0x165), sizeof(line_buffer));
-                }
+                snprintf(
+                    line_buffer,
+                    sizeof(line_buffer),
+                    HAROLD::H_Message_(group_a_count == 1 ? 0x164 : 0x165),
+                    static_cast<int32_t>(group_a_count)
+                );
 
                 print_y = static_cast<int16_t>(print_y + static_cast<int16_t>(line_step));
 

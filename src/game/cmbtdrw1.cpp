@@ -994,16 +994,10 @@ skip_cursor:
         {
             int16_t hull_size;
             
-            if (MOX::_combat_data[ship_idx].ftl_type == 0)
+            if (COMBINIT::Is_Combat_Satellite_(&MOX::_combat_data[ship_idx]))
             {
-                if (MOX::_combat_defender_player == 8)
-                {
-                    hull_size = 8;
-                }
-                else
-                {
-                    hull_size = COMBINIT::Type_Of_Space_Station_(MOX::_cmbt_colony_id);
-                }
+                hull_size = COMBINIT::Combat_Satellite_Hull_Class_(
+                    &MOX::_combat_data[ship_idx]);
             }
             else
             {
@@ -1908,21 +1902,29 @@ skip_cursor:
         *out_y = 0;
 
         if (ship_idx == 0) {
-            *out_x = 0;
-            *out_y = 0;
-
             if (MOX::_cmbt_colony_id == -1) {
-                *out_x = 9;
+                *out_x = 7;
                 *out_y = 7;
                 return;
             }
 
-            if (MOX::_planet[MOX::_colony[MOX::_cmbt_colony_id].planet].size != 2) {
+            static const int16_t planet_offsets[PLANET_SIZE_COUNT][2] = {
+                {2, 2},
+                {0, 1},
+                {7, 7},
+                {4, 4},
+                {6, 6},
+            };
+
+            int16_t planet_size =
+                MOX::_planet[MOX::_colony[MOX::_cmbt_colony_id].planet].size;
+            if (planet_size < PLANET_SIZE_TINY ||
+                planet_size >= PLANET_SIZE_COUNT) {
                 return;
             }
 
-            *out_x = 9;
-            *out_y = 7;
+            *out_x = planet_offsets[planet_size][0];
+            *out_y = planet_offsets[planet_size][1];
             return;
         }
 
@@ -2775,7 +2777,7 @@ skip_cursor:
 
                 if (is_ai == 0) {
                     if (COMBAT1::Weapon_Is_On_(MOX::_cur_ship, weapon_slot_idx) == 0) {
-                        display_color_mode = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].active == 1 ? 3 : 2;
+                        display_color_mode = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].active == 0 ? 2 : 3;
                     } else if (target_missile_idx < 0) {
                         if (target_ship_idx != -1) {
                             short rel_bearing = Relative_Bearing_(MOX::_cur_ship, target_ship_idx);
@@ -2818,9 +2820,10 @@ skip_cursor:
                 int8_t shots_left = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left;
                 uint8_t status = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].status;
 
-                if (((weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_FIGHTER) && ammo == 0) ||
+                if (display_color_mode != 3 &&
+                    (((weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_FIGHTER) && ammo == 0) ||
                     (weapon_type_class == WEAPON_TYPE_TORPEDO && ammo > 0) ||
-                    (shots_left == 0 && status != 1)) {
+                    (shots_left == 0 && status != 1))) {
                     display_color_mode = 2;
                 }
 
@@ -3480,14 +3483,17 @@ skip_cursor:
                     hull_index = MOX::_global_combat_data.size_class;
                 }
 
-                int32_t armor_total = TECHDATA::_hull_data[hull_index].armor_hp;
-                armor_total +=
-                    (static_cast<int32_t>(TECHDATA::_armor[MOX::_global_combat_data.armor_type].ships_bonus) *
-                     armor_total) /
-                    100;
+                int32_t armor_total = 0;
+                if (MOX::_settings.strategic_combat_flag == 0) {
+                    armor_total = TECHDATA::_hull_data[hull_index].armor_hp;
+                    armor_total +=
+                        (static_cast<int32_t>(TECHDATA::_armor[MOX::_global_combat_data.armor_type].ships_bonus) *
+                         armor_total) /
+                        100;
 
-                if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_HEAVY_ARMOR) != 0) {
-                    armor_total *= 3;
+                    if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, SPECIAL_HEAVY_ARMOR) != 0) {
+                        armor_total *= 3;
+                    }
                 }
 
                 KEN::Ken_Get_Text_Message_(0x5B, message_text, 0x50);

@@ -325,7 +325,7 @@ namespace SHIPMOVE {
      * The extended range is calculated as 150% of the player's standard ship range.
      */
     bool __cdecl Star_In_Extended_Range_Of_Player_(s_star_data* star, int16_t player_idx) {
-        int16_t extended_range = (int16_t)((MOX::_player[player_idx].ship_range * 3) / 2);
+        int16_t extended_range = (int16_t)((MOX::_player[player_idx].ship_range * 3 + 1) / 2);
 
         return Star_In_Range_Of_Player_(star, player_idx, extended_range);
     }

@@ -154,8 +154,13 @@ void __cdecl Summary_Screen_Print_Data_(void) {
             fonts::Print_Centered_(0x8c, y_climate, climate_str);
 
             char work_buf[100];
+            char food_text[16];
             fonts::Set_Font_Style_(1, &font_colors);
-            snprintf(work_buf, sizeof(work_buf), HAROLD::H_Message_(0x141), (int)summary->food_per_farmer);
+            COLCALC::Format_Food2(
+                (uint16_t)summary->food_per_farmer,
+                food_text,
+                sizeof(food_text));
+            snprintf(work_buf, sizeof(work_buf), "%s Food", food_text);
             fonts::Print_Centered_(0x8c, y_climate + climate_h + 4, work_buf);
 
             char* gravity_str = MOX::_planet_gravity_string[gravity_class];

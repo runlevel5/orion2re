@@ -69,6 +69,13 @@
         galactic_unification: 7,
       },
     },
+    ratio16: {
+      title: "16-bit ratio",
+      description: "A signed fractional value written as numerator/denominator.",
+      remarks: "Used for exact gameplay fractions whose numerator and denominator fit signed 16-bit storage.",
+      kind: "ratio",
+      component_type: "int16",
+    },
     stock_race_index: {
       title: "Stock race table index",
       description: "Index into the thirteen-entry table of predefined races.",
@@ -522,8 +529,8 @@
     },
     combat_ship_size_class: {
       title: "Combat ship size class",
-      description: "Hull size used to select the tactical Tractor Beam stopping threshold.",
-      remarks: "Includes Doom Star because tactical combat uses six size classes.",
+      description: "Six-class combat ship hull domain used by size-indexed gameplay tables.",
+      remarks: "Includes Doom Star because combat ships use six size classes.",
       kind: "enum",
       base_type: "uint8",
       allow_numeric: true,
@@ -592,6 +599,24 @@
       allow_numeric: true,
       reject_unknown_numeric: true,
       values: { none: 0, class_i: 1, class_iii: 2, class_v: 3, class_vii: 4, class_x: 5 },
+    },
+    shield_hull: {
+      title: "Shield hull class",
+      description: "Selects a ship or orbital-defense hull for shield capacity.",
+      remarks: "The order and names preserve the MOO2 1.50 shield_hull_multiplier table.",
+      kind: "enum",
+      base_type: "uint8",
+      values: {
+        frigate: 0,
+        destroyer: 1,
+        cruiser: 2,
+        battleship: 3,
+        titan: 4,
+        doomstar: 5,
+        star_base: 6,
+        battlestation: 7,
+        star_fortress: 8,
+      },
     },
     ship_computer: {
       title: "Ship computer",
@@ -778,6 +803,92 @@
     },
   },
   records: {
+    trade_goods_ratio: {
+      title: "Trade Goods conversion ratios",
+      description: "Production-to-BC conversion percentages for normal and Fantastic Traders races.",
+      fields: [
+        { id: "normal", title: "Normal", description: "Conversion percentage without Fantastic Traders.", type: "uint16", bind: ["normal"] },
+        { id: "fantastic_traders", title: "Fantastic Traders", description: "Conversion percentage with Fantastic Traders.", type: "uint16", bind: ["fantastic_traders"] },
+      ],
+    },
+    government_bonus: {
+      title: "Government bonuses",
+      description: "Cost and economy modifiers supplied by one government type.",
+      fields: [
+        {
+          id: "cost_reduction",
+          title: "Cost reduction",
+          description: "Fraction subtracted from affected ship and landing-ship costs.",
+          type: "ratio16",
+          bind: ["cost_reduction.numerator", "cost_reduction.denominator"],
+        },
+        { id: "science", title: "Research", description: "Research modifier in five-percent units.", type: "int8", bind: ["science"] },
+        { id: "money", title: "Income", description: "Base income modifier in five-percent units.", type: "int8", bind: ["money"] },
+        { id: "food", title: "Food", description: "Farmer-output modifier in five-percent units.", type: "int8", bind: ["food"] },
+        { id: "production", title: "Production", description: "Worker-output modifier in five-percent units.", type: "int8", bind: ["production"] },
+      ],
+    },
+    lander_ship_cost: {
+      title: "Landing ship costs",
+      description: "Production costs of colony, outpost, and transport ships.",
+      fields: [
+        { id: "colony_ship", title: "Colony Ship", description: "Base production cost of a Colony Ship.", type: "int32", bind: ["colony_ship"] },
+        { id: "outpost_ship", title: "Outpost Ship", description: "Base production cost of an Outpost Ship.", type: "int32", bind: ["outpost_ship"] },
+        { id: "transport_ship", title: "Transport", description: "Base production cost of a Transport.", type: "int32", bind: ["transport_ship"] },
+      ],
+    },
+    misc_costs: {
+      title: "Miscellaneous production costs",
+      description: "Production costs for Android population types.",
+      fields: [
+        { id: "android_farmer", title: "Android Farmer", description: "Production cost of an Android Farmer.", type: "uint16", constraints: { max: 32767 }, bind: ["android_farmer"] },
+        { id: "android_worker", title: "Android Worker", description: "Production cost of an Android Worker.", type: "uint16", constraints: { max: 32767 }, bind: ["android_worker"] },
+        { id: "android_scientist", title: "Android Scientist", description: "Production cost of an Android Scientist.", type: "uint16", constraints: { max: 32767 }, bind: ["android_scientist"] },
+      ],
+    },
+    growth_rate_bonus: {
+      title: "Population growth-rate modifiers",
+      description: "Additional percentage modifiers used by colony population growth.",
+      fields: [
+        {
+          id: "general_modifier",
+          title: "General modifier",
+          description: "Growth percentage added independently of Housing and technology.",
+          type: "uint8",
+          bind: ["general_modifier"],
+        },
+        {
+          id: "microbiotics_tech",
+          title: "Microbiotics",
+          description: "Growth percentage added by Microbiotics.",
+          type: "uint8",
+          bind: ["microbiotics_tech"],
+        },
+        {
+          id: "antidote_tech",
+          title: "Universal Antidote",
+          description: "Growth percentage added by Universal Antidote.",
+          type: "uint8",
+          bind: ["antidote_tech"],
+        },
+        {
+          id: "boom_event",
+          title: "Population Boom",
+          description: "Growth percentage added during a Population Boom.",
+          type: "uint8",
+          constraints: { max: 127 },
+          bind: ["boom_event"],
+        },
+        {
+          id: "plague_event",
+          title: "Plague",
+          description: "Growth penalty applied during a Plague.",
+          type: "int16",
+          constraints: { max: 0 },
+          bind: ["plague_event"],
+        },
+      ],
+    },
     mount_damage: {
       title: "Beam mount damage modifiers",
       description: "Damage percentages for Point Defense, normal, and Heavy Mount beams.",
@@ -785,6 +896,21 @@
         { id: "pd", title: "Point Defense", description: "Damage percentage for a Point Defense beam.", type: "uint16", bind: ["pd"] },
         { id: "nomod", title: "Normal mount", description: "Damage percentage for a beam without a mount modification.", type: "uint16", bind: ["nomod"] },
         { id: "heavy", title: "Heavy Mount", description: "Damage percentage for a Heavy Mount beam.", type: "uint16", bind: ["heavy"] },
+      ],
+    },
+    shield_data: {
+      title: "Ship shield data",
+      description: "Space, cost, and blocking strength for one ship shield.",
+      fields: [
+        {
+          id: "space", title: "Space", description: "Base space requirement for each combat ship size.", bind: ["space_per_ship_type"],
+          type: { kind: "array", count: 6, index_base: 0, index_type: "combat_ship_size_class", element: { type: "uint16" } },
+        },
+        {
+          id: "cost", title: "Cost", description: "Base production cost for each combat ship size.", bind: ["cost_per_ship_type"],
+          type: { kind: "array", count: 6, index_base: 0, index_type: "combat_ship_size_class", element: { type: "uint16" } },
+        },
+        { id: "shield_class", title: "Shield class", description: "Damage blocked by the shield.", type: "uint16", bind: ["shield_class"] },
       ],
     },
     miniaturization_settings: {
@@ -930,9 +1056,176 @@
         { id: "regen", title: "Regeneration", description: "Repair percentage supplied by a working Regeneration special when Amoeba regeneration is enabled.", type: "uint8", bind: ["regen"] },
       ],
     },
+    board_range: {
+      title: "Tactical boarding ranges",
+      description: "Ordinary and transporter boarding reaches in tactical squares.",
+      fields: [
+        {
+          id: "normal",
+          title: "Ordinary boarding",
+          description: "Maximum ordinary boarding distance in tactical squares.",
+          type: "uint8",
+          bind: ["normal"],
+        },
+        {
+          id: "transporters",
+          title: "Transporter boarding",
+          description: "Maximum transporter boarding distance in tactical squares.",
+          type: "uint8",
+          bind: ["transporters"],
+        },
+      ],
+    },
+    lander_ship_uses_stealth: {
+      title: "Landing ship stealth equipment",
+      description: "Controls whether each landing ship type installs the best researched stealth device.",
+      fields: [
+        { id: "colony_ship", title: "Colony Ship", description: "Equip Colony Ships with the best researched stealth device.", type: "bool", bind: ["colony_ship"] },
+        { id: "outpost_ship", title: "Outpost Ship", description: "Equip Outpost Ships with the best researched stealth device.", type: "bool", bind: ["outpost_ship"] },
+        { id: "transport_ship", title: "Transport", description: "Equip Transports with the best researched stealth device.", type: "bool", bind: ["transport_ship"] },
+      ],
+    },
   },
 
   parameters: {
+    trade_goods_ratio: {
+      title: "Trade Goods conversion ratios",
+      description: "Configures the percentage of positive net industry converted to BC by Trade Goods.",
+      remarks: "Results round upward. Defaults preserve classic behavior and match MOO2 1.50.",
+      examples: [
+        "colony trade_goods_ratio normal = 50;",
+        "colony trade_goods_ratio fantastic_traders = 100;",
+      ],
+      units: "percent",
+      group: "gameplay",
+      namespace: "colony",
+      type: "trade_goods_ratio",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::trade_goods_ratio",
+      },
+      default: { normal: 50, fantastic_traders: 100 },
+    },
+    govt_bonus: {
+      title: "Government bonuses",
+      description: "Configures cost, research, income, food, and production modifiers for every government.",
+      remarks: "Integer modifiers use five-percent units. Defaults preserve classic behavior and match the applicable MOO2 1.50 values.",
+      examples: [
+        "government govt_bonus feudal cost_reduction = 1/3;",
+        "government govt_bonus democracy money = 10;",
+      ],
+      group: "gameplay",
+      namespace: "government",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::government_bonuses",
+      },
+      type: {
+        kind: "array",
+        count: 8,
+        index_base: 0,
+        index_type: "government",
+        element: { type: "government_bonus" },
+      },
+      default: [
+        { cost_reduction: "1/3", science: -10, money: 0, food: 0, production: 0 },
+        { cost_reduction: "2/3", science: -5, money: 0, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 0, money: 0, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 0, money: 0, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 10, money: 10, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 15, money: 15, food: 0, production: 0 },
+        { cost_reduction: "0/1", science: 0, money: 0, food: 10, production: 10 },
+        { cost_reduction: "0/1", science: 0, money: 0, food: 20, production: 20 },
+      ],
+    },
+    lander_ship_cost: {
+      title: "Landing ship costs",
+      description: "Configures colony, outpost, and transport ship production costs independently.",
+      remarks: "Defaults preserve classic costs and match MOO2 1.50.",
+      examples: [
+        "colony lander_ship_cost colony_ship = 500;",
+        "colony lander_ship_cost outpost_ship = 100;",
+        "colony lander_ship_cost transport_ship = 100;",
+      ],
+      units: "production points",
+      group: "gameplay",
+      namespace: "colony",
+      type: "lander_ship_cost",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::lander_ship_cost",
+      },
+      default: {
+        colony_ship: 500,
+        outpost_ship: 100,
+        transport_ship: 100,
+      },
+    },
+    misc_costs: {
+      title: "Miscellaneous production costs",
+      description: "Configures each Android population type's production cost independently.",
+      remarks: "Defaults preserve classic costs and match MOO2 1.50.",
+      examples: [
+        "colony misc_costs android_farmer = 50;",
+        "colony misc_costs android_worker = 50;",
+        "colony misc_costs android_scientist = 50;",
+      ],
+      units: "production points",
+      group: "gameplay",
+      namespace: "colony",
+      type: "misc_costs",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::misc_costs",
+      },
+      default: {
+        android_farmer: 50,
+        android_worker: 50,
+        android_scientist: 50,
+      },
+    },
+    pop_bonus_biospheres: {
+      title: "Biospheres population bonus",
+      description: "Sets the population-capacity bonus provided by Biospheres.",
+      remarks: "The default of two preserves classic behavior and matches MOO2 1.50.",
+      examples: ["colony pop_bonus_biospheres = 2;"],
+      units: "population",
+      group: "gameplay",
+      namespace: "colony",
+      type: "uint8",
+      default: 2,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_pop_bonus_biospheres",
+      },
+    },
+    growth_rate_bonus: {
+      title: "Population growth-rate modifiers",
+      description: "Configures the general, technology, and event modifiers used by colony population growth.",
+      remarks: "The general modifier is independent of Housing. Defaults preserve classic growth behavior and match MOO2 1.50.",
+      examples: [
+        "colony growth_rate_bonus general_modifier = 0;",
+        "colony growth_rate_bonus microbiotics_tech = 25;",
+        "colony growth_rate_bonus antidote_tech = 50;",
+        "colony growth_rate_bonus boom_event = 100;",
+        "colony growth_rate_bonus plague_event = -200;",
+      ],
+      units: "percent",
+      group: "gameplay",
+      namespace: "colony",
+      type: "growth_rate_bonus",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::growth_rate_bonus",
+      },
+      default: {
+        general_modifier: 0,
+        microbiotics_tech: 25,
+        antidote_tech: 50,
+        boom_event: 100,
+        plague_event: -200,
+      },
+    },
     build_queue: {
       title: "Automatic build queues",
       description: "Defines the eleven build lists applied by Q and the digit hotkeys.",
@@ -1580,6 +1873,53 @@
       default: { enabled: false },
     },
 
+    round_teleporter: {
+      title: "Octagonal teleporter range",
+      description: "Uses an approximately round octagonal area for tactical teleport movement instead of the classic square area.",
+      examples: ["combat round_teleporter = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtmov1.h",
+        symbol: "CMBTMOV1::_round_teleporter",
+      },
+      default: false,
+    },
+
+    board_range: {
+      title: "Tactical boarding ranges",
+      description: "Configures ordinary and transporter boarding reach in tactical squares.",
+      examples: [
+        "combat board_range normal = 3;",
+        "combat board_range transporters = 12;",
+      ],
+      units: "tactical squares",
+      group: "gameplay",
+      namespace: "combat",
+      type: "board_range",
+      bind_root: {
+        header: "game/boarding.h",
+        symbol: "BOARDING::board_range",
+      },
+      default: { normal: 3, transporters: 12 },
+    },
+
+    sub_space_teleporter_range: {
+      title: "Sub-Space Teleporter range",
+      description: "Sets tactical teleport movement range.",
+      examples: ["combat sub_space_teleporter_range = 20;"],
+      units: "tactical squares",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      bind_root: {
+        header: "game/cmbtmov1.h",
+        symbol: "CMBTMOV1::_sub_space_teleporter_range",
+      },
+      default: 20,
+    },
+
     interactive_combat_stats: {
       title: "Interactive combat statistics",
       description: "Updates ship speed, remaining movement, combat bonuses, initiative, and fleet ordnance as combat state changes within a turn.",
@@ -1753,6 +2093,70 @@
       default: false,
     },
 
+    planet_non_enveloping: {
+      title: "Disable Enveloping against planets",
+      description: "Prevents beam and missile Enveloping modifiers from multiplying damage against planets.",
+      remarks: "False preserves classic behavior. Stellar Converters are unaffected.",
+      examples: ["combat planet_non_enveloping = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_planet_non_enveloping",
+      },
+      default: false,
+    },
+
+    compressor_per_size_class_damage: {
+      title: "Spatial Compressor damage by size class",
+      description: "Makes Spatial Compressor damage proportional to the target ship's size class.",
+      remarks: "False preserves classic behavior. When enabled, damage scales from one randomized roll for a Frigate through six rolls for a Doom Star, matching Pulsar size scaling.",
+      examples: ["combat compressor_per_size_class_damage = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtspec.h",
+        symbol: "CMBTSPEC::_compressor_per_size_class_damage",
+      },
+      default: false,
+    },
+
+    absorber_damage_reduction: {
+      title: "Energy Absorber damage reduction",
+      description: "Sets the percentage of incoming damage blocked and stored by an Energy Absorber.",
+      remarks: "The 25 percent default preserves classic behavior. Actual combat retains the classic minimum blocked charge of one damage.",
+      examples: ["combat absorber_damage_reduction = 25;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      constraints: { min: 0, max: 100 },
+      default: 25,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_absorber_damage_reduction",
+      },
+    },
+
+    damper_field_ratio: {
+      title: "Damper Field remaining damage",
+      description: "Sets the percentage of incoming damage remaining after a Damper Field reduction.",
+      remarks: "The 25 percent default preserves classic behavior.",
+      examples: ["combat damper_field_ratio = 25;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      constraints: { min: 0, max: 100 },
+      default: 25,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_damper_field_ratio",
+      },
+    },
+
     lightning_field_ratio: {
       title: "Lightning Field destruction chance",
       description: "Sets the chance for Lightning Field to destroy a missile, torpedo, or fighter.",
@@ -1843,6 +2247,96 @@
       type: "uint8",
       default: 4,
       bind_root: { header: "game/combat1.h", symbol: "COMBAT1::_td_combat_speed_bonus" },
+    },
+
+    shield: {
+      title: "Ship shield table",
+      description: "Configures shield space, cost, and blocking strength.",
+      remarks: "Conversion from MOO2 1.50 CFG syntax uses named nested arrays and the restored shield names. For example, `shield class_v_shield space_ca = 20;` becomes `design shield class_v space cruiser = 20;`, and `cost_ff` becomes `cost frigate`. The `none` row is exposed as the native empty sentinel and should normally remain zero.",
+      examples: [
+        "design shield class_v shield_class = 5;",
+        "design shield class_v space cruiser = 20;",
+        "design shield class_v cost battleship = 25;",
+      ],
+      group: "gameplay",
+      namespace: "design",
+      bind_root: { header: "game/techdata.h", symbol: "TECHDATA::_shields" },
+      type: {
+        kind: "array",
+        count: 6,
+        index_base: 0,
+        index_type: "ship_shield",
+        element: { type: "shield_data" },
+      },
+      default: [
+        { space: [0, 0, 0, 0, 0, 0], cost: [0, 0, 0, 0, 0, 0], shield_class: 0 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 1 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 3 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 5 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 7 },
+        { space: [5, 10, 20, 50, 100, 200], cost: [3, 5, 10, 25, 50, 100], shield_class: 10 },
+      ],
+    },
+
+    shield_hull_multiplier: {
+      title: "Shield capacity by hull",
+      description: "Sets the shield-capacity multiplier for each ship and orbital-defense hull.",
+      remarks: "Defaults preserve classic capacity, including the Doom Star and three orbital defenses.",
+      examples: ["design shield_hull_multiplier frigate = 5;"],
+      group: "gameplay",
+      namespace: "design",
+      bind_root: { header: "game/techdata.h", symbol: "TECHDATA::_shield_hull_multiplier" },
+      type: {
+        kind: "array",
+        count: 9,
+        index_base: 0,
+        index_type: "shield_hull",
+        element: { type: "uint16" },
+      },
+      default: [5, 10, 15, 20, 25, 35, 15, 20, 25],
+    },
+
+    hard_shields_damage_reduction: {
+      title: "Hard Shields damage reduction",
+      description: "Sets the additional damage blocked by working Hard Shields.",
+      examples: ["combat hard_shields_damage_reduction = 3;"],
+      units: "damage points",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      default: 3,
+      bind_root: { header: "game/techdata.h", symbol: "TECHDATA::_hard_shields_damage_reduction" },
+    },
+
+    megafluxers_tactical_bonus: {
+      title: "Megafluxers tactical space bonus",
+      description: "Increases tactical ship and orbital-defense space when Megafluxers are researched.",
+      examples: ["design megafluxers_tactical_bonus = 25;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "design",
+      type: "uint16",
+      default: 25,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_megafluxers_tactical_bonus",
+      },
+    },
+
+    augmented_engines_speed_bonus: {
+      title: "Augmented Engines speed bonus",
+      description: "Adds tactical combat speed while working Augmented Engines are installed.",
+      examples: ["design augmented_engines_speed_bonus = 5;"],
+      units: "combat speed",
+      group: "gameplay",
+      namespace: "design",
+      type: "uint8",
+      constraints: { max: 127 },
+      default: 5,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_augmented_engines_speed_bonus",
+      },
     },
 
     alternative_refit: {
@@ -2009,6 +2503,31 @@
       },
     },
 
+    scout_lab_research_bonus: {
+      title: "Scout Lab research bonus",
+      description: "Sets the research produced by a working Scout Lab on each ship size class.",
+      remarks: "Defaults preserve classic behavior and match MOO2 1.50.",
+      examples: [
+        "research scout_lab_research_bonus destroyer = 2;",
+        "research scout_lab_research_bonus doomstar = 32;",
+      ],
+      units: "research points per turn",
+      group: "gameplay",
+      namespace: "research",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::scout_lab_research_bonus",
+      },
+      type: {
+        kind: "array",
+        count: 6,
+        index_base: 0,
+        index_type: "combat_ship_size_class",
+        element: { type: "uint8" },
+      },
+      default: [1, 2, 4, 8, 16, 32],
+    },
+
     keep_research_on_breakthrough: {
       title: "Keep research after breakthroughs",
       description: "Retains research points above twice the completed field's cost after a research breakthrough.",
@@ -2066,6 +2585,21 @@
       bind_root: {
         header: "game/events.h",
         symbol: "EVENTS::event_delay",
+      },
+    },
+
+    federation_no_mixed_races_penalty: {
+      title: "Federation ignores mixed-race morale penalties",
+      description: "Prevents differing biological races from reducing morale on Federation colonies.",
+      remarks: "False preserves classic behavior. When enabled, Alien Control Center remains available while conquered population is present, but is unavailable after differing biological races are assimilated.",
+      examples: ["colony federation_no_mixed_races_penalty = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_federation_no_mixed_races_penalty",
       },
     },
 
@@ -2195,6 +2729,22 @@
       default: { cyber: 10, aru: 20, regen: 20 },
     },
 
+    systems_repair_percent: {
+      title: "Internal-system repair percentage",
+      description: "Sets repaired internal-system hit points as a percentage of the proportional structure repair pool.",
+      remarks: "The default of 50 preserves classic behavior and matches MOO2 1.50.",
+      examples: ["combat systems_repair_percent = 50;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint16",
+      default: 50,
+      bind_root: {
+        header: "game/cmbtfir2.h",
+        symbol: "CMBTFIR2::_systems_repair_percent",
+      },
+    },
+
     missile_initiative: {
       title: "Missile initiative",
       description: "Controls when newly fired missiles first move while ship initiative is enabled.",
@@ -2223,6 +2773,95 @@
         header: "game/science.h",
         symbol: "SCIENCE::_finds_presented_by_scientist",
       },
+    },
+
+    lander_ship_uses_stealth: {
+      title: "Landing ship stealth equipment",
+      description: "Controls whether colony, outpost, and transport ships install the best researched stealth device.",
+      remarks: "All fields default to false, preserving classic behavior and matching MOO2 1.50.",
+      examples: [
+        "colony lander_ship_uses_stealth colony_ship = true;",
+        "colony lander_ship_uses_stealth outpost_ship = true;",
+        "colony lander_ship_uses_stealth transport_ship = true;",
+      ],
+      group: "gameplay",
+      namespace: "colony",
+      type: "lander_ship_uses_stealth",
+      bind_root: {
+        header: "game/initship.h",
+        symbol: "INITSHIP::lander_ship_uses_stealth",
+      },
+      default: {
+        colony_ship: false,
+        outpost_ship: false,
+        transport_ship: false,
+      },
+    },
+
+    satellite_size_class_plus_one: {
+      title: "Increase satellite size class",
+      description: "Makes Star Bases Battleship-sized, Battlestations Titan-sized, and Star Fortresses Doom Star-sized in tactical combat.",
+      remarks: "This affects station footprint, size-scaled weapons and effects, internal systems, shields, and repair. The default false preserves classic size classes.",
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::_satellite_size_class_plus_one",
+      },
+    },
+
+    defensive_range_bonus: {
+      title: "Defensive installation range bonus",
+      description: "Additional range granted to orbital and ground defensive installations.",
+      remarks: "The default 0 preserves classic range.",
+      units: "three-square range units",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      default: 0,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_defensive_range_bonus",
+      },
+    },
+
+    broken_engine_explodes: {
+      title: "Destroyed engines explode",
+      description: "Controls whether losing all drive hit points destroys a ship in a damaging drive explosion.",
+      remarks: "True preserves classic behavior. When false, ships with destroyed drives remain in battle and self-destruct uses ordinary destruction without spherical explosion damage.",
+      examples: ["combat broken_engine_explodes = false;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: true,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_broken_engine_explodes",
+      },
+    },
+
+    postwarp_tech: {
+      title: "Post-warp starting technologies",
+      description: "Selects the technologies granted to every player in a Post-warp game.",
+      remarks: "The first seven entries are additionally granted in strategic combat. Defaults match MOO2 1.50 and include Fighter Bays as entry 29.",
+      examples: ["research postwarp_tech 29 = 66;"],
+      group: "gameplay",
+      namespace: "research",
+      bind_root: {
+        header: "game/techinit.h",
+        symbol: "TECHINIT::postwarp_tech",
+      },
+      type: {
+        kind: "array", count: 29, index_base: 1,
+        element: { type: "int16" },
+      },
+      default: [
+        56, 20, 192, 25, 82, 13, 13, 22, 132, 26,
+        179, 71, 72, 51, 191, 163, 46, 122, 155, 61,
+        87, 70, 73, 33, 57, 104, 180, 181, 66,
+      ],
     },
   },
 }

@@ -103,8 +103,13 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Cost_Of_Design_(int16_t player_idx, s_ship_design* ship_design) {
+        return Calculate_Design_(player_idx, ship_design, nullptr);
+    }
+
+    int16_t __cdecl Calculate_Design_(int16_t player_idx, s_ship_design* ship_design, uint8_t* combat_speed) {
         // TODO: Pass player_idx through the design-cost helpers instead of relying on a global.
         int16_t previous_player_idx = MOX::_PLAYER_NUM;
+        s_current_design* previous_design = MOX::_design;
         MOX::_PLAYER_NUM = player_idx;
 
         s_current_design current_design;
@@ -120,6 +125,7 @@ namespace DESIGN {
         current_design.ship_size = static_cast<int16_t>(ship_design->size);
 
         current_design.hull_space = DESIGN::Total_Design_Space_();
+        current_design.shield = (int16_t)ship_design->shield_type;
         current_design.computer_type = static_cast<int16_t>(ship_design->computer_type);
         current_design.picture_type = static_cast<int16_t>(ship_design->picture_num);
         current_design.armor_type = static_cast<int16_t>(ship_design->armor_type);
@@ -152,10 +158,14 @@ namespace DESIGN {
             }
         }
 
-        current_design.base_combat_speed = Current_Design_Combat_Speed_(MOX::_design);
         Update_Calculated_Design_Data_(player_idx);
+        current_design.base_combat_speed = Current_Design_Base_Combat_Speed_(MOX::_design);
+        if (combat_speed != nullptr) {
+            *combat_speed = (uint8_t)current_design.base_combat_speed;
+        }
 
         int16_t cost = static_cast<int16_t>(current_design.total_cost);
+        MOX::_design = previous_design;
         MOX::_PLAYER_NUM = previous_player_idx;
         return cost;
     }
@@ -181,7 +191,7 @@ namespace DESIGN {
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_AUGMENTED_ENGINES) != 0) {
             if (_use_augmented_engines != 0) {
-                speed += 5;
+                speed += _augmented_engines_speed_bonus;
             }
         }
 
@@ -273,7 +283,7 @@ namespace DESIGN {
         int32_t hull_size = TECHDATA::_hull_data[ship_size].size;
 
         if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_MEGAFLUXERS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            hull_size = (hull_size * 125) / 100;
+            hull_size = Apply_Megafluxers_Tactical_Bonus_(hull_size);
         }
 
         return hull_size;
@@ -461,21 +471,27 @@ namespace DESIGN {
         }
     }
 
-    /**
-     * @brief Applies cost reduction to the provided cost based on the player's government type (trait 0).
-     * 
-     * @param player_idx Index of the player in the global player array.
-     * @param cost Pointer to the cost value to be modified.
-     */
-    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t *cost) {
-        s_player *player = &MOX::_player[player_idx];
-        int8_t govt_trait = player->traits[TRAIT_CURRENT_GOVERNMENT];
-
-        if (govt_trait == GOVERNMENT_FEUDAL) {
-            *cost = (*cost * 2 + 2) / 3;
-        } else if (govt_trait == GOVERNMENT_CONFEDERATION) {
-            *cost = (*cost + 2) / 3;
+    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t* cost) {
+        int8_t government = MOX::_player[player_idx].traits[TRAIT_CURRENT_GOVERNMENT];
+        if ((uint8_t)government >= GOVERNMENT_COUNT) {
+            return;
         }
+
+        const s_ratio16& reduction = COLCALC::government_bonuses[government].cost_reduction;
+        if (reduction.denominator == 0) {
+            return;
+        }
+
+        int64_t reduction_amount =
+            (int64_t)*cost * reduction.numerator / reduction.denominator;
+        int64_t reduced_cost = (int64_t)*cost - reduction_amount;
+        if (reduced_cost < INT32_MIN) {
+            reduced_cost = INT32_MIN;
+        }
+        else if (reduced_cost > INT32_MAX) {
+            reduced_cost = INT32_MAX;
+        }
+        *cost = (int32_t)reduced_cost;
     }
 
     int16_t __cdecl Current_Design_Structural_Points_() {
@@ -501,15 +517,8 @@ namespace DESIGN {
 
     int16_t __cdecl Shield_Strength_() {
         s_current_design* design = MOX::_design;
-        int16_t multiplier;
-
-        if (design->ship_size < SHIP_SIZE_DOOM_STAR) {
-            multiplier = design->ship_size + 1;
-        } else {
-            multiplier = design->ship_size + 2;
-        }
-
-        int16_t strength = TECHDATA::_shields[design->shield].shield_class * multiplier * 5;
+        int16_t strength = (int16_t)TECHDATA::Shield_Strength_(
+            design->ship_size, design->shield);
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_MULTI_PHASED_SHIELDS)) {
             strength = (int16_t)((strength * 3) / 2);
@@ -552,7 +561,7 @@ namespace DESIGN {
         int16_t blocked_points = TECHDATA::_shields[shield_idx].shield_class;
 
         if (Current_Design_Has_Special_System_(MOX::_design, SPECIAL_HARD_SHIELDS)) {
-            blocked_points += 3;
+            blocked_points += TECHDATA::_hard_shields_damage_reduction;
         }
 
         return blocked_points;
