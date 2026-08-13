@@ -2,6 +2,43 @@
 
 #include "doctest/doctest.h"
 
+DOCTEST_TEST_CASE("Battle Pods combat speed uses the configured overload rules") {
+    s_tech_drive_data saved_drive = TECHDATA::_drives[DRIVE_NUCLEAR_DRIVE];
+    s_tech_specials_data saved_battle_pods = TECHDATA::_specials[SPECIAL_BATTLE_PODS];
+    bool saved_speed_bonus = DESIGN::_battle_pods_speed_bonus;
+    uint8_t saved_minimum_speed = DESIGN::_minimum_combat_speed;
+
+    TECHDATA::_drives[DRIVE_NUCLEAR_DRIVE].combat_speed_min[SHIP_SIZE_SMALL] = 10;
+    TECHDATA::_drives[DRIVE_NUCLEAR_DRIVE].combat_speed_max[SHIP_SIZE_SMALL] = 20;
+    TECHDATA::_specials[SPECIAL_BATTLE_PODS].space_per_ship_type[SHIP_SIZE_SMALL] =
+        static_cast<uint16_t>(-20);
+
+    s_current_design design = {};
+    design.ftl_type = DRIVE_NUCLEAR_DRIVE;
+    design.ship_size = SHIP_SIZE_SMALL;
+    design.hull_space = 100;
+    design.space_used = 40;
+    design.special_devices[0] = SPECIAL_BATTLE_PODS;
+
+    DESIGN::_battle_pods_speed_bonus = true;
+    DOCTEST_CHECK(DESIGN::Current_Design_Base_Combat_Speed_(&design) == 16);
+
+    DESIGN::_battle_pods_speed_bonus = false;
+    DESIGN::_minimum_combat_speed = 255;
+    DOCTEST_CHECK(DESIGN::Current_Design_Base_Combat_Speed_(&design) == 14);
+
+    design.space_used = 150;
+    DOCTEST_CHECK(DESIGN::Current_Design_Base_Combat_Speed_(&design) == 10);
+
+    DESIGN::_minimum_combat_speed = 5;
+    DOCTEST_CHECK(DESIGN::Current_Design_Base_Combat_Speed_(&design) == 5);
+
+    TECHDATA::_drives[DRIVE_NUCLEAR_DRIVE] = saved_drive;
+    TECHDATA::_specials[SPECIAL_BATTLE_PODS] = saved_battle_pods;
+    DESIGN::_battle_pods_speed_bonus = saved_speed_bonus;
+    DESIGN::_minimum_combat_speed = saved_minimum_speed;
+}
+
 DOCTEST_TEST_CASE("refit cost uses the corrected shared formulas") {
     int16_t saved_hull_cost = TECHDATA::_hull_data[HULL_FRIGATE].cost;
     int8_t saved_player_0_government =

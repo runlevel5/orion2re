@@ -5,12 +5,27 @@
 
 namespace TEST_COMBAT_REPAIR {
     void Reset_();
+    void Set_Zero_Speed_Unload_();
     void Set_Special_(int16_t ship_idx, int16_t special_id);
     void Damage_Special_(int16_t ship_idx, int16_t special_id);
     void Set_Cybernetic_(int16_t player_idx);
     void Set_Engineer_Bonus_(int16_t player_idx, int16_t amount);
     int Repair_Count_(int16_t ship_idx);
     int16_t Repair_Amount_(int16_t ship_idx);
+    int Speed_Calc_Count_();
+    int16_t Drive_Current_Hits_();
+    uint8_t Stored_Drive_Damage_();
+}
+
+DOCTEST_TEST_CASE("zero-base-speed ships unload without an endless drive repair loop") {
+    TEST_COMBAT_REPAIR::Reset_();
+    TEST_COMBAT_REPAIR::Set_Zero_Speed_Unload_();
+
+    COMBINIT::Unload_Combat_Ship_(0);
+
+    DOCTEST_CHECK(TEST_COMBAT_REPAIR::Speed_Calc_Count_() == 0);
+    DOCTEST_CHECK(TEST_COMBAT_REPAIR::Drive_Current_Hits_() == 10);
+    DOCTEST_CHECK(TEST_COMBAT_REPAIR::Stored_Drive_Damage_() == 0);
 }
 
 DOCTEST_TEST_CASE("regeneration remains disabled by default") {

@@ -2,19 +2,24 @@
 
 namespace {
     s_combat_data combat_data[2];
+    s_ship_data ships[2];
     s_player players[MAX_PLAYERS];
     int16_t engineer_bonus[MAX_PLAYERS];
     int16_t repair_amount[2];
     int repair_count[2];
+    int speed_calc_count;
 }
 
 namespace TEST_COMBAT_REPAIR {
     void Reset_() {
         memset(combat_data, 0, sizeof(combat_data));
+        memset(ships, 0, sizeof(ships));
         memset(players, 0, sizeof(players));
         memset(engineer_bonus, 0, sizeof(engineer_bonus));
         memset(repair_amount, 0, sizeof(repair_amount));
         memset(repair_count, 0, sizeof(repair_count));
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        speed_calc_count = 0;
 
         MOX::_combat_total_ship_count = 2;
         MOX::_combat_attacker_player = 0;
@@ -25,6 +30,26 @@ namespace TEST_COMBAT_REPAIR {
         combat_data[1].stasis_source_idx = UINT8_MAX;
         COMBINIT::_amoeba_regeneration = 0;
         COMBINIT::repair_rate = {10, 20, 20};
+    }
+
+    void Set_Zero_Speed_Unload_() {
+        combat_data[0].ship_idx = 0;
+        combat_data[0].current_speed = 0;
+        combat_data[0].drive_current_hits = 0;
+        combat_data[0].drive_max_hits = 10;
+        ships[0].d.combat_speed = 0;
+    }
+
+    int Speed_Calc_Count_() {
+        return speed_calc_count;
+    }
+
+    int16_t Drive_Current_Hits_() {
+        return combat_data[0].drive_current_hits;
+    }
+
+    uint8_t Stored_Drive_Damage_() {
+        return ships[0].drive_damage_percent;
     }
 
     void Set_Special_(int16_t ship_idx, int16_t special_id) {
@@ -56,10 +81,28 @@ namespace TEST_COMBAT_REPAIR {
 
 namespace MOX {
     s_combat_data* _combat_data = combat_data;
+    s_ship_data* _ship = ships;
     s_player* _player = players;
     int16_t _combat_total_ship_count;
     int16_t _combat_attacker_player;
     int16_t _combat_defender_player;
+}
+
+namespace TECHDATA {
+    s_tech_weapon_data _weapons[WEAPON_COUNT];
+}
+
+namespace COMBAT1 {
+    int16_t __cdecl Calc_Current_Speed_(int16_t) {
+        speed_calc_count++;
+        return 0;
+    }
+}
+
+namespace INITSHIP {
+    int16_t __cdecl Get_Ship_Armor_Hits_(int16_t) {
+        return 0;
+    }
 }
 
 namespace struct_ {

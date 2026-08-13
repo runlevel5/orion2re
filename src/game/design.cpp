@@ -207,19 +207,35 @@ namespace DESIGN {
     }
 
     uint8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design) {
-        uint8_t base_speed = (uint8_t)Current_Design_Min_Combat_Speed_(design);
+        int16_t minimum_speed = (int16_t)Current_Design_Min_Combat_Speed_(design);
         uint8_t speed_mod = (uint8_t)Current_Design_Max_Combat_Speed_(design);
 
-        int32_t space_utilization = (-100 * design->space_used) / design->hull_space;
+        int32_t effective_space_used = design->space_used;
+        if (!_battle_pods_speed_bonus) {
+            if (Current_Design_Has_Special_System_(design, SPECIAL_BATTLE_PODS) != 0) {
+                int16_t battle_pods_space = static_cast<int16_t>(
+                    TECHDATA::_specials[SPECIAL_BATTLE_PODS].space_per_ship_type[design->ship_size]);
+                effective_space_used -= battle_pods_space;
+                if (effective_space_used < 0) {
+                    effective_space_used = 0;
+                }
+            }
 
-        int16_t speed_diff = (int16_t)speed_mod - (int16_t)base_speed;
+            if (minimum_speed > _minimum_combat_speed) {
+                minimum_speed = _minimum_combat_speed;
+            }
+        }
+
+        int32_t space_utilization = (-100 * effective_space_used) / design->hull_space;
+
+        int16_t speed_diff = (int16_t)speed_mod - (int16_t)Current_Design_Min_Combat_Speed_(design);
 
         int32_t adjustment = (space_utilization * (int32_t)speed_diff) / 100;
 
         int16_t final_speed = (int16_t)speed_mod + (int16_t)adjustment;
 
-        if (final_speed < (int16_t)base_speed) {
-            final_speed = (int16_t)base_speed;
+        if (final_speed < minimum_speed) {
+            final_speed = minimum_speed;
         }
 
         return (uint8_t)final_speed;

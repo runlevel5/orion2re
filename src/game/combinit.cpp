@@ -2864,9 +2864,13 @@ void __cdecl Unload_Combat_Ship_(int16_t combat_ship_idx) {
     int16_t ship_idx = MOX::_combat_data[combat_ship_idx].ship_idx;
 
     if (ship_idx != -1) {
-        while (MOX::_combat_data[combat_ship_idx].current_speed < 1) {
-            MOX::_combat_data[combat_ship_idx].drive_current_hits++;
-            MOX::_combat_data[combat_ship_idx].current_speed = COMBAT1::Calc_Current_Speed_(combat_ship_idx);
+        if (MOX::_ship[ship_idx].d.combat_speed == 0) {
+            MOX::_combat_data[combat_ship_idx].drive_current_hits = MOX::_combat_data[combat_ship_idx].drive_max_hits;
+        } else {
+            while (MOX::_combat_data[combat_ship_idx].current_speed < 1) {
+                MOX::_combat_data[combat_ship_idx].drive_current_hits++;
+                MOX::_combat_data[combat_ship_idx].current_speed = COMBAT1::Calc_Current_Speed_(combat_ship_idx);
+            }
         }
 
         if (MOX::_combat_data[combat_ship_idx].drive_max_hits < MOX::_combat_data[combat_ship_idx].drive_current_hits) {

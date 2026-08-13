@@ -2321,6 +2321,37 @@
       },
     },
 
+    battle_pods_speed_bonus: {
+      title: "Battle Pods speed bonus",
+      description: "Controls whether unused Battle Pods capacity increases a ship's base combat speed.",
+      remarks: "True preserves classic behavior. False removes the empty-ship bonus and allows equipment in Battle Pods capacity to overload the ship.",
+      examples: ["design battle_pods_speed_bonus = false;"],
+      group: "gameplay",
+      namespace: "design",
+      type: "bool",
+      default: true,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_battle_pods_speed_bonus",
+      },
+    },
+
+    minimum_combat_speed: {
+      title: "Minimum overloaded combat speed",
+      description: "Sets the combat-speed floor for Battle Pods overload when the Battle Pods speed bonus is disabled.",
+      remarks: "The lower of this value and the hull's normal minimum speed is used. The default 255 prevents overload from lowering speed below the normal hull minimum; zero permits immobile designs.",
+      examples: ["design minimum_combat_speed = 5;"],
+      units: "combat speed",
+      group: "gameplay",
+      namespace: "design",
+      type: "uint8",
+      default: 255,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_minimum_combat_speed",
+      },
+    },
+
     alternative_refit: {
       title: "Alternative refit cost",
       description: "Uses the alternative ship-refit cost formula.",
