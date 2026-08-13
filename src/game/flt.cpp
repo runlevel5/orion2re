@@ -45,10 +45,10 @@ namespace FLT {
                 SHIPS::Get_Ship_Icon_Dimensions(zoom_level, &MOX::ship_icon_width[zoom_level], &MOX::ship_icon_height[zoom_level]);
 
                 int32_t x_denom = 506000 / map_width;
-                icon_x = (int16_t)((scaled_x * 1000) / x_denom) - (icon_w / 2) + map_x;
+            icon_x = (int16_t)(((scaled_x * 1000) / x_denom) * MOVEBOX::_g_galmap_zoom - MOVEBOX::_g_galmap_pan_x) - (icon_w / 2) + map_x;
 
                 int32_t y_denom = 400000 / map_height;
-                icon_y = (int16_t)((scaled_y * 1000) / y_denom) - (icon_h / 2) + map_y;
+            icon_y = (int16_t)(((scaled_y * 1000) / y_denom) * MOVEBOX::_g_galmap_zoom - MOVEBOX::_g_galmap_pan_y) - (icon_h / 2) + map_y;
             }
 
             MOX::ship_icon[i].x = icon_x;

@@ -29,6 +29,15 @@ namespace FLT2 {
         for (int16_t i = 0; i < MOX::ship_icon_count; ++i) {
             Get_Small_Icon_Animation_Size(i, &width, &height);
 
+            // A zoomed overview pans icons out of the viewport; their
+            // fields must not land over unrelated controls.
+            if (MOVEBOX::_g_galmap_zoom > 1 &&
+                (MOX::ship_icon[i].x + width < 306 || MOX::ship_icon[i].x > 624 ||
+                 MOX::ship_icon[i].y + height < 235 || MOX::ship_icon[i].y > 404)) {
+                MOX::ship_icon[i].stack_id = -1000;
+                continue;
+            }
+
             MOX::ship_icon[i].stack_id = fields::Add_Hidden_Field(
                 MOX::ship_icon[i].x,
                 MOX::ship_icon[i].y,

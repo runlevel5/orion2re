@@ -1,7 +1,20 @@
 #include "pch.h"
 
 namespace MOVEBOX {
-    void __cdecl Draw_Galaxy_Map_Box(s_animation_header* anim1, s_animation_header* unused_anim2, int16_t x_base, int16_t y_base, int16_t width, int16_t height, int16_t map_x_off, int16_t map_y_off, int16_t x_adj, int16_t y_adj, int16_t view_mode, int16_t exit_flag) {
+    // Enhancement: overview-map zoom. Content coordinates scale by
+    // _g_galmap_zoom and shift by the pan, while each box's viewport and
+    // clip stay put; at the default zoom of 1 with no pan every transform
+    // is the identity, so only the screen that sets it is affected.
+    int16_t _g_galmap_zoom = 1;
+    int16_t _g_galmap_pan_x = 0;
+    int16_t _g_galmap_pan_y = 0;
+
+    void __cdecl Draw_Galaxy_Map_Box(s_animation_header* anim1, s_animation_header* unused_anim2,
+                                    int16_t x_base, int16_t y_base,
+                                    int16_t width, int16_t height,
+                                    int16_t map_x_off, int16_t map_y_off,
+                                    int16_t x_adj, int16_t y_adj,
+                                    int16_t view_mode, int16_t exit_flag) {
         (void)unused_anim2;
 
         s_colors font_colors;
@@ -55,8 +68,8 @@ namespace MOVEBOX {
 
         if (MOX::NUM_STARS > 0) {
             for (int16_t i = 0; i < MOX::NUM_STARS; ++i) {
-                int32_t sx = x_start + map_x_off + ((MOX::star[i].x * 1000 / MOX::max_map_scale) * 10) / scale_x;
-                int32_t sy = y_start + map_y_off + ((MOX::star[i].y * 1000 / MOX::max_map_scale) * 10) / scale_y;
+                int32_t sx = x_start + map_x_off + (((MOX::star[i].x * 1000 / MOX::max_map_scale) * 10) / scale_x) * _g_galmap_zoom - _g_galmap_pan_x;
+                int32_t sy = y_start + map_y_off + (((MOX::star[i].y * 1000 / MOX::max_map_scale) * 10) / scale_y) * _g_galmap_zoom - _g_galmap_pan_y;
 
                 int8_t owner = MOX::star[i].owner;
                 const bool has_visible_owner = owner >= 0 && owner < MAX_PLAYERS;
@@ -361,13 +374,13 @@ namespace MOVEBOX {
 
         const int16_t star_center_offset = (star_marker_mode == 0) ? 2 : 3;
 
-        int16_t screen_x = static_cast<int16_t>((scaled_x * 10) / x_divisor);
+        int16_t screen_x = static_cast<int16_t>(((scaled_x * 10) / x_divisor) * _g_galmap_zoom - _g_galmap_pan_x);
         screen_x = static_cast<int16_t>(screen_x - star_center_offset);
         screen_x = static_cast<int16_t>(screen_x + base_x);
         screen_x = static_cast<int16_t>(screen_x + offset_x);
         *out_x = screen_x;
 
-        int16_t screen_y = static_cast<int16_t>((scaled_y * 10) / y_divisor);
+        int16_t screen_y = static_cast<int16_t>(((scaled_y * 10) / y_divisor) * _g_galmap_zoom - _g_galmap_pan_y);
         screen_y = static_cast<int16_t>(screen_y - star_center_offset);
         screen_y = static_cast<int16_t>(screen_y + base_y);
         screen_y = static_cast<int16_t>(screen_y + offset_y);
@@ -404,21 +417,29 @@ namespace MOVEBOX {
         const int32_t box_x =
             static_cast<int32_t>(left) +
             0x132 +
-            (((static_cast<int32_t>(star.x) * 1000) / static_cast<int32_t>(MOX::max_map_scale)) * 10) /
-                static_cast<int32_t>(x_divisor);
+            ((((static_cast<int32_t>(star.x) * 1000) / static_cast<int32_t>(MOX::max_map_scale)) * 10) /
+                static_cast<int32_t>(x_divisor)) * _g_galmap_zoom - _g_galmap_pan_x;
 
         const int32_t box_y =
             static_cast<int32_t>(top) +
             0xEB +
-            (((static_cast<int32_t>(star.y) * 1000) / static_cast<int32_t>(MOX::max_map_scale)) * 10) /
-                static_cast<int32_t>(y_divisor);
+            ((((static_cast<int32_t>(star.y) * 1000) / static_cast<int32_t>(MOX::max_map_scale)) * 10) /
+                static_cast<int32_t>(y_divisor)) * _g_galmap_zoom - _g_galmap_pan_y;
 
+        const bool clip_overview = _g_galmap_zoom > 1;
+        if (clip_overview) {
+            graphics::Set_Window(306, 235, 624, 404);
+            video::Clip_On();
+        }
         if (displayed_star_index == OFFICER::officer_star_chosen) {
             graphics::Box((int16_t)(box_x - 5), (int16_t)(box_y - 5), 0x0B, 0x0C, 1, (uint8_t)(OFFICER::offscrn_flash_value + 0x6E));
-            return;
+        } else {
+            graphics::Box((int16_t)(box_x - 5), (int16_t)(box_y - 5), 0x0B, 0x0C, 1, 0x1E);
         }
-
-        graphics::Box((int16_t)(box_x - 5), (int16_t)(box_y - 5), 0x0B, 0x0C, 1, 0x1E);
+        if (clip_overview) {
+            video::Clip_Off();
+            graphics::Reset_Window();
+        }
     }
 
     void __cdecl Box_Officer_Screen_Scanned_Star() {
@@ -426,13 +447,21 @@ namespace MOVEBOX {
         s_star_data* const scanned_star = &MOX::star[scanned_star_index];
         const int32_t map_scale = static_cast<int32_t>(MOX::max_map_scale);
 
-        const int32_t scaled_x = ((((int32_t)scanned_star->x * 1000) / map_scale) * 10) / 0x637;
-        const int32_t scaled_y = ((((int32_t)scanned_star->y * 1000) / map_scale) * 10) / 0x93e;
+        const int32_t scaled_x = (((((int32_t)scanned_star->x * 1000) / map_scale) * 10) / 0x637) * _g_galmap_zoom - _g_galmap_pan_x;
+        const int32_t scaled_y = (((((int32_t)scanned_star->y * 1000) / map_scale) * 10) / 0x93e) * _g_galmap_zoom - _g_galmap_pan_y;
 
         const int16_t box_x = (int16_t)((uint16_t)(scaled_x + 0x132) - 5);
         const int16_t box_y = (int16_t)((uint16_t)scaled_y + 0xE6);
 
-        graphics::Box(box_x, box_y, 0x0B, 0x0C, 1, 0x71);
+        if (_g_galmap_zoom > 1) {
+            graphics::Set_Window(306, 235, 624, 404);
+            video::Clip_On();
+            graphics::Box(box_x, box_y, 0x0B, 0x0C, 1, 0x71);
+            video::Clip_Off();
+            graphics::Reset_Window();
+        } else {
+            graphics::Box(box_x, box_y, 0x0B, 0x0C, 1, 0x71);
+        }
     }
 
     void __cdecl Add_Galaxy_Map_Fields_2(
@@ -480,6 +509,16 @@ namespace MOVEBOX {
                     field_style,
                     &star_x,
                     &star_y);
+
+                // A zoomed overview pans stars out of the viewport; their
+                // fields must not land over unrelated controls.
+                if (_g_galmap_zoom > 1 &&
+                    (star_x < window_left || star_y < window_top ||
+                     star_x > map_x + offset_x + map_width ||
+                     star_y > map_y + offset_y + map_height)) {
+                    star_field_ids[star_index] = -1000;
+                    continue;
+                }
 
                 int16_t field_id;
                 if (field_style == 0) {
