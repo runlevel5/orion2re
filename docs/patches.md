@@ -288,7 +288,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:9486` - `range to xy`: fixed in `CMBTAI::Range_To_XY_()`, `CMBTFIR2::Defensive_Fire_Check_()`, and `CMBTMOV1::Move_Ship_()` by calculating octagonal distance before pixel-to-square scaling, retaining corner-origin defensive-fire measurements, and synchronizing moving ships' cached grid positions; direct source logic replaces the 1.50 wrappers and movement hook.
 - [x] `asm.pl:9559` - `red the weapon`: fixed in `CMBTDRW1::Draw_Weapon_Status_Display_()` by preserving the disabled red palette when a weapon is also spent; this replaces the 1.50 code-cave bypass with direct source-level color-state precedence.
 - [x] `asm.pl:9579` - `colony bases and outposts`: fixed in `COLBLDG::Star_N_Uncolonized_Worlds_()` by counting only same-owner outposts as colony-base targets; this replaces the 1.50 code-cave owner check with a direct source-level invariant.
-- [ ] `asm.pl:9614` - `fighter ordnance`
+- [x] `asm.pl:9614` - `fighter ordnance`: fixed in `CMBTFIRE::Fire_Fighter_Beam_()` and `CMBTFIRE::Fire_Fighter_Bomb_()` by applying the combat owner's ordnance multiplier to both fighter damage bounds before attack resolution; direct source scaling replaces the 1.50 register-preserving helper calls.
 - [ ] `asm.pl:9685` - `shwifty range`
 - [ ] `asm.pl:10496` - `mixed race penalty`
 - [ ] `asm.pl:10523` - `battle pods cap`

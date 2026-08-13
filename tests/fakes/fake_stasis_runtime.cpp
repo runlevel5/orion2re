@@ -18,6 +18,7 @@ namespace {
     int16_t explosion_damage_source;
     int16_t spherical_effect_type;
     int16_t spherical_damage;
+    int16_t missile_hits;
 }
 
 namespace TEST_STASIS {
@@ -28,6 +29,7 @@ namespace TEST_STASIS {
         cleanup_count = 0;
         last_missile_hits_owner = -1;
         last_retargeted_missile = -1;
+        missile_hits = 4;
         has_transporters = false;
         for (int16_t& offset : ship_center_offsets) {
             offset = 10;
@@ -137,20 +139,43 @@ namespace TEST_BOMBING_RANGE {
     }
 }
 
+namespace TEST_FIGHTER_ORDNANCE {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        memset(MOX::_ordnance_bonus, 0, sizeof(MOX::_ordnance_bonus));
+        memset(MOX::_fighter_beam_type, 0,
+               sizeof(MOX::_fighter_beam_type));
+        missile_hits = 20;
+    }
+}
+
 namespace MOX {
     s_combat_data* _combat_data = combat_data;
     s_missile* _missile = missiles;
+    s_colony* _colony;
+    s_player* _player;
+    int16_t _ordnance_bonus[15];
+    int16_t _fighter_beam_type[9];
     int16_t _combat_attacker_player;
     int16_t _combat_defender_player;
     int16_t _combat_total_ship_count;
+    int16_t _cmbt_colony_id;
+    int16_t _in_nebula_flag;
+    int16_t _bio_weapon_flag;
     uint16_t _apply_damage_to_planet;
     int16_t _super_fast_flag;
     int16_t _ranged_to_hit_penalty[9];
     int16_t _ranged_damage_penalty[9];
+    s_combat_bomb_result _combat_bomb_result;
 }
 
 namespace TECHDATA {
     s_tech_weapon_data _weapons[WEAPON_COUNT];
+    s_tech_armor_data _armor[ARMOR_COUNT];
+    s_techdata_planetary_shield _planetary_shields[PLANETARY_SHIELD_COUNT];
+    s_tech_shield_data _shields[SHIELD_COUNT];
+    uint8_t _hard_shields_damage_reduction;
 }
 
 namespace COMBINIT {
@@ -176,7 +201,21 @@ namespace COMBINIT {
 namespace CMBTMIS {
     int16_t __cdecl Get_Missile_Hits_(int16_t, int16_t owner, uint16_t) {
         last_missile_hits_owner = owner;
-        return 4;
+        return missile_hits;
+    }
+
+    int16_t __cdecl Is_Missile_Target_Alive_(int16_t missile_idx) {
+        const s_missile* target =
+            &missiles[missiles[missile_idx].target_unit_idx];
+        return target->type > 0 && target->quantity > 0;
+    }
+
+    int16_t __cdecl Fighter_Ocv_(int16_t) {
+        return 0;
+    }
+
+    int16_t __cdecl Missile_Dcv_(int16_t, int16_t) {
+        return 0;
     }
 
     void __cdecl Retarget_Missile_(int16_t missile_idx) {
@@ -184,6 +223,12 @@ namespace CMBTMIS {
     }
 
     void __cdecl Kill_Missile_(int16_t) {
+    }
+}
+
+namespace game_random {
+    uint32_t __cdecl Random_(uint32_t) {
+        return 100;
     }
 }
 
@@ -207,6 +252,51 @@ namespace CMBTFIR2 {
     int16_t __cdecl Damage_From_Ship_Exploding_(int16_t ship_idx) {
         explosion_damage_source = ship_idx;
         return 42;
+    }
+
+    void __cdecl Kill_Crew_(int16_t, int16_t) {
+    }
+
+    void __cdecl Select_Internal_(
+        int16_t, int16_t* hit_type, int16_t*, int16_t, int16_t,
+        int16_t, int16_t
+    ) {
+        *hit_type = -1;
+    }
+
+    void __cdecl Apply_Internal_Damage_(
+        int16_t, int16_t*, int16_t, int16_t, int16_t
+    ) {
+    }
+}
+
+namespace INITSHIP {
+    int16_t __cdecl Best_Armor_(int16_t) {
+        return 0;
+    }
+}
+
+namespace BOMB {
+    void __cdecl Apply_Bomb_Hits_(s_combat_bomb_result*) {
+    }
+}
+
+namespace ERICNET {
+    void __cdecl Remove_Building_(int16_t, int16_t) {
+    }
+}
+
+namespace struct_ {
+    void __cdecl Clear_Structure_(void* dest, uint32_t size) {
+        memset(dest, 0, size);
+    }
+
+    void __cdecl Clear_Bit_Field_(void*, uint16_t) {
+    }
+}
+
+namespace strings {
+    void __cdecl Delete_Structure_(int32_t, void*, uint32_t, uint32_t) {
     }
 }
 

@@ -38,6 +38,10 @@ namespace TEST_ENGINE_EXPLOSION {
     int16_t Spherical_Damage_();
 }
 
+namespace TEST_FIGHTER_ORDNANCE {
+    void Reset_();
+}
+
 DOCTEST_TEST_CASE("bombing uses unrounded point distance") {
     TEST_BOMBING_RANGE::Reset_();
     MOX::_combat_data[1].weapons[0].weapon_id = WEAPON_NUCLEAR_BOMB;
@@ -170,6 +174,46 @@ DOCTEST_TEST_CASE("heavy fighter missile targeting follows scramble setting") {
             WEAPON_HEAVY_FIGHTER, 0) == 1);
 
     CMBTFIRE::_heavy_fighter_can_scramble = 0;
+}
+
+DOCTEST_TEST_CASE("fighter beams apply the fleet ordnance bonus") {
+    struct s_case {
+        int16_t ordnance_bonus;
+        int16_t expected_destroyed;
+        int16_t expected_quantity;
+        int16_t expected_hits_taken;
+    };
+    const s_case cases[] = {
+        { 100, 0, 2, 18 },
+        { 150, 1, 1, 3 },
+    };
+
+    for (const s_case& value : cases) {
+        TEST_FIGHTER_ORDNANCE::Reset_();
+        MOX::_combat_data[1].owner = 2;
+        MOX::_ordnance_bonus[2] = value.ordnance_bonus;
+        MOX::_fighter_beam_type[2] = WEAPON_LASER_CANNON;
+        TECHDATA::_weapons[WEAPON_LASER_CANNON].min_damage = 10;
+        TECHDATA::_weapons[WEAPON_LASER_CANNON].max_damage = 10;
+
+        MOX::_missile[0].source_unit_idx = 1;
+        MOX::_missile[0].target_unit_idx = 1;
+        MOX::_missile[0].quantity = 1;
+        MOX::_missile[1].type = WEAPON_NUCLEAR_MISSILE;
+        MOX::_missile[1].quantity = 2;
+        MOX::_missile[1].hits_taken = 8;
+
+        int16_t total_damage = 0;
+        int16_t total_struct_damage = 0;
+        CMBTFIRE::Fire_Fighter_Beam_(
+            0, 0, 1, &total_damage, &total_struct_damage);
+
+        DOCTEST_CHECK(total_damage == value.expected_destroyed);
+        DOCTEST_CHECK(
+            MOX::_missile[1].quantity == value.expected_quantity);
+        DOCTEST_CHECK(
+            MOX::_missile[1].hits_taken == value.expected_hits_taken);
+    }
 }
 
 DOCTEST_TEST_CASE("planet non-enveloping setting only suppresses planetary multiplier") {

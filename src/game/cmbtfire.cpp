@@ -1,6 +1,11 @@
 #include "pch.h"
 
 namespace {
+    int16_t Apply_Ordnance_Bonus_(int16_t damage, int16_t owner) {
+        return (int16_t)(
+            ((int32_t)damage * MOX::_ordnance_bonus[owner]) / 100);
+    }
+
     bool Can_Bomb_Planet_(
         int16_t ship_idx,
         int16_t planet_idx,
@@ -556,6 +561,10 @@ namespace CMBTFIRE {
 
         int16_t weapon_damage = TECHDATA::_weapons[weapon_id].max_damage;
         int16_t weapon_min_damage = TECHDATA::_weapons[weapon_id].min_damage;
+        weapon_damage =
+            Apply_Ordnance_Bonus_(weapon_damage, source_owner);
+        weapon_min_damage =
+            Apply_Ordnance_Bonus_(weapon_min_damage, source_owner);
 
         int16_t chance_to_hit;
         if (target_is_missile == 0) {
@@ -685,7 +694,9 @@ namespace CMBTFIRE {
         uint16_t weapon_flags;
         uint16_t damage_special_flags;
         int16_t min_damage;
+        int16_t max_damage;
         int16_t damage_range;
+        int16_t ordnance_owner;
         int16_t roll;
         int16_t damage;
         int16_t internal_damage;
@@ -707,7 +718,11 @@ namespace CMBTFIRE {
         }
 
         min_damage = TECHDATA::_weapons[weapon_id].min_damage;
-        damage_range = TECHDATA::_weapons[weapon_id].max_damage - min_damage;
+        max_damage = TECHDATA::_weapons[weapon_id].max_damage;
+        ordnance_owner = MOX::_missile[missile_idx].owner;
+        min_damage = Apply_Ordnance_Bonus_(min_damage, ordnance_owner);
+        max_damage = Apply_Ordnance_Bonus_(max_damage, ordnance_owner);
+        damage_range = max_damage - min_damage;
 
         for (int16_t i = 0; i < MOX::_missile[missile_idx].quantity; ++i) {
             roll = (int16_t)game_random::Random_(100);
