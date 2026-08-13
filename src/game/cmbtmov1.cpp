@@ -380,6 +380,9 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
                         speed_px
                     );
 
+                    ship->x = cur_x_px / 20;
+                    ship->y = cur_y_px / 20;
+
                     int16_t hit_missile_count = 0;
                     facing_dir = Get_Facing_(cur_x_px, cur_y_px, dest_x_px, dest_y_px);
 

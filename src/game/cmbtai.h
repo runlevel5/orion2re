@@ -71,6 +71,9 @@ namespace CMBTAI {
 
     int16_t __cdecl Range_To_XY_(int16_t ship_idx, int16_t target_x_px, int16_t target_y_px);
 
+    /** Returns corner-origin ship-to-point distance in legacy tactical range units. */
+    int16_t __cdecl Range_To_XY_From_Corner_(int16_t ship_idx, int16_t target_x_px, int16_t target_y_px);
+
     int16_t __cdecl Range_To_Missile_(int16_t unit_idx, int16_t missile_idx);
 
     int16_t __cdecl Will_Missile_Do_Damage_(int16_t target_idx, int16_t missile_idx);

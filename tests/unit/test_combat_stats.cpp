@@ -16,6 +16,8 @@ namespace {
     bool has_sub_space_teleporter;
     bool sub_space_teleporter_enabled;
     int16_t teleporter_used;
+    int16_t ship_center_offset_x;
+    int16_t ship_center_offset_y;
     bool font_style_selected;
     s_colors selected_font_colors;
     char weapon_name[] = "Weapon";
@@ -107,8 +109,8 @@ namespace COMBINIT {
     }
 
     void __cdecl Ship_Center_Offsets_(int16_t, int16_t* out_x, int16_t* out_y) {
-        *out_x = 0;
-        *out_y = 0;
+        *out_x = ship_center_offset_x;
+        *out_y = ship_center_offset_y;
     }
 }
 
@@ -379,6 +381,20 @@ DOCTEST_TEST_CASE("ship range exposes tactical squares without changing legacy r
 
     DOCTEST_CHECK(CMBTAI::Range_To_Ship_Squares_(0, 1) == 6);
     DOCTEST_CHECK(CMBTAI::Range_To_Ship_(0, 1) == 2);
+}
+
+DOCTEST_TEST_CASE("ship to point range measures pixels before scaling") {
+    memset(combat_data, 0, sizeof(combat_data));
+    ship_center_offset_x = 0;
+    ship_center_offset_y = 0;
+
+    DOCTEST_CHECK(CMBTAI::Range_To_XY_(0, 2, 19) == 1);
+
+    ship_center_offset_x = 20;
+    DOCTEST_CHECK(CMBTAI::Range_To_XY_(0, 20, 0) == 0);
+    DOCTEST_CHECK(CMBTAI::Range_To_XY_From_Corner_(0, 20, 0) == 1);
+
+    ship_center_offset_x = 0;
 }
 
 DOCTEST_TEST_CASE("round teleporter excludes square corners") {

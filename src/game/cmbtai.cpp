@@ -6,6 +6,24 @@ namespace CMBTAI {
 
 int16_t _fleet_target;
 
+namespace {
+    int16_t Range_To_XY_With_Offset_(
+        int16_t ship_idx,
+        int16_t target_x_px,
+        int16_t target_y_px,
+        int16_t offset_x_px,
+        int16_t offset_y_px
+    ) {
+        const int16_t ship_x_px =
+            (int16_t)(MOX::_combat_data[ship_idx].x * 20 + offset_x_px);
+        const int16_t ship_y_px =
+            (int16_t)(MOX::_combat_data[ship_idx].y * 20 + offset_y_px);
+        const int16_t distance_squares = special::Range_(
+            ship_x_px, ship_y_px, target_x_px, target_y_px) / 20;
+        return (distance_squares + 2) / 3;
+    }
+}
+
 /**
  * Checks if all active enemy ships are currently in stasis.
  * If so, releases the smallest enemy ship from stasis to prevent a combat deadlock.
@@ -1479,52 +1497,23 @@ int16_t __cdecl Is_Ship_Targeted_By_Missile_(int16_t ship_idx) {
 }
 
 int16_t __cdecl Range_To_XY_(int16_t ship_idx, int16_t target_x_px, int16_t target_y_px) {
-    int16_t off_x, off_y;
-    COMBINIT::Ship_Center_Offsets_(ship_idx, &off_x, &off_y);
+    int16_t center_x_offset;
+    int16_t center_y_offset;
+    COMBINIT::Ship_Center_Offsets_(
+        ship_idx, &center_x_offset, &center_y_offset);
+    return Range_To_XY_With_Offset_(
+        ship_idx,
+        target_x_px,
+        target_y_px,
+        center_x_offset,
+        center_y_offset);
+}
 
-    int16_t off_gx = off_x / 20;
-    int16_t off_gy = off_y / 20;
-
-    int16_t ship_gx = MOX::_combat_data[ship_idx].x;
-    int16_t ship_gy = MOX::_combat_data[ship_idx].y;
-
-    int16_t target_gx = target_x_px / 20;
-    int16_t target_gy = target_y_px / 20;
-
-    int16_t best_ship_x;
-    if (target_gx < ship_gx) {
-        best_ship_x = ship_gx - off_gx;
-        if (best_ship_x <= target_gx) {
-            best_ship_x = target_gx;
-        }
-    } else {
-        best_ship_x = ship_gx + off_gx;
-        if (best_ship_x >= target_gx) {
-            best_ship_x = target_gx;
-        }
-    }
-
-    int16_t best_ship_y;
-    if (target_gy < ship_gy) {
-        best_ship_y = ship_gy - off_gy;
-        if (best_ship_y <= target_gy) {
-            best_ship_y = target_gy;
-        }
-    } else {
-        best_ship_y = ship_gy + off_gy;
-        if (best_ship_y >= target_gy) {
-            best_ship_y = target_gy;
-        }
-    }
-
-    // The following comparisons are present in the disassembly as identity assignments
-    if (target_gx == best_ship_x) { target_gx = best_ship_x; }
-    if (target_gy == best_ship_y) { target_gy = best_ship_y; }
-
-    int16_t dist = special::Range_(best_ship_x, best_ship_y, target_gx, target_gy);
-
-    // Result is rounded up and scaled down
-    return (dist + 2) / 3;
+int16_t __cdecl Range_To_XY_From_Corner_(
+    int16_t ship_idx, int16_t target_x_px, int16_t target_y_px
+) {
+    return Range_To_XY_With_Offset_(
+        ship_idx, target_x_px, target_y_px, 0, 0);
 }
 
 /**

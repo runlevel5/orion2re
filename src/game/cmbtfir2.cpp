@@ -880,8 +880,8 @@ namespace CMBTFIR2 {
                         int8_t status = MOX::_combat_data[attacker_idx].special_status_flag;
                         if (status != 1 && status != 4 && MOX::_combat_data[attacker_idx].ai_range_tactic > 0) {
                             COMBINIT::Ship_Center_Offsets_(target_idx, &center_off_x, &center_off_y);
-                            range1 = CMBTAI::Range_To_XY_(attacker_idx, target_x + center_off_x, target_y + center_off_y);
-                            range2 = CMBTAI::Range_To_XY_(attacker_idx, dest_x + center_off_x, dest_y + center_off_y);
+                            range1 = CMBTAI::Range_To_XY_From_Corner_(attacker_idx, target_x + center_off_x, target_y + center_off_y);
+                            range2 = CMBTAI::Range_To_XY_From_Corner_(attacker_idx, dest_x + center_off_x, dest_y + center_off_y);
 
                             if (range1 < 1) {
                                 range1 = 1;
