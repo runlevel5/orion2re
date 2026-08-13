@@ -30,6 +30,7 @@ namespace CMBTFIRE {
     inline uint8_t _absorber_damage_reduction = 25;
     inline uint8_t _damper_field_ratio = 25;
     inline uint8_t _defensive_range_bonus = 0;
+    inline uint8_t _broken_engine_explodes = 1;
 
     /** Returns whether Enveloping damage should use all four directions for this target. */
     bool Enveloping_Applies_To_Target_(int16_t target_ship_idx);

@@ -30,6 +30,14 @@ namespace TEST_BOMBING_RANGE {
     void Set_Has_Transporters_(bool value);
 }
 
+namespace TEST_ENGINE_EXPLOSION {
+    void Reset_();
+    int16_t Destroy_FX_Type_();
+    int16_t Explosion_Damage_Source_();
+    int16_t Spherical_Effect_Type_();
+    int16_t Spherical_Damage_();
+}
+
 DOCTEST_TEST_CASE("bombing uses unrounded point distance") {
     TEST_BOMBING_RANGE::Reset_();
     MOX::_combat_data[1].weapons[0].weapon_id = WEAPON_NUCLEAR_BOMB;
@@ -78,6 +86,43 @@ DOCTEST_TEST_CASE("destroyed Crystal releases captures and invalidates effects")
     DOCTEST_CHECK(TEST_CRYSTAL_FLEET::Cleanup_Count_() == 2);
     DOCTEST_CHECK(TEST_CRYSTAL_FLEET::Cleanup_Source_(0) == 1);
     DOCTEST_CHECK(TEST_CRYSTAL_FLEET::Cleanup_Source_(1) == 2);
+}
+
+DOCTEST_TEST_CASE("destroyed engines follow the configured explosion rule") {
+    TEST_ENGINE_EXPLOSION::Reset_();
+    s_combat_data& ship = MOX::_combat_data[1];
+    ship.owner = 0;
+    ship.ftl_type = DRIVE_NUCLEAR_DRIVE;
+    ship.drive_current_hits = 0;
+    ship.structure_max = 100;
+
+    CMBTFIRE::_broken_engine_explodes = 1;
+    DOCTEST_CHECK(CMBTFIRE::Is_Combat_Ship_Dead_(1) == 3);
+
+    CMBTFIRE::_broken_engine_explodes = 0;
+    DOCTEST_CHECK(CMBTFIRE::Is_Combat_Ship_Dead_(1) == 0);
+}
+
+DOCTEST_TEST_CASE("disabled engine explosions make self destruct ordinary") {
+    TEST_ENGINE_EXPLOSION::Reset_();
+    CMBTFIRE::_broken_engine_explodes = 0;
+
+    CMBTFIRE::Destroy_Ship_(1, 20, 20, 0);
+
+    DOCTEST_CHECK(TEST_ENGINE_EXPLOSION::Destroy_FX_Type_() == 1);
+}
+
+DOCTEST_TEST_CASE("super fast drive explosions resolve spherical damage") {
+    TEST_ENGINE_EXPLOSION::Reset_();
+    MOX::_super_fast_flag = 1;
+    MOX::_combat_data[1].previous_owner = 0;
+
+    CMBTFIRE::Destroy_Ship_(1, 20, 20, 3);
+
+    DOCTEST_CHECK(MOX::_combat_data[1].unit_status == 5);
+    DOCTEST_CHECK(TEST_ENGINE_EXPLOSION::Explosion_Damage_Source_() == 1);
+    DOCTEST_CHECK(TEST_ENGINE_EXPLOSION::Spherical_Effect_Type_() == 3);
+    DOCTEST_CHECK(TEST_ENGINE_EXPLOSION::Spherical_Damage_() == 42);
 }
 
 DOCTEST_TEST_CASE("placing a ship in stasis cuts its continuing effects") {

@@ -254,7 +254,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:9741` - `systems_repair_percent` -> `combat.systems_repair_percent`
 - [x] `conf.pl:9763` - `trade_goods_ratio` -> `colony.trade_goods_ratio`
 - [ ] `conf.pl:9777` - `confirm_battle_message_timeout`
-- [ ] `conf.pl:9793` - `broken_engine_explodes`
+- [x] `conf.pl:9793` - `broken_engine_explodes` -> `combat.broken_engine_explodes`
 - [ ] `conf.pl:9806` - `ai_surrender_delay`
 - [ ] `conf.pl:9820` - `compressor_per_size_class_damage`
 - [ ] `conf.pl:9833` - `defensive_fire`

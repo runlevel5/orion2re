@@ -2779,6 +2779,21 @@
       },
     },
 
+    broken_engine_explodes: {
+      title: "Destroyed engines explode",
+      description: "Controls whether losing all drive hit points destroys a ship in a damaging drive explosion.",
+      remarks: "True preserves classic behavior. When false, ships with destroyed drives remain in battle and self-destruct uses ordinary destruction without spherical explosion damage.",
+      examples: ["combat broken_engine_explodes = false;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: true,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_broken_engine_explodes",
+      },
+    },
+
     postwarp_tech: {
       title: "Post-warp starting technologies",
       description: "Selects the technologies granted to every player in a Post-warp game.",

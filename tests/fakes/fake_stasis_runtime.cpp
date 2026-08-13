@@ -14,6 +14,10 @@ namespace {
     bool has_high_energy_focus;
     bool has_transporters;
     int16_t ship_center_offsets[4];
+    int16_t destroy_fx_type;
+    int16_t explosion_damage_source;
+    int16_t spherical_effect_type;
+    int16_t spherical_damage;
 }
 
 namespace TEST_STASIS {
@@ -40,6 +44,38 @@ namespace TEST_STASIS {
 
     int16_t Last_Retargeted_Missile_() {
         return last_retargeted_missile;
+    }
+}
+
+namespace TEST_ENGINE_EXPLOSION {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        MOX::_combat_attacker_player = 0;
+        MOX::_combat_defender_player = 1;
+        MOX::_combat_total_ship_count = 2;
+        MOX::_apply_damage_to_planet = 1;
+        MOX::_super_fast_flag = 0;
+        CMBTFIRE::_broken_engine_explodes = 1;
+        destroy_fx_type = -1;
+        explosion_damage_source = -1;
+        spherical_effect_type = -1;
+        spherical_damage = -1;
+    }
+
+    int16_t Destroy_FX_Type_() {
+        return destroy_fx_type;
+    }
+
+    int16_t Explosion_Damage_Source_() {
+        return explosion_damage_source;
+    }
+
+    int16_t Spherical_Effect_Type_() {
+        return spherical_effect_type;
+    }
+
+    int16_t Spherical_Damage_() {
+        return spherical_damage;
     }
 }
 
@@ -167,7 +203,23 @@ namespace CMBTAI {
     }
 }
 
+namespace CMBTFIR2 {
+    int16_t __cdecl Damage_From_Ship_Exploding_(int16_t ship_idx) {
+        explosion_damage_source = ship_idx;
+        return 42;
+    }
+}
+
 namespace CMBTSPEC {
-    void __cdecl Destroy_Ship_FX_(int16_t, int16_t, int16_t, int16_t) {
+    void __cdecl Destroy_Ship_FX_(
+        int16_t ship_idx, int16_t, int16_t, int16_t explosion_type) {
+        destroy_fx_type = explosion_type;
+        MOX::_combat_data[ship_idx].unit_status = 5;
+    }
+
+    void __cdecl Do_Spherical_SFX_(
+        int16_t, int16_t, int16_t, int16_t effect_type, int16_t damage) {
+        spherical_effect_type = effect_type;
+        spherical_damage = damage;
     }
 }

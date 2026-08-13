@@ -198,7 +198,10 @@ namespace CMBTFIRE {
             else if (ship->structure_damage >= ship->structure_max) {
                 result = 1;
             }
-            else if (ship->drive_current_hits == 0 && ship->owner <= 9 && ship->ftl_type > 0) {
+            else if (_broken_engine_explodes != 0 &&
+                     ship->drive_current_hits == 0 &&
+                     ship->owner <= 9 &&
+                     ship->ftl_type > 0) {
                 result = 3;
             }
 
@@ -271,9 +274,22 @@ namespace CMBTFIRE {
         Retarget_Missiles_Aimed_At_(ship_idx);
         COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
 
-        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+        if (MOX::_apply_damage_to_planet == 1) {
             if (ship.unit_status == 0) {
-                CMBTSPEC::Destroy_Ship_FX_(ship_idx, draw_x, draw_y, death_state);
+                int16_t destruction_type = death_state > 1 ? death_state : 1;
+                if (MOX::_super_fast_flag == 0) {
+                    CMBTSPEC::Destroy_Ship_FX_(
+                        ship_idx, draw_x, draw_y, destruction_type);
+                } else {
+                    ship.unit_status = 5;
+                    if (destruction_type > 1 && ship.previous_owner < 10) {
+                        int16_t damage =
+                            CMBTFIR2::Damage_From_Ship_Exploding_(ship_idx);
+                        CMBTSPEC::Do_Spherical_SFX_(
+                            ship_idx, draw_x, draw_y,
+                            destruction_type, damage);
+                    }
+                }
             }
         } else {
             ship.unit_status = 5;
