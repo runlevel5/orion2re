@@ -28,6 +28,23 @@ namespace {
         { WEAPON_PLASMA_FLUX, 10, 40 },
         { WEAPON_CAUSTIC_SLIME, 25, 50 },
     };
+
+    struct s_expected_special_exclusions {
+        int16_t special_id;
+        uint16_t excluded[6];
+    };
+
+    constexpr s_expected_special_exclusions kExpectedCloakExclusions[] = {
+        { SPECIAL_CLOAKING_DEVICE,
+          { SPECIAL_PHASING_CLOAK, SPECIAL_CLOAKING_DEVICE,
+            SPECIAL_STEALTH_FIELD, 0, 0, 0 } },
+        { SPECIAL_PHASING_CLOAK,
+          { SPECIAL_CLOAKING_DEVICE, SPECIAL_PHASING_CLOAK,
+            SPECIAL_STEALTH_FIELD, 0, 0, 0 } },
+        { SPECIAL_STEALTH_FIELD,
+          { SPECIAL_STEALTH_FIELD, SPECIAL_CLOAKING_DEVICE,
+            SPECIAL_PHASING_CLOAK, 0, 0, 0 } },
+    };
 }
 
 DOCTEST_TEST_CASE("strategic weapon damage uses corrected estimates") {
@@ -36,5 +53,16 @@ DOCTEST_TEST_CASE("strategic weapon damage uses corrected estimates") {
             TECHDATA::_weapons[expected.weapon_id];
         DOCTEST_CHECK(weapon.strat_min_damage == expected.minimum);
         DOCTEST_CHECK(weapon.strat_max_damage == expected.maximum);
+    }
+}
+
+DOCTEST_TEST_CASE("stealth field and cloaks are mutually exclusive") {
+    for (const s_expected_special_exclusions& expected :
+         kExpectedCloakExclusions) {
+        const s_tech_specials_data& special =
+            TECHDATA::_specials[expected.special_id];
+        for (int32_t i = 0; i < 6; ++i) {
+            DOCTEST_CHECK(special.exclude[i] == expected.excluded[i]);
+        }
     }
 }
