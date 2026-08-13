@@ -320,7 +320,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:11242` - `jump_gate_pass_nebula` -> `movement.jump_gate_pass_nebula`
 - [ ] `conf.pl:11255` - `ai_builds_colony_bases_prewarp`
 - [ ] `conf.pl:11285` - `lab_and_lore_against_antarans`
-- [ ] `conf.pl:11314` - `pop_bonus_subterranean`
+- [x] `conf.pl:11314` - `pop_bonus_subterranean` -> `colony.pop_bonus_subterranean`
 - [ ] `conf.pl:11327` - `pop_bonus_tolerant`
 - [ ] `conf.pl:11349` - `reinforced_hull_multiplier`
 - [ ] `conf.pl:11371` - `marine_kill_damage`

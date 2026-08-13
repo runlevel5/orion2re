@@ -951,7 +951,7 @@ namespace COLCALC {
         int max_pop = COLCALC::Size_And_Climate_Max_Population_(size, adjusted_climate, is_immune);
 
         if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_SUBTERRANEAN] != 0) {
-            max_pop += COLCALC::Double_Add_Two_(size);
+            max_pop += _pop_bonus_subterranean[size];
         }
 
         return static_cast<short>(max_pop);
@@ -1263,10 +1263,6 @@ namespace COLCALC {
         }
 
         colony->imports[ECON_BC] = static_cast<int16_t>(static_cast<uint8_t>(colony->maintenance[ECON_BC])) - colony->production[ECON_BC];
-    }
-
-    short __cdecl Double_Add_Two_(short value) {
-        return (value * 2) + 2;
     }
 
     int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, uint8_t is_immune) {

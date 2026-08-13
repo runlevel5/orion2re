@@ -293,6 +293,25 @@ DOCTEST_TEST_CASE("Biospheres population bonus is configurable") {
     DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit_(colony, 0) == 32);
 }
 
+DOCTEST_TEST_CASE("Subterranean population bonus is configurable by planet size") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+    MOX::_player[0].traits[TRAIT_SUBTERRANEAN] = 1;
+
+    for (int size = 0; size < PLANET_SIZE_COUNT; ++size) {
+        DOCTEST_CHECK(
+            COLCALC::Size_And_Climate_Race_Pop_Limit_(
+                (int8_t)size, PLANET_CLIMATE_GAIA, 0) ==
+            MOX::_planet_max_population[size] +
+                COLCALC::_pop_bonus_subterranean[size]);
+    }
+
+    COLCALC::_pop_bonus_subterranean[PLANET_SIZE_SMALL] = 9;
+
+    DOCTEST_CHECK(
+        COLCALC::Size_And_Climate_Race_Pop_Limit_(
+            PLANET_SIZE_SMALL, PLANET_CLIMATE_GAIA, 0) == 19);
+}
+
 DOCTEST_TEST_CASE("classic starvation preserves the final population") {
     s_colony* colony = Prepare_Starving_Colony_();
 

@@ -41,6 +41,13 @@ namespace TEST_COLONY_POP_GROWTH {
             -200,
         };
         COLCALC::_pop_bonus_biospheres = 2;
+        const uint8_t subterranean_defaults[PLANET_SIZE_COUNT] = {
+            2, 4, 6, 8, 10,
+        };
+        memcpy(
+            COLCALC::_pop_bonus_subterranean,
+            subterranean_defaults,
+            sizeof(subterranean_defaults));
         COLCALC::weather_control_climate = PLANET_CLIMATE_TOXIC;
         COLCALC::_federation_no_mixed_races_penalty = 0;
         COLCALC::_housing_creates_no_farmers = 0;
