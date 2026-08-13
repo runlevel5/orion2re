@@ -287,7 +287,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:9321` - `spatial size class`: implemented in `CMBTSPEC::Do_Spherical_SFX_()` with synchronized `combat compressor_per_size_class_damage`; direct source-level selection between the existing classic and size-scaled damage values replaces the 1.50 call-site helper while preserving classic behavior by default.
 - [x] `asm.pl:9486` - `range to xy`: fixed in `CMBTAI::Range_To_XY_()`, `CMBTFIR2::Defensive_Fire_Check_()`, and `CMBTMOV1::Move_Ship_()` by calculating octagonal distance before pixel-to-square scaling, retaining corner-origin defensive-fire measurements, and synchronizing moving ships' cached grid positions; direct source logic replaces the 1.50 wrappers and movement hook.
 - [x] `asm.pl:9559` - `red the weapon`: fixed in `CMBTDRW1::Draw_Weapon_Status_Display_()` by preserving the disabled red palette when a weapon is also spent; this replaces the 1.50 code-cave bypass with direct source-level color-state precedence.
-- [ ] `asm.pl:9579` - `colony bases and outposts`
+- [x] `asm.pl:9579` - `colony bases and outposts`: fixed in `COLBLDG::Star_N_Uncolonized_Worlds_()` by counting only same-owner outposts as colony-base targets; this replaces the 1.50 code-cave owner check with a direct source-level invariant.
 - [ ] `asm.pl:9614` - `fighter ordnance`
 - [ ] `asm.pl:9685` - `shwifty range`
 - [ ] `asm.pl:10496` - `mixed race penalty`
