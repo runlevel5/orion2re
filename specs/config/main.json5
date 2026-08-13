@@ -2778,5 +2778,27 @@
         symbol: "CMBTFIRE::_defensive_range_bonus",
       },
     },
+
+    postwarp_tech: {
+      title: "Post-warp starting technologies",
+      description: "Selects the technologies granted to every player in a Post-warp game.",
+      remarks: "The first seven entries are additionally granted in strategic combat. Defaults match MOO2 1.50 and include Fighter Bays as entry 29.",
+      examples: ["research postwarp_tech 29 = 66;"],
+      group: "gameplay",
+      namespace: "research",
+      bind_root: {
+        header: "game/techinit.h",
+        symbol: "TECHINIT::postwarp_tech",
+      },
+      type: {
+        kind: "array", count: 29, index_base: 1,
+        element: { type: "int16" },
+      },
+      default: [
+        56, 20, 192, 25, 82, 13, 13, 22, 132, 26,
+        179, 71, 72, 51, 191, 163, 46, 122, 155, 61,
+        87, 70, 73, 33, 57, 104, 180, 181, 66,
+      ],
+    },
   },
 }

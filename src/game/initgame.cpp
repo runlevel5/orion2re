@@ -269,6 +269,10 @@ namespace INITGAME {
             FILEDEF::Save_Moo_Custom_Player_Data_(MOX::_player);
         }
 
+        if (MOX::_settings.starting_civilization_level == 2) {
+            TECHINIT::Grant_Postwarp_Technologies_();
+        }
+
         game_random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
     }
 

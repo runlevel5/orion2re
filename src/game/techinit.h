@@ -2,6 +2,20 @@
 #include <cstdint>
 
 namespace TECHINIT {
+    inline constexpr int16_t POSTWARP_TECH_COUNT = 29;
+    inline constexpr int16_t POSTWARP_STRATEGIC_EXTRA_TECH_COUNT = 7;
+
+    inline int16_t postwarp_tech[POSTWARP_TECH_COUNT] = {
+        56, 20, 192, 25, 82, 13, 13, 22, 132, 26,
+        179, 71, 72, 51, 191, 163, 46, 122, 155, 61,
+        87, 70, 73, 33, 57, 104, 180, 181, 66,
+    };
+
+    /**
+     * Grants configured Post-warp technologies to every player.
+     */
+    void __cdecl Grant_Postwarp_Technologies_();
+
     /**
      * Initializes global technology metadata and populates per-field application lists.
      */

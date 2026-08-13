@@ -23,6 +23,7 @@
 #include "game/mapgen.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
+#include "game/techinit.h"
 
 namespace {
     bool Append_Decoded_(const char* source, config::s_config_write_set* write_set,
@@ -343,6 +344,36 @@ DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COLCALC::_keep_research_on_breakthrough == 1);
     DOCTEST_CHECK(COLCALC::_keep_research_on_finds == 1);
+}
+
+DOCTEST_TEST_CASE("Post-warp technology defaults and indexed bindings match 1.50") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const int16_t expected[TECHINIT::POSTWARP_TECH_COUNT] = {
+        56, 20, 192, 25, 82, 13, 13, 22, 132, 26,
+        179, 71, 72, 51, 191, 163, 46, 122, 155, 61,
+        87, 70, 73, 33, 57, 104, 180, 181, 66,
+    };
+    DOCTEST_CHECK(std::memcmp(
+        TECHINIT::postwarp_tech, expected, sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "research postwarp_tech 1 = 82;"
+        "research postwarp_tech 29 = 83;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(TECHINIT::postwarp_tech[0] == 82);
+    DOCTEST_CHECK(TECHINIT::postwarp_tech[28] == 83);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "research postwarp_tech 1 = 32768;",
+        &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("ground Commando settings preserve classic defaults") {

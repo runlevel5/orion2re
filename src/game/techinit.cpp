@@ -21,6 +21,25 @@ static char* Advance_To_Next_String_(char* tech_name_block, uint32_t& string_off
 }
 }
 
+void __cdecl Grant_Postwarp_Technologies_() {
+    const int16_t first_tech_idx =
+        MOX::_settings.strategic_combat_flag == 1
+            ? 0
+            : POSTWARP_STRATEGIC_EXTRA_TECH_COUNT;
+
+    for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+        for (int16_t tech_idx = first_tech_idx;
+             tech_idx < POSTWARP_TECH_COUNT;
+             ++tech_idx) {
+            const int16_t tech_app_id = postwarp_tech[tech_idx];
+            if (tech_app_id > 0 && tech_app_id < TECH_APP_COUNT) {
+                COLCALC::Player_Gets_Tech_App_(
+                    &MOX::_player[player_idx], tech_app_id);
+            }
+        }
+    }
+}
+
 void __cdecl Load_Tech_Names_() {
     LOADER::Load_Player_Special_Names_();
     RUSS::Mox_Update_();

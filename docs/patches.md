@@ -282,7 +282,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8411` - `specials repair percent`: implemented in `CMBTFIR2::Repair_Combat_Ship_()` with synchronized `combat systems_repair_percent` configuration; direct source-level scaling replaces the 1.50 arithmetic helper while preserving the classic 50 percent default.
 - [x] `asm.pl:8433` - `trade goods`: implemented in `COLCALC::Colony_BC_Production_()` with synchronized `colony trade_goods_ratio` settings for normal and Fantastic Traders conversion; direct source-level percentage selection replaces the 1.50 register-preserving assembly diversion while preserving classic 50/100 defaults.
 - [ ] `asm.pl:8468` - `rotate warning`
-- [ ] `asm.pl:8604` - `postwarp techtable length`
+- [x] `asm.pl:8604` - `postwarp techtable length`: implemented in `TECHINIT::Grant_Postwarp_Technologies_()` with synchronized `research postwarp_tech` configuration; source grants the first seven entries as strategic-tree exceptions and the remaining 22 in every Post-warp game, including Fighter Bays as entry 29, replacing the 1.50 loop-count and table-byte edits with bounded source-level iteration.
 - [ ] `asm.pl:9036` - `no engine explosion`
 - [ ] `asm.pl:9321` - `spatial size class`
 - [ ] `asm.pl:9486` - `range to xy`
