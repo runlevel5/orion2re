@@ -57,6 +57,11 @@ namespace MOVEBOX {
     /* Draws officer-screen overlays associated with the galaxy map. */
     void __cdecl Do_Officer_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int16_t scale_x, int16_t scale_y);
 
+    /* Enhancement: overview-map zoom state (identity at zoom 1, pan 0). */
+    extern int16_t _g_galmap_zoom;
+    extern int16_t _g_galmap_pan_x;
+    extern int16_t _g_galmap_pan_y;
+
     /* Draws the galaxy-map movable box.
      * anim1: Optional background animation. unused_anim2: Preserved unused parameter.
      * x_base/y_base: Box origin. width/height: Map dimensions. exit_flag: Early-exit state.

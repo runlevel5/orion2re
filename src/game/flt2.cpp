@@ -31,6 +31,15 @@ void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out
         for (int16_t i = 0; i < MOX::_ship_icon_count; ++i) {
             Get_Small_Icon_Animation_Size_(i, &width, &height);
 
+            // A zoomed overview pans icons out of the viewport; their
+            // fields must not land over unrelated controls.
+            if (MOVEBOX::_g_galmap_zoom > 1 &&
+                (MOX::_ship_icon[i].x + width < 306 || MOX::_ship_icon[i].x > 624 ||
+                 MOX::_ship_icon[i].y + height < 235 || MOX::_ship_icon[i].y > 404)) {
+                MOX::_ship_icon[i].stack_id = -1000;
+                continue;
+            }
+
             MOX::_ship_icon[i].stack_id = fields::Add_Hidden_Field_(
                 MOX::_ship_icon[i].x,
                 MOX::_ship_icon[i].y,

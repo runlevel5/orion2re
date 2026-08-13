@@ -5,6 +5,7 @@ namespace OFFICER {
     constexpr int16_t RACE_ONLY_SHIP_NODE_FIRST_INDEX = MAX_PLAYERS + 1;
 
     char s_OFFICER_LBX_00556980[16] = "OFFICER.LBX";
+    void Draw_Galmap_Zoom_Select_Box_();
     s_colors _normal_text_colors = {{61, 68, 67, 68, 68, 68, 68, 68}};
     s_colors _red_colors = {{75, 129, 77, 129, 129, 129, 129, 129}};
     s_colors _selected_text_colors = {{0x3E, 0x47, 0x45, 0x47, 0x47, 0x47, 0x47, 0x47}};
@@ -753,6 +754,14 @@ namespace OFFICER {
         }
 
         MOVEBOX::Draw_Galaxy_Map_Box_(nullptr, 0, 306, 235, 318, 169, 0, 0, 0, 0, 1, 0);
+
+        // With the overview zoomed, everything drawn over it stays inside
+        // the viewport; vanilla content never exceeds it, so no clip there.
+        const bool clip_overview = MOVEBOX::_g_galmap_zoom > 1;
+        if (clip_overview) {
+            graphics::Set_Window_(306, 235, 624, 404);
+            video::Clip_On_();
+        }
         FLT1::Draw_Fltscrn_Ship_Destination_Lines_(29);
         FLT1::Draw_Fltscrn_Small_Ship_Icons_();
 
@@ -763,6 +772,11 @@ namespace OFFICER {
         if (MOX::_small_ship_stack_ptr > -1 && is_fleet_screen) {
             FLT1::Draw_Flashing_Small_Ship_Icon_();
         }
+        if (clip_overview) {
+            video::Clip_Off_();
+            graphics::Reset_Window_();
+        }
+        Draw_Galmap_Zoom_Select_Box_();
 
         if (MOX::_scanned_big_ship > -1 && is_fleet_screen) {
             Print_Scanned_Ship_Name_();
@@ -968,6 +982,115 @@ namespace OFFICER {
         Scroll_Fleet_Ship_Into_View_(next);
     }
 
+    // Enhancement: pending zoom level while the area-selection box is up
+    // (0 when inactive), and the system the pan last centered on.
+    static int16_t _g_zoom_select_target = 0;
+    static int16_t _g_zoom_last_star = -1;
+
+    // Enhancement helper: while the overview map is zoomed, center the
+    // displayed system in the 318x169 viewport (clamped at the map edges)
+    // whenever it changes; a pan chosen via the selection box stays put.
+    // Returns true when the pan changed.
+    static bool Update_Galmap_Zoom_Pan_() {
+        int16_t old_x = MOVEBOX::_g_galmap_pan_x;
+        int16_t old_y = MOVEBOX::_g_galmap_pan_y;
+        if (_officer_star_displayed == _g_zoom_last_star &&
+            MOVEBOX::_g_galmap_zoom > 1) {
+            return false;
+        }
+        _g_zoom_last_star = _officer_star_displayed;
+        if (MOVEBOX::_g_galmap_zoom <= 1 ||
+            _officer_star_displayed < 0 || _officer_star_displayed >= MOX::_NUM_STARS) {
+            MOVEBOX::_g_galmap_pan_x = 0;
+            MOVEBOX::_g_galmap_pan_y = 0;
+        } else {
+            const int16_t zoom = MOVEBOX::_g_galmap_zoom;
+            const int32_t x_divisor = 506000 / 318 + 1;
+            const int32_t y_divisor = 400000 / 169 + 1;
+            const s_star_data* star = &MOX::_star[_officer_star_displayed];
+            int32_t rel_x = ((((int32_t)star->x * 1000) / MOX::_max_map_scale) * 10) / x_divisor;
+            int32_t rel_y = ((((int32_t)star->y * 1000) / MOX::_max_map_scale) * 10) / y_divisor;
+            int32_t pan_x = rel_x * zoom - 318 / 2;
+            int32_t pan_y = rel_y * zoom - 169 / 2;
+            int32_t max_pan_x = 318 * (zoom - 1);
+            int32_t max_pan_y = 169 * (zoom - 1);
+            if (pan_x < 0) pan_x = 0;
+            if (pan_y < 0) pan_y = 0;
+            if (pan_x > max_pan_x) pan_x = max_pan_x;
+            if (pan_y > max_pan_y) pan_y = max_pan_y;
+            MOVEBOX::_g_galmap_pan_x = (int16_t)pan_x;
+            MOVEBOX::_g_galmap_pan_y = (int16_t)pan_y;
+        }
+        return MOVEBOX::_g_galmap_pan_x != old_x || MOVEBOX::_g_galmap_pan_y != old_y;
+    }
+
+    // Enhancement helper: the selection box's rectangle in screen
+    // coordinates — the current view's slice that will fill the viewport
+    // at the pending zoom level, centered on the pointer and clamped to
+    // the overview.
+    static void Zoom_Select_Box_Rect_(int16_t* out_x, int16_t* out_y,
+                                      int16_t* out_w, int16_t* out_h) {
+        int16_t z = MOVEBOX::_g_galmap_zoom;
+        int16_t t = _g_zoom_select_target;
+        int16_t w = (int16_t)(318 * z / t);
+        int16_t h = (int16_t)(169 * z / t);
+        int16_t x = (int16_t)(mouse::Pointer_X_() - w / 2);
+        int16_t y = (int16_t)(mouse::Pointer_Y_() - h / 2);
+        if (x < 306) x = 306;
+        if (y < 235) y = 235;
+        if (x > 624 - w) x = (int16_t)(624 - w);
+        if (y > 404 - h) y = (int16_t)(404 - h);
+        *out_x = x;
+        *out_y = y;
+        *out_w = w;
+        *out_h = h;
+    }
+
+    // Enhancement helper: zooms into the selected area.
+    static void Commit_Zoom_Select_() {
+        int16_t box_x, box_y, box_w, box_h;
+        Zoom_Select_Box_Rect_(&box_x, &box_y, &box_w, &box_h);
+        int16_t z = MOVEBOX::_g_galmap_zoom;
+        int16_t t = _g_zoom_select_target;
+        int32_t pan_x = (int32_t)(box_x - 306 + MOVEBOX::_g_galmap_pan_x) * t / z;
+        int32_t pan_y = (int32_t)(box_y - 235 + MOVEBOX::_g_galmap_pan_y) * t / z;
+        int32_t max_pan_x = 318 * (t - 1);
+        int32_t max_pan_y = 169 * (t - 1);
+        if (pan_x < 0) pan_x = 0;
+        if (pan_y < 0) pan_y = 0;
+        if (pan_x > max_pan_x) pan_x = max_pan_x;
+        if (pan_y > max_pan_y) pan_y = max_pan_y;
+        MOVEBOX::_g_galmap_zoom = t;
+        MOVEBOX::_g_galmap_pan_x = (int16_t)pan_x;
+        MOVEBOX::_g_galmap_pan_y = (int16_t)pan_y;
+        _g_zoom_select_target = 0;
+        _g_zoom_last_star = _officer_star_displayed;
+        FLT::Set_Fltscrn_Small_Ship_Icon_XYs_(0x132, 0xEB, 0x13E, 0xA9);
+        MOX::_draw_officer_to_back = 1;
+    }
+
+    // Enhancement: the pulsating area-selection box, drawn over the map,
+    // and a caption naming the zoom state so the mode is obvious.
+    void Draw_Galmap_Zoom_Select_Box_() {
+        if (_g_zoom_select_target != 0) {
+            int16_t box_x, box_y, box_w, box_h;
+            Zoom_Select_Box_Rect_(&box_x, &box_y, &box_w, &box_h);
+            ERIC::Pulsing_Box_(box_x, box_y, box_w, box_h, 1, 1, 2);
+        }
+        if (_g_zoom_select_target != 0 || MOVEBOX::_g_galmap_zoom > 1) {
+            char caption[32];
+            if (_g_zoom_select_target != 0) {
+                snprintf(caption, sizeof(caption), "Choose zoom area (x%d)",
+                         (int)_g_zoom_select_target);
+            } else {
+                snprintf(caption, sizeof(caption), "Zoom x%d",
+                         (int)MOVEBOX::_g_galmap_zoom);
+            }
+            fonts::Set_Font_Style_Shadow_Down_(3, &_normal_text_colors);
+            fonts::Print_(310, 238, caption);
+        }
+    }
+
     // Enhancement: keyboard/wheel state for the Leaders screen.
     struct s_officers_kbd {
         uint8_t panel = 0;      // fleet-view focus: 0 = officer list, 1 = ship list
@@ -987,6 +1110,19 @@ namespace OFFICER {
     static int16_t Read_Officers_Input_(s_officers_kbd* kbd, bool is_fleet,
                                         const int16_t* leader_row_fields) {
         constexpr uint32_t WHEEL_STEP_MS = 120;
+        // Cycling or clicking to another system recenters a zoomed map.
+        if (Update_Galmap_Zoom_Pan_()) {
+            FLT::Set_Fltscrn_Small_Ship_Icon_XYs_(0x132, 0xEB, 0x13E, 0xA9);
+            MOX::_draw_officer_to_back = 1;
+        }
+        if (_g_zoom_select_target != 0) {
+            int16_t click_x, click_y;
+            uint32_t click_ticks;
+            if (platform::Consume_Left_Click_(&click_x, &click_y, &click_ticks) != 0 &&
+                click_x >= 306 && click_x <= 624 && click_y >= 235 && click_y <= 404) {
+                Commit_Zoom_Select_();
+            }
+        }
         int16_t synth_input = 0;
         const bool selecting = (_officer_button_mode == 0 ||
                                 _officer_button_mode == 1 ||
@@ -1038,6 +1174,45 @@ namespace OFFICER {
                                            : (int16_t)1;
             Move_Fleet_Ship_Selection_(step);
             kbd->name_wins = 1;
+        } else if (key > 0 && _officer_button_mode == -1 &&
+                   ((key & 0xFF) == '+' || (key & 0xFF) == '=' ||
+                    (key & 0xFF) == '-' || (key & 0xFF) == '_')) {
+            // '+' shows the main-screen-style area selection box; a click
+            // (or Enter) zooms into it. '-' backs out of the selection or
+            // zooms out a level around the view center. PgUp/PgDn keep the
+            // fleet-scroll meaning the vanilla -/+ hotkeys had.
+            int16_t ch = (int16_t)(key & 0xFF);
+            if (ch == '+' || ch == '=') {
+                if (_g_zoom_select_target == 0 && MOVEBOX::_g_galmap_zoom < 3) {
+                    _g_zoom_select_target = (int16_t)(MOVEBOX::_g_galmap_zoom + 1);
+                    MOX::_draw_officer_to_back = 1;
+                }
+            } else if (_g_zoom_select_target != 0) {
+                _g_zoom_select_target = 0;
+                MOX::_draw_officer_to_back = 1;
+            } else if (MOVEBOX::_g_galmap_zoom > 1) {
+                int16_t z = MOVEBOX::_g_galmap_zoom;
+                int32_t pan_x = ((int32_t)MOVEBOX::_g_galmap_pan_x + 159) * (z - 1) / z - 159;
+                int32_t pan_y = ((int32_t)MOVEBOX::_g_galmap_pan_y + 84) * (z - 1) / z - 84;
+                int32_t max_pan_x = 318 * (z - 2);
+                int32_t max_pan_y = 169 * (z - 2);
+                if (pan_x < 0) pan_x = 0;
+                if (pan_y < 0) pan_y = 0;
+                if (pan_x > max_pan_x) pan_x = max_pan_x;
+                if (pan_y > max_pan_y) pan_y = max_pan_y;
+                MOVEBOX::_g_galmap_zoom = (int16_t)(z - 1);
+                MOVEBOX::_g_galmap_pan_x = (int16_t)pan_x;
+                MOVEBOX::_g_galmap_pan_y = (int16_t)pan_y;
+                _g_zoom_last_star = _officer_star_displayed;
+                FLT::Set_Fltscrn_Small_Ship_Icon_XYs_(0x132, 0xEB, 0x13E, 0xA9);
+                MOX::_draw_officer_to_back = 1;
+            }
+        } else if (key == 0x1C0D && _g_zoom_select_target != 0 &&
+                   _officer_button_mode == -1) {
+            Commit_Zoom_Select_(); // Enter zooms into the selection box
+        } else if (key == 0x011B && _g_zoom_select_target != 0) {
+            _g_zoom_select_target = 0; // Esc cancels the selection box
+            MOX::_draw_officer_to_back = 1;
         } else if (key == 0x49E0 && _officer_button_mode == -1) { // PgUp
             synth_input = fields::Activate_Field_Hotkey_('-'); // scroll up
         } else if (key == 0x51E0 && _officer_button_mode == -1) { // PgDn
@@ -1162,6 +1337,12 @@ namespace OFFICER {
         if (MOX::_officer_scrn_type == -1) {
             MOX::_officer_scrn_type = LEADER_TYPE_SHIP;
         }
+
+        MOVEBOX::_g_galmap_zoom = 1;
+        MOVEBOX::_g_galmap_pan_x = 0;
+        MOVEBOX::_g_galmap_pan_y = 0;
+        _g_zoom_select_target = 0;
+        _g_zoom_last_star = -1;
 
         Reload_Officer_Screen_Pictures_();
         SHIPS::Build_Ship_Icons_();
@@ -1474,6 +1655,10 @@ namespace OFFICER {
             timer::Release_Time_(1);
 
         } while (exit_screen == 0);
+
+        MOVEBOX::_g_galmap_zoom = 1;
+        MOVEBOX::_g_galmap_pan_x = 0;
+        MOVEBOX::_g_galmap_pan_y = 0;
 
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
