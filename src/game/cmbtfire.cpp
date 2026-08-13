@@ -1,5 +1,51 @@
 #include "pch.h"
 
+namespace {
+    bool Can_Bomb_Planet_(
+        int16_t ship_idx,
+        int16_t planet_idx,
+        uint8_t bombing_range
+    ) {
+        int16_t ship_offset_x;
+        int16_t ship_offset_y;
+        int16_t planet_offset_x;
+        int16_t planet_offset_y;
+        COMBINIT::Ship_Center_Offsets_(
+            ship_idx, &ship_offset_x, &ship_offset_y);
+        COMBINIT::Ship_Center_Offsets_(
+            planet_idx, &planet_offset_x, &planet_offset_y);
+
+        int32_t distance_x =
+            MOX::_combat_data[ship_idx].x * 20 + ship_offset_x -
+            (MOX::_combat_data[planet_idx].x * 20 + planet_offset_x);
+        int32_t distance_y =
+            MOX::_combat_data[ship_idx].y * 20 + ship_offset_y -
+            (MOX::_combat_data[planet_idx].y * 20 + planet_offset_y);
+        if (distance_x < 0) {
+            distance_x = -distance_x;
+        }
+        if (distance_y < 0) {
+            distance_y = -distance_y;
+        }
+
+        const int32_t combined_offset_x =
+            ship_offset_x + planet_offset_x;
+        const int32_t combined_offset_y =
+            ship_offset_y + planet_offset_y;
+        distance_x = distance_x > combined_offset_x
+            ? distance_x - combined_offset_x
+            : 0;
+        distance_y = distance_y > combined_offset_y
+            ? distance_y - combined_offset_y
+            : 0;
+
+        const int32_t point_distance = distance_x > distance_y
+            ? distance_x + distance_y / 2
+            : distance_y + distance_x / 2;
+        return point_distance <= 20 * (bombing_range - 1);
+    }
+}
+
 namespace CMBTFIRE {
     s_mount_damage _mount_dmg[HIGH_ENERGY_FOCUS_PRESENCE_COUNT] = {
         { 50, 100, 150 },
@@ -348,6 +394,21 @@ namespace CMBTFIRE {
             return 0;
         }
 
+        const int8_t weapon_type = TECHDATA::_weapons[weapon_id].type;
+        if (weapon_type == WEAPON_TYPE_BOMB) {
+            if (target_idx != 0) {
+                return 0;
+            }
+
+            uint8_t bombing_range = 3;
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                    ship_idx, SPECIAL_TRANSPORTERS) != 0) {
+                bombing_range = BOARDING::board_range.transporters;
+            }
+            return Can_Bomb_Planet_(
+                ship_idx, target_idx, bombing_range);
+        }
+
         if (range == 0) {
             if (target_type == 1) {
                 range = CMBTAI::Range_To_Missile_(ship_idx, target_idx);
@@ -376,7 +437,7 @@ namespace CMBTFIRE {
         }
 
         in_range = 0;
-        switch (TECHDATA::_weapons[weapon_id].type) {
+        switch (weapon_type) {
         case 0: // Standard Beam / Direct fire
             if (range <= 8) {
                 return 1;
@@ -395,22 +456,7 @@ namespace CMBTFIRE {
             }
             break;
 
-        case 3: // Fighters / Shuttles
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x23 /* SPEC_CARRIER_GARRISON */)) {
-                if (range <= 4) {
-                    in_range = 1;
-                }
-            }
-            else if (range <= 1) {
-                in_range = 1;
-            }
-
-            if (target_idx != 0) {
-                return 0;
-            }
-            break;
-
-        case 5: // Specials and Bombs
+        case 5: // Specials
             if (weapon_id == WEAPON_TRACTOR_BEAM && range <= 4) return 1;
             if (weapon_id == WEAPON_STASIS_FIELD && range <= 1) return 1;
             if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET && range <= 5) return 1;

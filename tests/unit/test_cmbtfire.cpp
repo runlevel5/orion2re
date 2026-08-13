@@ -25,6 +25,41 @@ namespace TEST_WEAPON_RANGE {
     void Reset_();
 }
 
+namespace TEST_BOMBING_RANGE {
+    void Reset_();
+    void Set_Has_Transporters_(bool value);
+}
+
+DOCTEST_TEST_CASE("bombing uses unrounded point distance") {
+    TEST_BOMBING_RANGE::Reset_();
+    MOX::_combat_data[1].weapons[0].weapon_id = WEAPON_NUCLEAR_BOMB;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_BOMB].type = WEAPON_TYPE_BOMB;
+
+    MOX::_combat_data[1].x = 3;
+    DOCTEST_CHECK(
+        CMBTFIRE::Weapon_In_Range_(0, 1, 0, 0, 0) == 1);
+
+    MOX::_combat_data[1].y = 2;
+    DOCTEST_CHECK(
+        CMBTFIRE::Weapon_In_Range_(0, 1, 0, 0, 0) == 0);
+}
+
+DOCTEST_TEST_CASE("Transporters use configured bombing range") {
+    TEST_BOMBING_RANGE::Reset_();
+    TEST_BOMBING_RANGE::Set_Has_Transporters_(true);
+    BOARDING::board_range.transporters = 5;
+    MOX::_combat_data[1].weapons[0].weapon_id = WEAPON_NUCLEAR_BOMB;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_BOMB].type = WEAPON_TYPE_BOMB;
+
+    MOX::_combat_data[1].x = 5;
+    DOCTEST_CHECK(
+        CMBTFIRE::Weapon_In_Range_(0, 1, 0, 0, 0) == 1);
+
+    MOX::_combat_data[1].y = 2;
+    DOCTEST_CHECK(
+        CMBTFIRE::Weapon_In_Range_(0, 1, 0, 0, 0) == 0);
+}
+
 DOCTEST_TEST_CASE("destroyed Crystal releases captures and invalidates effects") {
     TEST_CRYSTAL_FLEET::Reset_();
 

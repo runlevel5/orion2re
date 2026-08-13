@@ -12,6 +12,8 @@ namespace {
     int16_t last_missile_hits_owner;
     int16_t last_retargeted_missile;
     bool has_high_energy_focus;
+    bool has_transporters;
+    int16_t ship_center_offsets[4];
 }
 
 namespace TEST_STASIS {
@@ -22,6 +24,10 @@ namespace TEST_STASIS {
         cleanup_count = 0;
         last_missile_hits_owner = -1;
         last_retargeted_missile = -1;
+        has_transporters = false;
+        for (int16_t& offset : ship_center_offsets) {
+            offset = 10;
+        }
     }
 
     int16_t Last_Cleanup_Source_() {
@@ -83,6 +89,18 @@ namespace TEST_BEAM_MODIFIERS {
     }
 }
 
+namespace TEST_BOMBING_RANGE {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        BOARDING::board_range = {3, 12};
+    }
+
+    void Set_Has_Transporters_(bool value) {
+        has_transporters = value;
+    }
+}
+
 namespace MOX {
     s_combat_data* _combat_data = combat_data;
     s_missile* _missile = missiles;
@@ -102,8 +120,20 @@ namespace TECHDATA {
 namespace COMBINIT {
     int16_t __cdecl Does_Combat_Ship_Have_Special_(
         int16_t, int16_t special_id) {
+        if (special_id == SPECIAL_TRANSPORTERS) {
+            return has_transporters;
+        }
         return special_id == SPECIAL_HIGH_ENERGY_FOCUS &&
             has_high_energy_focus;
+    }
+
+    void __cdecl Ship_Center_Offsets_(
+        int16_t ship_idx,
+        int16_t* out_x,
+        int16_t* out_y
+    ) {
+        *out_x = ship_center_offsets[ship_idx];
+        *out_y = ship_center_offsets[ship_idx];
     }
 }
 
