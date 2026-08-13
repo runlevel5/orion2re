@@ -296,7 +296,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:11600` - `colony enviromental stuff stuff`: fixed in `ERICNET::Add_Building_()` by refreshing cached colony climate and farming state after every building effect; this replaces the 1.50 call-site diversions with an owner-level invariant.
 - [x] `asm.pl:11617` - `required climate to build weather controller`: implemented in `COLCALC::Colony_Can_Build_Product_()` with synchronized `colony weather_control_climate`; direct source checks replace the 1.50 flag-returning helper while preserving the Toxic default and Radiated exception.
 - [x] `asm.pl:12616` - `warlord leaders +1 level`: implemented in `OFFICER::Get_Officer_Base_Level_()` and `OFFICER::Increase_Officer_Level_By_One_()` with synchronized `leaders leader_warlord_bonus`; effective Warlord level is optionally raised at every XP tier while advancement remains based on stored XP, replacing the 1.50 wrapper and call-site helper with direct source-level rules.
-- [ ] `asm.pl:13504` - `colony commando`
+- [x] `asm.pl:13504` - `colony commando`: fixed in `invasion::Compute_Colony_Officer_Bonus_()` and `invasion::Compute_Colony_Ground_Combat_Info_()` by retaining the resolved leader index and applying player bonuses before the colony officer bonus; direct source ordering replaces the 1.50 register preservation and call reordering.
 - [ ] `asm.pl:14321` - `strategic weapon damage`
 - [ ] `asm.pl:14601` - `strategic weapon damage value corrections`
 - [ ] `asm.pl:14701` - `telepath skill blocks mind control`

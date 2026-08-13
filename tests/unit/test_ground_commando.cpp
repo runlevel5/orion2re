@@ -5,10 +5,32 @@
 
 namespace test_ground_commando_runtime {
     void Reset_();
+    s_colony* Colony_();
     s_leader_data* Leader_(int index);
     s_ship_data* Ship_(int index);
     void Set_Colony_Officer_(int leader_idx);
     void Set_Officer_Level_(int16_t level);
+}
+
+DOCTEST_TEST_CASE("colony ground combat info preserves the resolved Commando officer") {
+    test_ground_commando_runtime::Reset_();
+    test_ground_commando_runtime::Set_Colony_Officer_(1);
+    test_ground_commando_runtime::Set_Officer_Level_(1);
+
+    s_colony* colony = test_ground_commando_runtime::Colony_();
+    colony->owner = 0;
+    colony->officer = 0;
+    colony->military[0] = 1;
+
+    s_leader_data* leader = test_ground_commando_runtime::Leader_(1);
+    leader->general_skills = LEADER_GENERAL_SKILL_COMMANDO;
+
+    invasion::_ground_commando_defender_x5 = 0;
+    s_invasion_side_info side = {};
+    invasion::Compute_Colony_Ground_Combat_Info_(colony, &side);
+
+    DOCTEST_CHECK(side.combat_modifiers.officer_bonus == 4);
+    DOCTEST_CHECK(side.combat_modifiers.officer_idx == 1);
 }
 
 DOCTEST_TEST_CASE("defending ground Commando setting selects the configured multipliers") {
