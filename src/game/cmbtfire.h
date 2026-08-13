@@ -62,6 +62,7 @@ namespace CMBTFIRE {
     inline uint8_t _double_range_accuracy_penalty = 1;
     inline uint8_t _double_range_damage_penalty = 0;
     inline uint8_t _planet_non_enveloping = 0;
+    inline uint8_t _simplified_beam_formula = 0;
     inline uint8_t _absorber_damage_reduction = 25;
     inline uint8_t _damper_field_ratio = 25;
     inline uint8_t _defensive_range_bonus = 0;

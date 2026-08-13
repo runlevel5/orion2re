@@ -21,6 +21,10 @@ namespace TEST_BEAM_MODIFIERS {
     void Set_Has_HEF_(bool has_hef);
 }
 
+namespace TEST_FAIR_BEAMS {
+    void Reset_();
+}
+
 namespace TEST_WEAPON_RANGE {
     void Reset_();
     void Set_Center_Offset_(int16_t ship_idx, int16_t offset);
@@ -337,6 +341,28 @@ DOCTEST_TEST_CASE("configured beam mount damage clamps negative modifiers") {
 
     DOCTEST_CHECK(hit_bonus == 25);
     DOCTEST_CHECK(damage == 0);
+}
+
+DOCTEST_TEST_CASE("simplified beam formula keeps range penalties effective") {
+    TEST_FAIR_BEAMS::Reset_();
+
+    int16_t hit_x = 0;
+    int16_t hit_y = 0;
+    int16_t reflected_damage = 0;
+    CMBTFIRE::Fire_Beam_Weapon_(
+        0, 0, WEAPON_LASER_CANNON, 0, TARGET_TYPE_MISSILE,
+        &hit_x, &hit_y, &reflected_damage);
+    DOCTEST_CHECK(hit_x == 1);
+
+    CMBTFIRE::_simplified_beam_formula = 1;
+    MOX::_missile[0].hits_taken = 0;
+    hit_x = 0;
+    CMBTFIRE::Fire_Beam_Weapon_(
+        0, 0, WEAPON_LASER_CANNON, 0, TARGET_TYPE_MISSILE,
+        &hit_x, &hit_y, &reflected_damage);
+    DOCTEST_CHECK(hit_x == 0);
+
+    CMBTFIRE::_simplified_beam_formula = 0;
 }
 
 DOCTEST_TEST_CASE("defensive installation range bonus is clamped and identity based") {

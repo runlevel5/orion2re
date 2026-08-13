@@ -302,7 +302,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:14701` - `telepath skill blocks mind control`: fixed in `ERIC::Player_Can_Mind_Control_Colony_()` and `ERIC::Player_Can_Mind_Control_Colony_With_Help_()` by checking Telepath and Telepath* through the shared star-leader lookup; this replaces the four 1.50 register-setting wrappers and prevents Assassin leaders from blocking mind control.
 - [x] `asm.pl:15672` - `2x penalty`: implemented in `CMBTFIRE::Get_Beam_Weapon_Modifiers_()` with synchronized accuracy and damage toggles plus configurable range tables; direct source conditions replace the 1.50 assembly helpers and constrain both effects to weapons carrying the intrinsic double-range-penalty property.
 - [ ] `asm.pl:15717` - `expected damage`
-- [ ] `asm.pl:16106` - `fair beams`
+- [x] `asm.pl:16106` - `fair beams`: implemented in `CMBTFIRE::Fire_Beam_Weapon_()` with synchronized `combat simplified_beam_formula`; enabled range and Point Defense modifiers are applied to beam attack instead of the capped threshold, replacing the 1.50 call-site helper with direct source logic while preserving the classic default.
 - [ ] `asm.pl:16844` - `subterranean bonuses`
 - [ ] `asm.pl:16912` - `stealth mutual exclusive with cloaks`
 - [ ] `asm.pl:16935` - `double range accuracy penalty inherent mod removals`

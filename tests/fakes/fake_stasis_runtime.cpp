@@ -19,6 +19,8 @@ namespace {
     int16_t spherical_effect_type;
     int16_t spherical_damage;
     int16_t missile_hits;
+    uint32_t random_value = 100;
+    int16_t beam_target_range = 9;
 }
 
 namespace TEST_STASIS {
@@ -30,6 +32,8 @@ namespace TEST_STASIS {
         last_missile_hits_owner = -1;
         last_retargeted_missile = -1;
         missile_hits = 4;
+        random_value = 100;
+        beam_target_range = 9;
         has_transporters = false;
         for (int16_t& offset : ship_center_offsets) {
             offset = 10;
@@ -140,6 +144,27 @@ namespace TEST_BEAM_MODIFIERS {
     }
 }
 
+namespace TEST_FAIR_BEAMS {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        TEST_BEAM_MODIFIERS::Reset_();
+        random_value = 20;
+        beam_target_range = 8;
+        missile_hits = 20;
+        CMBTFIRE::_simplified_beam_formula = 0;
+        MOX::_ordnance_bonus[0] = 100;
+        MOX::_combat_data[0].owner = 0;
+        MOX::_combat_data[0].tac_val_attack = 100;
+        MOX::_combat_data[1].owner = 0;
+        MOX::_missile[0].type = WEAPON_NUCLEAR_MISSILE;
+        MOX::_missile[0].source_unit_idx = 1;
+        MOX::_missile[0].quantity = 1;
+        TECHDATA::_weapons[WEAPON_LASER_CANNON].min_damage = 20;
+        TECHDATA::_weapons[WEAPON_LASER_CANNON].max_damage = 20;
+        MOX::_ranged_to_hit_penalty[8] = -85;
+    }
+}
+
 namespace TEST_BOMBING_RANGE {
     void Reset_() {
         TEST_STASIS::Reset_();
@@ -241,7 +266,7 @@ namespace CMBTMIS {
 
 namespace game_random {
     uint32_t __cdecl Random_(uint32_t) {
-        return 100;
+        return random_value;
     }
 }
 
@@ -251,13 +276,19 @@ namespace COMBAT1 {
     }
 }
 
+namespace CMBTDRW1 {
+    int16_t __cdecl Relative_Bearing_(int16_t, int16_t) {
+        return 0;
+    }
+}
+
 namespace CMBTAI {
     int16_t __cdecl Range_To_Ship_(int16_t, int16_t) {
-        return 9;
+        return beam_target_range;
     }
 
     int16_t __cdecl Range_To_Missile_(int16_t, int16_t) {
-        return 9;
+        return beam_target_range;
     }
 }
 

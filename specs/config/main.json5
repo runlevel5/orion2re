@@ -3093,5 +3093,20 @@
         87, 70, 73, 33, 57, 104, 180, 181, 66,
       ],
     },
+
+    simplified_beam_formula: {
+      title: "Simplified beam accuracy formula",
+      description: "Applies range penalties and Point Defense accuracy as ordinary beam attack modifiers.",
+      remarks: "False preserves the classic capped hit-threshold formula. True prevents high beam attack from bypassing range penalties and keeps penalties above 55 effective.",
+      examples: ["combat simplified_beam_formula = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_simplified_beam_formula",
+      },
+      default: false,
+    },
   },
 }

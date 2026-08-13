@@ -306,7 +306,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10927` - `2x_range_accuracy_penalty` -> renamed `combat.double_range_accuracy_penalty`
 - [ ] `conf.pl:10940` - `2x_range_damage_penalty` -> renamed `combat.double_range_damage_penalty`
 - [ ] `conf.pl:10953` - `antaran_star_fortress_space`
-- [ ] `conf.pl:10967` - `simplified_beam_formula`
+- [x] `conf.pl:10967` - `simplified_beam_formula` -> `combat.simplified_beam_formula`
 - [ ] `conf.pl:11001` - `ai_hypertech_threshold`
 - [ ] `conf.pl:11027` - `terraform_toxic_building`
 - [ ] `conf.pl:11040` - `combat_ships_without_ammo_stay`

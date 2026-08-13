@@ -1786,9 +1786,14 @@ namespace CMBTFIRE {
         int16_t continue_firing = 1;
         int16_t damage_variance = max_damage - min_damage;
         
-        int16_t range_modifier = 40 - hit_modifier;
-        if (range_modifier >= 95) {
-            range_modifier = 95;
+        int16_t range_modifier = 40;
+        if (_simplified_beam_formula != 0) {
+            hit_chance += hit_modifier;
+        } else {
+            range_modifier -= hit_modifier;
+            if (range_modifier >= 95) {
+                range_modifier = 95;
+            }
         }
 
         int16_t shield_hit_y = 0;
