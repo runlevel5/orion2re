@@ -1065,6 +1065,9 @@ namespace OFFICER {
         MOVEBOX::_g_galmap_pan_y = (int16_t)pan_y;
         _g_zoom_select_target = 0;
         _g_zoom_last_star = _officer_star_displayed;
+        // Hover state refers to pre-zoom positions.
+        MOX::_galaxy_map_scanned_star = -1;
+        MOX::_scanned_small_ship = -1;
         FLT::Set_Fltscrn_Small_Ship_Icon_XYs_(0x132, 0xEB, 0x13E, 0xA9);
         MOX::_draw_officer_to_back = 1;
     }
@@ -1204,6 +1207,8 @@ namespace OFFICER {
                 MOVEBOX::_g_galmap_pan_x = (int16_t)pan_x;
                 MOVEBOX::_g_galmap_pan_y = (int16_t)pan_y;
                 _g_zoom_last_star = _officer_star_displayed;
+                MOX::_galaxy_map_scanned_star = -1;
+                MOX::_scanned_small_ship = -1;
                 FLT::Set_Fltscrn_Small_Ship_Icon_XYs_(0x132, 0xEB, 0x13E, 0xA9);
                 MOX::_draw_officer_to_back = 1;
             }
@@ -1341,6 +1346,10 @@ namespace OFFICER {
         MOVEBOX::_g_galmap_zoom = 1;
         MOVEBOX::_g_galmap_pan_x = 0;
         MOVEBOX::_g_galmap_pan_y = 0;
+        MOVEBOX::_g_galmap_view_x = 306;
+        MOVEBOX::_g_galmap_view_y = 235;
+        MOVEBOX::_g_galmap_view_w = 318;
+        MOVEBOX::_g_galmap_view_h = 169;
         _g_zoom_select_target = 0;
         _g_zoom_last_star = -1;
 

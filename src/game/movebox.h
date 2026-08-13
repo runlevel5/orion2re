@@ -61,6 +61,10 @@ namespace MOVEBOX {
     extern int16_t _g_galmap_zoom;
     extern int16_t _g_galmap_pan_x;
     extern int16_t _g_galmap_pan_y;
+    extern int16_t _g_galmap_view_x;
+    extern int16_t _g_galmap_view_y;
+    extern int16_t _g_galmap_view_w;
+    extern int16_t _g_galmap_view_h;
 
     /* Draws the galaxy-map movable box.
      * anim1: Optional background animation. unused_anim2: Preserved unused parameter.

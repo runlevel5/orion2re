@@ -34,8 +34,10 @@ void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out
             // A zoomed overview pans icons out of the viewport; their
             // fields must not land over unrelated controls.
             if (MOVEBOX::_g_galmap_zoom > 1 &&
-                (MOX::_ship_icon[i].x + width < 306 || MOX::_ship_icon[i].x > 624 ||
-                 MOX::_ship_icon[i].y + height < 235 || MOX::_ship_icon[i].y > 404)) {
+                (MOX::_ship_icon[i].x + width < MOVEBOX::_g_galmap_view_x ||
+                 MOX::_ship_icon[i].x > MOVEBOX::_g_galmap_view_x + MOVEBOX::_g_galmap_view_w ||
+                 MOX::_ship_icon[i].y + height < MOVEBOX::_g_galmap_view_y ||
+                 MOX::_ship_icon[i].y > MOVEBOX::_g_galmap_view_y + MOVEBOX::_g_galmap_view_h)) {
                 MOX::_ship_icon[i].stack_id = -1000;
                 continue;
             }

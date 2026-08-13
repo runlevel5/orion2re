@@ -8,6 +8,10 @@ namespace MOVEBOX {
     int16_t _g_galmap_zoom = 1;
     int16_t _g_galmap_pan_x = 0;
     int16_t _g_galmap_pan_y = 0;
+    int16_t _g_galmap_view_x = 306;
+    int16_t _g_galmap_view_y = 235;
+    int16_t _g_galmap_view_w = 318;
+    int16_t _g_galmap_view_h = 169;
 
     void __cdecl Draw_Galaxy_Map_Box_(s_animation_header* anim1, s_animation_header* unused_anim2,
                                     int16_t x_base, int16_t y_base,
@@ -199,17 +203,40 @@ namespace MOVEBOX {
         s_star_data* star = &MOX::_star[MOX::_galaxy_map_scanned_star];
 
         int32_t x_scaled = (star->x * 1000) / (int32_t)MOX::_max_map_scale;
-        int16_t x = (int16_t)(((x_scaled * 10) / 1659) + 15) - 5;
+        int16_t x = (int16_t)(((x_scaled * 10) / 1659) * _g_galmap_zoom - _g_galmap_pan_x + 15) - 5;
 
         int32_t y_scaled = (star->y * 1000) / (int32_t)MOX::_max_map_scale;
-        int16_t y = (int16_t)((y_scaled * 10) / 2197) + 47;
+        int16_t y = (int16_t)(((y_scaled * 10) / 2197) * _g_galmap_zoom - _g_galmap_pan_y) + 47;
 
-        graphics::Box_(x, y, 11, 12, 1, 113);
+        if (_g_galmap_zoom > 1) {
+            graphics::Set_Window_(_g_galmap_view_x, _g_galmap_view_y,
+                                  (int16_t)(_g_galmap_view_x + _g_galmap_view_w),
+                                  (int16_t)(_g_galmap_view_y + _g_galmap_view_h));
+            video::Clip_On_();
+            graphics::Box_(x, y, 11, 12, 1, 113);
+            video::Clip_Off_();
+            graphics::Reset_Window_();
+        } else {
+            graphics::Box_(x, y, 11, 12, 1, 113);
+        }
     }
 
     void __cdecl Box_Fleet_Screen_Scanned_Ship_() {
         int16_t ship_idx = MOX::_scanned_small_ship;
         auto& icon = MOX::_ship_icon[ship_idx];
+
+        if (_g_galmap_zoom > 1) {
+            // The unclipped line writes of Box_ must not run with an icon
+            // panned outside the viewport.
+            graphics::Set_Window_(_g_galmap_view_x, _g_galmap_view_y,
+                                  (int16_t)(_g_galmap_view_x + _g_galmap_view_w),
+                                  (int16_t)(_g_galmap_view_y + _g_galmap_view_h));
+            video::Clip_On_();
+            graphics::Box_((int16_t)(icon.x + 4), (int16_t)(icon.y + 2), 11, 11, 1, 141);
+            video::Clip_Off_();
+            graphics::Reset_Window_();
+            return;
+        }
 
         graphics::Box_(
             icon.x + 4,
