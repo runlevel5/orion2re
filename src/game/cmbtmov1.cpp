@@ -1,6 +1,16 @@
 #include "pch.h"
 
 namespace CMBTMOV1 {
+    namespace {
+        int16_t Facing_Distance_(int16_t first_facing, int16_t second_facing) {
+            int16_t distance = abs(first_facing - second_facing);
+            if (distance > 8) {
+                distance = 16 - distance;
+            }
+            return distance;
+        }
+    }
+
     bool __cdecl Teleporter_Destination_In_Range_(
         int16_t ship_idx, int16_t target_x_px, int16_t target_y_px
     ) {
@@ -221,17 +231,11 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
     }
 
     int16_t target_facing = Get_Facing_(ship_x, ship_y, target_x, target_y);
-    int32_t facing_diff = (int32_t)target_facing - (int32_t)ship_facing;
-
-    int32_t abs_diff = abs(facing_diff);
-
-    if (abs_diff > 8) {
-        abs_diff = abs(abs_diff - 16);
-    }
+    int16_t facing_distance = Facing_Distance_(target_facing, ship_facing);
 
     int16_t turn_unit_cost = Turn_Cost_(ship_idx);
 
-    return dist + (int16_t)((int32_t)turn_unit_cost * abs_diff);
+    return dist + turn_unit_cost * facing_distance;
 }
 
     int16_t __cdecl Move_Ship_(int16_t ship_idx, int16_t dest_x, int16_t dest_y, int16_t move_cost_unused) {
@@ -342,13 +346,13 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
             }
 
             if (test_move_result != 0) {
-                int32_t turns = ((int32_t)facing_dir - (int32_t)ship->facing_dir + 16) & 0x0F;
-                move_cost = (int16_t)(turns * Turn_Cost_(ship_idx));
+                int16_t turns = Facing_Distance_(facing_dir, ship->facing_dir);
+                move_cost = turns * Turn_Cost_(ship_idx);
             } else {
                 move_cost = Move_Cost_(ship_idx, dest_x_px / 20, dest_y_px / 20);
             }
 
-            if (move_cost > 0) {
+            if (move_cost > 0 && test_move_result == 0) {
                 facing_dir = Get_Facing_(ship->x, ship->y, dest_x_px / 20, dest_y_px / 20);
                 if (old_missile_warning_gt_0) {
                     MOX::_missile_warning = 0;
@@ -491,6 +495,18 @@ void __cdecl Turn_To_Face_(int16_t ship_idx, int16_t target_x, int16_t target_y)
     );
 
     int16_t facing_dir = MOX::_combat_data[ship_idx].facing_dir;
+    int16_t warning_already_active = MOX::_missile_warning == 1;
+
+    if (MOX::_msl_impact_warning_flag == 1 &&
+        MOX::_auto_msl_warning_off == 0 &&
+        MOX::_missile_warning != 2) {
+        int16_t safe_facing = target_facing;
+        if (Rotate_Ship_Until_Impact_(ship_idx, &safe_facing) != 0) {
+            MOX::_missile_warning = 1;
+            target_facing = warning_already_active ? facing_dir : safe_facing;
+        }
+    }
+
     int16_t diff = facing_dir - target_facing;
 
     int16_t sign;
