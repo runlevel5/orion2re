@@ -16,6 +16,10 @@ namespace {
     bool has_sub_space_teleporter;
     bool sub_space_teleporter_enabled;
     int16_t teleporter_used;
+    bool font_style_selected;
+    s_colors selected_font_colors;
+    char weapon_name[] = "Weapon";
+    char weapon_name_plural[] = "Weapons";
 }
 
 namespace TEST_TRACTOR_POWER {
@@ -78,6 +82,8 @@ namespace MOX {
     int16_t _cur_ship;
     int16_t _net_flag;
     int16_t _speedx2_flag;
+    int16_t _auto_combat;
+    int16_t _take_control_flag;
     int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
     int16_t _fighter_beam_type[9];
     int16_t _fighter_bomb_type[9];
@@ -86,6 +92,7 @@ namespace MOX {
 namespace TECHDATA {
     s_tech_shield_data _shields[SHIELD_COUNT];
     s_tech_weapon_data _weapons[WEAPON_COUNT];
+    s_tech_weapon_mod_data _weapon_modifications[WEAPON_MOD_COUNT];
 }
 
 namespace COMBINIT {
@@ -126,6 +133,77 @@ namespace CMBTFIRE {
     int8_t __cdecl Special_Is_Turned_On_(int16_t, int16_t) {
         return sub_space_teleporter_enabled;
     }
+
+    int16_t __cdecl Weapon_In_Range_(int16_t, int16_t, int16_t, int16_t, int16_t) {
+        return 0;
+    }
+
+    int16_t __cdecl Target_Is_Legal_For_Weapon_(int16_t, uint16_t, int16_t, int16_t) {
+        return 0;
+    }
+}
+
+namespace graphics {
+    void __cdecl Interlaced_Fill_(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t) {
+    }
+}
+
+namespace fonts {
+    void __cdecl Set_Font_Style_Shadow_Down_(int16_t, const s_colors* colors) {
+        font_style_selected = colors != nullptr;
+        if (colors != nullptr) {
+            selected_font_colors = *colors;
+        }
+    }
+
+    void __cdecl Set_Outline_Color_(uint16_t, uint16_t) {
+    }
+
+    void __cdecl Set_Font_Spacing_(int16_t) {
+    }
+
+    void __cdecl Print_Integer_Right_(int16_t, int16_t, int32_t) {
+    }
+
+    void __cdecl Print_(int16_t, int16_t, const char*) {
+    }
+}
+
+namespace KEN {
+    void __cdecl Ken_Get_Text_Message_(int32_t, char* buffer, int16_t buffer_size) {
+        if (buffer_size > 0) {
+            buffer[0] = '\0';
+        }
+    }
+}
+
+extern "C" size_t SDL_strlcpy(char* destination, const char* source, size_t destination_size) {
+    const size_t source_length = strlen(source);
+    if (destination_size > 0) {
+        const size_t copy_length =
+            source_length < destination_size - 1 ? source_length : destination_size - 1;
+        memcpy(destination, source, copy_length);
+        destination[copy_length] = '\0';
+    }
+    return source_length;
+}
+
+extern "C" size_t SDL_strlcat(char* destination, const char* source, size_t destination_size) {
+    size_t destination_length = 0;
+    while (destination_length < destination_size &&
+           destination[destination_length] != '\0') {
+        destination_length++;
+    }
+
+    const size_t source_length = strlen(source);
+    if (destination_length < destination_size) {
+        const size_t available = destination_size - destination_length - 1;
+        const size_t copy_length = source_length < available ? source_length : available;
+        memcpy(destination + destination_length, source, copy_length);
+        destination[destination_length + copy_length] = '\0';
+    }
+
+    return destination_length + source_length;
 }
 
 namespace struct_ {
@@ -161,6 +239,43 @@ namespace special {
         int16_t) {
         *x_ptr = x2;
         *y_ptr = y2;
+    }
+}
+
+DOCTEST_TEST_CASE("disabled spent weapons remain red") {
+    memset(combat_data, 0, sizeof(combat_data));
+    memset(players, 0, sizeof(players));
+    memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+
+    MOX::_cur_ship = 0;
+    MOX::_auto_combat = 0;
+    MOX::_take_control_flag = 0;
+    MOX::_combat_data[0].owner = 0;
+    MOX::_player[0].objectives = PLAYER_OBJECTIVE_HUMAN;
+
+    s_combat_weapon_slot* slot = &MOX::_combat_data[0].weapons[0];
+    slot->weapon_id = WEAPON_LASER_CANNON;
+    slot->count = 1;
+    slot->arc = WEAPON_FIRING_ARC_ALL_SECTORS;
+    slot->active = -1;
+    slot->shots_left = 0;
+    slot->status = 0;
+
+    TECHDATA::_weapons[slot->weapon_id].name = weapon_name;
+    TECHDATA::_weapons[slot->weapon_id].name_plural = weapon_name_plural;
+    TECHDATA::_weapons[slot->weapon_id].type = WEAPON_TYPE_BEAM;
+
+    font_style_selected = false;
+    memset(&selected_font_colors, 0, sizeof(selected_font_colors));
+
+    CMBTDRW1::Draw_Weapon_Status_Display_(-1, -1);
+
+    const uint8_t expected_colors[8] = {
+        0x48, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a, 0x4a,
+    };
+    DOCTEST_REQUIRE(font_style_selected);
+    for (int i = 0; i < 8; ++i) {
+        DOCTEST_CHECK(selected_font_colors.colors[i] == expected_colors[i]);
     }
 }
 

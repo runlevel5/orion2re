@@ -2777,7 +2777,7 @@ skip_cursor:
 
                 if (is_ai == 0) {
                     if (COMBAT1::Weapon_Is_On_(MOX::_cur_ship, weapon_slot_idx) == 0) {
-                        display_color_mode = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].active == 1 ? 3 : 2;
+                        display_color_mode = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].active == 0 ? 2 : 3;
                     } else if (target_missile_idx < 0) {
                         if (target_ship_idx != -1) {
                             short rel_bearing = Relative_Bearing_(MOX::_cur_ship, target_ship_idx);
@@ -2820,9 +2820,10 @@ skip_cursor:
                 int8_t shots_left = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left;
                 uint8_t status = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].status;
 
-                if (((weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_FIGHTER) && ammo == 0) ||
+                if (display_color_mode != 3 &&
+                    (((weapon_type_class == WEAPON_TYPE_MISSILE || weapon_type_class == WEAPON_TYPE_BOMB || weapon_type_class == WEAPON_TYPE_FIGHTER) && ammo == 0) ||
                     (weapon_type_class == WEAPON_TYPE_TORPEDO && ammo > 0) ||
-                    (shots_left == 0 && status != 1)) {
+                    (shots_left == 0 && status != 1))) {
                     display_color_mode = 2;
                 }
 

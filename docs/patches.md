@@ -286,7 +286,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:9036` - `no engine explosion`: implemented in `CMBTFIRE::Is_Combat_Ship_Dead_()` and `CMBTFIRE::Destroy_Ship_()` with synchronized `combat broken_engine_explodes` configuration; direct death classification and Super-fast spherical damage resolution replace the 1.50 code-cave helpers while preserving classic behavior by default.
 - [x] `asm.pl:9321` - `spatial size class`: implemented in `CMBTSPEC::Do_Spherical_SFX_()` with synchronized `combat compressor_per_size_class_damage`; direct source-level selection between the existing classic and size-scaled damage values replaces the 1.50 call-site helper while preserving classic behavior by default.
 - [ ] `asm.pl:9486` - `range to xy`
-- [ ] `asm.pl:9559` - `red the weapon`
+- [x] `asm.pl:9559` - `red the weapon`: fixed in `CMBTDRW1::Draw_Weapon_Status_Display_()` by preserving the disabled red palette when a weapon is also spent; this replaces the 1.50 code-cave bypass with direct source-level color-state precedence.
 - [ ] `asm.pl:9579` - `colony bases and outposts`
 - [ ] `asm.pl:9614` - `fighter ordnance`
 - [ ] `asm.pl:9685` - `shwifty range`
