@@ -32,8 +32,10 @@ namespace FLT2 {
             // A zoomed overview pans icons out of the viewport; their
             // fields must not land over unrelated controls.
             if (MOVEBOX::_g_galmap_zoom > 1 &&
-                (MOX::ship_icon[i].x + width < 306 || MOX::ship_icon[i].x > 624 ||
-                 MOX::ship_icon[i].y + height < 235 || MOX::ship_icon[i].y > 404)) {
+                (MOX::ship_icon[i].x + width < MOVEBOX::_g_galmap_view_x ||
+                 MOX::ship_icon[i].x > MOVEBOX::_g_galmap_view_x + MOVEBOX::_g_galmap_view_w ||
+                 MOX::ship_icon[i].y + height < MOVEBOX::_g_galmap_view_y ||
+                 MOX::ship_icon[i].y > MOVEBOX::_g_galmap_view_y + MOVEBOX::_g_galmap_view_h)) {
                 MOX::ship_icon[i].stack_id = -1000;
                 continue;
             }

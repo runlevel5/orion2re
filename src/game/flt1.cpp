@@ -332,12 +332,151 @@ namespace FLT1 {
         allocate::Get_Remaining_Block_Space((void*)(uintptr_t)MOX::screen_seg);
     }
 
+    // Enhancement: pending zoom level while the area-selection box is up
+    // (0 when inactive) on the fleet map.
+    static int16_t _g_fzoom_select_target = 0;
+
+    // Enhancement helper: the selection box's rectangle — the current
+    // view's slice that will fill the fleet map at the pending zoom level,
+    // centered on the pointer and clamped to the viewport.
+    static void Fleet_Zoom_Select_Box_Rect_(int16_t* out_x, int16_t* out_y,
+                                            int16_t* out_w, int16_t* out_h) {
+        int16_t z = MOVEBOX::_g_galmap_zoom;
+        int16_t t = _g_fzoom_select_target;
+        int16_t w = (int16_t)(305 * z / t);
+        int16_t h = (int16_t)(182 * z / t);
+        int16_t x = (int16_t)(mouse::Pointer_X() - w / 2);
+        int16_t y = (int16_t)(mouse::Pointer_Y() - h / 2);
+        if (x < 15) x = 15;
+        if (y < 52) y = 52;
+        if (x > 320 - w) x = (int16_t)(320 - w);
+        if (y > 234 - h) y = (int16_t)(234 - h);
+        *out_x = x;
+        *out_y = y;
+        *out_w = w;
+        *out_h = h;
+    }
+
+    // Enhancement helper: zooms into the selected area.
+    static void Fleet_Commit_Zoom_Select_() {
+        int16_t box_x, box_y, box_w, box_h;
+        Fleet_Zoom_Select_Box_Rect_(&box_x, &box_y, &box_w, &box_h);
+        int16_t z = MOVEBOX::_g_galmap_zoom;
+        int16_t t = _g_fzoom_select_target;
+        int32_t pan_x = (int32_t)(box_x - 15 + MOVEBOX::_g_galmap_pan_x) * t / z;
+        int32_t pan_y = (int32_t)(box_y - 52 + MOVEBOX::_g_galmap_pan_y) * t / z;
+        int32_t max_pan_x = 305 * (t - 1);
+        int32_t max_pan_y = 182 * (t - 1);
+        if (pan_x < 0) pan_x = 0;
+        if (pan_y < 0) pan_y = 0;
+        if (pan_x > max_pan_x) pan_x = max_pan_x;
+        if (pan_y > max_pan_y) pan_y = max_pan_y;
+        MOVEBOX::_g_galmap_zoom = t;
+        MOVEBOX::_g_galmap_pan_x = (int16_t)pan_x;
+        MOVEBOX::_g_galmap_pan_y = (int16_t)pan_y;
+        _g_fzoom_select_target = 0;
+        // Hover state refers to pre-zoom positions.
+        MOX::galaxy_map_scanned_star = -1;
+        MOX::scanned_small_ship = -1;
+        FLT::Set_Fltscrn_Small_Ship_Icon_XYs(15, 52, 305, 182);
+        MOX::draw_fleet_screen_to_back = 1;
+    }
+
+    // Enhancement: the pulsating area-selection box and the zoom caption.
+    static void Draw_Fleet_Zoom_Overlay_() {
+        if (_g_fzoom_select_target != 0) {
+            int16_t box_x, box_y, box_w, box_h;
+            Fleet_Zoom_Select_Box_Rect_(&box_x, &box_y, &box_w, &box_h);
+            ERIC::Pulsing_Box(box_x, box_y, box_w, box_h, 1, 1, 2);
+        }
+        if (_g_fzoom_select_target != 0 || MOVEBOX::_g_galmap_zoom > 1) {
+            char caption[32];
+            if (_g_fzoom_select_target != 0) {
+                snprintf(caption, sizeof(caption), "Choose zoom area (x%d)",
+                         (int)_g_fzoom_select_target);
+            } else {
+                snprintf(caption, sizeof(caption), "Zoom x%d",
+                         (int)MOVEBOX::_g_galmap_zoom);
+            }
+            fonts::Set_Font_Style_Shadow_Down(3, &FLT2::normal_colors);
+            fonts::Print(18, 55, caption);
+        }
+    }
+
+    // Enhancement helper: '+'/'-' zoom the fleet map like the Leaders
+    // screen — '+' raises the selection box, click or Enter commits, Esc
+    // or '-' backs out, '-' otherwise steps out around the view center.
+    // Returns 1 when the key or click was consumed.
+    static int16_t Read_Fleet_Zoom_Input_() {
+        int32_t key = key::Read_Key();
+        if (key != 0) {
+            int16_t ch = (int16_t)(key & 0xFF);
+            if (key > 0 && (ch == '+' || ch == '=')) {
+                if (_g_fzoom_select_target == 0 && MOVEBOX::_g_galmap_zoom < 3) {
+                    _g_fzoom_select_target = (int16_t)(MOVEBOX::_g_galmap_zoom + 1);
+                }
+                return 1;
+            }
+            if (key > 0 && (ch == '-' || ch == '_')) {
+                if (_g_fzoom_select_target != 0) {
+                    _g_fzoom_select_target = 0;
+                } else if (MOVEBOX::_g_galmap_zoom > 1) {
+                    int16_t z = MOVEBOX::_g_galmap_zoom;
+                    int32_t pan_x = ((int32_t)MOVEBOX::_g_galmap_pan_x + 152) * (z - 1) / z - 152;
+                    int32_t pan_y = ((int32_t)MOVEBOX::_g_galmap_pan_y + 91) * (z - 1) / z - 91;
+                    int32_t max_pan_x = 305 * (z - 2);
+                    int32_t max_pan_y = 182 * (z - 2);
+                    if (pan_x < 0) pan_x = 0;
+                    if (pan_y < 0) pan_y = 0;
+                    if (pan_x > max_pan_x) pan_x = max_pan_x;
+                    if (pan_y > max_pan_y) pan_y = max_pan_y;
+                    MOVEBOX::_g_galmap_zoom = (int16_t)(z - 1);
+                    MOVEBOX::_g_galmap_pan_x = (int16_t)pan_x;
+                    MOVEBOX::_g_galmap_pan_y = (int16_t)pan_y;
+                    MOX::galaxy_map_scanned_star = -1;
+                    MOX::scanned_small_ship = -1;
+                    FLT::Set_Fltscrn_Small_Ship_Icon_XYs(15, 52, 305, 182);
+                    MOX::draw_fleet_screen_to_back = 1;
+                }
+                return 1;
+            }
+            if (key == 0x1C0D && _g_fzoom_select_target != 0) {
+                Fleet_Commit_Zoom_Select_();
+                return 1;
+            }
+            if (key == 0x011B && _g_fzoom_select_target != 0) {
+                _g_fzoom_select_target = 0;
+                return 1;
+            }
+            key::Push_Key_Code((uint32_t)key, g_last_scan_code);
+        }
+
+        if (_g_fzoom_select_target != 0) {
+            int16_t click_x, click_y;
+            uint32_t click_ticks;
+            if (platform::Consume_Left_Click_(&click_x, &click_y, &click_ticks) != 0 &&
+                click_x >= 15 && click_x <= 320 && click_y >= 52 && click_y <= 234) {
+                Fleet_Commit_Zoom_Select_();
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     void __cdecl Draw_Fleet_Screen() {
         if (MOX::draw_fleet_screen_to_back != 0 || MOX::FULL_DRAW_SCREEN_FLAG != 0) {
             graphics::Reset_Window();
             graphics::Fill(0, 0, 639, 479, 0);
             animate::Draw(0, 0, MOX::fleet_background_seg);
-            FLT1::Draw_Fltscrn_Small_Ship_Icons();
+            if (MOVEBOX::_g_galmap_zoom > 1) {
+                graphics::Set_Window(15, 52, 320, 234);
+                video::Clip_On();
+                FLT1::Draw_Fltscrn_Small_Ship_Icons();
+                video::Clip_Off();
+                graphics::Reset_Window();
+            } else {
+                FLT1::Draw_Fltscrn_Small_Ship_Icons();
+            }
             video::Copy_Off_To_Back();
 
             if (MOX::draw_fleet_screen_to_back != 0) {
@@ -360,9 +499,18 @@ namespace FLT1 {
             graphics::Reset_Window();
         }
 
+        if (MOVEBOX::_g_galmap_zoom > 1) {
+            graphics::Set_Window(15, 52, 320, 234);
+            video::Clip_On();
+        }
         FLT1::Draw_Fltscrn_Relocation_Lines(SCREEN_FLEET);
         FLT1::Draw_Fltscrn_Ship_Destination_Lines(SCREEN_FLEET);
+        if (MOVEBOX::_g_galmap_zoom > 1) {
+            video::Clip_Off();
+            graphics::Reset_Window();
+        }
         MOVEBOX::Draw_Galaxy_Map_Box(nullptr, nullptr, 15, 52, 305, 182, 0, 0, 0, 0, 1, -1);
+        Draw_Fleet_Zoom_Overlay_();
 
         if (FLT1::relocate_button_mode != 1) {
             if (mouse::Mouse_Button() == 1) {
@@ -390,12 +538,23 @@ namespace FLT1 {
             }
         }
 
+        // Both draw at ship-icon coordinates, which a zoomed overview can
+        // pan outside the viewport; the sprite blit does not clip on its
+        // own, so it must not run unclipped there.
+        if (MOVEBOX::_g_galmap_zoom > 1) {
+            graphics::Set_Window(15, 52, 320, 234);
+            video::Clip_On();
+        }
         if (MOX::scanned_small_ship > -1) {
             OFFICER::Print_Galmap_Scanned_Ship(MOX::scanned_small_ship);
         }
 
         if (MOX::small_ship_stack_ptr > -1) {
             FLT1::Draw_Flashing_Small_Ship_Icon();
+        }
+        if (MOVEBOX::_g_galmap_zoom > 1) {
+            video::Clip_Off();
+            graphics::Reset_Window();
         }
 
         if (MOX::n_fltscrn_big_icons > 0) {
@@ -481,6 +640,15 @@ namespace FLT1 {
         MOX::scanned_small_ship = -1;
         MOX::scanned_big_ship = -1;
 
+        MOVEBOX::_g_galmap_zoom = 1;
+        MOVEBOX::_g_galmap_pan_x = 0;
+        MOVEBOX::_g_galmap_pan_y = 0;
+        MOVEBOX::_g_galmap_view_x = 15;
+        MOVEBOX::_g_galmap_view_y = 52;
+        MOVEBOX::_g_galmap_view_w = 305;
+        MOVEBOX::_g_galmap_view_h = 182;
+        _g_fzoom_select_target = 0;
+
         FLT::Set_Fltscrn_Small_Ship_Icon_XYs(15, 52, 305, 182);
         FLT2::Set_Initial_Stack_Pointer();
 
@@ -537,7 +705,13 @@ namespace FLT1 {
             timer::Mark_Time();
             MOX::fix_palette = 0;
 
-            int16_t input = fields::Get_Input();
+            int16_t input;
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
+                Read_Fleet_Zoom_Input_() != 0) {
+                input = 0;
+            } else {
+                input = fields::Get_Input();
+            }
             scan_val.words[0] = fields::Scan_Input();
 
             if (input < 0 && relocate_button_mode == 1) {
@@ -783,6 +957,11 @@ namespace FLT1 {
                 MOVEBOX::Vanish_Fleet_Movement_Box();
             }
         }
+
+        MOVEBOX::_g_galmap_zoom = 1;
+        MOVEBOX::_g_galmap_pan_x = 0;
+        MOVEBOX::_g_galmap_pan_y = 0;
+        _g_fzoom_select_target = 0;
 
         mouse::Set_Mouse_List(&MOX::mouse_list_arrow, 1);
         MOX::cur_map_scale = saved_map_scale;
