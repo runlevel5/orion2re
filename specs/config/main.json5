@@ -2090,6 +2090,21 @@
       default: false,
     },
 
+    compressor_per_size_class_damage: {
+      title: "Spatial Compressor damage by size class",
+      description: "Makes Spatial Compressor damage proportional to the target ship's size class.",
+      remarks: "False preserves classic behavior. When enabled, damage scales from one randomized roll for a Frigate through six rolls for a Doom Star, matching Pulsar size scaling.",
+      examples: ["combat compressor_per_size_class_damage = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtspec.h",
+        symbol: "CMBTSPEC::_compressor_per_size_class_damage",
+      },
+      default: false,
+    },
+
     absorber_damage_reduction: {
       title: "Energy Absorber damage reduction",
       description: "Sets the percentage of incoming damage blocked and stored by an Energy Absorber.",

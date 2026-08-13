@@ -15,6 +15,7 @@ namespace SHIPMOVE {
 
 namespace CMBTSPEC {
     uint8_t _leader_dies_with_no;
+    uint8_t _compressor_per_size_class_damage;
 }
 
 namespace CMBTMIS {

@@ -4,6 +4,7 @@
 namespace CMBTSPEC {
     extern int32_t _g_engine_sfx_handle;
     extern uint8_t _leader_dies_with_no;
+    extern uint8_t _compressor_per_size_class_damage;
 
     /** Draws the cloaking or decloaking effect for a combat ship.
      * @param ship_idx Combat ship index to animate.

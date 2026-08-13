@@ -284,7 +284,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:8468` - `rotate warning`: fixed in `CMBTMOV1::Turn_To_Face_()` and `CMBTMOV1::Move_Ship_()` by predicting missile impacts during required rotation, retaining the last safe facing, using shortest-direction turn cost, and preserving that facing when prediction stops movement; local source state replaces the 1.50 scratch globals and call-site wrappers.
 - [x] `asm.pl:8604` - `postwarp techtable length`: implemented in `TECHINIT::Grant_Postwarp_Technologies_()` with synchronized `research postwarp_tech` configuration; source grants the first seven entries as strategic-tree exceptions and the remaining 22 in every Post-warp game, including Fighter Bays as entry 29, replacing the 1.50 loop-count and table-byte edits with bounded source-level iteration.
 - [x] `asm.pl:9036` - `no engine explosion`: implemented in `CMBTFIRE::Is_Combat_Ship_Dead_()` and `CMBTFIRE::Destroy_Ship_()` with synchronized `combat broken_engine_explodes` configuration; direct death classification and Super-fast spherical damage resolution replace the 1.50 code-cave helpers while preserving classic behavior by default.
-- [ ] `asm.pl:9321` - `spatial size class`
+- [x] `asm.pl:9321` - `spatial size class`: implemented in `CMBTSPEC::Do_Spherical_SFX_()` with synchronized `combat compressor_per_size_class_damage`; direct source-level selection between the existing classic and size-scaled damage values replaces the 1.50 call-site helper while preserving classic behavior by default.
 - [ ] `asm.pl:9486` - `range to xy`
 - [ ] `asm.pl:9559` - `red the weapon`
 - [ ] `asm.pl:9579` - `colony bases and outposts`

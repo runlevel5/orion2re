@@ -256,7 +256,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:9777` - `confirm_battle_message_timeout`
 - [x] `conf.pl:9793` - `broken_engine_explodes` -> `combat.broken_engine_explodes`
 - [ ] `conf.pl:9806` - `ai_surrender_delay`
-- [ ] `conf.pl:9820` - `compressor_per_size_class_damage`
+- [x] `conf.pl:9820` - `compressor_per_size_class_damage` -> `combat.compressor_per_size_class_damage`
 - [ ] `conf.pl:9833` - `defensive_fire`
 - [ ] `conf.pl:9866` - `starting_techfield`
 - [ ] `conf.pl:9889` - `initial_building`
@@ -531,8 +531,8 @@ These five registrations remain in `conf.pl` for compatibility or generator hist
 ## Completeness check
 
 - Effective active configuration variables: **391**.
-- Exact same-named current registry parameters: **59**.
-- Configuration variables still requiring restoration review: **332**.
+- Exact same-named current registry parameters: **60**.
+- Configuration variables still requiring restoration review: **331**.
 - Superseded `expired` configuration registrations: **5**.
 - Patch-owned writable `var_*` allocations: **47**.
 - Original writable `va_symbol` aliases: **34**.

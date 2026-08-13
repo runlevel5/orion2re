@@ -13,6 +13,7 @@ namespace CMBTSPEC {
 
     int32_t _g_engine_sfx_handle;
     uint8_t _leader_dies_with_no;
+    uint8_t _compressor_per_size_class_damage;
 
     bool __cdecl Draw_Clipped_Tractor_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* bitmap) {
         if (line::Clip_Line_(&x1, &y1, &x2, &y2) != 0) {
@@ -1952,10 +1953,12 @@ namespace CMBTSPEC {
             }
 
             if (sfx_type == 2) {
+                if (_compressor_per_size_class_damage == 0) {
+                    damage_out = (int16_t)chance;
+                }
                 MOX::_combat_data[ship_idx].structure_damage =
-                    (int16_t)(MOX::_combat_data[ship_idx].structure_damage + (int16_t)chance);
+                    (int16_t)(MOX::_combat_data[ship_idx].structure_damage + damage_out);
                 struct_damage = 0;
-                damage_out = (int16_t)chance;
             }
             else {
                 int16_t facing = CMBTDRW1::Relative_Bearing_(ship_idx, source_ship_idx);

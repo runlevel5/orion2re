@@ -10,6 +10,7 @@
 #include "doctest/doctest.h"
 #include "game/boarding.h"
 #include "game/cmbtfire.h"
+#include "game/cmbtspec.h"
 #include "game/combinit.h"
 #include "game/cmbtmov1.h"
 #include "game/cmbtmis.h"
@@ -156,6 +157,25 @@ DOCTEST_TEST_CASE("planet non-enveloping setting preserves the classic default")
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(CMBTFIRE::_planet_non_enveloping == 1);
+}
+
+DOCTEST_TEST_CASE("Spatial Compressor size scaling preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTSPEC::_compressor_per_size_class_damage == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat compressor_per_size_class_damage = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTSPEC::_compressor_per_size_class_damage == 1);
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
 }
 
 DOCTEST_TEST_CASE("absorber and damper ratios preserve classic defaults and bind independently") {
