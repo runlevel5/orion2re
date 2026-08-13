@@ -295,7 +295,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:10617` - `extended fuel range rounding`: fixed in `SHIPMOVE::Star_In_Extended_Range_Of_Player_()` by rounding 150 percent range up for odd fuel ranges, matching ship-specific extended fuel tanks and preventing boundary systems from being excluded; direct source arithmetic replaces the 1.50 instruction patch.
 - [ ] `asm.pl:11600` - `colony enviromental stuff stuff`
 - [ ] `asm.pl:11617` - `required climate to build weather controller`
-- [ ] `asm.pl:12616` - `warlord leaders +1 level`
+- [x] `asm.pl:12616` - `warlord leaders +1 level`: implemented in `OFFICER::Get_Officer_Base_Level_()` and `OFFICER::Increase_Officer_Level_By_One_()` with synchronized `leaders leader_warlord_bonus`; effective Warlord level is optionally raised at every XP tier while advancement remains based on stored XP, replacing the 1.50 wrapper and call-site helper with direct source-level rules.
 - [ ] `asm.pl:13504` - `colony commando`
 - [ ] `asm.pl:14321` - `strategic weapon damage`
 - [ ] `asm.pl:14601` - `strategic weapon damage value corrections`

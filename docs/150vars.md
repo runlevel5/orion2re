@@ -293,7 +293,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10653` - `no_outpost_prompt`
 - [x] `conf.pl:10669` - `crystal_keep` -> `combat.crystal_keep`
 - [x] `conf.pl:10683` - `satellite_warlord_bonus` -> `combat.satellite_warlord_bonus`
-- [ ] `conf.pl:10696` - `leader_warlord_bonus`
+- [x] `conf.pl:10696` - `leader_warlord_bonus` -> `leaders.leader_warlord_bonus`
 - [ ] `conf.pl:10709` - `alternate_diplomacy`
 - [ ] `conf.pl:10723` - `rebel_display`
 - [ ] `conf.pl:10769` - `defenses_allowed_mods`
@@ -527,14 +527,3 @@ These five registrations remain in `conf.pl` for compatibility or generator hist
 - `asm.pl:5059` - `var_stats_help_y_step_1` at executable offset `0x18E03A`
 - `asm.pl:5060` - `var_stats_help_y_step_2` at executable offset `0x18E03E`
 - `asm.pl:12671` - `var_leader_exp_end` at executable offset `0x117C40`
-
-## Completeness check
-
-- Effective active configuration variables: **391**.
-- Exact same-named current registry parameters: **63**.
-- Configuration variables still requiring restoration review: **328**.
-- Superseded `expired` configuration registrations: **5**.
-- Patch-owned writable `var_*` allocations: **47**.
-- Original writable `va_symbol` aliases: **34**.
-- Original writable `add_symbol` data aliases: **9**.
-- Total binary writable aliases: **43**.

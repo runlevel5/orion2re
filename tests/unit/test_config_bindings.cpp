@@ -22,6 +22,7 @@
 #include "game/invasion.h"
 #include "game/initship.h"
 #include "game/mapgen.h"
+#include "game/officer.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
 #include "game/techinit.h"
@@ -466,6 +467,21 @@ DOCTEST_TEST_CASE("ground Commando settings preserve classic defaults") {
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(invasion::_ground_commando_defender_x5 == 1);
     DOCTEST_CHECK(invasion::_ground_commando_attacker_x2 == 1);
+}
+
+DOCTEST_TEST_CASE("leader Warlord setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(OFFICER::_leader_warlord_bonus == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "leaders leader_warlord_bonus = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(OFFICER::_leader_warlord_bonus == 1);
 }
 
 DOCTEST_TEST_CASE("Federation mixed-race setting preserves the classic default") {

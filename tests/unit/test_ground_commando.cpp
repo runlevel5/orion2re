@@ -77,3 +77,56 @@ DOCTEST_TEST_CASE("attacking ground Commando setting selects the configured mult
     invasion::Compute_Attacker_Officer_Bonus_(ship_indexes, 1, &bonuses);
     DOCTEST_CHECK(bonuses.officer_bonus == 9);
 }
+
+DOCTEST_TEST_CASE("leader Warlord bonus applies at every XP tier when enabled") {
+    struct s_level_case {
+        int16_t xp;
+        int16_t base_level;
+    };
+    const s_level_case cases[] = {
+        {0, 0},
+        {60, 1},
+        {150, 2},
+        {300, 3},
+        {500, 4},
+        {1000, 4},
+    };
+
+    OFFICER::_leader_warlord_bonus = 0;
+    for (const s_level_case& test_case : cases) {
+        DOCTEST_CHECK(OFFICER::Get_Officer_Base_Level_(test_case.xp, 0) ==
+                      test_case.base_level);
+        DOCTEST_CHECK(OFFICER::Get_Officer_Base_Level_(test_case.xp, 1) ==
+                      test_case.base_level + (test_case.xp >= 1000 ? 1 : 0));
+    }
+
+    OFFICER::_leader_warlord_bonus = 1;
+    for (const s_level_case& test_case : cases) {
+        DOCTEST_CHECK(OFFICER::Get_Officer_Base_Level_(test_case.xp, 1) ==
+                      test_case.base_level + 1);
+    }
+}
+
+DOCTEST_TEST_CASE("leader XP advancement ignores the effective Warlord bonus") {
+    struct s_advance_case {
+        int16_t initial_xp;
+        int16_t expected_xp;
+    };
+    const s_advance_case cases[] = {
+        {0, 60},
+        {60, 150},
+        {150, 300},
+        {300, 500},
+        {500, 1000},
+        {1000, 1000},
+    };
+
+    test_ground_commando_runtime::Reset_();
+    OFFICER::_leader_warlord_bonus = 1;
+    for (const s_advance_case& test_case : cases) {
+        s_leader_data* leader = test_ground_commando_runtime::Leader_(0);
+        leader->xp = test_case.initial_xp;
+        OFFICER::Increase_Officer_Level_By_One_(0);
+        DOCTEST_CHECK(leader->xp == test_case.expected_xp);
+    }
+}

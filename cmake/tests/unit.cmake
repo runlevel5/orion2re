@@ -397,6 +397,7 @@ orion2re_add_unit_test(test_ground_commando
     PRODUCTION_SOURCES
         src/game/invasion.cpp
         src/game/invasion_config.cpp
+        src/game/officer.cpp
     FAKE_SOURCES
         tests/fakes/fake_ground_commando_runtime.cpp
 )

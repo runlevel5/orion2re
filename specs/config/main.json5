@@ -2536,6 +2536,21 @@
       },
     },
 
+    leader_warlord_bonus: {
+      title: "Warlord bonus for leaders",
+      description: "Raises Warlord leaders' effective level by one at every XP tier without changing their experience.",
+      remarks: "False preserves classic behavior, where Warlord grants the extra level only at 1000 XP.",
+      examples: ["leaders leader_warlord_bonus = true;"],
+      group: "gameplay",
+      namespace: "leaders",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/officer.h",
+        symbol: "OFFICER::_leader_warlord_bonus",
+      },
+    },
+
     leader_dies_with_no: {
       title: "Leader death exclamation for every ship destruction",
       description: "Plays the leader death exclamation when any ship carrying a leader is destroyed, including regular and Quantum Detonator explosions.",

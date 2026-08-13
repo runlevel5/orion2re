@@ -42,3 +42,7 @@ namespace TECHDATA {
 namespace SCIENCE {
     uint8_t _finds_presented_by_scientist;
 }
+
+namespace OFFICER {
+    uint8_t _leader_warlord_bonus;
+}
