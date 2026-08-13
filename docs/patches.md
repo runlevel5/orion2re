@@ -290,7 +290,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:9579` - `colony bases and outposts`: fixed in `COLBLDG::Star_N_Uncolonized_Worlds_()` by counting only same-owner outposts as colony-base targets; this replaces the 1.50 code-cave owner check with a direct source-level invariant.
 - [x] `asm.pl:9614` - `fighter ordnance`: fixed in `CMBTFIRE::Fire_Fighter_Beam_()` and `CMBTFIRE::Fire_Fighter_Bomb_()` by applying the combat owner's ordnance multiplier to both fighter damage bounds before attack resolution; direct source scaling replaces the 1.50 register-preserving helper calls.
 - [ ] `asm.pl:9685` - `shwifty range`
-- [ ] `asm.pl:10496` - `mixed race penalty`
+- [x] `asm.pl:10496` - `mixed race penalty`: implemented in `COLCALC::Mixed_Race_Morale_Penalty_()` with synchronized `colony.federation_no_mixed_races_penalty`; the direct source-level government rule replaces the 1.50 call-site wrapper while preserving classic behavior by default.
 - [ ] `asm.pl:10523` - `battle pods cap`
 - [x] `asm.pl:10617` - `extended fuel range rounding`: fixed in `SHIPMOVE::Star_In_Extended_Range_Of_Player_()` by rounding 150 percent range up for odd fuel ranges, matching ship-specific extended fuel tanks and preventing boundary systems from being excluded; direct source arithmetic replaces the 1.50 instruction patch.
 - [ ] `asm.pl:11600` - `colony enviromental stuff stuff`
@@ -318,7 +318,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:18379` - `ground defense armor multiplier`
 - [ ] `asm.pl:18892` - `fighter garrison strength for bomber bays`
 - [ ] `asm.pl:18901` - `xeno psychology spy bonus`
-- [ ] `asm.pl:19202` - `mixed race penalty building`
+- [x] `asm.pl:19202` - `mixed race penalty building`: implemented in `COLCALC::Colony_Can_Build_Product_()` by withholding Alien Control Center from enabled Federation colonies after differing biological races are assimilated, while conquered population retains classic build eligibility.
 - [ ] `asm.pl:19382` - `is_ship_out_of_ammo checks`
 - [ ] `asm.pl:19812` - `F9 displays star distance if black hole is in between`
 

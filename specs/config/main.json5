@@ -2570,6 +2570,21 @@
       },
     },
 
+    federation_no_mixed_races_penalty: {
+      title: "Federation ignores mixed-race morale penalties",
+      description: "Prevents differing biological races from reducing morale on Federation colonies.",
+      remarks: "False preserves classic behavior. When enabled, Alien Control Center remains available while conquered population is present, but is unavailable after differing biological races are assimilated.",
+      examples: ["colony federation_no_mixed_races_penalty = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_federation_no_mixed_races_penalty",
+      },
+    },
+
     housing_creates_no_farmers: {
       title: "Housing creates no farmers",
       description: "Prevents population grown while a colony produces Housing from being assigned to farming.",

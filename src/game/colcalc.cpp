@@ -3,6 +3,13 @@
 #include "build_queue.h"
 
 namespace COLCALC {
+    static bool Federation_Ignores_Mixed_Race_Penalty_(const s_colony* colony) {
+        uint8_t owner = (uint8_t)colony->owner;
+        return _federation_no_mixed_races_penalty != 0 &&
+            owner < MAX_PLAYERS &&
+            MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT] == GOVERNMENT_FEDERATION;
+    }
+
     ColonyBaseFunc _colony_empire_base_functions[3] = {
         Colony_Empire_Base_Food2_Produced_,
         Colony_Empire_Base_Industry_Produced_,
@@ -691,6 +698,10 @@ namespace COLCALC {
     }
 
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony) {
+        if (Federation_Ignores_Mixed_Race_Penalty_(colony)) {
+            return 0;
+        }
+
         uint8_t n_pops = static_cast<uint8_t>(colony->n_pops);
 
         if (n_pops > 1 && colony->buildings[BUILDING_ALIEN_CONTROL_CENTER] == 0) {
@@ -2922,7 +2933,9 @@ namespace COLCALC {
                                     if (first_race == -1) {
                                         first_race = race;
                                     } else if (first_race != race) {
-                                        if (MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT] / 2 != 3) {
+                                        if (MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT] / 2 !=
+                                                GOVERNMENT_UNIFICATION / 2 &&
+                                            !Federation_Ignores_Mixed_Race_Penalty_(colony)) {
                                             return 1;
                                         }
                                     }

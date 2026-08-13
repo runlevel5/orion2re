@@ -415,6 +415,22 @@ DOCTEST_TEST_CASE("ground Commando settings preserve classic defaults") {
     DOCTEST_CHECK(invasion::_ground_commando_attacker_x2 == 1);
 }
 
+DOCTEST_TEST_CASE("Federation mixed-race setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::_federation_no_mixed_races_penalty == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony federation_no_mixed_races_penalty = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(COLCALC::_federation_no_mixed_races_penalty == 1);
+}
+
 DOCTEST_TEST_CASE("Housing population assignment setting preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

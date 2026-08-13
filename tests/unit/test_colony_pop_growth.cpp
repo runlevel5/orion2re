@@ -55,6 +55,18 @@ namespace {
         return colony;
     }
 
+    s_colony* Prepare_Mixed_Race_Colony_() {
+        TEST_COLONY_POP_GROWTH::Reset_();
+
+        s_colony* colony = &MOX::_colony[0];
+        colony->owner = 0;
+        colony->n_pops = 2;
+        colony->pop[0] = 0;
+        colony->pop[1] = 1;
+        MOX::_player[0].traits[TRAIT_CURRENT_GOVERNMENT] = GOVERNMENT_FEDERATION;
+        return colony;
+    }
+
     uint32_t New_Colonist_Job_(const s_colony* colony) {
         return (colony->pop[1] & 0x180u) >> 7;
     }
@@ -82,6 +94,41 @@ namespace {
         colony->production_spent = cost;
         return colony;
     }
+}
+
+DOCTEST_TEST_CASE("Federation mixed-race morale preserves the classic default") {
+    s_colony* colony = Prepare_Mixed_Race_Colony_();
+
+    DOCTEST_CHECK(COLCALC::Mixed_Race_Morale_Penalty_(colony) == -4);
+
+    COLCALC::_federation_no_mixed_races_penalty = 1;
+
+    DOCTEST_CHECK(COLCALC::Mixed_Race_Morale_Penalty_(colony) == 0);
+
+    MOX::_player[0].traits[TRAIT_CURRENT_GOVERNMENT] = GOVERNMENT_DEMOCRACY;
+
+    DOCTEST_CHECK(COLCALC::Mixed_Race_Morale_Penalty_(colony) == -4);
+}
+
+DOCTEST_TEST_CASE("Federation mixed-race rule restricts Alien Control Center") {
+    s_colony* colony = Prepare_Mixed_Race_Colony_();
+    TECHDATA::_buildings[BUILDING_ALIEN_CONTROL_CENTER].tech_app =
+        TECH_APP_ALIEN_MANAGEMENT_CENTER;
+    MOX::_player[0].tech_applications[TECH_APP_ALIEN_MANAGEMENT_CENTER] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_ALIEN_CONTROL_CENTER) == 1);
+
+    COLCALC::_federation_no_mixed_races_penalty = 1;
+
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_ALIEN_CONTROL_CENTER) == 2);
+
+    colony->pop[1] |= 0x400;
+
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_ALIEN_CONTROL_CENTER) == 1);
 }
 
 DOCTEST_TEST_CASE("population growth preserves the classic base modifier") {

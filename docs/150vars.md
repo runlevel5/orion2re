@@ -274,7 +274,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10083` - `no_capitol_morale_penalty`
 - [ ] `conf.pl:10100` - `ai_productivity_bonus`
 - [ ] `conf.pl:10118` - `ai_income_bonus`
-- [ ] `conf.pl:10136` - `federation_no_mixed_races_penalty`
+- [x] `conf.pl:10136` - `federation_no_mixed_races_penalty` -> `colony.federation_no_mixed_races_penalty`
 - [ ] `conf.pl:10149` - `battle_pods_speed_bonus`
 - [ ] `conf.pl:10162` - `minimum_combat_speed`
 - [ ] `conf.pl:10190` - `bc_bonus`
