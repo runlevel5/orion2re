@@ -402,6 +402,27 @@ orion2re_add_unit_test(test_ground_commando
         tests/fakes/fake_ground_commando_runtime.cpp
 )
 
+orion2re_add_unit_test(test_eric
+    SOURCES
+        tests/unit/test_eric.cpp
+    PRODUCTION_SOURCES
+        src/game/eric.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_eric_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_eric PRIVATE /Gy)
+    target_link_options(test_eric PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_eric PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_eric PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_eric PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
 orion2re_add_unit_test(test_ericnet
     SOURCES
         tests/unit/test_ericnet.cpp

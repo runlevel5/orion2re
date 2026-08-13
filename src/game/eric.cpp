@@ -319,9 +319,8 @@ namespace ERIC {
     int8_t __cdecl Player_Can_Mind_Control_Colony_(int16_t player_idx, int16_t colony_idx) {
         if (MOX::_player[player_idx].traits[TRAIT_TELEPATHIC] != 0) {
             if (Player_Has_Ship_Size_Or_Larger_At_Star_(player_idx, SHIP_SIZE_LARGE, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
-                if (!Player_Has_Leader_With_General_Skill_At_Star_(MOX::_colony[colony_idx].owner, 0, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
-                    // Note: The original code calls this function twice with identical arguments.
-                    if (!Player_Has_Leader_With_General_Skill_At_Star_(MOX::_colony[colony_idx].owner, 0, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
+                if (!Player_Has_Leader_With_General_Skill_At_Star_(MOX::_colony[colony_idx].owner, 48, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
+                    if (!Player_Has_Leader_With_General_Skill_At_Star_(MOX::_colony[colony_idx].owner, 49, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
                         if (MOX::_player[MOX::_colony[colony_idx].owner].traits[TRAIT_TELEPATHIC] == 0) {
                             return 1;
                         }
@@ -351,9 +350,8 @@ namespace ERIC {
 
         int16_t owner_idx = MOX::_colony[colony_idx].owner;
 
-        // The original code redundantly checks the exact same condition twice
-        if (Player_Has_Leader_With_General_Skill_At_Star_(owner_idx, 0, star_idx) != 0 ||
-            Player_Has_Leader_With_General_Skill_At_Star_(owner_idx, 0, star_idx) != 0)
+        if (Player_Has_Leader_With_General_Skill_At_Star_(owner_idx, 48, star_idx) != 0 ||
+            Player_Has_Leader_With_General_Skill_At_Star_(owner_idx, 49, star_idx) != 0)
         {
             GENDRAW::Help_(ESTRINGS::E_Strings_(0x200));
             return 0;
