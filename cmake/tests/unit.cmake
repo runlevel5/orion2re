@@ -452,6 +452,13 @@ orion2re_add_unit_test(test_shield_table
         tests/fakes/fake_shield_table_runtime.cpp
 )
 
+orion2re_add_unit_test(test_techdata
+    SOURCES
+        tests/unit/test_techdata.cpp
+    PRODUCTION_SOURCES
+        src/game/techdata.cpp
+)
+
 orion2re_add_unit_test(test_bombardment_ammo
     SOURCES
         tests/unit/test_bombardment_ammo.cpp
