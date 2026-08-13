@@ -292,7 +292,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:9685` - `shwifty range`
 - [ ] `asm.pl:10496` - `mixed race penalty`
 - [ ] `asm.pl:10523` - `battle pods cap`
-- [ ] `asm.pl:10617` - `extended fuel range rounding`
+- [x] `asm.pl:10617` - `extended fuel range rounding`: fixed in `SHIPMOVE::Star_In_Extended_Range_Of_Player_()` by rounding 150 percent range up for odd fuel ranges, matching ship-specific extended fuel tanks and preventing boundary systems from being excluded; direct source arithmetic replaces the 1.50 instruction patch.
 - [ ] `asm.pl:11600` - `colony enviromental stuff stuff`
 - [ ] `asm.pl:11617` - `required climate to build weather controller`
 - [ ] `asm.pl:12616` - `warlord leaders +1 level`

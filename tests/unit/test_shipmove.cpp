@@ -98,6 +98,16 @@ DOCTEST_TEST_CASE("in-flight recalculation keeps route after fuel range is lost"
     DOCTEST_CHECK(move_info.traveling_speed == 4);
 }
 
+DOCTEST_TEST_CASE("extended fuel range rounds odd ranges up") {
+    TEST_SHIPMOVE::Reset_();
+
+    MOX::_player[0].ship_range = 9;
+    MOX::_star[1].x = 14 * 30;
+
+    DOCTEST_CHECK_FALSE(SHIPMOVE::Star_In_Normal_Range_Of_Player_(&MOX::_star[1], 0));
+    DOCTEST_CHECK(SHIPMOVE::Star_In_Extended_Range_Of_Player_(&MOX::_star[1], 0));
+}
+
 DOCTEST_TEST_CASE("movement stores the numeric navigator bonus") {
     TEST_SHIPMOVE::Reset_();
 
