@@ -462,6 +462,8 @@ namespace ERICNET {
         if (Building_Forces_Combat_Reengagement_(building_idx)) {
             star->ignore_combat_ships = 0;
         }
+
+        COLCALC::Colony_Environmental_Stuff_(colony);
     }
 
     void __cdecl Best_Instructor_Bonus_(int16_t* instructor_bonus_by_player) {
