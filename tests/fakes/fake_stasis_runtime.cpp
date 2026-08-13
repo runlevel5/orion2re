@@ -37,6 +37,14 @@ namespace TEST_STASIS {
     }
 }
 
+namespace TEST_WEAPON_RANGE {
+    void Reset_() {
+        TEST_STASIS::Reset_();
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        CMBTFIRE::_defensive_range_bonus = 0;
+    }
+}
+
 namespace TEST_CRYSTAL_FLEET {
     void Reset_() {
         TEST_STASIS::Reset_();
@@ -116,6 +124,16 @@ namespace CMBTMIS {
 namespace COMBAT1 {
     void __cdecl Remove_Continuing_Effect_Specials_(int16_t source_idx) {
         cleanup_sources[cleanup_count++] = source_idx;
+    }
+}
+
+namespace CMBTAI {
+    int16_t __cdecl Range_To_Ship_(int16_t, int16_t) {
+        return 9;
+    }
+
+    int16_t __cdecl Range_To_Missile_(int16_t, int16_t) {
+        return 9;
     }
 }
 

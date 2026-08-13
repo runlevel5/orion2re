@@ -196,7 +196,7 @@ namespace CMBTFIR2 {
             fleet_bonus -= fleet_base;
         }
 
-        if (MOX::_combat_data[combat_unit_idx].ftl_type > 0 && owner < MAX_PLAYERS) {
+        if (MOX::_combat_data[combat_unit_idx].ship_idx != -1 && owner < MAX_PLAYERS) {
             trait_bonus = (int16_t)MOX::_player[owner].traits[TRAIT_SHIP_DEFENSE];
         }
 
@@ -241,14 +241,11 @@ namespace CMBTFIR2 {
             s_combat_data* ship = &MOX::_combat_data[i];
 
             if (ship->owner == (int8_t)player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
-                if (ship->ftl_type == 0 && !CMBTMOV1::Ship_Is_In_Stasis_(i)) {
-                    if (ship->size_class == 2) {
-                        size_bonus = 0;
-                    } else if (ship->size_class == 3) {
-                        size_bonus = 10;
-                    } else if (ship->size_class == 4) {
-                        size_bonus = 20;
-                    }
+                if (COMBINIT::Is_Combat_Satellite_(ship) &&
+                    !CMBTMOV1::Ship_Is_In_Stasis_(i)) {
+                    const int16_t station_tier =
+                        COMBINIT::Combat_Satellite_Hull_Class_(ship) - HULL_STAR_BASE;
+                    size_bonus = station_tier * 10;
                 }
 
                 int16_t officer_idx = ship->officer_idx;
@@ -534,10 +531,15 @@ namespace CMBTFIR2 {
     }
 
     void __cdecl Init_Internal_Space_(s_combat_data* ship) {
+        int16_t hull_class = ship->size_class;
+        if (COMBINIT::Is_Combat_Satellite_(ship)) {
+            hull_class = COMBINIT::Combat_Satellite_Hull_Class_(ship);
+        }
+
         if (ship->ftl_type <= 0) {
             ship->drive_max_hits = 0;
         } else {
-            ship->drive_max_hits = TECHDATA::_hull_data[ship->size_class].drive_hp;
+            ship->drive_max_hits = TECHDATA::_hull_data[hull_class].drive_hp;
         }
 
         if (struct_::Test_Bit_Field_(ship->special_device_flags, 27 /* SPEC_STRUCTURAL_ANALYZER */) &&
@@ -546,7 +548,7 @@ namespace CMBTFIR2 {
         }
 
         ship->computer_max_hits = ship->computer_type > COMPUTER_NO_COMPUTER
-            ? TECHDATA::_hull_data[ship->size_class].computer_hp
+            ? TECHDATA::_hull_data[hull_class].computer_hp
             : 0;
 
         for (int i = 0; i < 8; ++i) {
@@ -600,7 +602,7 @@ namespace CMBTFIR2 {
         if (ship->shield_type <= 0) {
             ship->shield_max_hits = 0;
         } else {
-            ship->shield_max_hits = TECHDATA::_hull_data[ship->size_class].shield_hp;
+            ship->shield_max_hits = TECHDATA::_hull_data[hull_class].shield_hp;
         }
 
         CMBTFIR2::Clear_Internal_Space_(ship);
@@ -628,31 +630,24 @@ namespace CMBTFIR2 {
 
         if (ship->ship_idx >= 0) {
             armor_hits = INITSHIP::Get_Ship_Armor_Hits_(ship->ship_idx);
+        } else if (COMBINIT::Is_Combat_Satellite_(ship)) {
+            const int16_t hull_class =
+                COMBINIT::Combat_Satellite_Hull_Class_(ship);
+            const int16_t hull_armor = TECHDATA::_hull_data[hull_class].armor_hp;
+            armor_hits = hull_armor +
+                         (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus *
+                                   hull_armor / 100);
         } else {
-            int8_t size = ship->size_class;
-            if (ship->ftl_type == 0) {
-                if (size == 2) {
-                    armor_hits = TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp + 
-                                 (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp / 100);
-                } else if (size == 3) {
-                    armor_hits = TECHDATA::_hull_data[HULL_BATTLESTATION].armor_hp + 
-                                 (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp / 100);
-                } else if (size == 4) {
-                    armor_hits = TECHDATA::_hull_data[HULL_STAR_FORTRESS].armor_hp + 
-                                 (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[HULL_STAR_BASE].armor_hp / 100);
-                }
-            } else {
-                armor_hits = TECHDATA::_hull_data[size].armor_hp + 
-                             (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                       TECHDATA::_hull_data[size].armor_hp / 100);
-            }
-            
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HEAVY_ARMOR)) {
-                armor_hits *= 3;
-            }
+            const int16_t hull_armor =
+                TECHDATA::_hull_data[ship->size_class].armor_hp;
+            armor_hits = hull_armor +
+                         (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus *
+                                   hull_armor / 100);
+        }
+
+        if (ship->ship_idx < 0 &&
+            COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, SPECIAL_HEAVY_ARMOR)) {
+            armor_hits *= 3;
         }
 
         int32_t hull_repair = (amount * (ship->structure_max + armor_hits)) / 100;

@@ -29,6 +29,7 @@ namespace CMBTFIRE {
     inline uint8_t _planet_non_enveloping = 0;
     inline uint8_t _absorber_damage_reduction = 25;
     inline uint8_t _damper_field_ratio = 25;
+    inline uint8_t _defensive_range_bonus = 0;
 
     /** Returns whether Enveloping damage should use all four directions for this target. */
     bool Enveloping_Applies_To_Target_(int16_t target_ship_idx);

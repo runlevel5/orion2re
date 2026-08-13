@@ -994,16 +994,10 @@ skip_cursor:
         {
             int16_t hull_size;
             
-            if (MOX::_combat_data[ship_idx].ftl_type == 0)
+            if (COMBINIT::Is_Combat_Satellite_(&MOX::_combat_data[ship_idx]))
             {
-                if (MOX::_combat_defender_player == 8)
-                {
-                    hull_size = 8;
-                }
-                else
-                {
-                    hull_size = COMBINIT::Type_Of_Space_Station_(MOX::_cmbt_colony_id);
-                }
+                hull_size = COMBINIT::Combat_Satellite_Hull_Class_(
+                    &MOX::_combat_data[ship_idx]);
             }
             else
             {

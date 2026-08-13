@@ -384,7 +384,8 @@ namespace COMBAT1 {
 
                 if (MOX::_combat_total_ship_count > 0) {
                     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
-                        if (MOX::_combat_data[i].ftl_type == 0 && MOX::_combat_data[i].unit_status == 0) {
+                        if (COMBINIT::Is_Combat_Satellite_(&MOX::_combat_data[i]) &&
+                            MOX::_combat_data[i].unit_status == 0) {
                             if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0) {
                                 CMBTMOV1::Rotate_Ship_(i, (MOX::_combat_data[i].facing_dir + 2) & 0xf, (MOX::_combat_data[i].x - MOX::_cur_combat_x) * 20, (MOX::_combat_data[i].y - MOX::_cur_combat_y) * 20);
                             }
@@ -627,7 +628,9 @@ namespace COMBAT1 {
                                         if (MOX::_combat_data[MOX::_cur_ship].is_retreating == 0) {
                                             int16_t msg_id = 0;
                                             if (Enemy_Dissipator_Exists_(MOX::_combat_data[MOX::_cur_ship].owner) == 0) {
-                                                if (MOX::_combat_data[MOX::_cur_ship].ftl_type == 0) {
+                                                if (MOX::_cur_ship == 0 ||
+                                                    COMBINIT::Is_Combat_Satellite_(
+                                                        &MOX::_combat_data[MOX::_cur_ship])) {
                                                     msg_id = 59;
                                                 } else if (MOX::_combat_data[MOX::_cur_ship].current_speed < 1) {
                                                     msg_id = 79;

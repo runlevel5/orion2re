@@ -357,6 +357,14 @@ namespace CMBTFIRE {
             }
         }
 
+        const s_combat_data* source = &MOX::_combat_data[ship_idx];
+        if (ship_idx == 0 || COMBINIT::Is_Combat_Satellite_(source)) {
+            range -= _defensive_range_bonus;
+            if (range < 0) {
+                range = 0;
+            }
+        }
+
         // Double range flag
         if (specials & 0x4) {
             range *= 2;

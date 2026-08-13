@@ -2749,5 +2749,34 @@
         transport_ship: false,
       },
     },
+
+    satellite_size_class_plus_one: {
+      title: "Increase satellite size class",
+      description: "Makes Star Bases Battleship-sized, Battlestations Titan-sized, and Star Fortresses Doom Star-sized in tactical combat.",
+      remarks: "This affects station footprint, size-scaled weapons and effects, internal systems, shields, and repair. The default false preserves classic size classes.",
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::_satellite_size_class_plus_one",
+      },
+    },
+
+    defensive_range_bonus: {
+      title: "Defensive installation range bonus",
+      description: "Additional range granted to orbital and ground defensive installations.",
+      remarks: "The default 0 preserves classic range.",
+      units: "three-square range units",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint8",
+      default: 0,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_defensive_range_bonus",
+      },
+    },
   },
 }

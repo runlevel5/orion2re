@@ -6,7 +6,7 @@
 
 namespace TEST_SHIELD_TABLE {
     void Reset_();
-    s_combat_data* Combat_Ship_();
+    s_combat_data* Combat_Ship_(int16_t ship_idx = 0);
     s_current_design* Design_();
     void Set_Combat_Special_(int16_t special_id);
     void Set_Design_Special_(int16_t special_id);
@@ -23,12 +23,33 @@ DOCTEST_TEST_CASE("shield capacity uses configured hull multipliers") {
 
 DOCTEST_TEST_CASE("combat satellites select orbital defense shield rows") {
     TEST_SHIELD_TABLE::Reset_();
-    s_combat_data* ship = TEST_SHIELD_TABLE::Combat_Ship_();
+    s_combat_data* ship = TEST_SHIELD_TABLE::Combat_Ship_(1);
     ship->ship_idx = -1;
+    ship->ftl_type = DRIVE_NO_DRIVE;
     ship->size_class = SHIP_SIZE_LARGE;
     ship->shield_type = SHIELD_CLASS_V_SHIELD;
 
-    DOCTEST_CHECK(COMBINIT::Calc_Combat_Shield_Max_(0) ==
+    DOCTEST_CHECK(COMBINIT::Calc_Combat_Shield_Max_(1) ==
+                  TECHDATA::_shield_hull_multiplier[HULL_STAR_BASE] *
+                      TECHDATA::_shields[SHIELD_CLASS_V_SHIELD].shield_class);
+}
+
+DOCTEST_TEST_CASE("satellite shield rows remain stable across configured tactical sizes") {
+    TEST_SHIELD_TABLE::Reset_();
+    s_combat_data* ship = TEST_SHIELD_TABLE::Combat_Ship_(1);
+    ship->ship_idx = -1;
+    ship->ftl_type = DRIVE_NO_DRIVE;
+    ship->shield_type = SHIELD_CLASS_V_SHIELD;
+
+    COMBINIT::_satellite_size_class_plus_one = 0;
+    ship->size_class = SHIP_SIZE_LARGE;
+    DOCTEST_CHECK(COMBINIT::Calc_Combat_Shield_Max_(1) ==
+                  TECHDATA::_shield_hull_multiplier[HULL_STAR_BASE] *
+                      TECHDATA::_shields[SHIELD_CLASS_V_SHIELD].shield_class);
+
+    COMBINIT::_satellite_size_class_plus_one = 1;
+    ship->size_class = SHIP_SIZE_HUGE;
+    DOCTEST_CHECK(COMBINIT::Calc_Combat_Shield_Max_(1) ==
                   TECHDATA::_shield_hull_multiplier[HULL_STAR_BASE] *
                       TECHDATA::_shields[SHIELD_CLASS_V_SHIELD].shield_class);
 }

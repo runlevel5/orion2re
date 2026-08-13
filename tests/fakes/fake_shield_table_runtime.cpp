@@ -1,17 +1,18 @@
 #include "pch.h"
 
 namespace {
-    s_combat_data combat_data;
+    s_combat_data combat_data[2];
     s_current_design current_design;
 }
 
 namespace TEST_SHIELD_TABLE {
     void Reset_() {
-        memset(&combat_data, 0, sizeof(combat_data));
+        memset(combat_data, 0, sizeof(combat_data));
         memset(&current_design, 0, sizeof(current_design));
-        MOX::_combat_data = &combat_data;
+        MOX::_combat_data = combat_data;
         MOX::_design = &current_design;
         MOX::_in_nebula_flag = 0;
+        COMBINIT::_satellite_size_class_plus_one = 0;
 
         const uint16_t multipliers[HULL_CLASS_COUNT] = {
             5, 10, 15, 20, 25, 35, 15, 20, 25
@@ -25,8 +26,8 @@ namespace TEST_SHIELD_TABLE {
         TECHDATA::_hard_shields_damage_reduction = 3;
     }
 
-    s_combat_data* Combat_Ship_() {
-        return &combat_data;
+    s_combat_data* Combat_Ship_(int16_t ship_idx) {
+        return &combat_data[ship_idx];
     }
 
     s_current_design* Design_() {
@@ -34,7 +35,7 @@ namespace TEST_SHIELD_TABLE {
     }
 
     void Set_Combat_Special_(int16_t special_id) {
-        combat_data.special_device_flags[special_id / 8] |=
+        combat_data[0].special_device_flags[special_id / 8] |=
             (uint8_t)(1u << (special_id % 8));
     }
 
@@ -49,7 +50,7 @@ namespace TEST_SHIELD_TABLE {
 }
 
 namespace MOX {
-    s_combat_data* _combat_data = &combat_data;
+    s_combat_data* _combat_data = combat_data;
     s_current_design* _design = &current_design;
     int16_t _in_nebula_flag;
 }

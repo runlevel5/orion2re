@@ -214,7 +214,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:8659` - `weapon_range`
 - [ ] `conf.pl:8705` - `spherical_range_to_ship`
 - [ ] `conf.pl:8736` - `spherical_range_to_missile`
-- [ ] `conf.pl:8757` - `defensive_range_bonus`
+- [x] `conf.pl:8757` - `defensive_range_bonus` -> `combat.defensive_range_bonus`
 - [x] `conf.pl:8769` - `pop_bonus_biospheres` -> `colony.pop_bonus_biospheres`
 - [x] `conf.pl:8781` - `shield_hull_multiplier` -> `design.shield_hull_multiplier`
 - [x] `conf.pl:8797` - `lightning_field_ratio` -> `combat.lightning_field_ratio`
@@ -351,7 +351,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:11923` - `aquatic_treats_tundra_as_swamp`
 - [ ] `conf.pl:11936` - `non_ics_phasing_cloak_mode`
 - [x] `conf.pl:11949` - `non_ics_tractor_and_bhg_mode` -> `combat.non_ics_tractor_and_bhg_mode`
-- [ ] `conf.pl:11963` - `satellite_size_class_plus_one`
+- [x] `conf.pl:11963` - `satellite_size_class_plus_one` -> `combat.satellite_size_class_plus_one`
 - [ ] `conf.pl:11997` - `new_farmer_food_threshold`
 - [x] `conf.pl:12013` - `housing_creates_no_farmers` -> `colony.housing_creates_no_farmers`
 - [x] `conf.pl:12027` - `kill_excess_marines_after_capture` -> `combat.kill_excess_marines_after_capture`

@@ -21,6 +21,10 @@ namespace TEST_BEAM_MODIFIERS {
     void Set_Has_HEF_(bool has_hef);
 }
 
+namespace TEST_WEAPON_RANGE {
+    void Reset_();
+}
+
 DOCTEST_TEST_CASE("destroyed Crystal releases captures and invalidates effects") {
     TEST_CRYSTAL_FLEET::Reset_();
 
@@ -172,4 +176,25 @@ DOCTEST_TEST_CASE("configured beam mount damage clamps negative modifiers") {
 
     DOCTEST_CHECK(hit_bonus == 25);
     DOCTEST_CHECK(damage == 0);
+}
+
+DOCTEST_TEST_CASE("defensive installation range bonus is clamped and identity based") {
+    TEST_WEAPON_RANGE::Reset_();
+    s_combat_data& station = MOX::_combat_data[1];
+    station.ship_idx = -1;
+    station.ftl_type = DRIVE_NO_DRIVE;
+    station.weapons[0].weapon_id = WEAPON_LASER_CANNON;
+    TECHDATA::_weapons[WEAPON_LASER_CANNON].type = WEAPON_TYPE_BEAM;
+
+    CMBTFIRE::_defensive_range_bonus = 0;
+    DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 1, 2, 0, 9) == 0);
+
+    CMBTFIRE::_defensive_range_bonus = 1;
+    DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 1, 2, 0, 9) != 0);
+
+    CMBTFIRE::_defensive_range_bonus = UINT8_MAX;
+    DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 1, 2, 0, 9) != 0);
+
+    station.ship_idx = 4;
+    DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 1, 2, 0, 9) == 0);
 }

@@ -13,7 +13,20 @@ namespace COMBINIT {
     inline uint8_t _planet_damper_enabled = 0;
     inline uint8_t _satellite_capture_enabled = 0;
     inline uint8_t _satellite_warlord_bonus = 0;
+    inline uint8_t _satellite_size_class_plus_one = 0;
     inline uint8_t _phasing_cloak_effective_turns = 10;
+
+    inline bool Is_Combat_Satellite_(const s_combat_data* ship) {
+        return ship != nullptr &&
+               ship != MOX::_combat_data &&
+               ship->ship_idx == -1 &&
+               ship->ftl_type == DRIVE_NO_DRIVE;
+    }
+
+    inline int16_t Combat_Satellite_Hull_Class_(const s_combat_data* ship) {
+        return ship->size_class + 4 -
+               (_satellite_size_class_plus_one != 0 ? 1 : 0);
+    }
 
     struct s_satellite_capture_state {
         int16_t colony_idx = -1;

@@ -11,6 +11,7 @@ namespace TEST_ABSORBER_CLEANUP {
     void Reset_() {
         memset(combat_data, 0, sizeof(combat_data));
         memset(TECHDATA::_hull_data, 0, sizeof(TECHDATA::_hull_data));
+        memset(TECHDATA::_armor, 0, sizeof(TECHDATA::_armor));
         memset(TECHDATA::_specials, 0, sizeof(TECHDATA::_specials));
         combat_data[1].structure_max = 100;
         combat_data[1].drive_current_hits = 1;
@@ -18,6 +19,7 @@ namespace TEST_ABSORBER_CLEANUP {
         combat_data[1].size_class = HULL_CRUISER;
         TECHDATA::_hull_data[HULL_CRUISER].drive_hp = 30;
         CMBTFIR2::_systems_repair_percent = 50;
+        COMBINIT::_satellite_size_class_plus_one = 0;
         MOX::_apply_damage_to_planet = 0;
         warning_count = 0;
         combat_refresh_count = 0;

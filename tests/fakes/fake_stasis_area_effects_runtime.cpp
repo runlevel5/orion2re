@@ -27,6 +27,7 @@ namespace TEST_STASIS_AREA_EFFECTS {
         MOX::_combat_attacker_player = 0;
         MOX::_combat_defender_player = 1;
         COMBAT1::_continuous_bhg = 0;
+        COMBINIT::_satellite_size_class_plus_one = 0;
     }
 
     void Set_Special_(int16_t ship_idx, int16_t special_id) {

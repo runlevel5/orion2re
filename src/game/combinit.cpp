@@ -455,8 +455,8 @@ int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx) {
     if (shield_type > 0) {
         int8_t size_class = ship->size_class;
 
-        if (ship->ship_idx == -1) {
-            size_class += 4;
+        if (Is_Combat_Satellite_(ship)) {
+            size_class = (int8_t)Combat_Satellite_Hull_Class_(ship);
         }
 
         max_shield = (int16_t)TECHDATA::Shield_Strength_(size_class, shield_type);
@@ -1241,7 +1241,8 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     fortress_size_scaled = (fortress_size_scaled + ((fortress_size_scaled >> 31) & 3)) >> 2;
     int16_t fortress_weapon_space = (int16_t)((fortress_size_scaled - (fortress_size_scaled >> 31)) >> 1);
 
-    ship->size_class = SHIP_SIZE_TITAN;
+    ship->size_class = SHIP_SIZE_TITAN +
+                       (_satellite_size_class_plus_one != 0 ? 1 : 0);
     ship->picture_num = 5;
     ship->owner = (int8_t)MOX::_combat_defender_player;
     ship->previous_owner = (uint8_t)MOX::_combat_defender_player;
@@ -1808,7 +1809,8 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         }
         int16_t half_size = size / 2;
         space = size - half_size;
-        MOX::_combat_data[MOX::_combat_total_ship_count].size_class = SHIP_SIZE_LARGE;
+        MOX::_combat_data[MOX::_combat_total_ship_count].size_class =
+            SHIP_SIZE_LARGE + (_satellite_size_class_plus_one != 0 ? 1 : 0);
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 40;
     } else if (station_type == HULL_BATTLESTATION) {
         strlcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_BATTLESTATION].name, sizeof(MOX::_combat_data[MOX::_combat_total_ship_count].name));
@@ -1822,7 +1824,8 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         }
         int16_t half_size = size / 2;
         space = size - half_size;
-        MOX::_combat_data[MOX::_combat_total_ship_count].size_class = SHIP_SIZE_HUGE;
+        MOX::_combat_data[MOX::_combat_total_ship_count].size_class =
+            SHIP_SIZE_HUGE + (_satellite_size_class_plus_one != 0 ? 1 : 0);
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 41;
     } else if (station_type == HULL_STAR_FORTRESS) {
         strlcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[HULL_STAR_FORTRESS].name, sizeof(MOX::_combat_data[MOX::_combat_total_ship_count].name));
@@ -1836,7 +1839,8 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         }
         int16_t half_size = size / 2;
         space = size - half_size;
-        MOX::_combat_data[MOX::_combat_total_ship_count].size_class = SHIP_SIZE_TITAN;
+        MOX::_combat_data[MOX::_combat_total_ship_count].size_class =
+            SHIP_SIZE_TITAN + (_satellite_size_class_plus_one != 0 ? 1 : 0);
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 42;
     }
 
@@ -2065,6 +2069,12 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     MOX::_combat_data[MOX::_combat_total_ship_count].structure_damage = 0;
     MOX::_combat_data[MOX::_combat_total_ship_count].is_retreating = 0;
 
+    if (Does_Combat_Ship_Have_Special_(
+            MOX::_combat_total_ship_count, SPECIAL_DAMPER_FIELD) != 0) {
+        MOX::_combat_data[MOX::_combat_total_ship_count].shield_type =
+            SHIELD_NO_SHIELD;
+    }
+
     CMBTFIR2::Init_Internal_Space_(&MOX::_combat_data[MOX::_combat_total_ship_count]);
 
     if (MOX::_combat_data[MOX::_combat_total_ship_count].shield_type > 0) {
@@ -2110,7 +2120,7 @@ void __cdecl Deploy_Ships_() {
     MOX::_combat_data[0].size_class = 100;
 
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
-        if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
+        if (Is_Combat_Satellite_(&MOX::_combat_data[i])) {
             saved_size = MOX::_combat_data[i].size_class;
             MOX::_combat_data[i].size_class = 99;
         }
@@ -2121,14 +2131,14 @@ void __cdecl Deploy_Ships_() {
     MOX::_combat_data[0].size_class = SHIP_SIZE_DOOM_STAR;
 
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
-        if (MOX::_combat_data[i].ftl_type == DRIVE_NO_DRIVE) {
+        if (Is_Combat_Satellite_(&MOX::_combat_data[i])) {
             MOX::_combat_data[i].size_class = saved_size;
         }
     }
 
     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
         s_combat_data* ship = &MOX::_combat_data[i];
-        if (ship->ftl_type == DRIVE_NO_DRIVE) {
+        if (Is_Combat_Satellite_(ship)) {
             int8_t x_pos;
             if (defender_deploy_x < 40) {
                 x_pos = MOX::_combat_data[0].x + 11;
@@ -2648,7 +2658,8 @@ void __cdecl End_Of_Combat_(int16_t star_idx, int16_t colony_pop_lost, int16_t c
         COMBINIT::Init_Special_Devices_(i);
         s_combat_data* ship = &MOX::_combat_data[i];
 
-        if (ship->ftl_type == DRIVE_NO_DRIVE && (ship->unit_status == 5 || ship->owner != MOX::_combat_defender_player)) {
+        if (Is_Combat_Satellite_(ship) &&
+            (ship->unit_status == 5 || ship->owner != MOX::_combat_defender_player)) {
             if (star_idx != MOX::_NUM_STARS) {
                 s_colony* col = &MOX::_colony[MOX::_cmbt_colony_id];
                 int16_t satellite_building = -1;
