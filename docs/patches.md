@@ -294,7 +294,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:10523` - `battle pods cap`: implemented in `DESIGN::Current_Design_Base_Combat_Speed_()` and `COMBINIT::Unload_Combat_Ship_()` with synchronized Battle Pods bonus and overload-floor settings; direct source calculations replace the 1.50 helper calls, and intentional zero-speed designs bypass the impossible end-of-combat repair loop.
 - [x] `asm.pl:10617` - `extended fuel range rounding`: fixed in `SHIPMOVE::Star_In_Extended_Range_Of_Player_()` by rounding 150 percent range up for odd fuel ranges, matching ship-specific extended fuel tanks and preventing boundary systems from being excluded; direct source arithmetic replaces the 1.50 instruction patch.
 - [ ] `asm.pl:11600` - `colony enviromental stuff stuff`
-- [ ] `asm.pl:11617` - `required climate to build weather controller`
+- [x] `asm.pl:11617` - `required climate to build weather controller`: implemented in `COLCALC::Colony_Can_Build_Product_()` with synchronized `colony weather_control_climate`; direct source checks replace the 1.50 flag-returning helper while preserving the Toxic default and Radiated exception.
 - [x] `asm.pl:12616` - `warlord leaders +1 level`: implemented in `OFFICER::Get_Officer_Base_Level_()` and `OFFICER::Increase_Officer_Level_By_One_()` with synchronized `leaders leader_warlord_bonus`; effective Warlord level is optionally raised at every XP tier while advancement remains based on stored XP, replacing the 1.50 wrapper and call-site helper with direct source-level rules.
 - [ ] `asm.pl:13504` - `colony commando`
 - [ ] `asm.pl:14321` - `strategic weapon damage`

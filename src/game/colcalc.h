@@ -46,6 +46,7 @@ namespace COLCALC {
 
     extern s_trade_goods_ratio trade_goods_ratio;
     extern uint8_t _pop_bonus_biospheres;
+    extern uint8_t weather_control_climate;
 
     extern uint8_t _federation_no_mixed_races_penalty;
     extern uint8_t _housing_creates_no_farmers;

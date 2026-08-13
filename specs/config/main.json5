@@ -259,6 +259,27 @@
         lifeless: { value: 3, description: "Map-generation bucket dominated by barren and toxic climates." },
       },
     },
+    planet_climate: {
+      title: "Planet climate",
+      description: "Identifies a planet or colony climate.",
+      remarks: "Complete uint8 climate domain ordered from Toxic through Gaia.",
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: {
+        toxic: 0,
+        radiated: 1,
+        barren: 2,
+        desert: 3,
+        tundra: 4,
+        ocean: 5,
+        swamp: 6,
+        arid: 7,
+        terran: 8,
+        gaia: 9,
+      },
+    },
     map_generation_satellite: {
       title: "Map-generation satellite choice",
       description: "Selects the kind of object generated in a system orbit.",
@@ -1225,6 +1246,20 @@
       bind_root: {
         header: "game/colcalc.h",
         symbol: "COLCALC::_pop_bonus_biospheres",
+      },
+    },
+    weather_control_climate: {
+      title: "Weather Controller minimum climate",
+      description: "Sets the minimum climate where a Weather Controller can be built when farming is possible.",
+      remarks: "Radiated is a special setting that allows every climate except Radiated. Toxic preserves classic behavior.",
+      examples: ["colony weather_control_climate = desert;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "planet_climate",
+      default: "toxic",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::weather_control_climate",
       },
     },
     growth_rate_bonus: {

@@ -3046,7 +3046,11 @@ namespace COLCALC {
                         return 0;
                     }
                     case BUILDING_WEATHER_CONTROLLER: {
-                        return (colony->food2_per_farmer == 0) ? 2 : 1;
+                        if (colony->food2_per_farmer == 0) return 2;
+                        if (weather_control_climate == PLANET_CLIMATE_RADIATED) {
+                            return (colony->climate == PLANET_CLIMATE_RADIATED) ? 2 : 1;
+                        }
+                        return (uint8_t)colony->climate < weather_control_climate ? 2 : 1;
                     }
                     case BUILDING_ARTIFICIAL_PLANET: {
                         return COLCALC::Star_Has_Asteroid_Or_Gas_Giant_(MOX::_planet[colony->planet].star_index);

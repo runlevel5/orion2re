@@ -281,7 +281,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10223` - `food_farmer_bonus`
 - [ ] `conf.pl:10268` - `research_scientist_bonus`
 - [ ] `conf.pl:10313` - `production_worker_bonus`
-- [ ] `conf.pl:10339` - `weather_control_climate`
+- [x] `conf.pl:10339` - `weather_control_climate` -> `colony.weather_control_climate`
 - [ ] `conf.pl:10362` - `alternate_defensive_fire_range`
 - [ ] `conf.pl:10385` - `alternate_defensive_fire`
 - [ ] `conf.pl:10398` - `leaders_no_limit`
