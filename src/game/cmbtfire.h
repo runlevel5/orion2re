@@ -7,6 +7,39 @@
 #define COMBAT_PLANET_DEFENSE_FIGHTER_GARRISON 0x8
 
 namespace CMBTFIRE {
+    struct s_weapon_range {
+        uint8_t proton_torpedo;
+        uint8_t dragon_breath;
+        uint8_t anti_missile_rocket;
+        uint8_t gyro_destabilizer;
+        uint8_t tractor_beam;
+        uint8_t plasma_web;
+        uint8_t caustic_slime;
+        uint8_t stasis_field;
+        uint8_t black_hole_generator;
+    };
+
+    struct s_spherical_range_to_ship {
+        uint8_t pulsar;
+        uint8_t spatial_compressor;
+        uint8_t plasma_flux;
+        uint8_t drive_explosion;
+    };
+
+    struct s_spherical_range_to_missile {
+        uint32_t pulsar;
+        uint32_t spatial_compressor;
+        uint32_t plasma_flux;
+        uint32_t drive_explosion;
+    };
+
+    typedef enum SPHERICAL_EFFECT {
+        SPHERICAL_EFFECT_PULSAR = 0,
+        SPHERICAL_EFFECT_SPATIAL_COMPRESSOR = 1,
+        SPHERICAL_EFFECT_PLASMA_FLUX = 2,
+        SPHERICAL_EFFECT_DRIVE_EXPLOSION = 3,
+    } SPHERICAL_EFFECT;
+
     enum e_high_energy_focus_presence : uint8_t {
         HIGH_ENERGY_FOCUS_ABSENT = 0,
         HIGH_ENERGY_FOCUS_PRESENT = 1,
@@ -31,6 +64,15 @@ namespace CMBTFIRE {
     inline uint8_t _damper_field_ratio = 25;
     inline uint8_t _defensive_range_bonus = 0;
     inline uint8_t _broken_engine_explodes = 1;
+    inline s_weapon_range weapon_range = {
+        8, 5, 5, 5, 4, 5, 5, 1, 5,
+    };
+    inline s_spherical_range_to_ship spherical_range_to_ship = {
+        6, 4, 6, 6,
+    };
+    inline s_spherical_range_to_missile spherical_range_to_missile = {
+        122, 96, 122, 135,
+    };
 
     /** Returns whether Enveloping damage should use all four directions for this target. */
     bool Enveloping_Applies_To_Target_(int16_t target_ship_idx);
@@ -128,6 +170,14 @@ namespace CMBTFIRE {
 
     /** Returns whether the selected weapon slot can currently reach the target. */
     int16_t __cdecl Weapon_In_Range_(int16_t weapon_slot_idx, int16_t ship_idx, int16_t target_idx, int16_t target_type, int16_t range);
+
+    /** Returns whether a spherical effect reaches the selected ship or flyer. */
+    bool Spherical_Effect_In_Range_(
+        int16_t source_ship_idx,
+        int16_t target_idx,
+        int16_t target_type,
+        SPHERICAL_EFFECT effect
+    );
 
     /** Applies damage to the leading missile in a missile stack and reports destroyed missiles. */
     void __cdecl Apply_Damage_To_Missile_(int16_t missile_idx, int16_t* damage_io, uint16_t specials, uint16_t weapon_flags);

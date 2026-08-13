@@ -86,6 +86,19 @@ namespace TEST_WEAPON_RANGE {
         TEST_STASIS::Reset_();
         memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
         CMBTFIRE::_defensive_range_bonus = 0;
+        CMBTFIRE::weapon_range = {
+            8, 5, 5, 5, 4, 5, 5, 1, 5,
+        };
+        CMBTFIRE::spherical_range_to_ship = {
+            6, 4, 6, 6,
+        };
+        CMBTFIRE::spherical_range_to_missile = {
+            122, 96, 122, 135,
+        };
+    }
+
+    void Set_Center_Offset_(int16_t ship_idx, int16_t offset) {
+        ship_center_offsets[ship_idx] = offset;
     }
 }
 

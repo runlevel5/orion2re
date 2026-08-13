@@ -211,9 +211,9 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:8507` - `spy_roll_success_threshold`
 - [ ] `conf.pl:8533` - `pop_bonus_advanced_city_planning`
 - [ ] `conf.pl:8605` - `stock_race`
-- [ ] `conf.pl:8659` - `weapon_range`
-- [ ] `conf.pl:8705` - `spherical_range_to_ship`
-- [ ] `conf.pl:8736` - `spherical_range_to_missile`
+- [x] `conf.pl:8659` - `weapon_range` -> `combat.weapon_range`
+- [x] `conf.pl:8705` - `spherical_range_to_ship` -> `combat.spherical_range_to_ship`
+- [x] `conf.pl:8736` - `spherical_range_to_missile` -> `combat.spherical_range_to_missile`
 - [x] `conf.pl:8757` - `defensive_range_bonus` -> `combat.defensive_range_bonus`
 - [x] `conf.pl:8769` - `pop_bonus_biospheres` -> `colony.pop_bonus_biospheres`
 - [x] `conf.pl:8781` - `shield_hull_multiplier` -> `design.shield_hull_multiplier`
@@ -531,8 +531,8 @@ These five registrations remain in `conf.pl` for compatibility or generator hist
 ## Completeness check
 
 - Effective active configuration variables: **391**.
-- Exact same-named current registry parameters: **60**.
-- Configuration variables still requiring restoration review: **331**.
+- Exact same-named current registry parameters: **63**.
+- Configuration variables still requiring restoration review: **328**.
 - Superseded `expired` configuration registrations: **5**.
 - Patch-owned writable `var_*` allocations: **47**.
 - Original writable `va_symbol` aliases: **34**.

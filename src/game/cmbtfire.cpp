@@ -6,6 +6,46 @@ namespace {
             ((int32_t)damage * MOX::_ordnance_bonus[owner]) / 100);
     }
 
+    int32_t Octagonal_Distance_(int32_t dx, int32_t dy) {
+        if (dx < 0) {
+            dx = -dx;
+        }
+        if (dy < 0) {
+            dy = -dy;
+        }
+        return dx > dy ? dx + dy / 2 : dy + dx / 2;
+    }
+
+    uint8_t Spherical_Ship_Radius_(CMBTFIRE::SPHERICAL_EFFECT effect) {
+        switch (effect) {
+            case CMBTFIRE::SPHERICAL_EFFECT_PULSAR:
+                return CMBTFIRE::spherical_range_to_ship.pulsar;
+            case CMBTFIRE::SPHERICAL_EFFECT_SPATIAL_COMPRESSOR:
+                return CMBTFIRE::spherical_range_to_ship.spatial_compressor;
+            case CMBTFIRE::SPHERICAL_EFFECT_PLASMA_FLUX:
+                return CMBTFIRE::spherical_range_to_ship.plasma_flux;
+            case CMBTFIRE::SPHERICAL_EFFECT_DRIVE_EXPLOSION:
+                return CMBTFIRE::spherical_range_to_ship.drive_explosion;
+        }
+        return 0;
+    }
+
+    uint32_t Spherical_Missile_Radius_(
+        CMBTFIRE::SPHERICAL_EFFECT effect
+    ) {
+        switch (effect) {
+            case CMBTFIRE::SPHERICAL_EFFECT_PULSAR:
+                return CMBTFIRE::spherical_range_to_missile.pulsar;
+            case CMBTFIRE::SPHERICAL_EFFECT_SPATIAL_COMPRESSOR:
+                return CMBTFIRE::spherical_range_to_missile.spatial_compressor;
+            case CMBTFIRE::SPHERICAL_EFFECT_PLASMA_FLUX:
+                return CMBTFIRE::spherical_range_to_missile.plasma_flux;
+            case CMBTFIRE::SPHERICAL_EFFECT_DRIVE_EXPLOSION:
+                return CMBTFIRE::spherical_range_to_missile.drive_explosion;
+        }
+        return 0;
+    }
+
     bool Can_Bomb_Planet_(
         int16_t ship_idx,
         int16_t planet_idx,
@@ -67,6 +107,54 @@ namespace CMBTFIRE {
 
     int32_t Damper_Field_Remaining_Damage_(int32_t damage) {
         return (int32_t)(((int64_t)damage * _damper_field_ratio) / 100);
+    }
+
+    bool Spherical_Effect_In_Range_(
+        int16_t source_ship_idx,
+        int16_t target_idx,
+        int16_t target_type,
+        SPHERICAL_EFFECT effect
+    ) {
+        int16_t source_offset_x;
+        int16_t source_offset_y;
+        COMBINIT::Ship_Center_Offsets_(
+            source_ship_idx, &source_offset_x, &source_offset_y);
+
+        const int32_t source_x =
+            MOX::_combat_data[source_ship_idx].x * 20 + source_offset_x;
+        const int32_t source_y =
+            MOX::_combat_data[source_ship_idx].y * 20 + source_offset_y;
+
+        if (target_type == TARGET_TYPE_MISSILE) {
+            const int32_t distance = Octagonal_Distance_(
+                source_x - MOX::_missile[target_idx].x,
+                source_y - MOX::_missile[target_idx].y);
+            return (uint32_t)distance <= Spherical_Missile_Radius_(effect);
+        }
+
+        int16_t target_offset_x;
+        int16_t target_offset_y;
+        COMBINIT::Ship_Center_Offsets_(
+            target_idx, &target_offset_x, &target_offset_y);
+        int32_t distance_x = source_x -
+            (MOX::_combat_data[target_idx].x * 20 + target_offset_x);
+        int32_t distance_y = source_y -
+            (MOX::_combat_data[target_idx].y * 20 + target_offset_y);
+        if (distance_x < 0) {
+            distance_x = -distance_x;
+        }
+        if (distance_y < 0) {
+            distance_y = -distance_y;
+        }
+        distance_x = distance_x > target_offset_x
+            ? distance_x - target_offset_x
+            : 0;
+        distance_y = distance_y > target_offset_y
+            ? distance_y - target_offset_y
+            : 0;
+
+        const int32_t distance = Octagonal_Distance_(distance_x, distance_y);
+        return distance < (int32_t)Spherical_Ship_Radius_(effect) * 20;
     }
 
     void __cdecl Destroy_Colony_Defense_(int16_t n_to_destroy) {
@@ -431,6 +519,23 @@ namespace CMBTFIRE {
         }
 
         if (range == 0) {
+            switch (weapon_id) {
+                case WEAPON_PULSAR:
+                    return Spherical_Effect_In_Range_(
+                        ship_idx, target_idx, target_type,
+                        SPHERICAL_EFFECT_PULSAR);
+                case WEAPON_SPATIAL_COMPRESSOR:
+                    return Spherical_Effect_In_Range_(
+                        ship_idx, target_idx, target_type,
+                        SPHERICAL_EFFECT_SPATIAL_COMPRESSOR);
+                case WEAPON_PLASMA_FLUX:
+                    return Spherical_Effect_In_Range_(
+                        ship_idx, target_idx, target_type,
+                        SPHERICAL_EFFECT_PLASMA_FLUX);
+                default:
+                    break;
+            }
+
             if (target_type == 1) {
                 range = CMBTAI::Range_To_Missile_(ship_idx, target_idx);
             }
@@ -469,26 +574,28 @@ namespace CMBTFIRE {
         case 2:
         case 4: // Missiles and Torpedoes
             in_range = 1;
-            if (weapon_id == 0x13 /* WPN_MISSILE_PULSAR? */ && range > 8) {
+            if (weapon_id == WEAPON_PROTON_TORPEDO &&
+                range > weapon_range.proton_torpedo) {
                 return 0;
             }
-            if (weapon_id == 0x28 /* WPN_TORPEDO_PLASMA? */ && range > 5) {
+            if (weapon_id == WEAPON_DRAGON_BREATH &&
+                range > weapon_range.dragon_breath) {
                 return 0;
             }
             break;
 
         case 5: // Specials
-            if (weapon_id == WEAPON_TRACTOR_BEAM && range <= 4) return 1;
-            if (weapon_id == WEAPON_STASIS_FIELD && range <= 1) return 1;
-            if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET && range <= 5) return 1;
-            if (weapon_id == WEAPON_GYRO_DESTABILIZER && range <= 5) return 1;
-            if (weapon_id == WEAPON_PLASMA_WEB && range <= 5) return 1;
+            if (weapon_id == WEAPON_TRACTOR_BEAM && range <= weapon_range.tractor_beam) return 1;
+            if (weapon_id == WEAPON_STASIS_FIELD && range <= weapon_range.stasis_field) return 1;
+            if (weapon_id == WEAPON_ANTI_MISSILE_ROCKET && range <= weapon_range.anti_missile_rocket) return 1;
+            if (weapon_id == WEAPON_GYRO_DESTABILIZER && range <= weapon_range.gyro_destabilizer) return 1;
+            if (weapon_id == WEAPON_PLASMA_WEB && range <= weapon_range.plasma_web) return 1;
             if (weapon_id == WEAPON_PULSAR && range <= 1) return 1;
-            if (weapon_id == WEAPON_BLACK_HOLE_GENERATOR && range <= 5) return 1;
+            if (weapon_id == WEAPON_BLACK_HOLE_GENERATOR && range <= weapon_range.black_hole_generator) return 1;
             if (weapon_id == WEAPON_STELLAR_CONVERTER) return 1;
             if (weapon_id == WEAPON_SPATIAL_COMPRESSOR && range <= 1) return 1;
             if (weapon_id == WEAPON_PLASMA_FLUX && range <= 1) return 1;
-            if (weapon_id == WEAPON_CAUSTIC_SLIME && range <= 5) return 1;
+            if (weapon_id == WEAPON_CAUSTIC_SLIME && range <= weapon_range.caustic_slime) return 1;
             break;
 
         default:

@@ -23,6 +23,7 @@ namespace TEST_BEAM_MODIFIERS {
 
 namespace TEST_WEAPON_RANGE {
     void Reset_();
+    void Set_Center_Offset_(int16_t ship_idx, int16_t offset);
 }
 
 namespace TEST_BOMBING_RANGE {
@@ -321,4 +322,74 @@ DOCTEST_TEST_CASE("defensive installation range bonus is clamped and identity ba
 
     station.ship_idx = 4;
     DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 1, 2, 0, 9) == 0);
+}
+
+DOCTEST_TEST_CASE("configured weapon ranges replace fixed special limits") {
+    TEST_WEAPON_RANGE::Reset_();
+    s_combat_weapon_slot& weapon = MOX::_combat_data[0].weapons[0];
+
+    weapon.weapon_id = WEAPON_TRACTOR_BEAM;
+    TECHDATA::_weapons[WEAPON_TRACTOR_BEAM].type = WEAPON_TYPE_SPECIAL;
+    CMBTFIRE::weapon_range.tractor_beam = 7;
+    DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 0, 1, 0, 7) == 1);
+    DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 0, 1, 0, 8) == 0);
+
+    weapon.weapon_id = WEAPON_PROTON_TORPEDO;
+    TECHDATA::_weapons[WEAPON_PROTON_TORPEDO].type = WEAPON_TYPE_TORPEDO;
+    CMBTFIRE::weapon_range.proton_torpedo = 10;
+    DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 0, 1, 0, 10) == 1);
+    DOCTEST_CHECK(CMBTFIRE::Weapon_In_Range_(0, 0, 1, 0, 11) == 0);
+}
+
+DOCTEST_TEST_CASE("spherical ship range uses configured center-to-edge boundary") {
+    TEST_WEAPON_RANGE::Reset_();
+    TEST_WEAPON_RANGE::Set_Center_Offset_(0, 0);
+    TEST_WEAPON_RANGE::Set_Center_Offset_(1, 10);
+    CMBTFIRE::spherical_range_to_ship.pulsar = 6;
+
+    MOX::_combat_data[1].x = 4;
+    MOX::_combat_data[1].y = 2;
+    DOCTEST_CHECK(CMBTFIRE::Spherical_Effect_In_Range_(
+        0, 1, TARGET_TYPE_SHIP, CMBTFIRE::SPHERICAL_EFFECT_PULSAR));
+
+    MOX::_combat_data[1].x = 5;
+    DOCTEST_CHECK_FALSE(CMBTFIRE::Spherical_Effect_In_Range_(
+        0, 1, TARGET_TYPE_SHIP, CMBTFIRE::SPHERICAL_EFFECT_PULSAR));
+}
+
+DOCTEST_TEST_CASE("spherical flyer range includes its configured point boundary") {
+    TEST_WEAPON_RANGE::Reset_();
+    TEST_WEAPON_RANGE::Set_Center_Offset_(0, 0);
+    CMBTFIRE::spherical_range_to_missile.spatial_compressor = 96;
+
+    MOX::_missile[0].x = 80;
+    MOX::_missile[0].y = 32;
+    DOCTEST_CHECK(CMBTFIRE::Spherical_Effect_In_Range_(
+        0, 0, TARGET_TYPE_MISSILE,
+        CMBTFIRE::SPHERICAL_EFFECT_SPATIAL_COMPRESSOR));
+
+    MOX::_missile[0].x = 81;
+    DOCTEST_CHECK_FALSE(CMBTFIRE::Spherical_Effect_In_Range_(
+        0, 0, TARGET_TYPE_MISSILE,
+        CMBTFIRE::SPHERICAL_EFFECT_SPATIAL_COMPRESSOR));
+}
+
+DOCTEST_TEST_CASE("spherical effects select independent configured radii") {
+    TEST_WEAPON_RANGE::Reset_();
+    TEST_WEAPON_RANGE::Set_Center_Offset_(0, 0);
+    MOX::_missile[0].x = 100;
+    CMBTFIRE::spherical_range_to_missile = {
+        99, 100, 101, 102,
+    };
+
+    DOCTEST_CHECK_FALSE(CMBTFIRE::Spherical_Effect_In_Range_(
+        0, 0, TARGET_TYPE_MISSILE, CMBTFIRE::SPHERICAL_EFFECT_PULSAR));
+    DOCTEST_CHECK(CMBTFIRE::Spherical_Effect_In_Range_(
+        0, 0, TARGET_TYPE_MISSILE,
+        CMBTFIRE::SPHERICAL_EFFECT_SPATIAL_COMPRESSOR));
+    DOCTEST_CHECK(CMBTFIRE::Spherical_Effect_In_Range_(
+        0, 0, TARGET_TYPE_MISSILE, CMBTFIRE::SPHERICAL_EFFECT_PLASMA_FLUX));
+    DOCTEST_CHECK(CMBTFIRE::Spherical_Effect_In_Range_(
+        0, 0, TARGET_TYPE_MISSILE,
+        CMBTFIRE::SPHERICAL_EFFECT_DRIVE_EXPLOSION));
 }

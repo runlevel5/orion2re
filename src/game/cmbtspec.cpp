@@ -9,6 +9,21 @@ namespace CMBTSPEC {
                 ERICNET::Mox_Play_Sound_(0x21);
             }
         }
+
+        CMBTFIRE::SPHERICAL_EFFECT Spherical_Effect_From_Type_(
+            int16_t effect_type
+        ) {
+            switch (effect_type) {
+                case 0:
+                    return CMBTFIRE::SPHERICAL_EFFECT_PLASMA_FLUX;
+                case 1:
+                    return CMBTFIRE::SPHERICAL_EFFECT_PULSAR;
+                case 2:
+                    return CMBTFIRE::SPHERICAL_EFFECT_SPATIAL_COMPRESSOR;
+                default:
+                    return CMBTFIRE::SPHERICAL_EFFECT_DRIVE_EXPLOSION;
+            }
+        }
     }
 
     int32_t _g_engine_sfx_handle;
@@ -1613,6 +1628,8 @@ namespace CMBTSPEC {
         COLONY::Load_Ship_Bitm_();
 
         int16_t sfx_type = effect_type;
+        const CMBTFIRE::SPHERICAL_EFFECT spherical_effect =
+            Spherical_Effect_From_Type_(sfx_type);
         bool draw_ships_collapsing_flag = true;
         void* remap_colors = nullptr;
 
@@ -1684,7 +1701,9 @@ namespace CMBTSPEC {
                     int32_t dy = (int32_t)cy - center_y;
                     int32_t dist_sq = dx * dx + dy * dy;
 
-                    if (dist_sq <= radius_sq) {
+                    if (CMBTFIRE::Spherical_Effect_In_Range_(
+                            source_ship_idx, i, TARGET_TYPE_SHIP,
+                            spherical_effect)) {
                         int32_t abs_dy = dy;
                         if (abs_dy < 0) abs_dy = -abs_dy;
                         int32_t abs_dx = dx;
@@ -1851,7 +1870,9 @@ namespace CMBTSPEC {
                 if (dy < 0) dy = -dy;
                 int32_t dist_sq = dx * dx + dy * dy;
 
-                if (dist_sq <= radius_sq) {
+                if (CMBTFIRE::Spherical_Effect_In_Range_(
+                        source_ship_idx, (int16_t)i, TARGET_TYPE_MISSILE,
+                        spherical_effect)) {
                     int16_t damage = 0;
                     int16_t owner = CMBTMIS::Missile_Owner_((int16_t)i);
                     int32_t kill_ratio = 0;

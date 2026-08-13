@@ -178,6 +178,59 @@ DOCTEST_TEST_CASE("Spatial Compressor size scaling preserves the classic default
     DOCTEST_REQUIRE(config::Commit_State(&state));
 }
 
+DOCTEST_TEST_CASE("spherical and weapon ranges preserve and replace 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.proton_torpedo == 8);
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.tractor_beam == 4);
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.black_hole_generator == 5);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_ship.pulsar == 6);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_ship.spatial_compressor == 4);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_missile.pulsar == 122);
+    DOCTEST_CHECK(
+        CMBTFIRE::spherical_range_to_missile.drive_explosion == 135);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat weapon_range tractor_beam = 7;"
+        "combat weapon_range proton_torpedo = 10;"
+        "combat spherical_range_to_ship pulsar = 8;"
+        "combat spherical_range_to_ship drive_explosion = 9;"
+        "combat spherical_range_to_missile spatial_compressor = 120;"
+        "combat spherical_range_to_missile drive_explosion = 140;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.tractor_beam == 7);
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.proton_torpedo == 10);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_ship.pulsar == 8);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_ship.drive_explosion == 9);
+    DOCTEST_CHECK(
+        CMBTFIRE::spherical_range_to_missile.spatial_compressor == 120);
+    DOCTEST_CHECK(
+        CMBTFIRE::spherical_range_to_missile.drive_explosion == 140);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat weapon_range tractor_beam = 256;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat spherical_range_to_ship pulsar = 256;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat spherical_range_to_missile pulsar = 2147483648;",
+        &writes, &diagnostic));
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+}
+
 DOCTEST_TEST_CASE("absorber and damper ratios preserve classic defaults and bind independently") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

@@ -1069,6 +1069,41 @@
         },
       ],
     },
+    weapon_range: {
+      title: "Tactical weapon ranges",
+      description: "Maximum firing ranges for weapons with individual range limits.",
+      fields: [
+        { id: "proton_torpedo", title: "Proton Torpedo", description: "Maximum Proton Torpedo firing range.", type: "uint8", bind: ["proton_torpedo"] },
+        { id: "dragon_breath", title: "Dragon Breath", description: "Maximum Dragon Breath firing range.", type: "uint8", bind: ["dragon_breath"] },
+        { id: "anti_missile_rocket", title: "Anti-Missile Rocket", description: "Maximum Anti-Missile Rocket firing range.", type: "uint8", bind: ["anti_missile_rocket"] },
+        { id: "gyro_destabilizer", title: "Gyro Destabilizer", description: "Maximum Gyro Destabilizer firing range.", type: "uint8", bind: ["gyro_destabilizer"] },
+        { id: "tractor_beam", title: "Tractor Beam", description: "Maximum Tractor Beam firing range.", type: "uint8", bind: ["tractor_beam"] },
+        { id: "plasma_web", title: "Plasma Web", description: "Maximum Plasma Web firing range.", type: "uint8", bind: ["plasma_web"] },
+        { id: "caustic_slime", title: "Caustic Slime", description: "Maximum Caustic Slime firing range.", type: "uint8", bind: ["caustic_slime"] },
+        { id: "stasis_field", title: "Stasis Field", description: "Maximum Stasis Field firing range.", type: "uint8", bind: ["stasis_field"] },
+        { id: "black_hole_generator", title: "Black Hole Generator", description: "Maximum Black Hole Generator firing range.", type: "uint8", bind: ["black_hole_generator"] },
+      ],
+    },
+    spherical_range_to_ship: {
+      title: "Spherical effect ranges to ships",
+      description: "Center-to-edge ranges used when spherical effects target ships.",
+      fields: [
+        { id: "pulsar", title: "Pulsar", description: "Pulsar range to a ship edge.", type: "uint8", bind: ["pulsar"] },
+        { id: "spatial_compressor", title: "Spatial Compressor", description: "Spatial Compressor range to a ship edge.", type: "uint8", bind: ["spatial_compressor"] },
+        { id: "plasma_flux", title: "Plasma Flux", description: "Plasma Flux range to a ship edge.", type: "uint8", bind: ["plasma_flux"] },
+        { id: "drive_explosion", title: "Drive explosion", description: "Drive and Quantum Detonator explosion range to a ship edge.", type: "uint8", bind: ["drive_explosion"] },
+      ],
+    },
+    spherical_range_to_missile: {
+      title: "Spherical effect ranges to flyers",
+      description: "Center-to-center point ranges used when spherical effects target missiles and fighters.",
+      fields: [
+        { id: "pulsar", title: "Pulsar", description: "Pulsar range to a missile or fighter center.", type: "uint32", constraints: { max: 2147483647 }, bind: ["pulsar"] },
+        { id: "spatial_compressor", title: "Spatial Compressor", description: "Spatial Compressor range to a missile or fighter center.", type: "uint32", constraints: { max: 2147483647 }, bind: ["spatial_compressor"] },
+        { id: "plasma_flux", title: "Plasma Flux", description: "Plasma Flux range to a missile or fighter center.", type: "uint32", constraints: { max: 2147483647 }, bind: ["plasma_flux"] },
+        { id: "drive_explosion", title: "Drive explosion", description: "Drive and Quantum Detonator explosion range to a missile or fighter center.", type: "uint32", constraints: { max: 2147483647 }, bind: ["drive_explosion"] },
+      ],
+    },
     lander_ship_uses_stealth: {
       title: "Landing ship stealth equipment",
       description: "Controls whether each landing ship type installs the best researched stealth device.",
@@ -2822,6 +2857,74 @@
       bind_root: {
         header: "game/combinit.h",
         symbol: "COMBINIT::_satellite_size_class_plus_one",
+      },
+    },
+
+    weapon_range: {
+      title: "Tactical weapon ranges",
+      description: "Configures the maximum firing range of weapons with individual limits.",
+      remarks: "Values use the legacy three-square tactical range units. Defaults match MOO2 1.50.",
+      examples: ["combat weapon_range tractor_beam = 4;"],
+      units: "three-square range units",
+      group: "gameplay",
+      namespace: "combat",
+      type: "weapon_range",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::weapon_range",
+      },
+      default: {
+        proton_torpedo: 8,
+        dragon_breath: 5,
+        anti_missile_rocket: 5,
+        gyro_destabilizer: 5,
+        tractor_beam: 4,
+        plasma_web: 5,
+        caustic_slime: 5,
+        stasis_field: 1,
+        black_hole_generator: 5,
+      },
+    },
+
+    spherical_range_to_ship: {
+      title: "Spherical effect ranges to ships",
+      description: "Configures spherical-effect reach from the source center to the target ship edge.",
+      remarks: "Targets strictly below the configured range are affected. Defaults match MOO2 1.50.",
+      examples: ["combat spherical_range_to_ship pulsar = 6;"],
+      units: "tactical squares",
+      group: "gameplay",
+      namespace: "combat",
+      type: "spherical_range_to_ship",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::spherical_range_to_ship",
+      },
+      default: {
+        pulsar: 6,
+        spatial_compressor: 4,
+        plasma_flux: 6,
+        drive_explosion: 6,
+      },
+    },
+
+    spherical_range_to_missile: {
+      title: "Spherical effect ranges to flyers",
+      description: "Configures spherical-effect reach from the source center to missile and fighter centers.",
+      remarks: "Targets at exactly the configured range are affected. Defaults match MOO2 1.50.",
+      examples: ["combat spherical_range_to_missile pulsar = 122;"],
+      units: "tactical points",
+      group: "gameplay",
+      namespace: "combat",
+      type: "spherical_range_to_missile",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::spherical_range_to_missile",
+      },
+      default: {
+        pulsar: 122,
+        spatial_compressor: 96,
+        plasma_flux: 122,
+        drive_explosion: 135,
       },
     },
 
