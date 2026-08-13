@@ -1962,7 +1962,10 @@ namespace CMBTFIRE {
 
         *hit_bonus_out = CMBTFIRE::Get_Beam_Range_To_Hit_Bonus_(ship_idx, effective_range);
 
-        if (TECHDATA::_weapons[wpn_idx].natural_mods & WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY) {
+        const bool has_double_range_penalty =
+            (TECHDATA::_weapons[wpn_idx].natural_mods &
+             WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY) != 0;
+        if (has_double_range_penalty && _double_range_accuracy_penalty != 0) {
             *hit_bonus_out *= 2;
         }
 
@@ -1974,7 +1977,13 @@ namespace CMBTFIRE {
         const s_mount_damage* mount_damage = &_mount_dmg[focus_state];
 
         if (!(wpn_modifier_flags & 0x20) && !(TECHDATA::_weapons[wpn_idx].natural_mods & WEAPON_NATURAL_FLAG_NO_RANGE_DISSIPATION)) {
-            *dmg_mod_out += MOX::_ranged_damage_penalty[effective_range];
+            int16_t range_damage_penalty =
+                MOX::_ranged_damage_penalty[effective_range];
+            if (has_double_range_penalty &&
+                _double_range_damage_penalty != 0) {
+                range_damage_penalty *= 2;
+            }
+            *dmg_mod_out += range_damage_penalty;
         }
 
         uint16_t configured_damage;

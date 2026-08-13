@@ -2,6 +2,8 @@
 
 namespace MOX {
     s_settings _settings = {};
+    int16_t _ranged_to_hit_penalty[9] = {};
+    int16_t _ranged_damage_penalty[9] = {};
 }
 
 namespace MAPGEN {

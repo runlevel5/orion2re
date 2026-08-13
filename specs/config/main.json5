@@ -2116,6 +2116,70 @@
       ],
     },
 
+    double_range_accuracy_penalty: {
+      title: "Double-range accuracy penalty",
+      description: "Controls whether weapons with the intrinsic double-range-penalty property double their range accuracy penalty.",
+      remarks: "True preserves classic behavior. This setting corresponds to MOO2 1.50's 2x_range_accuracy_penalty name.",
+      examples: ["combat double_range_accuracy_penalty = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: true,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_double_range_accuracy_penalty",
+      },
+    },
+
+    double_range_damage_penalty: {
+      title: "Double-range damage dissipation",
+      description: "Controls whether weapons with the intrinsic double-range-penalty property double their range damage dissipation.",
+      remarks: "False preserves classic behavior. This setting corresponds to MOO2 1.50's 2x_range_damage_penalty name.",
+      examples: ["combat double_range_damage_penalty = false;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_double_range_damage_penalty",
+      },
+    },
+
+    ranged_to_hit_penalty: {
+      title: "Beam range accuracy penalties",
+      description: "Sets the beam accuracy modifier for effective combat ranges zero through eight.",
+      examples: ["combat ranged_to_hit_penalty 8 = -85;"],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: {
+        header: "game/mox.h",
+        symbol: "MOX::_ranged_to_hit_penalty",
+      },
+      type: {
+        kind: "array", count: 9, index_base: 0,
+        element: { type: "int16" },
+      },
+      default: [0, 0, -10, -20, -30, -40, -55, -70, -85],
+    },
+
+    ranged_damage_penalty: {
+      title: "Beam range damage penalties",
+      description: "Sets the beam damage percentage modifier for effective combat ranges zero through eight.",
+      examples: ["combat ranged_damage_penalty 8 = -65;"],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: {
+        header: "game/mox.h",
+        symbol: "MOX::_ranged_damage_penalty",
+      },
+      type: {
+        kind: "array", count: 9, index_base: 0,
+        element: { type: "int16" },
+      },
+      default: [0, 0, -10, -20, -30, -40, -50, -60, -65],
+    },
+
     fighters_use_point_defense: {
       title: "Fighters use point-defense beams",
       description: "Applies point-defense accuracy and damage modifiers to fighter beam weapons.",

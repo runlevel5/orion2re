@@ -288,6 +288,42 @@ DOCTEST_TEST_CASE("beam modifiers use configured mount damage") {
     DOCTEST_CHECK(damage == 175);
 }
 
+DOCTEST_TEST_CASE("double-range settings independently control beam penalties") {
+    struct s_case {
+        uint16_t natural_mods;
+        uint8_t accuracy_enabled;
+        uint8_t damage_enabled;
+        int16_t expected_accuracy;
+        int16_t expected_damage;
+    };
+    const s_case cases[] = {
+        { WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY, 1, 0, -20, 90 },
+        { WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY, 0, 1, -10, 80 },
+        { WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY, 1, 1, -20, 80 },
+        { 0, 1, 1, -10, 90 },
+    };
+
+    for (const s_case& value : cases) {
+        TEST_BEAM_MODIFIERS::Reset_();
+        MOX::_ranged_to_hit_penalty[2] = -10;
+        MOX::_ranged_damage_penalty[2] = -10;
+        TECHDATA::_weapons[0].natural_mods = value.natural_mods;
+        CMBTFIRE::_double_range_accuracy_penalty = value.accuracy_enabled;
+        CMBTFIRE::_double_range_damage_penalty = value.damage_enabled;
+
+        int16_t hit_bonus = 0;
+        int16_t damage = 0;
+        CMBTFIRE::Get_Beam_Weapon_Modifiers_(
+            0, 2, 0, 0, &hit_bonus, &damage);
+
+        DOCTEST_CHECK(hit_bonus == value.expected_accuracy);
+        DOCTEST_CHECK(damage == value.expected_damage);
+    }
+
+    CMBTFIRE::_double_range_accuracy_penalty = 1;
+    CMBTFIRE::_double_range_damage_penalty = 0;
+}
+
 DOCTEST_TEST_CASE("configured beam mount damage clamps negative modifiers") {
     TEST_BEAM_MODIFIERS::Reset_();
     CMBTFIRE::_mount_dmg[CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].pd = 20;

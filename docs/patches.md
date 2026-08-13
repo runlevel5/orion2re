@@ -300,7 +300,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:14321` - `strategic weapon damage`: fixed in the `INITSHIP` best-weapon selectors and `COMBAT` strategic attack routines by ranking and resolving strategic weapons from their dedicated strategic damage fields; direct source-level field selection replaces the 1.50 code-cave diversions while preserving tactical selection behavior.
 - [x] `asm.pl:14601` - `strategic weapon damage value corrections`: fixed in `TECHDATA::_weapons` by restoring the corrected strategic minimum and maximum damage estimates for sixteen weapons; direct source table values replace the 1.50 binary data-byte patches.
 - [x] `asm.pl:14701` - `telepath skill blocks mind control`: fixed in `ERIC::Player_Can_Mind_Control_Colony_()` and `ERIC::Player_Can_Mind_Control_Colony_With_Help_()` by checking Telepath and Telepath* through the shared star-leader lookup; this replaces the four 1.50 register-setting wrappers and prevents Assassin leaders from blocking mind control.
-- [ ] `asm.pl:15672` - `2x penalty`
+- [x] `asm.pl:15672` - `2x penalty`: implemented in `CMBTFIRE::Get_Beam_Weapon_Modifiers_()` with synchronized accuracy and damage toggles plus configurable range tables; direct source conditions replace the 1.50 assembly helpers and constrain both effects to weapons carrying the intrinsic double-range-penalty property.
 - [ ] `asm.pl:15717` - `expected damage`
 - [ ] `asm.pl:16106` - `fair beams`
 - [ ] `asm.pl:16844` - `subterranean bonuses`

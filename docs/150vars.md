@@ -303,8 +303,8 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10855` - `proton_torpedo_apply_speed_base`
 - [ ] `conf.pl:10899` - `satellite_ammo_basis`
 - [ ] `conf.pl:10913` - `missile_base_ammo_basis`
-- [ ] `conf.pl:10927` - `2x_range_accuracy_penalty`
-- [ ] `conf.pl:10940` - `2x_range_damage_penalty`
+- [ ] `conf.pl:10927` - `2x_range_accuracy_penalty` -> renamed `combat.double_range_accuracy_penalty`
+- [ ] `conf.pl:10940` - `2x_range_damage_penalty` -> renamed `combat.double_range_damage_penalty`
 - [ ] `conf.pl:10953` - `antaran_star_fortress_space`
 - [ ] `conf.pl:10967` - `simplified_beam_formula`
 - [ ] `conf.pl:11001` - `ai_hypertech_threshold`
@@ -333,8 +333,8 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:11507` - `all_planet_shields_block_bioweapons`
 - [ ] `conf.pl:11529` - `lithovore_has_fungi_in_tech_tree`
 - [ ] `conf.pl:11568` - `race_personality`
-- [ ] `conf.pl:11605` - `ranged_to_hit_penalty`
-- [ ] `conf.pl:11621` - `ranged_damage_penalty`
+- [x] `conf.pl:11605` - `ranged_to_hit_penalty` -> `combat.ranged_to_hit_penalty`
+- [x] `conf.pl:11621` - `ranged_damage_penalty` -> `combat.ranged_damage_penalty`
 - [ ] `conf.pl:11637` - `first_council_delay`
 - [ ] `conf.pl:11652` - `council_frequency`
 - [ ] `conf.pl:11668` - `elite_offensive_ants`
