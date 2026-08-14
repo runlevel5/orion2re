@@ -255,6 +255,7 @@ orion2re_add_unit_test(test_colony_pop_growth
     SOURCES
         tests/unit/test_colony_pop_growth.cpp
     PRODUCTION_SOURCES
+        src/game/aidata.cpp
         src/game/colcalc.cpp
         src/game/colcalc_config.cpp
     FAKE_SOURCES

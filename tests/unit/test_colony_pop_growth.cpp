@@ -312,6 +312,27 @@ DOCTEST_TEST_CASE("Subterranean population bonus is configurable by planet size"
             PLANET_SIZE_SMALL, PLANET_CLIMATE_GAIA, 0) == 19);
 }
 
+DOCTEST_TEST_CASE("uncolonized planet AI separates size weight from Subterranean capacity") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_planet_data* planet = &MOX::_planet[0];
+    planet->colony_index = -1;
+    planet->planet_type = PLANET_TYPE_PLANET;
+    planet->size = PLANET_SIZE_MEDIUM;
+    planet->climate = PLANET_CLIMATE_GAIA;
+    planet->mineral_class = 0;
+    planet->gravity_class = PLANET_GRAVITY_NORMAL_G;
+
+    DOCTEST_CHECK(AIDATA::Uncolonized_Planet_Worth_To_Player_(
+        planet, &MOX::_player[0]) == 27);
+
+    MOX::_player[0].traits[TRAIT_SUBTERRANEAN] = 1;
+    COLCALC::_pop_bonus_subterranean[PLANET_SIZE_MEDIUM] = 9;
+
+    DOCTEST_CHECK(AIDATA::Uncolonized_Planet_Worth_To_Player_(
+        planet, &MOX::_player[0]) == 43);
+}
+
 DOCTEST_TEST_CASE("Aquatic Tundra population uses the configured climate treatment") {
     TEST_COLONY_POP_GROWTH::Reset_();
     MOX::_player[0].traits[TRAIT_AQUATIC] = 1;

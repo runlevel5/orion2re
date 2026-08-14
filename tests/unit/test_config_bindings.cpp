@@ -598,6 +598,35 @@ DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
         &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("Subterranean population bonuses bind by planet size") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const uint8_t expected[PLANET_SIZE_COUNT] = {2, 4, 6, 8, 10};
+    DOCTEST_CHECK(std::memcmp(
+        COLCALC::_pop_bonus_subterranean, expected, sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony pop_bonus_subterranean tiny = 3;"
+        "colony pop_bonus_subterranean medium = 9;"
+        "colony pop_bonus_subterranean huge = 12;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::_pop_bonus_subterranean[PLANET_SIZE_TINY] == 3);
+    DOCTEST_CHECK(COLCALC::_pop_bonus_subterranean[PLANET_SIZE_MEDIUM] == 9);
+    DOCTEST_CHECK(COLCALC::_pop_bonus_subterranean[PLANET_SIZE_HUGE] == 12);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony pop_bonus_subterranean small = 256;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("Trade Goods ratios preserve 1.50 defaults and bind independently") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
