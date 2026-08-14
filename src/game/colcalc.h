@@ -22,6 +22,7 @@ namespace COLCALC {
     extern s_lander_ship_cost lander_ship_cost;
 
     struct s_misc_costs {
+        uint16_t freighters;
         uint16_t android_farmer;
         uint16_t android_worker;
         uint16_t android_scientist;
@@ -54,6 +55,7 @@ namespace COLCALC {
     extern uint8_t _housing_creates_no_farmers;
     extern uint8_t _planet_extinction;
     extern uint8_t _zero_colony_lost;
+    extern uint8_t _feudal_affects_freighters;
     extern uint8_t _keep_research_on_breakthrough;
     extern uint8_t _keep_research_on_finds;
     extern uint8_t scout_lab_research_bonus[SHIP_SIZE_COUNT];

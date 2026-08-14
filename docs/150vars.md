@@ -59,7 +59,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:1591` - `missile_defense` -> `combat.missile_defense`
 - [ ] `conf.pl:1645` - `ship_communication_range`
 - [ ] `conf.pl:1686` - `planetary_shield`
-- [ ] `conf.pl:1719` - `misc_costs`
+- [x] `conf.pl:1719` - `misc_costs` -> `colony.misc_costs`
 - [x] `conf.pl:1742` - `jump_gate_speed_bonus` -> `movement.jump_gate_speed_bonus`
 - [ ] `conf.pl:1755` - `warp_interdictor_range`
 - [ ] `conf.pl:1788` - `crew_data`
@@ -361,7 +361,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:12114` - `recloak_next_turn` -> `combat.recloak_next_turn`
 - [x] `conf.pl:12136` - `rephase_cloak_next_turn` -> `combat.rephase_cloak_next_turn`
 - [x] `conf.pl:12149` - `zero_colony_lost` -> `colony.zero_colony_lost`
-- [ ] `conf.pl:12165` - `feudal_affects_freighters`
+- [x] `conf.pl:12165` - `feudal_affects_freighters` -> `colony.feudal_affects_freighters`
 - [ ] `conf.pl:12187` - `ai_tech_prio`
 - [ ] `conf.pl:12214` - `planet_rangemaster`
 - [ ] `conf.pl:12227` - `planet_achilles`

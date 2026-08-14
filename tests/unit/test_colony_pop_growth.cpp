@@ -7,6 +7,7 @@ namespace TEST_COLONY_POP_GROWTH {
     int32_t Destroy_Colony_Reason_();
     void Set_Add_Spy_Result_(int16_t result);
     int16_t Deleted_Product_();
+    void Set_Government_Cost_Reduction_(int32_t amount);
     void Set_Population_Boom_(bool enabled);
     void Set_Plague_(bool enabled);
 }
@@ -463,6 +464,25 @@ DOCTEST_TEST_CASE("Android production costs are selected independently") {
     DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_FARMER) == 30);
     DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_WORKER) == 40);
     DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_SCIENTIST) == 60);
+}
+
+DOCTEST_TEST_CASE("freighter production cost uses configured cost and optional government reduction") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_colony* colony = &MOX::_colony[0];
+    colony->owner = 0;
+
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(
+        colony, COLONY_PRODUCTION_FREIGHTERS) == 50);
+
+    COLCALC::misc_costs.freighters = 48;
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(
+        colony, COLONY_PRODUCTION_FREIGHTERS) == 48);
+
+    TEST_COLONY_POP_GROWTH::Set_Government_Cost_Reduction_(16);
+    COLCALC::_feudal_affects_freighters = 1;
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(
+        colony, COLONY_PRODUCTION_FREIGHTERS) == 32);
 }
 
 DOCTEST_TEST_CASE("completed building grants no maintenance cash") {

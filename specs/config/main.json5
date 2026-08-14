@@ -870,8 +870,9 @@
     },
     misc_costs: {
       title: "Miscellaneous production costs",
-      description: "Production costs for Android population types.",
+      description: "Production costs for freighter fleets and Android population types.",
       fields: [
+        { id: "freighters", title: "Freighter Fleet", description: "Production cost of a five-freighter fleet.", type: "uint16", constraints: { max: 32767 }, bind: ["freighters"] },
         { id: "android_farmer", title: "Android Farmer", description: "Production cost of an Android Farmer.", type: "uint16", constraints: { max: 32767 }, bind: ["android_farmer"] },
         { id: "android_worker", title: "Android Worker", description: "Production cost of an Android Worker.", type: "uint16", constraints: { max: 32767 }, bind: ["android_worker"] },
         { id: "android_scientist", title: "Android Scientist", description: "Production cost of an Android Scientist.", type: "uint16", constraints: { max: 32767 }, bind: ["android_scientist"] },
@@ -1222,9 +1223,10 @@
     },
     misc_costs: {
       title: "Miscellaneous production costs",
-      description: "Configures each Android population type's production cost independently.",
+      description: "Configures freighter fleet and Android population production costs independently.",
       remarks: "Defaults preserve classic costs and match MOO2 1.50.",
       examples: [
+        "colony misc_costs freighters = 50;",
         "colony misc_costs android_farmer = 50;",
         "colony misc_costs android_worker = 50;",
         "colony misc_costs android_scientist = 50;",
@@ -1238,9 +1240,24 @@
         symbol: "COLCALC::misc_costs",
       },
       default: {
+        freighters: 50,
         android_farmer: 50,
         android_worker: 50,
         android_scientist: 50,
+      },
+    },
+    feudal_affects_freighters: {
+      title: "Government cost reduction affects freighters",
+      description: "Applies the owning government's ship-cost reduction to freighter fleets.",
+      remarks: "False preserves classic behavior. With default government bonuses, true applies Feudal and Confederation reductions.",
+      examples: ["colony feudal_affects_freighters = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_feudal_affects_freighters",
       },
     },
     pop_bonus_biospheres: {

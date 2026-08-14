@@ -562,6 +562,32 @@ DOCTEST_TEST_CASE("landing ship costs preserve classic defaults and bind indepen
     DOCTEST_CHECK(COLCALC::lander_ship_cost.transport_ship == 80);
 }
 
+DOCTEST_TEST_CASE("freighter cost settings preserve classic defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::misc_costs.freighters == 50);
+    DOCTEST_CHECK(COLCALC::_feudal_affects_freighters == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony misc_costs freighters = 48;"
+        "colony feudal_affects_freighters = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::misc_costs.freighters == 48);
+    DOCTEST_CHECK(COLCALC::_feudal_affects_freighters == 1);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony misc_costs freighters = 32768;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

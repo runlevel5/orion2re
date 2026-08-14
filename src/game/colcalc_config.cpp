@@ -22,6 +22,7 @@ namespace COLCALC {
         50,
         50,
         50,
+        50,
     };
 
     s_growth_rate_bonus growth_rate_bonus = {
@@ -47,6 +48,7 @@ namespace COLCALC {
     uint8_t _housing_creates_no_farmers = 0;
     uint8_t _planet_extinction = 0;
     uint8_t _zero_colony_lost = 0;
+    uint8_t _feudal_affects_freighters = 0;
     uint8_t _keep_research_on_breakthrough = 0;
     uint8_t _keep_research_on_finds = 0;
     uint8_t scout_lab_research_bonus[SHIP_SIZE_COUNT] = {

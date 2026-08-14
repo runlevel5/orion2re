@@ -2610,8 +2610,13 @@ namespace COLCALC {
             case COLONY_PRODUCTION_SPY:
                 return 100;
 
-            case COLONY_PRODUCTION_FREIGHTERS:
-                return 50;
+            case COLONY_PRODUCTION_FREIGHTERS: {
+                int32_t cost = misc_costs.freighters;
+                if (_feudal_affects_freighters != 0) {
+                    DESIGN::Cost_Reduction_For_Govt_Type_(colony->owner, &cost);
+                }
+                return cost;
+            }
 
             case COLONY_PRODUCTION_FARMER:
                 return misc_costs.android_farmer;

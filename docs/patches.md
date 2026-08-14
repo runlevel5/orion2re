@@ -313,7 +313,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17157` - `aquatic treats tundra as swamp`: implemented through `COLCALC::Calc_Player_Climate_()` with synchronized `colony aquatic_treats_tundra_as_swamp`; the shared source-level climate transform keeps population capacity, farmer production, and potential-colony food consistent while preserving classic Terran treatment by default.
 - [x] `asm.pl:17339` - `transport ship extended fuel tanks`: implemented in `INITSHIP::Load_Transport_Ship_Design_()` with synchronized `colony transport_ship_extended_range` configuration; direct source-level equipment selection replaces the 1.50 helper around the drive-table calculation while preserving the classic default.
 - [x] `asm.pl:17365` - `skip outpostization prompt`: implemented in `REPORT::Colonization_()` by excluding automatic outpost candidates when `interface no_outpost_prompt` is enabled while retaining eligible colony prompts; direct source-level candidate filtering replaces the 1.50 call wrapper.
-- [ ] `asm.pl:17499` - `freighter cost`
+- [x] `asm.pl:17499` - `freighter cost`: implemented in `COLCALC::Colony_Product_Cost_()` with synchronized `colony misc_costs freighters` and `colony feudal_affects_freighters` settings; direct source-level cost selection and the existing government-reduction helper replace the 1.50 stack expansion and added assembly wrapper while preserving classic defaults.
 - [ ] `asm.pl:17531` - `satellite special 6 and 14`
 - [ ] `asm.pl:18379` - `ground defense armor multiplier`
 - [ ] `asm.pl:18892` - `fighter garrison strength for bomber bays`
