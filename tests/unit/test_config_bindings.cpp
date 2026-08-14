@@ -352,6 +352,31 @@ DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor 
         "combat civilian_armor titanium = 0;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("ground defense armor multiplier preserves and replaces the classic value") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_ground_defense_armor_multiplier == 100);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat ground_defense_armor_multiplier = 150;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_ground_defense_armor_multiplier == 150);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat ground_defense_armor_multiplier = 0;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat ground_defense_armor_multiplier = 10001;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("shield tables preserve classic defaults and bind by name") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

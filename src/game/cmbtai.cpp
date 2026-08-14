@@ -1903,10 +1903,8 @@ int16_t __cdecl Get_Total_Hits_(int16_t ship_idx) {
     else {
         int16_t owner = MOX::_combat_data[0].owner;
         int16_t best_armor_idx = INITSHIP::Best_Armor_(owner);
-        int16_t absorption = TECHDATA::_armor[best_armor_idx].ships_bonus;
-
-        // defense_value = ((absorption * 4 + 400) * 25) / 100
-        int16_t defense_value = (int16_t)(((absorption * 4 + 400) * 25) / 100);
+        int16_t defense_value = (int16_t)CMBTFIRE::Ground_Defense_Structure_(
+            TECHDATA::_armor[best_armor_idx].ships_bonus);
         int16_t planet_defenses = CMBTFIRE::Does_Combat_Planet_Have_Defenses_();
 
         for (int16_t i = 0; i < 4; ++i) {

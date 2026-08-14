@@ -324,7 +324,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:11327` - `pop_bonus_tolerant`
 - [ ] `conf.pl:11349` - `reinforced_hull_multiplier`
 - [ ] `conf.pl:11371` - `marine_kill_damage`
-- [ ] `conf.pl:11387` - `ground_defense_armor_multiplier`
+- [x] `conf.pl:11387` - `ground_defense_armor_multiplier` -> `combat.ground_defense_armor_multiplier`
 - [ ] `conf.pl:11401` - `spies_can_frame_anyone`
 - [ ] `conf.pl:11423` - `no_starting_ships`
 - [ ] `conf.pl:11445` - `no_initial_tech_prompt`

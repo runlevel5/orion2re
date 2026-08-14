@@ -248,6 +248,21 @@ DOCTEST_TEST_CASE("absorber and damper percentage calculations preserve classic 
     CMBTFIRE::_damper_field_ratio = 25;
 }
 
+DOCTEST_TEST_CASE("ground defense structure applies the configured armor multiplier") {
+    CMBTFIRE::_ground_defense_armor_multiplier = 100;
+    DOCTEST_CHECK(CMBTFIRE::Ground_Defense_Structure_(0) == 100);
+    DOCTEST_CHECK(CMBTFIRE::Ground_Defense_Structure_(100) == 200);
+
+    CMBTFIRE::_ground_defense_armor_multiplier = 150;
+    DOCTEST_CHECK(CMBTFIRE::Ground_Defense_Structure_(0) == 150);
+    DOCTEST_CHECK(CMBTFIRE::Ground_Defense_Structure_(100) == 300);
+
+    CMBTFIRE::_ground_defense_armor_multiplier = 10000;
+    DOCTEST_CHECK(CMBTFIRE::Ground_Defense_Structure_(900) == 100000);
+
+    CMBTFIRE::_ground_defense_armor_multiplier = 100;
+}
+
 DOCTEST_TEST_CASE("beam mount damage defaults match classic HEF combinations") {
     TEST_BEAM_MODIFIERS::Reset_();
 

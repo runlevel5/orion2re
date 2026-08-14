@@ -3268,6 +3268,23 @@
       default: false,
     },
 
+    ground_defense_armor_multiplier: {
+      title: "Ground-defense armor multiplier",
+      description: "Multiplies the structure of each planetary ground-defense building after applying the defending armor technology.",
+      remarks: "The value is divided by 100. The default 100 preserves classic behavior and matches MOO2 1.50.",
+      examples: ["combat ground_defense_armor_multiplier = 150;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint16",
+      constraints: { min: 1, max: 10000 },
+      default: 100,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_ground_defense_armor_multiplier",
+      },
+    },
+
     no_outpost_prompt: {
       title: "Skip outpost placement prompts",
       description: "Skips automatic outpost placement prompts when an outpost ship arrives at a star.",
