@@ -320,7 +320,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:18901` - `xeno psychology spy bonus`
 - [x] `asm.pl:19202` - `mixed race penalty building`: implemented in `COLCALC::Colony_Can_Build_Product_()` by withholding Alien Control Center from enabled Federation colonies after differing biological races are assimilated, while conquered population retains classic build eligibility.
 - [x] `asm.pl:19382` - `is_ship_out_of_ammo checks`: fixed in `CMBTAI::Is_Ship_Out_Of_Ammo_()` by treating combat ships with an assigned officer as ineligible for ammo-triggered auto-retreat; this directly expresses the 1.50 code-cave leader guard without additional state.
-- [ ] `asm.pl:19812` - `F9 displays star distance if black hole is in between`
+- [x] `asm.pl:19812` - `F9 displays star distance if black hole is in between`: implemented in `MAINSCR2::Draw_Main_Screen_For_Star_Distan()` by always formatting the computed parsec distance, regardless of black-hole obstruction; direct source-level display selection replaces the 1.50 conditional-branch opcode patch without changing route blocking.
 
 ### Follow-up topics
 

@@ -1821,7 +1821,7 @@ namespace MAINPUPS {
         char message_buffer[500];
         char tech_buffer[500];
         char* leader_name;
-        char* format_string;
+        const char* format_string;
         int16_t officer_cost;
         int16_t maintenance_cost;
 

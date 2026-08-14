@@ -44,7 +44,6 @@ namespace MAINSCR2 {
         int16_t star_idx = MOX::_screen_mouse_list_type;
         int16_t previous_temp_star_handle = MOX::_temp_star_handle;
         s_colors distance_outline_colors = {{0x70, 0x72, 0x71, 0x72, 0x72, 0x72, 0x72, 0x72}};
-        s_colors blocked_path_outline_colors = {{0x4C, 0x50, 0x4E, 0x50, 0x50, 0x50, 0x50, 0x50}};
 
         MAINSCR::Draw_Mini_Main_Screen_();
         MAINSCR::Draw_Main_Main_Screen_();
@@ -77,16 +76,9 @@ namespace MAINSCR2 {
                             int32_t distance = GEO::Parsecs_Between_Stars_(star_idx, MOX::_temp_star_handle);
 
                             char distance_text[80];
-                            if (struct_::Test_Bit_Field_(MOX::_star[star_idx].black_hole_blocks, MOX::_temp_star_handle) != 0) {
-                                fonts::Set_Outline_Color_(0, 0);
-                                fonts::Set_Font_Style_Outline_(2, &blocked_path_outline_colors);
-                                strlcpy(distance_text, HAROLD::H_Message_(234), sizeof(distance_text));
-                                MISC::Change_Font_Style_(1);
-                            } else {
-                                fonts::Set_Outline_Color_(0, 0);
-                                fonts::Set_Font_Style_Outline_(2, &distance_outline_colors);
-                                snprintf(distance_text, sizeof(distance_text), HAROLD::H_Message_(235), distance);
-                            }
+                            fonts::Set_Outline_Color_(0, 0);
+                            fonts::Set_Font_Style_Outline_(2, &distance_outline_colors);
+                            snprintf(distance_text, sizeof(distance_text), HAROLD::H_Message_(235), distance);
 
                             int16_t width = fonts::Get_String_Width_(distance_text);
                             if (x2 + width + 10 <= 522) {
