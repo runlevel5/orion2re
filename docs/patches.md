@@ -316,7 +316,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17499` - `freighter cost`: implemented in `COLCALC::Colony_Product_Cost_()` with synchronized `colony misc_costs freighters` and `colony feudal_affects_freighters` settings; direct source-level cost selection and the existing government-reduction helper replace the 1.50 stack expansion and added assembly wrapper while preserving classic defaults.
 - [ ] `asm.pl:17531` - `satellite special 6 and 14`
 - [ ] `asm.pl:18379` - `ground defense armor multiplier`
-- [ ] `asm.pl:18892` - `fighter garrison strength for bomber bays`
+- [x] `asm.pl:18892` - `fighter garrison strength for bomber bays`: fixed in `AIPOWER::Fighter_Garrison_Strength_()` by counting interceptor, Heavy Fighter, and Bomber capacity once each in the point-defense estimate; this replaces the 1.50 register-selection patch with the direct source-level formula.
 - [ ] `asm.pl:18901` - `xeno psychology spy bonus`
 - [x] `asm.pl:19202` - `mixed race penalty building`: implemented in `COLCALC::Colony_Can_Build_Product_()` by withholding Alien Control Center from enabled Federation colonies after differing biological races are assimilated, while conquered population retains classic build eligibility.
 - [ ] `asm.pl:19382` - `is_ship_out_of_ammo checks`

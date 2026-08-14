@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "doctest/doctest.h"
+#include "game/aipower.h"
 #include "game/cmbtdrw1.h"
 #include "game/cmbtmov1.h"
 #include "game/combat1.h"
@@ -12,6 +13,9 @@ namespace {
     s_missile missiles[300];
     s_planet_data planets[1];
     s_player players[MAX_PLAYERS];
+    int16_t best_bomb_weapon;
+    int16_t best_point_defense_weapon;
+    int16_t best_ship_shield;
     bool has_phase_shifter;
     bool has_sub_space_teleporter;
     bool has_energy_absorber;
@@ -106,6 +110,7 @@ namespace MOX {
     s_missile* _missile = missiles;
     s_planet_data* _planet = planets;
     s_player* _player = players;
+    s_settings _settings;
     int16_t _cmbt_colony_id;
     int16_t _combat_total_ship_count;
     int16_t _cur_ship;
@@ -227,8 +232,16 @@ namespace CMBTFIRE {
 }
 
 namespace INITSHIP {
+    int16_t __cdecl Best_Bomb_Weapon_(int16_t) {
+        return best_bomb_weapon;
+    }
+
+    int16_t __cdecl Best_Point_Defense_Weapon_(int16_t) {
+        return best_point_defense_weapon;
+    }
+
     int16_t __cdecl Best_Ship_Shield_(int16_t) {
-        return SHIELD_NO_SHIELD;
+        return best_ship_shield;
     }
 }
 
@@ -341,6 +354,27 @@ namespace special {
         *x_ptr = x2;
         *y_ptr = y2;
     }
+}
+
+DOCTEST_TEST_CASE("fighter garrison strength counts each advanced fighter bay once") {
+    memset(players, 0, sizeof(players));
+    memset(&MOX::_settings, 0, sizeof(MOX::_settings));
+    memset(TECHDATA::_shields, 0, sizeof(TECHDATA::_shields));
+    memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+
+    best_bomb_weapon = WEAPON_BOMBER;
+    best_point_defense_weapon = WEAPON_INTERCEPTOR;
+    best_ship_shield = 0;
+    TECHDATA::_weapons[best_point_defense_weapon].max_damage = 10;
+
+    MOX::_player[0].tech_applications[TECH_APP_BOMBER_BAYS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    DOCTEST_CHECK(AIPOWER::Fighter_Garrison_Strength_(0, 1) == 120);
+
+    MOX::_player[0].tech_applications[TECH_APP_BOMBER_BAYS] = 0;
+    MOX::_player[0].tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    DOCTEST_CHECK(AIPOWER::Fighter_Garrison_Strength_(0, 1) == 80);
 }
 
 DOCTEST_TEST_CASE("disabled spent weapons remain red") {

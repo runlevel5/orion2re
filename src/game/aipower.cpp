@@ -537,9 +537,9 @@ namespace AIPOWER {
     uint16_t __cdecl Fighter_Garrison_Strength_(int16_t player_idx, int16_t target_player_idx) {
         int16_t pd_weapon_idx = INITSHIP::Best_Point_Defense_Weapon_(player_idx);
         int16_t bomb_weapon_idx = INITSHIP::Best_Bomb_Weapon_(player_idx);
-        int16_t bomber_modifier = 0;
-        int16_t shield_value = Get_Best_Ship_Shield_Value_(target_player_idx);
         int16_t bomber_count = 0;
+        int16_t shield_value = Get_Best_Ship_Shield_Value_(target_player_idx);
+        int16_t heavy_fighter_count = 0;
 
         if (MOX::_settings.strategic_combat_flag == 1) {
             return 120;
@@ -550,11 +550,11 @@ namespace AIPOWER {
 
         if (player->tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             pd_count = 0;
-            bomber_modifier = 0;
-            bomber_count = 4;
+            bomber_count = 0;
+            heavy_fighter_count = 4;
         } else if (player->tech_applications[TECH_APP_BOMBER_BAYS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             pd_count = 0;
-            bomber_modifier = 6;
+            bomber_count = 6;
         }
 
         int32_t bomb_dmg = (int32_t)TECHDATA::_weapons[bomb_weapon_idx].max_damage - shield_value;
@@ -567,8 +567,8 @@ namespace AIPOWER {
             pd_dmg = 0;
         }
 
-        uint16_t base_strength = (int16_t)bomb_dmg * ((bomber_count * 3 / 2) + bomber_modifier) +
-                                 (int16_t)pd_dmg * (pd_count + bomber_count * 2);
+        uint16_t base_strength = (int16_t)bomb_dmg * ((heavy_fighter_count * 3 / 2) + bomber_count) +
+                                 (int16_t)pd_dmg * (pd_count + heavy_fighter_count + bomber_count);
 
         base_strength &= 0x3fff;
 
