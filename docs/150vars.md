@@ -387,7 +387,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:12666` - `no_future_tech_peek`
 - [ ] `conf.pl:12701` - `system_and_event_crystal`
 - [ ] `conf.pl:12722` - `capitol_can_be_bombed`
-- [ ] `conf.pl:12756` - `spy_tech_bonus`
+- [x] `conf.pl:12756` - `spy_tech_bonus` -> `spy.spy_tech_bonus`
 - [ ] `conf.pl:12779` - `loaded_config_prompt`
 - [x] `conf.pl:12794` - `telepathic_multiple_capture` -> `combat.telepathic_multiple_capture`
 - [ ] `conf.pl:12809` - `marine_kill_damage_blocker`

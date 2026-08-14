@@ -96,6 +96,7 @@ orion2re_add_unit_test(test_config_decode
         src/game/events_config.cpp
         src/game/invasion_config.cpp
         src/game/ship_config.cpp
+        src/game/spy_bonus.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -114,6 +115,7 @@ orion2re_add_unit_test(test_config_bindings
         src/game/events_config.cpp
         src/game/invasion_config.cpp
         src/game/ship_config.cpp
+        src/game/spy_bonus.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -133,6 +135,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/game/events_config.cpp
         src/game/invasion_config.cpp
         src/game/ship_config.cpp
+        src/game/spy_bonus.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -155,6 +158,7 @@ orion2re_add_unit_test(test_config_loader
         src/game/events_config.cpp
         src/game/invasion_config.cpp
         src/game/ship_config.cpp
+        src/game/spy_bonus.cpp
         src/game/compat.cpp
         src/game/vfs.cpp
         src/game/vfs_file.cpp
@@ -175,6 +179,13 @@ target_include_directories(test_config_loader PRIVATE
 orion2re_add_unit_test(test_pop_helpers
     SOURCES
         tests/unit/test_pop_helpers.cpp
+)
+
+orion2re_add_unit_test(test_spy
+    SOURCES
+        tests/unit/test_spy.cpp
+    PRODUCTION_SOURCES
+        src/game/spy_bonus.cpp
 )
 
 orion2re_add_unit_test(test_aidudes

@@ -5,32 +5,6 @@ namespace spy {
 
     int16_t _spy_bonuses[MAX_PLAYERS * 2];
 
-    int16_t __cdecl Tech_Spy_Bonus_(s_player* player) {
-        int16_t bonus = 0;
-
-        if (player->tech_applications[TECH_APP_CYBER_SECURITY_LINK] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            bonus = 10;
-        }
-
-        if (player->tech_applications[TECH_APP_NEURAL_SCANNER] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            bonus += 10;
-        }
-
-        if (player->tech_applications[TECH_APP_PSIONICS] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            bonus += 10;
-        }
-
-        if (player->tech_applications[TECH_APP_STEALTH_SUIT] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            bonus += 10;
-        }
-
-        if (player->tech_applications[TECH_APP_TELEPATHIC_TRAINING] == TECH_RESEARCH_STATUS_RESEARCHED) {
-            bonus += 5;
-        }
-
-        return bonus;
-    }
-
     void __cdecl Compute_Spy_Bonuses_(s_player* player, int16_t* defense_bonus_out, int16_t* attack_bonus_out) {
         int32_t telepathic_bonus = player->traits[TRAIT_TELEPATHIC] * 10;
         int32_t tech_and_trait_bonus = Tech_Spy_Bonus_(player) + player->traits[TRAIT_SPYING_BONUS];

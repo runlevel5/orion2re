@@ -3,6 +3,17 @@
 struct s_leader_data;
 
 namespace spy {
+    struct s_spy_tech_bonus {
+        uint8_t neural_scanner;
+        uint8_t xeno_psychology;
+        uint8_t telepathic_training;
+        uint8_t cyber_security_link;
+        uint8_t stealth_suit;
+        uint8_t psionics;
+    };
+
+    extern s_spy_tech_bonus spy_tech_bonus;
+
     extern int8_t _lookup_table[MAX_PLAYERS];
 
     /* Returns the spy bonus granted by the player's completed spy-related technologies.

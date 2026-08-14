@@ -947,6 +947,18 @@
         },
       ],
     },
+    spy_tech_bonus: {
+      title: "Technology spying bonuses",
+      description: "Spy bonuses granted by researched technology applications.",
+      fields: [
+        { id: "neural_scanner", title: "Neural Scanner", description: "Spy bonus granted by Neural Scanner.", type: "uint8", bind: ["neural_scanner"] },
+        { id: "xeno_psychology", title: "Xeno Psychology", description: "Spy bonus granted by Xeno Psychology.", type: "uint8", bind: ["xeno_psychology"] },
+        { id: "telepathic_training", title: "Telepathic Training", description: "Spy bonus granted by Telepathic Training.", type: "uint8", bind: ["telepathic_training"] },
+        { id: "cyber_security_link", title: "Cyber Security Link", description: "Spy bonus granted by Cyber Security Link.", type: "uint8", bind: ["cyber_security_link"] },
+        { id: "stealth_suit", title: "Stealth Suit", description: "Spy bonus granted by Stealth Suit.", type: "uint8", bind: ["stealth_suit"] },
+        { id: "psionics", title: "Psionics", description: "Spy bonus granted by Psionics.", type: "uint8", bind: ["psionics"] },
+      ],
+    },
     mount_damage: {
       title: "Beam mount damage modifiers",
       description: "Damage percentages for Point Defense, normal, and Heavy Mount beams.",
@@ -1375,6 +1387,30 @@
         antidote_tech: 50,
         boom_event: 100,
         plague_event: -200,
+      },
+    },
+    spy_tech_bonus: {
+      title: "Technology spying bonuses",
+      description: "Configures the spy bonus granted by each spy-related technology.",
+      remarks: "Defaults preserve classic behavior. Xeno Psychology defaults to zero but can be assigned a multiplayer spy bonus, matching MOO2 1.50.",
+      examples: [
+        "spy spy_tech_bonus neural_scanner = 10;",
+        "spy spy_tech_bonus xeno_psychology = 5;",
+      ],
+      group: "gameplay",
+      namespace: "spy",
+      type: "spy_tech_bonus",
+      bind_root: {
+        header: "game/spy.h",
+        symbol: "spy::spy_tech_bonus",
+      },
+      default: {
+        neural_scanner: 10,
+        xeno_psychology: 0,
+        telepathic_training: 5,
+        cyber_security_link: 10,
+        stealth_suit: 10,
+        psionics: 10,
       },
     },
     build_queue: {

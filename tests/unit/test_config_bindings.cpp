@@ -26,6 +26,7 @@
 #include "game/report.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
+#include "game/spy.h"
 #include "game/techinit.h"
 
 namespace {
@@ -653,6 +654,36 @@ DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
         "colony growth_rate_bonus plague_event = 1;",
+        &writes, &diagnostic));
+}
+
+DOCTEST_TEST_CASE("technology spy bonuses preserve 1.50 defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(spy::spy_tech_bonus.neural_scanner == 10);
+    DOCTEST_CHECK(spy::spy_tech_bonus.xeno_psychology == 0);
+    DOCTEST_CHECK(spy::spy_tech_bonus.telepathic_training == 5);
+    DOCTEST_CHECK(spy::spy_tech_bonus.cyber_security_link == 10);
+    DOCTEST_CHECK(spy::spy_tech_bonus.stealth_suit == 10);
+    DOCTEST_CHECK(spy::spy_tech_bonus.psionics == 10);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "spy spy_tech_bonus neural_scanner = 12;"
+        "spy spy_tech_bonus xeno_psychology = 7;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(spy::spy_tech_bonus.neural_scanner == 12);
+    DOCTEST_CHECK(spy::spy_tech_bonus.xeno_psychology == 7);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "spy spy_tech_bonus xeno_psychology = 256;",
         &writes, &diagnostic));
 }
 
