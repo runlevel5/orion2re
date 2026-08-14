@@ -758,6 +758,41 @@ DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {
     DOCTEST_CHECK(COMBINIT::_satellite_capture_enabled == 1);
 }
 
+DOCTEST_TEST_CASE("satellite special priorities bind as two-dimensional choices") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COMBINIT::starbase_special[4][0] == SPECIAL_WIDE_AREA_JAMMER);
+    DOCTEST_CHECK(COMBINIT::starbase_special[4][1] == SPECIAL_MULTI_WAVE_ECM_JAMMER);
+    DOCTEST_CHECK(COMBINIT::starbase_special[4][2] == SPECIAL_ECM_JAMMER);
+    DOCTEST_CHECK(COMBINIT::starbase_special[5][0] == SPECIAL_WARP_DISSIPATOR);
+    DOCTEST_CHECK(COMBINIT::starbase_special[13][0] == SPECIAL_TRANSPORTERS);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat starbase_special 6 1 = reflection_field;"
+        "combat starbase_special 6 2 = 19;"
+        "combat starbase_special 14 1 = warp_dissipator;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COMBINIT::starbase_special[5][0] == SPECIAL_REFLECTION_FIELD);
+    DOCTEST_CHECK(COMBINIT::starbase_special[5][1] == SPECIAL_LIGHTNING_FIELD);
+    DOCTEST_CHECK(COMBINIT::starbase_special[13][0] == SPECIAL_WARP_DISSIPATOR);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat starbase_special 15 1 = ecm_jammer;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat starbase_special 6 4 = ecm_jammer;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("satellite torpedo setting preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

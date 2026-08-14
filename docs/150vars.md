@@ -64,7 +64,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:1755` - `warp_interdictor_range`
 - [ ] `conf.pl:1788` - `crew_data`
 - [ ] `conf.pl:1903` - `artemis_system_net`
-- [ ] `conf.pl:1975` - `starbase_special`
+- [x] `conf.pl:1975` - `starbase_special` -> `combat.starbase_special`
 - [ ] `conf.pl:2049` - `ai_ship_design_bio_weapons_theme`
 - [ ] `conf.pl:2075` - `ai_ship_design_capture_theme`
 - [ ] `conf.pl:2101` - `ai_ship_design_cloaking_theme`

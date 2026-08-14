@@ -1,6 +1,28 @@
 #pragma once
 
 namespace COMBINIT {
+    constexpr int STARBASE_SPECIAL_SLOT_COUNT = 14;
+    constexpr int STARBASE_SPECIAL_ALTERNATIVE_COUNT = 3;
+
+    inline uint8_t starbase_special
+        [STARBASE_SPECIAL_SLOT_COUNT]
+        [STARBASE_SPECIAL_ALTERNATIVE_COUNT] = {
+            {SPECIAL_REINFORCED_HULL, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_SHIELD_CAPACITOR, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_HARD_SHIELDS, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_MULTI_PHASED_SHIELDS, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_WIDE_AREA_JAMMER, SPECIAL_MULTI_WAVE_ECM_JAMMER, SPECIAL_ECM_JAMMER},
+            {SPECIAL_WARP_DISSIPATOR, SPECIAL_WARP_DISSIPATOR, SPECIAL_WARP_DISSIPATOR},
+            {SPECIAL_SECURITY_STATIONS, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_BATTLE_SCANNER, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_HIGH_ENERGY_FOCUS, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_STRUCTURAL_ANALYZER, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_ACHILLES_TARGETING_UNIT, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_RANGEMASTER_UNIT, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_TRANSPORTERS, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+            {SPECIAL_TRANSPORTERS, SPECIAL_NO_SPECIAL, SPECIAL_NO_SPECIAL},
+        };
+
     struct s_repair_rate {
         uint8_t cyber;
         uint8_t aru;
@@ -126,6 +148,10 @@ namespace COMBINIT {
     // Loads one orbital defense platform or station into combat data.
     // station_type: Station hull/type selector.
     void __cdecl Load_Combat_Satelite_(int16_t station_type);
+
+    // Installs the defender's researched orbital-defense specials in priority order.
+    void __cdecl Load_Combat_Satellite_Specials_(
+        s_combat_data* satellite, const s_player* defender);
 
     // Loads and applies the combat palette for one participant.
     // player_idx: Player or monster owner index.
