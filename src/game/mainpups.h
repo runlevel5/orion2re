@@ -40,8 +40,6 @@ namespace MAINPUPS {
 
     extern int16_t _officer_gains_level_state;
 
-    extern char* _g_str_ptr;
-
     extern int16_t _last_scanned_field;
     extern int16_t _g_state;
     extern int8_t _selection_state_flag;

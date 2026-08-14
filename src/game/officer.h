@@ -264,7 +264,7 @@ namespace OFFICER {
 
     void __cdecl Load_Officer_Skill_Icons_(void* buffer);
 
-    uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message);
+    uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id);
 
     void __cdecl Decrement_Officer_ETA_();
 
