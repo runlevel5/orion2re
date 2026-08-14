@@ -10,6 +10,8 @@ namespace {
 
 namespace test::fakes {
     int32_t last_played_sound = -1;
+    int32_t environmental_refresh_count = 0;
+    s_colony* last_environmental_colony = nullptr;
 }
 
 namespace MOX {
@@ -50,7 +52,10 @@ namespace COLBLDG {
 
 namespace COLCALC {
     void __cdecl Compute_Star_Colony_Stuff_(s_star_data*) {}
-    void __cdecl Colony_Environmental_Stuff_(s_colony*) {}
+    void __cdecl Colony_Environmental_Stuff_(s_colony* colony) {
+        test::fakes::environmental_refresh_count++;
+        test::fakes::last_environmental_colony = colony;
+    }
     void __cdecl Colony_Calculation_(int16_t) {}
 }
 

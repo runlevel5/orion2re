@@ -10,6 +10,10 @@ namespace {
     constexpr int16_t kStrategicDrive = DRIVE_ANTI_MATTER_DRIVE;
     constexpr int16_t kMissileWeapon = 15;
     constexpr int16_t kTorpedoWeapon = 18;
+    constexpr int16_t kTacticalBeamWeapon = 3;
+    constexpr int16_t kStrategicBeamWeapon = 4;
+    constexpr int16_t kTacticalBombWeapon = 21;
+    constexpr int16_t kStrategicBombWeapon = 22;
 
     s_player players[MAX_PLAYERS];
     s_ship_data ships[1];
@@ -120,6 +124,62 @@ DOCTEST_TEST_CASE("planetary defenses select torpedoes only when enabled") {
 
     DOCTEST_CHECK(INITSHIP::Best_Missile_Weapon_NT_(kPlayer) ==
                   kTorpedoWeapon);
+}
+
+DOCTEST_TEST_CASE("strategic designs rank weapons by strategic damage") {
+    Reset_Initship_();
+
+    TECHDATA::_weapons[kTacticalBeamWeapon].tech_app_id =
+        TECH_APP_LASER_CANNON;
+    TECHDATA::_weapons[kTacticalBeamWeapon].type = WEAPON_TYPE_BEAM;
+    TECHDATA::_weapons[kTacticalBeamWeapon].max_damage = 30;
+    TECHDATA::_weapons[kTacticalBeamWeapon].strat_max_damage = 4;
+    TECHDATA::_weapons[kStrategicBeamWeapon].tech_app_id =
+        TECH_APP_PARTICLE_BEAM;
+    TECHDATA::_weapons[kStrategicBeamWeapon].type = WEAPON_TYPE_BEAM;
+    TECHDATA::_weapons[kStrategicBeamWeapon].max_damage = 10;
+    TECHDATA::_weapons[kStrategicBeamWeapon].strat_max_damage = 25;
+
+    TECHDATA::_weapons[kMissileWeapon].max_damage = 30;
+    TECHDATA::_weapons[kMissileWeapon].strat_max_damage = 5;
+    TECHDATA::_weapons[kTorpedoWeapon].max_damage = 10;
+    TECHDATA::_weapons[kTorpedoWeapon].strat_max_damage = 25;
+
+    TECHDATA::_weapons[kTacticalBombWeapon].tech_app_id =
+        TECH_APP_NUCLEAR_BOMB;
+    TECHDATA::_weapons[kTacticalBombWeapon].type = WEAPON_TYPE_BOMB;
+    TECHDATA::_weapons[kTacticalBombWeapon].max_damage = 30;
+    TECHDATA::_weapons[kTacticalBombWeapon].strat_max_damage = 3;
+    TECHDATA::_weapons[kStrategicBombWeapon].tech_app_id =
+        TECH_APP_FUSION_BOMB;
+    TECHDATA::_weapons[kStrategicBombWeapon].type = WEAPON_TYPE_BOMB;
+    TECHDATA::_weapons[kStrategicBombWeapon].max_damage = 10;
+    TECHDATA::_weapons[kStrategicBombWeapon].strat_max_damage = 24;
+
+    players[kPlayer].tech_applications[TECH_APP_LASER_CANNON] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    players[kPlayer].tech_applications[TECH_APP_PARTICLE_BEAM] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    players[kPlayer].tech_applications[TECH_APP_NUCLEAR_BOMB] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    players[kPlayer].tech_applications[TECH_APP_FUSION_BOMB] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+
+    DOCTEST_CHECK(INITSHIP::Best_Beam_Weapon_(kPlayer) ==
+                  kTacticalBeamWeapon);
+    DOCTEST_CHECK(INITSHIP::Best_Missile_Weapon_(kPlayer) ==
+                  kMissileWeapon);
+    DOCTEST_CHECK(INITSHIP::Best_Bomb_Weapon_(kPlayer) ==
+                  kTacticalBombWeapon);
+
+    MOX::_settings.strategic_combat_flag = 1;
+
+    DOCTEST_CHECK(INITSHIP::Best_Beam_Weapon_(kPlayer) ==
+                  kStrategicBeamWeapon);
+    DOCTEST_CHECK(INITSHIP::Best_Missile_Weapon_(kPlayer) ==
+                  kTorpedoWeapon);
+    DOCTEST_CHECK(INITSHIP::Best_Bomb_Weapon_(kPlayer) ==
+                  kStrategicBombWeapon);
 }
 
 DOCTEST_TEST_CASE("fighter point defense skips shield-only beams") {

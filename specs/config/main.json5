@@ -259,6 +259,37 @@
         lifeless: { value: 3, description: "Map-generation bucket dominated by barren and toxic climates." },
       },
     },
+    planet_size: {
+      title: "Planet size",
+      description: "Identifies a planet size class.",
+      remarks: "Complete uint8 planet-size domain ordered from Tiny through Huge.",
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: { tiny: 0, small: 1, medium: 2, large: 3, huge: 4 },
+    },
+    planet_climate: {
+      title: "Planet climate",
+      description: "Identifies a planet or colony climate.",
+      remarks: "Complete uint8 climate domain ordered from Toxic through Gaia.",
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: {
+        toxic: 0,
+        radiated: 1,
+        barren: 2,
+        desert: 3,
+        tundra: 4,
+        ocean: 5,
+        swamp: 6,
+        arid: 7,
+        terran: 8,
+        gaia: 9,
+      },
+    },
     map_generation_satellite: {
       title: "Map-generation satellite choice",
       description: "Selects the kind of object generated in a system orbit.",
@@ -1076,6 +1107,41 @@
         },
       ],
     },
+    weapon_range: {
+      title: "Tactical weapon ranges",
+      description: "Maximum firing ranges for weapons with individual range limits.",
+      fields: [
+        { id: "proton_torpedo", title: "Proton Torpedo", description: "Maximum Proton Torpedo firing range.", type: "uint8", bind: ["proton_torpedo"] },
+        { id: "dragon_breath", title: "Dragon Breath", description: "Maximum Dragon Breath firing range.", type: "uint8", bind: ["dragon_breath"] },
+        { id: "anti_missile_rocket", title: "Anti-Missile Rocket", description: "Maximum Anti-Missile Rocket firing range.", type: "uint8", bind: ["anti_missile_rocket"] },
+        { id: "gyro_destabilizer", title: "Gyro Destabilizer", description: "Maximum Gyro Destabilizer firing range.", type: "uint8", bind: ["gyro_destabilizer"] },
+        { id: "tractor_beam", title: "Tractor Beam", description: "Maximum Tractor Beam firing range.", type: "uint8", bind: ["tractor_beam"] },
+        { id: "plasma_web", title: "Plasma Web", description: "Maximum Plasma Web firing range.", type: "uint8", bind: ["plasma_web"] },
+        { id: "caustic_slime", title: "Caustic Slime", description: "Maximum Caustic Slime firing range.", type: "uint8", bind: ["caustic_slime"] },
+        { id: "stasis_field", title: "Stasis Field", description: "Maximum Stasis Field firing range.", type: "uint8", bind: ["stasis_field"] },
+        { id: "black_hole_generator", title: "Black Hole Generator", description: "Maximum Black Hole Generator firing range.", type: "uint8", bind: ["black_hole_generator"] },
+      ],
+    },
+    spherical_range_to_ship: {
+      title: "Spherical effect ranges to ships",
+      description: "Center-to-edge ranges used when spherical effects target ships.",
+      fields: [
+        { id: "pulsar", title: "Pulsar", description: "Pulsar range to a ship edge.", type: "uint8", bind: ["pulsar"] },
+        { id: "spatial_compressor", title: "Spatial Compressor", description: "Spatial Compressor range to a ship edge.", type: "uint8", bind: ["spatial_compressor"] },
+        { id: "plasma_flux", title: "Plasma Flux", description: "Plasma Flux range to a ship edge.", type: "uint8", bind: ["plasma_flux"] },
+        { id: "drive_explosion", title: "Drive explosion", description: "Drive and Quantum Detonator explosion range to a ship edge.", type: "uint8", bind: ["drive_explosion"] },
+      ],
+    },
+    spherical_range_to_missile: {
+      title: "Spherical effect ranges to flyers",
+      description: "Center-to-center point ranges used when spherical effects target missiles and fighters.",
+      fields: [
+        { id: "pulsar", title: "Pulsar", description: "Pulsar range to a missile or fighter center.", type: "uint32", constraints: { max: 2147483647 }, bind: ["pulsar"] },
+        { id: "spatial_compressor", title: "Spatial Compressor", description: "Spatial Compressor range to a missile or fighter center.", type: "uint32", constraints: { max: 2147483647 }, bind: ["spatial_compressor"] },
+        { id: "plasma_flux", title: "Plasma Flux", description: "Plasma Flux range to a missile or fighter center.", type: "uint32", constraints: { max: 2147483647 }, bind: ["plasma_flux"] },
+        { id: "drive_explosion", title: "Drive explosion", description: "Drive and Quantum Detonator explosion range to a missile or fighter center.", type: "uint32", constraints: { max: 2147483647 }, bind: ["drive_explosion"] },
+      ],
+    },
     lander_ship_uses_stealth: {
       title: "Landing ship stealth equipment",
       description: "Controls whether each landing ship type installs the best researched stealth device.",
@@ -1197,6 +1263,41 @@
       bind_root: {
         header: "game/colcalc.h",
         symbol: "COLCALC::_pop_bonus_biospheres",
+      },
+    },
+    pop_bonus_subterranean: {
+      title: "Subterranean population bonuses",
+      description: "Sets the population-capacity bonus provided by Subterranean for each planet size.",
+      remarks: "Defaults preserve classic behavior and match MOO2 1.50.",
+      examples: ["colony pop_bonus_subterranean tiny = 2;"],
+      units: "population",
+      group: "gameplay",
+      namespace: "colony",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_pop_bonus_subterranean",
+      },
+      type: {
+        kind: "array",
+        count: 5,
+        index_base: 0,
+        index_type: "planet_size",
+        element: { type: "uint8" },
+      },
+      default: [2, 4, 6, 8, 10],
+    },
+    weather_control_climate: {
+      title: "Weather Controller minimum climate",
+      description: "Sets the minimum climate where a Weather Controller can be built when farming is possible.",
+      remarks: "Radiated is a special setting that allows every climate except Radiated. Toxic preserves classic behavior.",
+      examples: ["colony weather_control_climate = desert;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "planet_climate",
+      default: "toxic",
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::weather_control_climate",
       },
     },
     growth_rate_bonus: {
@@ -1695,6 +1796,22 @@
       default: "race_tech",
     },
 
+    starbase_fleet_beam_offense: {
+      title: "Star Base fleet beam offense",
+      description: "Sets the fleet beam attack bonus provided by an active Star Base.",
+      remarks: "The zero default preserves classic behavior. Battlestations and Star Fortresses retain their separate 10 and 20 bonuses.",
+      examples: ["combat_bonus starbase_fleet_beam_offense = 0;"],
+      units: "beam attack",
+      group: "gameplay",
+      namespace: "combat_bonus",
+      type: "uint8",
+      bind_root: {
+        header: "game/cmbtfir2.h",
+        symbol: "CMBTFIR2::_starbase_fleet_beam_offense",
+      },
+      default: 0,
+    },
+
     phasing_cloak_effective_turns: {
       title: "Initial Phasing Cloak duration",
       description: "Sets the number of combat rounds a working Phasing Cloak starts in its phase-cloaked state.",
@@ -2064,6 +2181,70 @@
       ],
     },
 
+    double_range_accuracy_penalty: {
+      title: "Double-range accuracy penalty",
+      description: "Controls whether weapons with the intrinsic double-range-penalty property double their range accuracy penalty.",
+      remarks: "True preserves classic behavior. This setting corresponds to MOO2 1.50's 2x_range_accuracy_penalty name.",
+      examples: ["combat double_range_accuracy_penalty = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: true,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_double_range_accuracy_penalty",
+      },
+    },
+
+    double_range_damage_penalty: {
+      title: "Double-range damage dissipation",
+      description: "Controls whether weapons with the intrinsic double-range-penalty property double their range damage dissipation.",
+      remarks: "False preserves classic behavior. This setting corresponds to MOO2 1.50's 2x_range_damage_penalty name.",
+      examples: ["combat double_range_damage_penalty = false;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_double_range_damage_penalty",
+      },
+    },
+
+    ranged_to_hit_penalty: {
+      title: "Beam range accuracy penalties",
+      description: "Sets the beam accuracy modifier for effective combat ranges zero through eight.",
+      examples: ["combat ranged_to_hit_penalty 8 = -85;"],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: {
+        header: "game/mox.h",
+        symbol: "MOX::_ranged_to_hit_penalty",
+      },
+      type: {
+        kind: "array", count: 9, index_base: 0,
+        element: { type: "int16" },
+      },
+      default: [0, 0, -10, -20, -30, -40, -55, -70, -85],
+    },
+
+    ranged_damage_penalty: {
+      title: "Beam range damage penalties",
+      description: "Sets the beam damage percentage modifier for effective combat ranges zero through eight.",
+      examples: ["combat ranged_damage_penalty 8 = -65;"],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: {
+        header: "game/mox.h",
+        symbol: "MOX::_ranged_damage_penalty",
+      },
+      type: {
+        kind: "array", count: 9, index_base: 0,
+        element: { type: "int16" },
+      },
+      default: [0, 0, -10, -20, -30, -40, -50, -60, -65],
+    },
+
     fighters_use_point_defense: {
       title: "Fighters use point-defense beams",
       description: "Applies point-defense accuracy and damage modifiers to fighter beam weapons.",
@@ -2339,6 +2520,37 @@
       },
     },
 
+    battle_pods_speed_bonus: {
+      title: "Battle Pods speed bonus",
+      description: "Controls whether unused Battle Pods capacity increases a ship's base combat speed.",
+      remarks: "True preserves classic behavior. False removes the empty-ship bonus and allows equipment in Battle Pods capacity to overload the ship.",
+      examples: ["design battle_pods_speed_bonus = false;"],
+      group: "gameplay",
+      namespace: "design",
+      type: "bool",
+      default: true,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_battle_pods_speed_bonus",
+      },
+    },
+
+    minimum_combat_speed: {
+      title: "Minimum overloaded combat speed",
+      description: "Sets the combat-speed floor for Battle Pods overload when the Battle Pods speed bonus is disabled.",
+      remarks: "The lower of this value and the hull's normal minimum speed is used. The default 255 prevents overload from lowering speed below the normal hull minimum; zero permits immobile designs.",
+      examples: ["design minimum_combat_speed = 5;"],
+      units: "combat speed",
+      group: "gameplay",
+      namespace: "design",
+      type: "uint8",
+      default: 255,
+      bind_root: {
+        header: "game/design_config.h",
+        symbol: "DESIGN::_minimum_combat_speed",
+      },
+    },
+
     alternative_refit: {
       title: "Alternative refit cost",
       description: "Uses the alternative ship-refit cost formula.",
@@ -2485,6 +2697,21 @@
       bind_root: {
         header: "game/invasion.h",
         symbol: "invasion::_ground_commando_attacker_x2",
+      },
+    },
+
+    leader_warlord_bonus: {
+      title: "Warlord bonus for leaders",
+      description: "Raises Warlord leaders' effective level by one at every XP tier without changing their experience.",
+      remarks: "False preserves classic behavior, where Warlord grants the extra level only at 1000 XP.",
+      examples: ["leaders leader_warlord_bonus = true;"],
+      group: "gameplay",
+      namespace: "leaders",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/officer.h",
+        symbol: "OFFICER::_leader_warlord_bonus",
       },
     },
 
@@ -2812,6 +3039,74 @@
       },
     },
 
+    weapon_range: {
+      title: "Tactical weapon ranges",
+      description: "Configures the maximum firing range of weapons with individual limits.",
+      remarks: "Values use the legacy three-square tactical range units. Defaults match MOO2 1.50.",
+      examples: ["combat weapon_range tractor_beam = 4;"],
+      units: "three-square range units",
+      group: "gameplay",
+      namespace: "combat",
+      type: "weapon_range",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::weapon_range",
+      },
+      default: {
+        proton_torpedo: 8,
+        dragon_breath: 5,
+        anti_missile_rocket: 5,
+        gyro_destabilizer: 5,
+        tractor_beam: 4,
+        plasma_web: 5,
+        caustic_slime: 5,
+        stasis_field: 1,
+        black_hole_generator: 5,
+      },
+    },
+
+    spherical_range_to_ship: {
+      title: "Spherical effect ranges to ships",
+      description: "Configures spherical-effect reach from the source center to the target ship edge.",
+      remarks: "Targets strictly below the configured range are affected. Defaults match MOO2 1.50.",
+      examples: ["combat spherical_range_to_ship pulsar = 6;"],
+      units: "tactical squares",
+      group: "gameplay",
+      namespace: "combat",
+      type: "spherical_range_to_ship",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::spherical_range_to_ship",
+      },
+      default: {
+        pulsar: 6,
+        spatial_compressor: 4,
+        plasma_flux: 6,
+        drive_explosion: 6,
+      },
+    },
+
+    spherical_range_to_missile: {
+      title: "Spherical effect ranges to flyers",
+      description: "Configures spherical-effect reach from the source center to missile and fighter centers.",
+      remarks: "Targets at exactly the configured range are affected. Defaults match MOO2 1.50.",
+      examples: ["combat spherical_range_to_missile pulsar = 122;"],
+      units: "tactical points",
+      group: "gameplay",
+      namespace: "combat",
+      type: "spherical_range_to_missile",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::spherical_range_to_missile",
+      },
+      default: {
+        pulsar: 122,
+        spatial_compressor: 96,
+        plasma_flux: 122,
+        drive_explosion: 135,
+      },
+    },
+
     defensive_range_bonus: {
       title: "Defensive installation range bonus",
       description: "Additional range granted to orbital and ground defensive installations.",
@@ -2862,6 +3157,21 @@
         179, 71, 72, 51, 191, 163, 46, 122, 155, 61,
         87, 70, 73, 33, 57, 104, 180, 181, 66,
       ],
+    },
+
+    simplified_beam_formula: {
+      title: "Simplified beam accuracy formula",
+      description: "Applies range penalties and Point Defense accuracy as ordinary beam attack modifiers.",
+      remarks: "False preserves the classic capped hit-threshold formula. True prevents high beam attack from bypassing range penalties and keeps penalties above 55 effective.",
+      examples: ["combat simplified_beam_formula = true;"],
+      group: "gameplay",
+      namespace: "combat",
+      type: "bool",
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_simplified_beam_formula",
+      },
+      default: false,
     },
   },
 }

@@ -5,6 +5,8 @@
 
 namespace test::fakes {
     extern int32_t last_played_sound;
+    extern int32_t environmental_refresh_count;
+    extern s_colony* last_environmental_colony;
 }
 
 namespace {
@@ -32,6 +34,8 @@ namespace {
         memset(MOX::_ship, 0, sizeof(s_ship_data));
         MOX::_colony[0].planet = 0;
         MOX::_planet[0].star_index = 0;
+        test::fakes::environmental_refresh_count = 0;
+        test::fakes::last_environmental_colony = nullptr;
     }
 
     void Restore_Default_Reengage_Buildings_() {
@@ -69,6 +73,18 @@ DOCTEST_TEST_CASE("gameplay sound playback follows settings and combat speed") {
 }
 
 DOCTEST_TEST_SUITE("building combat re-engagement") {
+
+DOCTEST_TEST_CASE("adding an environmental building refreshes the affected colony") {
+    Reset_Colony_();
+    MOX::_colony[0].climate = PLANET_CLIMATE_ARID;
+    MOX::_planet[0].climate = PLANET_CLIMATE_ARID;
+
+    ERICNET::Add_Building_(0, BUILDING_TERRAFORMING);
+
+    DOCTEST_CHECK(MOX::_planet[0].climate == PLANET_CLIMATE_TERRAN);
+    DOCTEST_CHECK(test::fakes::environmental_refresh_count == 1);
+    DOCTEST_CHECK(test::fakes::last_environmental_colony == &MOX::_colony[0]);
+}
 
 DOCTEST_TEST_CASE("default defenses invalidate ignored combat when added or removed") {
     Restore_Default_Reengage_Buildings_();

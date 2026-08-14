@@ -211,9 +211,9 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:8507` - `spy_roll_success_threshold`
 - [ ] `conf.pl:8533` - `pop_bonus_advanced_city_planning`
 - [ ] `conf.pl:8605` - `stock_race`
-- [ ] `conf.pl:8659` - `weapon_range`
-- [ ] `conf.pl:8705` - `spherical_range_to_ship`
-- [ ] `conf.pl:8736` - `spherical_range_to_missile`
+- [x] `conf.pl:8659` - `weapon_range` -> `combat.weapon_range`
+- [x] `conf.pl:8705` - `spherical_range_to_ship` -> `combat.spherical_range_to_ship`
+- [x] `conf.pl:8736` - `spherical_range_to_missile` -> `combat.spherical_range_to_missile`
 - [x] `conf.pl:8757` - `defensive_range_bonus` -> `combat.defensive_range_bonus`
 - [x] `conf.pl:8769` - `pop_bonus_biospheres` -> `colony.pop_bonus_biospheres`
 - [x] `conf.pl:8781` - `shield_hull_multiplier` -> `design.shield_hull_multiplier`
@@ -275,13 +275,13 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10100` - `ai_productivity_bonus`
 - [ ] `conf.pl:10118` - `ai_income_bonus`
 - [x] `conf.pl:10136` - `federation_no_mixed_races_penalty` -> `colony.federation_no_mixed_races_penalty`
-- [ ] `conf.pl:10149` - `battle_pods_speed_bonus`
-- [ ] `conf.pl:10162` - `minimum_combat_speed`
+- [x] `conf.pl:10149` - `battle_pods_speed_bonus` -> `design.battle_pods_speed_bonus`
+- [x] `conf.pl:10162` - `minimum_combat_speed` -> `design.minimum_combat_speed`
 - [ ] `conf.pl:10190` - `bc_bonus`
 - [ ] `conf.pl:10223` - `food_farmer_bonus`
 - [ ] `conf.pl:10268` - `research_scientist_bonus`
 - [ ] `conf.pl:10313` - `production_worker_bonus`
-- [ ] `conf.pl:10339` - `weather_control_climate`
+- [x] `conf.pl:10339` - `weather_control_climate` -> `colony.weather_control_climate`
 - [ ] `conf.pl:10362` - `alternate_defensive_fire_range`
 - [ ] `conf.pl:10385` - `alternate_defensive_fire`
 - [ ] `conf.pl:10398` - `leaders_no_limit`
@@ -293,7 +293,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10653` - `no_outpost_prompt`
 - [x] `conf.pl:10669` - `crystal_keep` -> `combat.crystal_keep`
 - [x] `conf.pl:10683` - `satellite_warlord_bonus` -> `combat.satellite_warlord_bonus`
-- [ ] `conf.pl:10696` - `leader_warlord_bonus`
+- [x] `conf.pl:10696` - `leader_warlord_bonus` -> `leaders.leader_warlord_bonus`
 - [ ] `conf.pl:10709` - `alternate_diplomacy`
 - [ ] `conf.pl:10723` - `rebel_display`
 - [ ] `conf.pl:10769` - `defenses_allowed_mods`
@@ -303,10 +303,10 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10855` - `proton_torpedo_apply_speed_base`
 - [ ] `conf.pl:10899` - `satellite_ammo_basis`
 - [ ] `conf.pl:10913` - `missile_base_ammo_basis`
-- [ ] `conf.pl:10927` - `2x_range_accuracy_penalty`
-- [ ] `conf.pl:10940` - `2x_range_damage_penalty`
+- [ ] `conf.pl:10927` - `2x_range_accuracy_penalty` -> renamed `combat.double_range_accuracy_penalty`
+- [ ] `conf.pl:10940` - `2x_range_damage_penalty` -> renamed `combat.double_range_damage_penalty`
 - [ ] `conf.pl:10953` - `antaran_star_fortress_space`
-- [ ] `conf.pl:10967` - `simplified_beam_formula`
+- [x] `conf.pl:10967` - `simplified_beam_formula` -> `combat.simplified_beam_formula`
 - [ ] `conf.pl:11001` - `ai_hypertech_threshold`
 - [ ] `conf.pl:11027` - `terraform_toxic_building`
 - [ ] `conf.pl:11040` - `combat_ships_without_ammo_stay`
@@ -320,7 +320,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:11242` - `jump_gate_pass_nebula` -> `movement.jump_gate_pass_nebula`
 - [ ] `conf.pl:11255` - `ai_builds_colony_bases_prewarp`
 - [ ] `conf.pl:11285` - `lab_and_lore_against_antarans`
-- [ ] `conf.pl:11314` - `pop_bonus_subterranean`
+- [x] `conf.pl:11314` - `pop_bonus_subterranean` -> `colony.pop_bonus_subterranean`
 - [ ] `conf.pl:11327` - `pop_bonus_tolerant`
 - [ ] `conf.pl:11349` - `reinforced_hull_multiplier`
 - [ ] `conf.pl:11371` - `marine_kill_damage`
@@ -333,8 +333,8 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:11507` - `all_planet_shields_block_bioweapons`
 - [ ] `conf.pl:11529` - `lithovore_has_fungi_in_tech_tree`
 - [ ] `conf.pl:11568` - `race_personality`
-- [ ] `conf.pl:11605` - `ranged_to_hit_penalty`
-- [ ] `conf.pl:11621` - `ranged_damage_penalty`
+- [x] `conf.pl:11605` - `ranged_to_hit_penalty` -> `combat.ranged_to_hit_penalty`
+- [x] `conf.pl:11621` - `ranged_damage_penalty` -> `combat.ranged_damage_penalty`
 - [ ] `conf.pl:11637` - `first_council_delay`
 - [ ] `conf.pl:11652` - `council_frequency`
 - [ ] `conf.pl:11668` - `elite_offensive_ants`
@@ -527,14 +527,3 @@ These five registrations remain in `conf.pl` for compatibility or generator hist
 - `asm.pl:5059` - `var_stats_help_y_step_1` at executable offset `0x18E03A`
 - `asm.pl:5060` - `var_stats_help_y_step_2` at executable offset `0x18E03E`
 - `asm.pl:12671` - `var_leader_exp_end` at executable offset `0x117C40`
-
-## Completeness check
-
-- Effective active configuration variables: **391**.
-- Exact same-named current registry parameters: **60**.
-- Configuration variables still requiring restoration review: **331**.
-- Superseded `expired` configuration registrations: **5**.
-- Patch-owned writable `var_*` allocations: **47**.
-- Original writable `va_symbol` aliases: **34**.
-- Original writable `add_symbol` data aliases: **9**.
-- Total binary writable aliases: **43**.

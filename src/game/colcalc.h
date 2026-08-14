@@ -46,6 +46,8 @@ namespace COLCALC {
 
     extern s_trade_goods_ratio trade_goods_ratio;
     extern uint8_t _pop_bonus_biospheres;
+    extern uint8_t _pop_bonus_subterranean[PLANET_SIZE_COUNT];
+    extern uint8_t weather_control_climate;
 
     extern uint8_t _federation_no_mixed_races_penalty;
     extern uint8_t _housing_creates_no_farmers;
@@ -360,8 +362,6 @@ namespace COLCALC {
     int __cdecl Calc_Player_Climate_(int player_idx, int climate);
 
     int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, uint8_t is_immune);
-
-    short __cdecl Double_Add_Two_(short value);
 
     int16_t __cdecl Size_And_Climate_Race_Pop_Limit_(int8_t size, int climate, int16_t player_idx);
 

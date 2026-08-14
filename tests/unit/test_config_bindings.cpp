@@ -23,6 +23,7 @@
 #include "game/invasion.h"
 #include "game/initship.h"
 #include "game/mapgen.h"
+#include "game/officer.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
 #include "game/techinit.h"
@@ -160,6 +161,22 @@ DOCTEST_TEST_CASE("fighter point-defense setting preserves the classic default")
     DOCTEST_CHECK(CMBTFIRE::_fighters_use_point_defense == 1);
 }
 
+DOCTEST_TEST_CASE("simplified beam formula preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_simplified_beam_formula == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat simplified_beam_formula = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_simplified_beam_formula == 1);
+}
+
 DOCTEST_TEST_CASE("planet non-enveloping setting preserves the classic default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -189,6 +206,59 @@ DOCTEST_TEST_CASE("Spatial Compressor size scaling preserves the classic default
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(CMBTSPEC::_compressor_per_size_class_damage == 1);
+
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+}
+
+DOCTEST_TEST_CASE("spherical and weapon ranges preserve and replace 1.50 defaults") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.proton_torpedo == 8);
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.tractor_beam == 4);
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.black_hole_generator == 5);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_ship.pulsar == 6);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_ship.spatial_compressor == 4);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_missile.pulsar == 122);
+    DOCTEST_CHECK(
+        CMBTFIRE::spherical_range_to_missile.drive_explosion == 135);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat weapon_range tractor_beam = 7;"
+        "combat weapon_range proton_torpedo = 10;"
+        "combat spherical_range_to_ship pulsar = 8;"
+        "combat spherical_range_to_ship drive_explosion = 9;"
+        "combat spherical_range_to_missile spatial_compressor = 120;"
+        "combat spherical_range_to_missile drive_explosion = 140;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.tractor_beam == 7);
+    DOCTEST_CHECK(CMBTFIRE::weapon_range.proton_torpedo == 10);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_ship.pulsar == 8);
+    DOCTEST_CHECK(CMBTFIRE::spherical_range_to_ship.drive_explosion == 9);
+    DOCTEST_CHECK(
+        CMBTFIRE::spherical_range_to_missile.spatial_compressor == 120);
+    DOCTEST_CHECK(
+        CMBTFIRE::spherical_range_to_missile.drive_explosion == 140);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat weapon_range tractor_beam = 256;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat spherical_range_to_ship pulsar = 256;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat spherical_range_to_missile pulsar = 2147483648;",
+        &writes, &diagnostic));
 
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
     DOCTEST_REQUIRE(config::Commit_State(&state));
@@ -429,6 +499,21 @@ DOCTEST_TEST_CASE("ground Commando settings preserve classic defaults") {
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(invasion::_ground_commando_defender_x5 == 1);
     DOCTEST_CHECK(invasion::_ground_commando_attacker_x2 == 1);
+}
+
+DOCTEST_TEST_CASE("leader Warlord setting preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(OFFICER::_leader_warlord_bonus == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "leaders leader_warlord_bonus = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(OFFICER::_leader_warlord_bonus == 1);
 }
 
 DOCTEST_TEST_CASE("Federation mixed-race setting preserves the classic default") {
@@ -904,6 +989,27 @@ DOCTEST_TEST_CASE("missile initiative preserves the classic delay by default") {
         "combat missile_initiative = 1;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("Star Base fleet beam offense preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIR2::_starbase_fleet_beam_offense == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat_bonus starbase_fleet_beam_offense = 17;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIR2::_starbase_fleet_beam_offense == 17);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat_bonus starbase_fleet_beam_offense = 256;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("Phasing Cloak duration preserves the 1.50 default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -922,6 +1028,7 @@ DOCTEST_TEST_CASE("Phasing Cloak duration preserves the 1.50 default") {
 
 DOCTEST_TEST_CASE("combat namespace settings resolve bidirectionally and commit defaults") {
     const char* paths[] = {
+        "combat_bonus.starbase_fleet_beam_offense",
         "combat_bonus.phasing_cloak_effective_turns",
         "combat.round_teleporter",
         "combat.board_range.normal",

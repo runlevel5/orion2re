@@ -951,7 +951,7 @@ namespace COLCALC {
         int max_pop = COLCALC::Size_And_Climate_Max_Population_(size, adjusted_climate, is_immune);
 
         if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_SUBTERRANEAN] != 0) {
-            max_pop += COLCALC::Double_Add_Two_(size);
+            max_pop += _pop_bonus_subterranean[size];
         }
 
         return static_cast<short>(max_pop);
@@ -1263,10 +1263,6 @@ namespace COLCALC {
         }
 
         colony->imports[ECON_BC] = static_cast<int16_t>(static_cast<uint8_t>(colony->maintenance[ECON_BC])) - colony->production[ECON_BC];
-    }
-
-    short __cdecl Double_Add_Two_(short value) {
-        return (value * 2) + 2;
     }
 
     int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, uint8_t is_immune) {
@@ -3046,7 +3042,11 @@ namespace COLCALC {
                         return 0;
                     }
                     case BUILDING_WEATHER_CONTROLLER: {
-                        return (colony->food2_per_farmer == 0) ? 2 : 1;
+                        if (colony->food2_per_farmer == 0) return 2;
+                        if (weather_control_climate == PLANET_CLIMATE_RADIATED) {
+                            return (colony->climate == PLANET_CLIMATE_RADIATED) ? 2 : 1;
+                        }
+                        return (uint8_t)colony->climate < weather_control_climate ? 2 : 1;
                     }
                     case BUILDING_ARTIFICIAL_PLANET: {
                         return COLCALC::Star_Has_Asteroid_Or_Gas_Giant_(MOX::_planet[colony->planet].star_index);

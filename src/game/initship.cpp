@@ -4,6 +4,14 @@
 
 namespace INITSHIP {
     namespace {
+        int16_t Weapon_Selection_Max_Damage_(
+            const s_tech_weapon_data& weapon) {
+            if (MOX::_settings.strategic_combat_flag == 1) {
+                return weapon.strat_max_damage;
+            }
+            return weapon.max_damage;
+        }
+
         namespace stealth_landers {
             struct s_device_lookup {
                 uint16_t tech_application;
@@ -726,13 +734,16 @@ namespace INITSHIP {
 
         // Iterate through known beam weapons (0-39)
         for (int16_t i = 0; i < 40; ++i) {
+            const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
+
             // Check if player has researched this weapon and ensure it is a beam weapon.
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED &&
-                TECHDATA::_weapons[i].type == WEAPON_TYPE_BEAM) {
+            if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED &&
+                weapon.type == WEAPON_TYPE_BEAM) {
 
                 // Track weapon with highest damage
-                if (TECHDATA::_weapons[i].max_damage > max_damage) {
-                    max_damage = TECHDATA::_weapons[i].max_damage;
+                int16_t weapon_damage = Weapon_Selection_Max_Damage_(weapon);
+                if (weapon_damage > max_damage) {
+                    max_damage = weapon_damage;
                     best_weapon_idx = i;
                 }
             }
@@ -747,12 +758,15 @@ namespace INITSHIP {
 
         if (player_idx < MAX_PLAYERS) {
             for (int16_t i = 0; i < 40; ++i) {
+                const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
+
                 // check if player has researched the weapon (value 3 usually means fully researched/available)
-                if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
-                    if (TECHDATA::_weapons[i].type == WEAPON_TYPE_MISSILE || TECHDATA::_weapons[i].type == WEAPON_TYPE_TORPEDO) {
-                        if (max_damage < TECHDATA::_weapons[i].max_damage) {
+                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED) {
+                    if (weapon.type == WEAPON_TYPE_MISSILE || weapon.type == WEAPON_TYPE_TORPEDO) {
+                        int16_t weapon_damage = Weapon_Selection_Max_Damage_(weapon);
+                        if (max_damage < weapon_damage) {
                             best_idx = i;
-                            max_damage = TECHDATA::_weapons[i].max_damage;
+                            max_damage = weapon_damage;
                         }
                     }
                 }
@@ -1047,11 +1061,13 @@ namespace INITSHIP {
             const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
 
             if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == TECH_RESEARCH_STATUS_RESEARCHED &&
-                weapon.type == WEAPON_TYPE_BOMB &&
-                weapon.max_damage > max_damage)
+                weapon.type == WEAPON_TYPE_BOMB)
             {
-                best_weapon_idx = i;
-                max_damage = weapon.max_damage;
+                int16_t weapon_damage = Weapon_Selection_Max_Damage_(weapon);
+                if (weapon_damage > max_damage) {
+                    best_weapon_idx = i;
+                    max_damage = weapon_damage;
+                }
             }
         }
 

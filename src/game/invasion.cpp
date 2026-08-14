@@ -84,7 +84,7 @@ void __cdecl Compute_Colony_Officer_Bonus_(s_colony* colony, s_invasion_player_b
         }
 
         if (bonuses->officer_bonus > 0) {
-            bonuses->officer_idx = (int8_t)colony->officer;
+            bonuses->officer_idx = (int8_t)leader_idx;
         }
     }
 }
@@ -914,8 +914,8 @@ void __cdecl Compute_Colony_Ground_Combat_Info_(s_colony* colony, s_invasion_sid
     side_info->unit_counts[1] = colony->military[0];
     side_info->unit_counts[2] = (int16_t)Colony_N_Militia_(colony);
 
-    Compute_Colony_Officer_Bonus_(colony, &side_info->combat_modifiers);
     Compute_Player_Ground_Combat_Bonuses_(colony->owner, &side_info->combat_modifiers, 1);
+    Compute_Colony_Officer_Bonus_(colony, &side_info->combat_modifiers);
     Compute_Ground_Combat_Info_(side_info, &side_info->combat_modifiers, nullptr);
 }
 

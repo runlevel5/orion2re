@@ -67,6 +67,20 @@ namespace {
         return colony;
     }
 
+    s_colony* Prepare_Weather_Controller_() {
+        TEST_COLONY_POP_GROWTH::Reset_();
+
+        s_colony* colony = &MOX::_colony[0];
+        colony->owner = 0;
+        colony->climate = PLANET_CLIMATE_TOXIC;
+        colony->food2_per_farmer = 2;
+        TECHDATA::_buildings[BUILDING_WEATHER_CONTROLLER].tech_app =
+            TECH_APP_WEATHER_CONTROL_SYSTEM;
+        MOX::_player[0].tech_applications[TECH_APP_WEATHER_CONTROL_SYSTEM] =
+            TECH_RESEARCH_STATUS_RESEARCHED;
+        return colony;
+    }
+
     uint32_t New_Colonist_Job_(const s_colony* colony) {
         return (colony->pop[1] & 0x180u) >> 7;
     }
@@ -129,6 +143,41 @@ DOCTEST_TEST_CASE("Federation mixed-race rule restricts Alien Control Center") {
 
     DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
         colony, BUILDING_ALIEN_CONTROL_CENTER) == 1);
+}
+
+DOCTEST_TEST_CASE("Weather Controller preserves classic climate eligibility") {
+    s_colony* colony = Prepare_Weather_Controller_();
+
+    colony->food2_per_farmer = 0;
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_WEATHER_CONTROLLER) == 2);
+
+    colony->food2_per_farmer = 2;
+    colony->climate = PLANET_CLIMATE_RADIATED;
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_WEATHER_CONTROLLER) == 1);
+}
+
+DOCTEST_TEST_CASE("Weather Controller uses the configured climate") {
+    s_colony* colony = Prepare_Weather_Controller_();
+    COLCALC::weather_control_climate = PLANET_CLIMATE_DESERT;
+
+    colony->climate = PLANET_CLIMATE_BARREN;
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_WEATHER_CONTROLLER) == 2);
+
+    colony->climate = PLANET_CLIMATE_DESERT;
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_WEATHER_CONTROLLER) == 1);
+
+    COLCALC::weather_control_climate = PLANET_CLIMATE_RADIATED;
+    colony->climate = PLANET_CLIMATE_TOXIC;
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_WEATHER_CONTROLLER) == 1);
+
+    colony->climate = PLANET_CLIMATE_RADIATED;
+    DOCTEST_CHECK(COLCALC::Colony_Can_Build_Product_(
+        colony, BUILDING_WEATHER_CONTROLLER) == 2);
 }
 
 DOCTEST_TEST_CASE("population growth preserves the classic base modifier") {
@@ -242,6 +291,25 @@ DOCTEST_TEST_CASE("Biospheres population bonus is configurable") {
     COLCALC::_pop_bonus_biospheres = 7;
 
     DOCTEST_CHECK(COLCALC::Colony_Race_Pop_Limit_(colony, 0) == 32);
+}
+
+DOCTEST_TEST_CASE("Subterranean population bonus is configurable by planet size") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+    MOX::_player[0].traits[TRAIT_SUBTERRANEAN] = 1;
+
+    for (int size = 0; size < PLANET_SIZE_COUNT; ++size) {
+        DOCTEST_CHECK(
+            COLCALC::Size_And_Climate_Race_Pop_Limit_(
+                (int8_t)size, PLANET_CLIMATE_GAIA, 0) ==
+            MOX::_planet_max_population[size] +
+                COLCALC::_pop_bonus_subterranean[size]);
+    }
+
+    COLCALC::_pop_bonus_subterranean[PLANET_SIZE_SMALL] = 9;
+
+    DOCTEST_CHECK(
+        COLCALC::Size_And_Climate_Race_Pop_Limit_(
+            PLANET_SIZE_SMALL, PLANET_CLIMATE_GAIA, 0) == 19);
 }
 
 DOCTEST_TEST_CASE("classic starvation preserves the final population") {

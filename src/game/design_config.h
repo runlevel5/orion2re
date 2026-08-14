@@ -32,6 +32,8 @@ namespace DESIGN {
     extern uint8_t _design_button_shield;
     inline uint16_t _megafluxers_tactical_bonus = 25;
     inline uint8_t _augmented_engines_speed_bonus = 5;
+    inline bool _battle_pods_speed_bonus = true;
+    inline uint8_t _minimum_combat_speed = 255;
 
     inline int32_t Apply_Megafluxers_Tactical_Bonus_(int32_t space) {
         return (space * (100 + _megafluxers_tactical_bonus)) / 100;

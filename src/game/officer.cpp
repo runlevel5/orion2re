@@ -4,6 +4,7 @@ namespace OFFICER {
     // value represents ship-stack head node 9; subsequent values are contiguous.
     constexpr int16_t RACE_ONLY_SHIP_NODE_FIRST_INDEX = MAX_PLAYERS + 1;
 
+    uint8_t _leader_warlord_bonus = 0;
     char s_OFFICER_LBX_00556980[16] = "OFFICER.LBX";
     void Draw_Galmap_Zoom_Select_Box_();
     s_colors _normal_text_colors = {{61, 68, 67, 68, 68, 68, 68, 68}};
@@ -42,22 +43,25 @@ namespace OFFICER {
     }
 
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord) {
+        int16_t level;
+
         if (xp < 60) {
-            return 0;
+            level = 0;
+        } else if (xp < 150) {
+            level = 1;
+        } else if (xp < 300) {
+            level = 2;
+        } else if (xp < 500) {
+            level = 3;
+        } else {
+            level = 4;
         }
-        if (xp < 150) {
-            return 1;
+
+        if (warlord != 0 && (_leader_warlord_bonus != 0 || xp >= 1000)) {
+            ++level;
         }
-        if (xp < 300) {
-            return 2;
-        }
-        if (xp < 500) {
-            return 3;
-        }
-        if (xp < 1000) {
-            return 4;
-        }
-        return (warlord != 0) ? 5 : 4;
+
+        return level;
     }
 
     int32_t __cdecl Officer_Skill_Bonus_(uint32_t unused, int16_t leader_idx, int16_t skill_idx) {
@@ -255,17 +259,7 @@ namespace OFFICER {
         const int16_t level_thresholds[] = { 60, 150, 300, 500, 1000 };
 
         s_leader_data& leader = MOX::_leaders[leader_index];
-        int8_t warlord = 0;
-
-        // Check if the officer's owner has the Warlord trait
-        if (leader.player_index != -1) {
-            if (MOX::_player[leader.player_index].traits[TRAIT_WARLORD] != 0) {
-                warlord = 1;
-            }
-        }
-
-        // Calculate the current level based on XP and Warlord status
-        int16_t current_level = Get_Officer_Base_Level_(leader.xp, warlord);
+        int16_t current_level = Get_Officer_Base_Level_(leader.xp, 0);
 
         // Increase level if not already at max (level 5 / Elite)
         if (current_level >= 0 && current_level < 5) {

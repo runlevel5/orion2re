@@ -1293,15 +1293,12 @@ namespace AIDATA {
         int32_t worth = 0;
 
         if (planet->planet_type == PLANET_TYPE_PLANET) {
-            int16_t subterranean_bonus = 0;
-            if (evaluating_player->traits[TRAIT_SUBTERRANEAN] != 0) {
-                subterranean_bonus = COLCALC::Double_Add_Two_(planet->size);
-            }
+            int16_t size_bonus = (int16_t)((planet->size + 1) * 2);
 
             int16_t player_idx = (int16_t)(evaluating_player - MOX::_player);
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, player_idx);
 
-            int32_t total_pop_sum = max_pop + subterranean_bonus;
+            int32_t total_pop_sum = max_pop + size_bonus;
             if (evaluating_player->tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == TECH_RESEARCH_STATUS_RESEARCHED) {
                 total_pop_sum += 5;
             }

@@ -38,6 +38,10 @@ namespace COLCALC {
     };
 
     uint8_t _pop_bonus_biospheres = 2;
+    uint8_t _pop_bonus_subterranean[PLANET_SIZE_COUNT] = {
+        2, 4, 6, 8, 10,
+    };
+    uint8_t weather_control_climate = PLANET_CLIMATE_TOXIC;
     uint8_t _federation_no_mixed_races_penalty = 0;
     uint8_t _housing_creates_no_farmers = 0;
     uint8_t _planet_extinction = 0;

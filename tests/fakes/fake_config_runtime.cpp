@@ -2,6 +2,8 @@
 
 namespace MOX {
     s_settings _settings = {};
+    int16_t _ranged_to_hit_penalty[9] = {};
+    int16_t _ranged_damage_penalty[9] = {};
 }
 
 namespace MAPGEN {
@@ -30,6 +32,7 @@ namespace CMBTFIRE {
 }
 
 namespace CMBTFIR2 {
+    uint8_t _starbase_fleet_beam_offense = 0;
     uint16_t _systems_repair_percent = 50;
 }
 
@@ -41,4 +44,8 @@ namespace TECHDATA {
 
 namespace SCIENCE {
     uint8_t _finds_presented_by_scientist;
+}
+
+namespace OFFICER {
+    uint8_t _leader_warlord_bonus;
 }

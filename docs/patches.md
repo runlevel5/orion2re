@@ -289,26 +289,26 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:9559` - `red the weapon`: fixed in `CMBTDRW1::Draw_Weapon_Status_Display_()` by preserving the disabled red palette when a weapon is also spent; this replaces the 1.50 code-cave bypass with direct source-level color-state precedence.
 - [x] `asm.pl:9579` - `colony bases and outposts`: fixed in `COLBLDG::Star_N_Uncolonized_Worlds_()` by counting only same-owner outposts as colony-base targets; this replaces the 1.50 code-cave owner check with a direct source-level invariant.
 - [x] `asm.pl:9614` - `fighter ordnance`: fixed in `CMBTFIRE::Fire_Fighter_Beam_()` and `CMBTFIRE::Fire_Fighter_Bomb_()` by applying the combat owner's ordnance multiplier to both fighter damage bounds before attack resolution; direct source scaling replaces the 1.50 register-preserving helper calls.
-- [ ] `asm.pl:9685` - `shwifty range`
+- [x] `asm.pl:9685` - `shwifty range`: fixed in `CMBTFIRE::Weapon_In_Range_()` and `CMBTSPEC::Do_Spherical_SFX_()` by sharing configured center-to-edge ship and center-to-center flyer predicates for live targeting and damage; this replaces the 1.50 call-site diversions and animation-radius comparisons with one source-level invariant while retaining supplied hypothetical ranges for AI estimates.
 - [x] `asm.pl:10496` - `mixed race penalty`: implemented in `COLCALC::Mixed_Race_Morale_Penalty_()` with synchronized `colony.federation_no_mixed_races_penalty`; the direct source-level government rule replaces the 1.50 call-site wrapper while preserving classic behavior by default.
-- [ ] `asm.pl:10523` - `battle pods cap`
+- [x] `asm.pl:10523` - `battle pods cap`: implemented in `DESIGN::Current_Design_Base_Combat_Speed_()` and `COMBINIT::Unload_Combat_Ship_()` with synchronized Battle Pods bonus and overload-floor settings; direct source calculations replace the 1.50 helper calls, and intentional zero-speed designs bypass the impossible end-of-combat repair loop.
 - [x] `asm.pl:10617` - `extended fuel range rounding`: fixed in `SHIPMOVE::Star_In_Extended_Range_Of_Player_()` by rounding 150 percent range up for odd fuel ranges, matching ship-specific extended fuel tanks and preventing boundary systems from being excluded; direct source arithmetic replaces the 1.50 instruction patch.
-- [ ] `asm.pl:11600` - `colony enviromental stuff stuff`
-- [ ] `asm.pl:11617` - `required climate to build weather controller`
-- [ ] `asm.pl:12616` - `warlord leaders +1 level`
-- [ ] `asm.pl:13504` - `colony commando`
-- [ ] `asm.pl:14321` - `strategic weapon damage`
-- [ ] `asm.pl:14601` - `strategic weapon damage value corrections`
-- [ ] `asm.pl:14701` - `telepath skill blocks mind control`
-- [ ] `asm.pl:15672` - `2x penalty`
+- [x] `asm.pl:11600` - `colony enviromental stuff stuff`: fixed in `ERICNET::Add_Building_()` by refreshing cached colony climate and farming state after every building effect; this replaces the 1.50 call-site diversions with an owner-level invariant.
+- [x] `asm.pl:11617` - `required climate to build weather controller`: implemented in `COLCALC::Colony_Can_Build_Product_()` with synchronized `colony weather_control_climate`; direct source checks replace the 1.50 flag-returning helper while preserving the Toxic default and Radiated exception.
+- [x] `asm.pl:12616` - `warlord leaders +1 level`: implemented in `OFFICER::Get_Officer_Base_Level_()` and `OFFICER::Increase_Officer_Level_By_One_()` with synchronized `leaders leader_warlord_bonus`; effective Warlord level is optionally raised at every XP tier while advancement remains based on stored XP, replacing the 1.50 wrapper and call-site helper with direct source-level rules.
+- [x] `asm.pl:13504` - `colony commando`: fixed in `invasion::Compute_Colony_Officer_Bonus_()` and `invasion::Compute_Colony_Ground_Combat_Info_()` by retaining the resolved leader index and applying player bonuses before the colony officer bonus; direct source ordering replaces the 1.50 register preservation and call reordering.
+- [x] `asm.pl:14321` - `strategic weapon damage`: fixed in the `INITSHIP` best-weapon selectors and `COMBAT` strategic attack routines by ranking and resolving strategic weapons from their dedicated strategic damage fields; direct source-level field selection replaces the 1.50 code-cave diversions while preserving tactical selection behavior.
+- [x] `asm.pl:14601` - `strategic weapon damage value corrections`: fixed in `TECHDATA::_weapons` by restoring the corrected strategic minimum and maximum damage estimates for sixteen weapons; direct source table values replace the 1.50 binary data-byte patches.
+- [x] `asm.pl:14701` - `telepath skill blocks mind control`: fixed in `ERIC::Player_Can_Mind_Control_Colony_()` and `ERIC::Player_Can_Mind_Control_Colony_With_Help_()` by checking Telepath and Telepath* through the shared star-leader lookup; this replaces the four 1.50 register-setting wrappers and prevents Assassin leaders from blocking mind control.
+- [x] `asm.pl:15672` - `2x penalty`: implemented in `CMBTFIRE::Get_Beam_Weapon_Modifiers_()` with synchronized accuracy and damage toggles plus configurable range tables; direct source conditions replace the 1.50 assembly helpers and constrain both effects to weapons carrying the intrinsic double-range-penalty property.
 - [ ] `asm.pl:15717` - `expected damage`
-- [ ] `asm.pl:16106` - `fair beams`
-- [ ] `asm.pl:16844` - `subterranean bonuses`
-- [ ] `asm.pl:16912` - `stealth mutual exclusive with cloaks`
-- [ ] `asm.pl:16935` - `double range accuracy penalty inherent mod removals`
-- [ ] `asm.pl:16951` - `starting relations symmetry meklar-bulrathi`
+- [x] `asm.pl:16106` - `fair beams`: implemented in `CMBTFIRE::Fire_Beam_Weapon_()` with synchronized `combat simplified_beam_formula`; enabled range and Point Defense modifiers are applied to beam attack instead of the capped threshold, replacing the 1.50 call-site helper with direct source logic while preserving the classic default.
+- [x] `asm.pl:16844` - `subterranean bonuses`: fixed in `AIDATA::Uncolonized_Planet_Worth_To_Player_()` and `COLCALC::Size_And_Climate_Race_Pop_Limit_()` by making the classic size term a common AI valuation baseline and applying the synchronized per-size Subterranean capacity table at its source; direct source logic replaces the 1.50 branch and helper call.
+- [x] `asm.pl:16912` - `stealth mutual exclusive with cloaks`: implemented in `TECHDATA::_specials` by making Stealth Field, Cloaking Device, and Phasing Cloak reciprocal exclusions; the authoritative table is shared by human and AI design legality and directly replaces the 1.50 binary data writes.
+- [x] `asm.pl:16935` - `double range accuracy penalty inherent mod removals`: fixed in `TECHDATA::_weapons` by retaining the intrinsic always-hit property while removing the contradictory double-range penalty from Mauler Device and Plasma Breath; direct source table corrections replace the two 1.50 data-byte patches.
+- [x] `asm.pl:16951` - `starting relations symmetry meklar-bulrathi`: fixed in `diplomac::_starting_relations` by making the Meklar-to-Bulrathi starting relation match the reciprocal `-12` value; this directly restores the 1.50 data correction.
 - [ ] `asm.pl:16960` - `leader hire tech`
-- [ ] `asm.pl:17108` - `star base fleet beam offense`
+- [x] `asm.pl:17108` - `star base fleet beam offense`: implemented in `CMBTFIR2::Fleet_Offensive_Bonus_()` with synchronized `combat_bonus starbase_fleet_beam_offense` configuration; direct source-level station-tier selection replaces the 1.50 code-cave diversion while preserving the classic zero default.
 - [ ] `asm.pl:17131` - `fair leader hire`
 - [ ] `asm.pl:17157` - `aquatic treats tundra as swamp`
 - [ ] `asm.pl:17339` - `transport ship extended fuel tanks`

@@ -11,6 +11,7 @@ struct s_officer_picture_slot {
 
 namespace OFFICER {
     extern char s_OFFICER_LBX_00556980[16];
+    extern uint8_t _leader_warlord_bonus;
 
     s_animation_header* __cdecl Load_Officer_Picture_(
         int32_t unused,
