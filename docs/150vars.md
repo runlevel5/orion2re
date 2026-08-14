@@ -225,7 +225,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:8893` - `prewarp_techfield`
 - [ ] `conf.pl:8920` - `ship_initiative`
 - [x] `conf.pl:8945` - `continuous_bhg` -> `combat.continuous_bhg`
-- [ ] `conf.pl:8973` - `command_points`
+- [x] `conf.pl:8973` - `command_points` -> `command.command_points`
 - [ ] `conf.pl:9083` - `skill_cost`
 - [ ] `conf.pl:9106` - `skill_cost_commando`
 - [ ] `conf.pl:9125` - `megawealth_no_double_cost`
@@ -265,8 +265,8 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:9937` - `defensive_fire_max_range`
 - [x] `conf.pl:9950` - `keep_research_on_breakthrough` -> `research.keep_research_on_breakthrough`
 - [x] `conf.pl:9964` - `keep_research_on_finds` -> `research.keep_research_on_finds`
-- [ ] `conf.pl:9978` - `ship_command_points_usage`
-- [ ] `conf.pl:9996` - `landers_size_class`
+- [x] `conf.pl:9978` - `ship_command_points_usage` -> `command.ship_command_points_usage`
+- [x] `conf.pl:9996` - `landers_size_class` -> `command.landers_size_class`
 - [ ] `conf.pl:10010` - `raid_damage_per_marine`
 - [x] `conf.pl:10023` - `finds_presented_by_scientist` -> `research.finds_presented_by_scientist`
 - [ ] `conf.pl:10039` - `barracks_morale_bonus`

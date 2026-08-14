@@ -3,6 +3,20 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    struct s_command_points {
+        int8_t starting;
+        int8_t star_base;
+        int8_t battlestation;
+        int8_t star_fortress;
+        int8_t tachyon_communications;
+        int8_t sub_space_communications;
+        int8_t hyperspace_communications;
+        int8_t warlord_planet;
+    };
+
+    extern s_command_points command_points;
+    extern uint8_t ship_command_points_usage[SHIP_SIZE_COUNT];
+
     struct s_government_bonus {
         s_ratio16 cost_reduction;
         int8_t science;

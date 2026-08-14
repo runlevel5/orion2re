@@ -485,7 +485,7 @@ namespace INITSHIP {
         const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_COLONY][(uint8_t)MOX::_settings.language];
         strlcpy(design->name, localized_name, sizeof(design->name));
 
-        design->size = SHIP_SIZE_SMALL;
+        design->size = _landers_size_class;
         design->ship_type = SHIP_TYPE_COLONY;
         design->shield_type = SHIELD_NO_SHIELD;
 
@@ -511,7 +511,7 @@ namespace INITSHIP {
 
         strlcpy(design->name, MOX::_ship_type_names[SHIP_TYPE_OUTPOST][(uint8_t)MOX::_settings.language], sizeof(design->name));
 
-        design->size = SHIP_SIZE_SMALL;
+        design->size = _landers_size_class;
         design->ship_type = SHIP_TYPE_OUTPOST;
         design->shield_type = SHIELD_NO_SHIELD;
         design->ftl_type = static_cast<int8_t>(Best_Warp_Drive_(player_idx));
@@ -1794,7 +1794,7 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     const char* localized_name = MOX::_ship_type_names[SHIP_TYPE_TRANSPORT][(uint8_t)MOX::_settings.language];
     strlcpy(design->name, localized_name, sizeof(design->name));
 
-    design->size = SHIP_SIZE_SMALL;
+    design->size = INITSHIP::_landers_size_class;
     design->ship_type = SHIP_TYPE_TRANSPORT;
     design->shield_type = SHIELD_NO_SHIELD;
 

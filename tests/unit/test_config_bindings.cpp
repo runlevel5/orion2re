@@ -450,6 +450,58 @@ DOCTEST_TEST_CASE("Scout Lab research bonuses preserve classic defaults and bind
         &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("command-point settings preserve classic defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::command_points.starting == 5);
+    DOCTEST_CHECK(COLCALC::command_points.star_base == 1);
+    DOCTEST_CHECK(COLCALC::command_points.battlestation == 2);
+    DOCTEST_CHECK(COLCALC::command_points.star_fortress == 3);
+    DOCTEST_CHECK(COLCALC::command_points.tachyon_communications == 1);
+    DOCTEST_CHECK(COLCALC::command_points.sub_space_communications == 2);
+    DOCTEST_CHECK(COLCALC::command_points.hyperspace_communications == 3);
+    DOCTEST_CHECK(COLCALC::command_points.warlord_planet == 2);
+    const uint8_t expected[SHIP_SIZE_COUNT] = {1, 2, 3, 4, 5, 6};
+    DOCTEST_CHECK(std::memcmp(COLCALC::ship_command_points_usage, expected,
+                              sizeof(expected)) == 0);
+    DOCTEST_CHECK(INITSHIP::_landers_size_class == SHIP_SIZE_SMALL);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "command command_points starting = -7;"
+        "command command_points star_base = 4;"
+        "command command_points battlestation = 6;"
+        "command command_points star_fortress = 8;"
+        "command command_points tachyon_communications = 2;"
+        "command command_points sub_space_communications = 4;"
+        "command command_points hyperspace_communications = 6;"
+        "command command_points warlord_planet = 3;"
+        "command ship_command_points_usage cruiser = 9;"
+        "command landers_size_class = cruiser;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::command_points.starting == -7);
+    DOCTEST_CHECK(COLCALC::command_points.star_fortress == 8);
+    DOCTEST_CHECK(COLCALC::ship_command_points_usage[SHIP_SIZE_LARGE] == 9);
+    DOCTEST_CHECK(INITSHIP::_landers_size_class == SHIP_SIZE_LARGE);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "command command_points starting = 128;", &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "command ship_command_points_usage frigate = 256;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "command landers_size_class = orbital;", &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));

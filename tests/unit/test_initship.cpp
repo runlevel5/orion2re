@@ -53,6 +53,7 @@ namespace {
         INITSHIP::_satellite_uses_torpedoes = 0;
         INITSHIP::_td_ftl_bonus = 2;
         INITSHIP::_transport_ship_extended_range = 0;
+        INITSHIP::_landers_size_class = SHIP_SIZE_SMALL;
         INITSHIP::lander_ship_uses_stealth = {};
         SHIPSTAK::stealth_bonus = { 500, 500, 500, 500 };
         MOX::_settings = {};
@@ -258,6 +259,22 @@ DOCTEST_TEST_CASE("transport extended range follows its setting") {
     INITSHIP::Load_Transport_Ship_Design_(kPlayer, &design);
     DOCTEST_CHECK(struct_::Test_Bit_Field_(
         design.special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS));
+}
+
+DOCTEST_TEST_CASE("configured landing-ship size applies to every lander design") {
+    Reset_Initship_();
+    INITSHIP::_landers_size_class = SHIP_SIZE_MEDIUM;
+
+    s_ship_design colony = {};
+    s_ship_design outpost = {};
+    s_ship_design transport = {};
+    INITSHIP::Load_Colony_Ship_Design_(kPlayer, &colony);
+    INITSHIP::Load_Outpost_Ship_Design_(kPlayer, &outpost);
+    INITSHIP::Load_Transport_Ship_Design_(kPlayer, &transport);
+
+    DOCTEST_CHECK(colony.size == SHIP_SIZE_MEDIUM);
+    DOCTEST_CHECK(outpost.size == SHIP_SIZE_MEDIUM);
+    DOCTEST_CHECK(transport.size == SHIP_SIZE_MEDIUM);
 }
 
 DOCTEST_TEST_CASE("lander stealth remains disabled by default") {

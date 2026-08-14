@@ -1,6 +1,21 @@
 #include "pch.h"
 
 namespace COLCALC {
+    s_command_points command_points = {
+        5,
+        1,
+        2,
+        3,
+        1,
+        2,
+        3,
+        2,
+    };
+
+    uint8_t ship_command_points_usage[SHIP_SIZE_COUNT] = {
+        1, 2, 3, 4, 5, 6,
+    };
+
     s_government_bonus government_bonuses[GOVERNMENT_COUNT] = {
         { { 1, 3 }, -10, 0, 0, 0 },
         { { 2, 3 }, -5, 0, 0, 0 },

@@ -100,6 +100,35 @@ DOCTEST_TEST_CASE("Scout Lab research uses the configured bonus for every ship s
     }
 }
 
+DOCTEST_TEST_CASE("configured command-point values and ship usage drive maintenance") {
+    TEST_PLAYER_STATS::Reset_();
+    MOX::_NUM_COLONIES = 3;
+    MOX::_NUM_SHIPS = 2;
+
+    MOX::_player[0].traits[TRAIT_WARLORD] = 1;
+    MOX::_player[0].tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    MOX::_colony[0].buildings[BUILDING_STAR_BASE] = 1;
+    MOX::_colony[1].buildings[BUILDING_BATTLESTATION] = 1;
+    MOX::_colony[2].buildings[BUILDING_STAR_FORTRESS] = 1;
+
+    COLCALC::command_points = {7, 2, 4, 6, 1, 3, 5, 3};
+    const uint8_t usage[SHIP_SIZE_COUNT] = {2, 5, 8, 11, 14, 17};
+    memcpy(COLCALC::ship_command_points_usage, usage, sizeof(usage));
+
+    MOX::_ship[0].owner = 0;
+    MOX::_ship[0].d.ship_type = SHIP_TYPE_COMBAT;
+    MOX::_ship[0].d.size = SHIP_SIZE_LARGE;
+    MOX::_ship[1].owner = 0;
+    MOX::_ship[1].d.ship_type = SHIP_TYPE_COLONY;
+    MOX::_ship[1].d.size = SHIP_SIZE_MEDIUM;
+
+    COLCALC::Compute_Player_Maintenance_(&MOX::_player[0], nullptr);
+
+    DOCTEST_CHECK(MOX::_player[0].command_points == 43);
+    DOCTEST_CHECK(MOX::_player[0].command_points_used == 13);
+}
+
 DOCTEST_TEST_CASE("configured Food Replicator PP costs cap spending without negative production") {
     struct s_case {
         uint8_t pp_cost;

@@ -14,6 +14,7 @@ namespace INITSHIP {
     inline uint8_t _satellite_uses_torpedoes = 0;
     inline uint8_t _td_ftl_bonus = 2;
     inline uint8_t _transport_ship_extended_range = 0;
+    inline uint8_t _landers_size_class = SHIP_SIZE_SMALL;
     inline s_lander_ship_uses_stealth lander_ship_uses_stealth = {};
 
     void __cdecl Repair_Ships_At_Colonies_();
