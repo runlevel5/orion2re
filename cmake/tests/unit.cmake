@@ -443,6 +443,27 @@ orion2re_add_unit_test(test_missile_defense
         tests/fakes/fake_fields_helpers_runtime.cpp
 )
 
+orion2re_add_unit_test(test_diplomac
+    SOURCES
+        tests/unit/test_diplomac.cpp
+    PRODUCTION_SOURCES
+        src/game/diplomac.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_diplomac_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_diplomac PRIVATE /Gy)
+    target_link_options(test_diplomac PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_diplomac PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_diplomac PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_diplomac PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
 orion2re_add_unit_test(test_combat_stats
     SOURCES
         tests/unit/test_combat_stats.cpp
