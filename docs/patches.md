@@ -308,7 +308,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16935` - `double range accuracy penalty inherent mod removals`: fixed in `TECHDATA::_weapons` by retaining the intrinsic always-hit property while removing the contradictory double-range penalty from Mauler Device and Plasma Breath; direct source table corrections replace the two 1.50 data-byte patches.
 - [x] `asm.pl:16951` - `starting relations symmetry meklar-bulrathi`: fixed in `diplomac::_starting_relations` by making the Meklar-to-Bulrathi starting relation match the reciprocal `-12` value; this directly restores the 1.50 data correction.
 - [ ] `asm.pl:16960` - `leader hire tech`
-- [ ] `asm.pl:17108` - `star base fleet beam offense`
+- [x] `asm.pl:17108` - `star base fleet beam offense`: implemented in `CMBTFIR2::Fleet_Offensive_Bonus_()` with synchronized `combat_bonus starbase_fleet_beam_offense` configuration; direct source-level station-tier selection replaces the 1.50 code-cave diversion while preserving the classic zero default.
 - [ ] `asm.pl:17131` - `fair leader hire`
 - [ ] `asm.pl:17157` - `aquatic treats tundra as swamp`
 - [ ] `asm.pl:17339` - `transport ship extended fuel tanks`

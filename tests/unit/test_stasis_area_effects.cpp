@@ -38,6 +38,23 @@ DOCTEST_TEST_CASE("stasis disables satellite attack bonus") {
     DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 0);
 }
 
+DOCTEST_TEST_CASE("Star Base fleet attack bonus is configurable and disabled by stasis") {
+    TEST_STASIS_AREA_EFFECTS::Reset_();
+    s_combat_data& station = MOX::_combat_data[1];
+    station.owner = 0;
+    station.ship_idx = -1;
+    station.ftl_type = DRIVE_NO_DRIVE;
+    station.size_class = SHIP_SIZE_LARGE;
+
+    DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 0);
+
+    CMBTFIR2::_starbase_fleet_beam_offense = 17;
+    DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 17);
+
+    TEST_STASIS_AREA_EFFECTS::Set_In_Stasis_(1, true);
+    DOCTEST_CHECK(CMBTFIR2::Fleet_Offensive_Bonus_(0) == 0);
+}
+
 DOCTEST_TEST_CASE("ordinary no-drive ships do not receive satellite attack bonuses") {
     TEST_STASIS_AREA_EFFECTS::Reset_();
     s_combat_data& ship = MOX::_combat_data[1];

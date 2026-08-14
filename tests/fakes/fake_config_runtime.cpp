@@ -32,6 +32,7 @@ namespace CMBTFIRE {
 }
 
 namespace CMBTFIR2 {
+    uint8_t _starbase_fleet_beam_offense = 0;
     uint16_t _systems_repair_percent = 50;
 }
 

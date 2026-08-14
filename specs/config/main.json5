@@ -1789,6 +1789,22 @@
       default: "race_tech",
     },
 
+    starbase_fleet_beam_offense: {
+      title: "Star Base fleet beam offense",
+      description: "Sets the fleet beam attack bonus provided by an active Star Base.",
+      remarks: "The zero default preserves classic behavior. Battlestations and Star Fortresses retain their separate 10 and 20 bonuses.",
+      examples: ["combat_bonus starbase_fleet_beam_offense = 0;"],
+      units: "beam attack",
+      group: "gameplay",
+      namespace: "combat_bonus",
+      type: "uint8",
+      bind_root: {
+        header: "game/cmbtfir2.h",
+        symbol: "CMBTFIR2::_starbase_fleet_beam_offense",
+      },
+      default: 0,
+    },
+
     phasing_cloak_effective_turns: {
       title: "Initial Phasing Cloak duration",
       description: "Sets the number of combat rounds a working Phasing Cloak starts in its phase-cloaked state.",

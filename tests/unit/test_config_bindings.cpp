@@ -973,6 +973,27 @@ DOCTEST_TEST_CASE("missile initiative preserves the classic delay by default") {
         "combat missile_initiative = 1;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("Star Base fleet beam offense preserves the classic default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIR2::_starbase_fleet_beam_offense == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat_bonus starbase_fleet_beam_offense = 17;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIR2::_starbase_fleet_beam_offense == 17);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat_bonus starbase_fleet_beam_offense = 256;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("Phasing Cloak duration preserves the 1.50 default") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -991,6 +1012,7 @@ DOCTEST_TEST_CASE("Phasing Cloak duration preserves the 1.50 default") {
 
 DOCTEST_TEST_CASE("combat namespace settings resolve bidirectionally and commit defaults") {
     const char* paths[] = {
+        "combat_bonus.starbase_fleet_beam_offense",
         "combat_bonus.phasing_cloak_effective_turns",
         "combat.round_teleporter",
         "combat.board_range.normal",

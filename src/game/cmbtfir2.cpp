@@ -21,6 +21,7 @@ namespace CMBTFIR2 {
     }
 
     int16_t _artemis_net_chance[6] = { 20, 30, 40, 50, 80, 100 };
+    uint8_t _starbase_fleet_beam_offense = 0;
     uint16_t _systems_repair_percent = 50;
 
     int16_t __cdecl Helmsman_Bonus_(int16_t leader_idx) {
@@ -245,7 +246,9 @@ namespace CMBTFIR2 {
                     !CMBTMOV1::Ship_Is_In_Stasis_(i)) {
                     const int16_t station_tier =
                         COMBINIT::Combat_Satellite_Hull_Class_(ship) - HULL_STAR_BASE;
-                    size_bonus = station_tier * 10;
+                    size_bonus = station_tier == 0
+                        ? _starbase_fleet_beam_offense
+                        : station_tier * 10;
                 }
 
                 int16_t officer_idx = ship->officer_idx;
