@@ -36,17 +36,28 @@ namespace {
         }
         return true;
     }
+
+    config::t_variable_id Variable_Id_(const char* path) {
+        config::t_variable_id id = config::CONFIG_NO_VARIABLE;
+        config::Find_Variable(path, std::strlen(path), &id);
+        return id;
+    }
 }
 
 DOCTEST_TEST_SUITE("configuration lifecycle") {
 
 DOCTEST_TEST_CASE("effective state initializes from defaults or current native values") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     config::s_effective_config defaults;
     config::Initialize_Effective_Config(&defaults);
-    DOCTEST_CHECK(defaults.state.values[0].bool_value);
-    DOCTEST_CHECK(defaults.state.values[1].integer_value == 50);
-    DOCTEST_CHECK(defaults.state.values[2].bool_value);
-    DOCTEST_CHECK(defaults.state.values[3].integer_value == 50);
+    DOCTEST_CHECK(defaults.state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(defaults.state.values[music_volume].integer_value == 50);
+    DOCTEST_CHECK(defaults.state.values[sound_enabled].bool_value);
+    DOCTEST_CHECK(defaults.state.values[sound_volume].integer_value == 50);
     DOCTEST_CHECK(defaults.provenance.size() == config::variable_count);
     for (const config::s_value_provenance& provenance : defaults.provenance) {
         DOCTEST_CHECK_FALSE(provenance.has_override);
@@ -58,13 +69,17 @@ DOCTEST_TEST_CASE("effective state initializes from defaults or current native v
     MOX::_settings.sound_fx_level = 67;
     config::s_effective_config native;
     config::Read_Effective_Native_Config(&native);
-    DOCTEST_CHECK_FALSE(native.state.values[0].bool_value);
-    DOCTEST_CHECK(native.state.values[1].integer_value == 34);
-    DOCTEST_CHECK(native.state.values[2].bool_value);
-    DOCTEST_CHECK(native.state.values[3].integer_value == 67);
+    DOCTEST_CHECK_FALSE(native.state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(native.state.values[music_volume].integer_value == 34);
+    DOCTEST_CHECK(native.state.values[sound_enabled].bool_value);
+    DOCTEST_CHECK(native.state.values[sound_volume].integer_value == 67);
 }
 
 DOCTEST_TEST_CASE("complete documents commit state and per-value provenance atomically") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     MOX::_settings.music_on = 1;
     MOX::_settings.music_level = 50;
     MOX::_settings.sound_fx_on = 1;
@@ -79,9 +94,9 @@ DOCTEST_TEST_CASE("complete documents commit state and per-value provenance atom
         "audio sound_effects_volume = 25;\n",
         "base_game", &effective, &diagnostic));
 
-    DOCTEST_CHECK_FALSE(effective.state.values[0].bool_value);
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 75);
-    DOCTEST_CHECK(effective.state.values[3].integer_value == 25);
+    DOCTEST_CHECK_FALSE(effective.state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 75);
+    DOCTEST_CHECK(effective.state.values[sound_volume].integer_value == 25);
     DOCTEST_CHECK(MOX::_settings.music_on == 0);
     DOCTEST_CHECK(MOX::_settings.music_level == 75);
     DOCTEST_CHECK(MOX::_settings.sound_fx_level == 25);
@@ -145,6 +160,8 @@ DOCTEST_TEST_CASE("document failure rolls back earlier writes provenance and nat
 }
 
 DOCTEST_TEST_CASE("stop terminates the current document before later statements") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     config::s_effective_config effective;
     config::Initialize_Effective_Config(&effective);
     config::s_cfg_diagnostic diagnostic;
@@ -152,11 +169,13 @@ DOCTEST_TEST_CASE("stop terminates the current document before later statements"
     DOCTEST_REQUIRE(Apply_(
         "audio music_volume = 70; stop; audio music_volume = 99;",
         "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 70);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 70);
     DOCTEST_CHECK(MOX::_settings.music_level == 70);
 }
 
 DOCTEST_TEST_CASE("include remains a loader operation and deferred enable is ignored") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     config::s_effective_config effective;
     config::Initialize_Effective_Config(&effective);
     config::s_cfg_diagnostic diagnostic;
@@ -166,12 +185,12 @@ DOCTEST_TEST_CASE("include remains a loader operation and deferred enable is ign
         "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
                   "include execution requires the configuration loader");
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 50);
 
     DOCTEST_REQUIRE(Apply_(
         "audio music_volume = 70; enable balance_mod;",
         "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 70);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 70);
 }
 
 }

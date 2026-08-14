@@ -6,6 +6,10 @@ namespace MOX {
     int16_t _ranged_damage_penalty[9] = {};
 }
 
+namespace REPORT {
+    uint8_t _no_outpost_prompt;
+}
+
 namespace MAPGEN {
     int16_t _maximum_star_count = 99;
 }

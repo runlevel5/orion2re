@@ -212,7 +212,7 @@ namespace {
 
     void Add_Sentinel_(config::s_config_write_set* write_set) {
         config::s_config_write write;
-        write.variable_id = 1;
+        write.variable_id = config::CONFIG_NO_VARIABLE;
         write.canonical_path = "sentinel";
         write_set->writes.push_back(std::move(write));
     }
@@ -255,18 +255,31 @@ DOCTEST_TEST_CASE("all top-level configuration parameters belong to namespaces")
 
 DOCTEST_TEST_SUITE("configuration assignment decode") {
 
-DOCTEST_TEST_CASE("stable names resolve to incremental runtime ids") {
-    config::t_variable_id music_id = 99;
+DOCTEST_TEST_CASE("stable names resolve to runtime variables") {
+    config::t_variable_id music_id = config::CONFIG_NO_VARIABLE;
     DOCTEST_REQUIRE(config::Find_Variable(
         "audio.music_volume", std::strlen("audio.music_volume"), &music_id));
-    DOCTEST_CHECK(music_id == 1);
     const config::s_type_descriptor* music = config::Get_Variable_Type(music_id);
     DOCTEST_REQUIRE(music != nullptr);
     DOCTEST_CHECK(music->value_type == config::CONFIG_VALUE_INT8);
     DOCTEST_CHECK(music->min == 0);
     DOCTEST_CHECK(music->max == 100);
-    DOCTEST_CHECK(config::Get_Variable_Type(0) == config::Get_Variable_Type(2));
-    DOCTEST_CHECK(config::Get_Variable_Type(1) == config::Get_Variable_Type(3));
+    config::t_variable_id music_enabled_id = config::CONFIG_NO_VARIABLE;
+    config::t_variable_id sound_enabled_id = config::CONFIG_NO_VARIABLE;
+    config::t_variable_id sound_volume_id = config::CONFIG_NO_VARIABLE;
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "audio.music_enabled", std::strlen("audio.music_enabled"),
+        &music_enabled_id));
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "audio.sound_effects_enabled",
+        std::strlen("audio.sound_effects_enabled"), &sound_enabled_id));
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "audio.sound_effects_volume",
+        std::strlen("audio.sound_effects_volume"), &sound_volume_id));
+    DOCTEST_CHECK(config::Get_Variable_Type(music_enabled_id) ==
+                  config::Get_Variable_Type(sound_enabled_id));
+    DOCTEST_CHECK(config::Get_Variable_Type(music_id) ==
+                  config::Get_Variable_Type(sound_volume_id));
     std::string music_name;
     DOCTEST_REQUIRE(config::Get_Variable_Name(music_id, &music_name));
     DOCTEST_CHECK(music_name == "audio.music_volume");
@@ -339,7 +352,11 @@ DOCTEST_TEST_CASE("stable path writes resolve for replay in the current build") 
     config::s_cfg_diagnostic diagnostic;
 
     DOCTEST_REQUIRE(config::Resolve_Write_Path(&write, &diagnostic));
-    DOCTEST_CHECK(write.variable_id == 3);
+    config::t_variable_id expected_id = config::CONFIG_NO_VARIABLE;
+    DOCTEST_REQUIRE(config::Find_Variable(
+        "audio.sound_effects_volume",
+        std::strlen("audio.sound_effects_volume"), &expected_id));
+    DOCTEST_CHECK(write.variable_id == expected_id);
 
     write.canonical_path = "weapons.foo.bar.1.baz";
     DOCTEST_CHECK_FALSE(config::Resolve_Write_Path(&write, &diagnostic));
@@ -351,14 +368,14 @@ DOCTEST_TEST_CASE("stable path writes resolve for replay in the current build") 
 DOCTEST_TEST_CASE("bool and integer assignments produce typed atomic writes") {
     struct s_integer_case {
         const char* source;
-        config::t_variable_id variable_id;
+        const char* canonical_path;
         int64_t expected;
     };
     const s_integer_case integers[] = {
-        {"audio music_volume = 75;", 1, 75},
-        {"audio music_volume = 0x32;", 1, 50},
-        {"audio sound_effects_volume = 0b110010;", 3, 50},
-        {"audio sound_effects_volume = 25;", 3, 25},
+        {"audio music_volume = 75;", "audio.music_volume", 75},
+        {"audio music_volume = 0x32;", "audio.music_volume", 50},
+        {"audio sound_effects_volume = 0b110010;", "audio.sound_effects_volume", 50},
+        {"audio sound_effects_volume = 25;", "audio.sound_effects_volume", 25},
     };
 
     for (const s_integer_case& test_case : integers) {
@@ -366,7 +383,7 @@ DOCTEST_TEST_CASE("bool and integer assignments produce typed atomic writes") {
         config::s_cfg_diagnostic diagnostic;
         DOCTEST_REQUIRE(Decode_(test_case.source, &write_set, &diagnostic));
         DOCTEST_REQUIRE(write_set.writes.size() == 1);
-        DOCTEST_CHECK(write_set.writes[0].variable_id == test_case.variable_id);
+        DOCTEST_CHECK(write_set.writes[0].canonical_path == test_case.canonical_path);
         DOCTEST_CHECK(write_set.writes[0].value.type == config::CONFIG_VALUE_INT8);
         DOCTEST_CHECK(write_set.writes[0].value.integer_value == test_case.expected);
         DOCTEST_CHECK(write_set.writes[0].provenance.source == "decode.cfg");

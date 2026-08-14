@@ -290,7 +290,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10496` - `monsters_stay_chance`
 - [ ] `conf.pl:10592` - `force_event_type`
 - [x] `conf.pl:10609` - `event_delay` -> `events.event_delay`
-- [ ] `conf.pl:10653` - `no_outpost_prompt`
+- [x] `conf.pl:10653` - `no_outpost_prompt` -> `interface.no_outpost_prompt`
 - [x] `conf.pl:10669` - `crystal_keep` -> `combat.crystal_keep`
 - [x] `conf.pl:10683` - `satellite_warlord_bonus` -> `combat.satellite_warlord_bonus`
 - [x] `conf.pl:10696` - `leader_warlord_bonus` -> `leaders.leader_warlord_bonus`
@@ -357,7 +357,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:12027` - `kill_excess_marines_after_capture` -> `combat.kill_excess_marines_after_capture`
 - [x] `conf.pl:12040` - `amoeba_regeneration` -> `combat.amoeba_regeneration`
 - [ ] `conf.pl:12070` - `first_pop_to_production`
-- [ ] `conf.pl:12101` - `transport_ship_extended_range`
+- [x] `conf.pl:12101` - `transport_ship_extended_range` -> `colony.transport_ship_extended_range`
 - [x] `conf.pl:12114` - `recloak_next_turn` -> `combat.recloak_next_turn`
 - [x] `conf.pl:12136` - `rephase_cloak_next_turn` -> `combat.rephase_cloak_next_turn`
 - [x] `conf.pl:12149` - `zero_colony_lost` -> `colony.zero_colony_lost`

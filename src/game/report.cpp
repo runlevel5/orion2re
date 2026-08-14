@@ -1,6 +1,7 @@
 #include "pch.h"
 
 namespace REPORT {
+    uint8_t _no_outpost_prompt;
     int16_t _n_reports;
     s_report _reports[MAX_REPORTS];
     uint8_t _done_player_reports;
@@ -156,6 +157,15 @@ namespace REPORT {
                     s_colony* colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
                     s_ship_data* colony_ship = Player_Ship_Type_At_Star_(player_idx, SHIP_TYPE_COLONY, star_idx, 0);
                     s_ship_data* outpost_ship = Player_Ship_Type_At_Star_(player_idx, SHIP_TYPE_OUTPOST, star_idx, 0);
+
+                    if (_no_outpost_prompt != 0) {
+                        outpost_ship = nullptr;
+                        if (colony_ship != nullptr &&
+                            COLONIZE::Star_N_Colonizable_Planets_For_Player_(
+                                &MOX::_star[star_idx], player_idx) == 0) {
+                            colony_ship = nullptr;
+                        }
+                    }
 
                     bool has_ships = false;
                     if (colony_ship != nullptr || outpost_ship != nullptr) {

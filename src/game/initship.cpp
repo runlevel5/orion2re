@@ -1810,6 +1810,11 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     design->special_device_flags[3] = 0;
     design->special_device_flags[4] = 0;
 
+    if (_transport_ship_extended_range != 0) {
+        struct_::Set_Bit_Field_(
+            design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
+    }
+
     // Reset all weapon slots
     for (int16_t i = 0; i < 8; ++i) {
         design->ship_weapon[i].type = 0;

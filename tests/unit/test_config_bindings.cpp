@@ -23,6 +23,7 @@
 #include "game/initship.h"
 #include "game/mapgen.h"
 #include "game/officer.h"
+#include "game/report.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
 #include "game/techinit.h"
@@ -77,6 +78,12 @@ namespace {
         write.provenance.line = 7;
         write.provenance.column = 9;
         return write;
+    }
+
+    config::t_variable_id Variable_Id_(const char* path) {
+        config::t_variable_id id = config::CONFIG_NO_VARIABLE;
+        config::Find_Variable(path, std::strlen(path), &id);
+        return id;
     }
 }
 
@@ -1519,18 +1526,28 @@ DOCTEST_TEST_CASE("schema defaults restore complete predefined ship templates") 
 }
 
 DOCTEST_TEST_CASE("logical defaults initialize typed candidate state") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     config::s_config_state state;
 
     config::Initialize_Defaults(&state);
 
     DOCTEST_REQUIRE(state.values.size() == config::variable_count);
-    DOCTEST_CHECK(state.values[0].bool_value);
-    DOCTEST_CHECK(state.values[1].integer_value == 50);
-    DOCTEST_CHECK(state.values[2].bool_value);
-    DOCTEST_CHECK(state.values[3].integer_value == 50);
+    DOCTEST_CHECK(state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(state.values[music_volume].integer_value == 50);
+    DOCTEST_CHECK(state.values[sound_enabled].bool_value);
+    DOCTEST_CHECK(state.values[sound_volume].integer_value == 50);
 }
 
 DOCTEST_TEST_CASE("native state conversion normalizes legacy byte flags") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     MOX::_settings.music_on = 7;
     MOX::_settings.music_level = 42;
     MOX::_settings.sound_fx_on = 0;
@@ -1539,13 +1556,18 @@ DOCTEST_TEST_CASE("native state conversion normalizes legacy byte flags") {
     config::s_config_state state;
     config::Read_Current_State(&state);
 
-    DOCTEST_CHECK(state.values[0].bool_value);
-    DOCTEST_CHECK(state.values[1].integer_value == 42);
-    DOCTEST_CHECK_FALSE(state.values[2].bool_value);
-    DOCTEST_CHECK(state.values[3].integer_value == 63);
+    DOCTEST_CHECK(state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(state.values[music_volume].integer_value == 42);
+    DOCTEST_CHECK_FALSE(state.values[sound_enabled].bool_value);
+    DOCTEST_CHECK(state.values[sound_volume].integer_value == 63);
 }
 
 DOCTEST_TEST_CASE("write sets apply to temporary state before explicit commit") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     MOX::_settings.music_on = 1;
     MOX::_settings.music_level = 50;
     MOX::_settings.sound_fx_on = 1;
@@ -1563,10 +1585,10 @@ DOCTEST_TEST_CASE("write sets apply to temporary state before explicit commit") 
     config::s_config_state candidate_state = base_state;
     DOCTEST_REQUIRE(config::Apply_Write_Set(&write_set, &candidate_state, &diagnostic));
 
-    DOCTEST_CHECK_FALSE(candidate_state.values[0].bool_value);
-    DOCTEST_CHECK(candidate_state.values[1].integer_value == 75);
-    DOCTEST_CHECK(candidate_state.values[2].bool_value);
-    DOCTEST_CHECK(candidate_state.values[3].integer_value == 25);
+    DOCTEST_CHECK_FALSE(candidate_state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(candidate_state.values[music_volume].integer_value == 75);
+    DOCTEST_CHECK(candidate_state.values[sound_enabled].bool_value);
+    DOCTEST_CHECK(candidate_state.values[sound_volume].integer_value == 25);
     DOCTEST_CHECK(MOX::_settings.music_on == 1);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
     DOCTEST_CHECK(MOX::_settings.sound_fx_level == 50);
@@ -1602,6 +1624,11 @@ DOCTEST_TEST_CASE("transaction commits complete write sets and later writes win"
 }
 
 DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     MOX::_settings.music_on = 1;
     MOX::_settings.music_level = 40;
     MOX::_settings.sound_fx_on = 1;
@@ -1611,10 +1638,10 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
     config::Read_Current_State(&base_state);
     config::s_config_state candidate_state;
     config::Initialize_Defaults(&candidate_state);
-    candidate_state.values[0].bool_value = false;
-    candidate_state.values[1].integer_value = 1;
-    candidate_state.values[2].bool_value = false;
-    candidate_state.values[3].integer_value = 2;
+    candidate_state.values[music_enabled].bool_value = false;
+    candidate_state.values[music_volume].integer_value = 1;
+    candidate_state.values[sound_enabled].bool_value = false;
+    candidate_state.values[sound_volume].integer_value = 2;
     const config::s_config_state original_candidate = candidate_state;
 
     config::s_config_write_set write_set;
@@ -1622,7 +1649,7 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
     DOCTEST_REQUIRE(Append_Decoded_(
         "audio music_volume = 80;", &write_set, &diagnostic));
     write_set.writes.push_back(Invalid_Write_(
-        3, config::CONFIG_VALUE_INT8, 101));
+        sound_volume, config::CONFIG_VALUE_INT8, 101));
 
     DOCTEST_CHECK_FALSE(config::Apply_Write_Set(
         &write_set, &candidate_state, &diagnostic));
@@ -1637,12 +1664,27 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
     DOCTEST_CHECK(MOX::_settings.sound_fx_level == 60);
 
     write_set.writes.back() = Invalid_Write_(
-        3, config::CONFIG_VALUE_BOOL, 0);
+        sound_volume, config::CONFIG_VALUE_BOOL, 0);
     DOCTEST_CHECK_FALSE(config::Apply_Write_Set(
         &write_set, &candidate_state, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
                   "typed write mismatch for audio.sound_effects_volume");
     DOCTEST_CHECK(MOX::_settings.music_level == 40);
+}
+
+DOCTEST_TEST_CASE("outpost prompt setting preserves classic behavior by default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(REPORT::_no_outpost_prompt == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "interface no_outpost_prompt = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(REPORT::_no_outpost_prompt == 1);
 }
 
 }

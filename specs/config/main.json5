@@ -3021,6 +3021,21 @@
       },
     },
 
+    transport_ship_extended_range: {
+      title: "Extended-range transport ships",
+      description: "Equips transport ships with Extended Fuel Tanks.",
+      remarks: "False preserves classic transport range.",
+      examples: ["colony transport_ship_extended_range = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/initship.h",
+        symbol: "INITSHIP::_transport_ship_extended_range",
+      },
+    },
+
     satellite_size_class_plus_one: {
       title: "Increase satellite size class",
       description: "Makes Star Bases Battleship-sized, Battlestations Titan-sized, and Star Fortresses Doom Star-sized in tactical combat.",
@@ -3168,6 +3183,21 @@
         symbol: "CMBTFIRE::_simplified_beam_formula",
       },
       default: false,
+    },
+
+    no_outpost_prompt: {
+      title: "Skip outpost placement prompts",
+      description: "Skips automatic outpost placement prompts when an outpost ship arrives at a star.",
+      remarks: "False preserves classic behavior. Colony placement prompts remain available when the player has a colony ship and an eligible planet.",
+      examples: ["interface no_outpost_prompt = true;"],
+      group: "interface",
+      namespace: "interface",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/report.h",
+        symbol: "REPORT::_no_outpost_prompt",
+      },
     },
   },
 }

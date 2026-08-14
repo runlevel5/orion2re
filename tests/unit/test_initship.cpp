@@ -52,6 +52,7 @@ namespace {
 
         INITSHIP::_satellite_uses_torpedoes = 0;
         INITSHIP::_td_ftl_bonus = 2;
+        INITSHIP::_transport_ship_extended_range = 0;
         INITSHIP::lander_ship_uses_stealth = {};
         SHIPSTAK::stealth_bonus = { 500, 500, 500, 500 };
         MOX::_settings = {};
@@ -243,6 +244,20 @@ DOCTEST_TEST_CASE("strategic ship bonuses use hull defense and suppress lander d
     DOCTEST_CHECK(defense == 0);
     DOCTEST_CHECK(missile_defense == 0);
     DOCTEST_CHECK(attack == 10);
+}
+
+DOCTEST_TEST_CASE("transport extended range follows its setting") {
+    Reset_Initship_();
+
+    s_ship_design design = {};
+    INITSHIP::Load_Transport_Ship_Design_(kPlayer, &design);
+    DOCTEST_CHECK_FALSE(struct_::Test_Bit_Field_(
+        design.special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS));
+
+    INITSHIP::_transport_ship_extended_range = 1;
+    INITSHIP::Load_Transport_Ship_Design_(kPlayer, &design);
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        design.special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS));
 }
 
 DOCTEST_TEST_CASE("lander stealth remains disabled by default") {

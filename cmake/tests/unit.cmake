@@ -313,6 +313,27 @@ orion2re_add_unit_test(test_colonize
         tests/fakes/fake_colonize_runtime.cpp
 )
 
+orion2re_add_unit_test(test_report
+    SOURCES
+        tests/unit/test_report.cpp
+    PRODUCTION_SOURCES
+        src/game/report.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_report_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_report PRIVATE /Gy)
+    target_link_options(test_report PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_report PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_report PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_report PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
+
 orion2re_add_unit_test(test_shipmove
     SOURCES
         tests/unit/test_shipmove.cpp

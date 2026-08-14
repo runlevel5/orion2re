@@ -311,8 +311,8 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:17108` - `star base fleet beam offense`: implemented in `CMBTFIR2::Fleet_Offensive_Bonus_()` with synchronized `combat_bonus starbase_fleet_beam_offense` configuration; direct source-level station-tier selection replaces the 1.50 code-cave diversion while preserving the classic zero default.
 - [x] `asm.pl:17131` - `fair leader hire`: fixed in `NEXTTURN::Next_Turn_Calc_()` by shuffling each turn's player order before checking leader offers, so every player is checked exactly once without persistent lower-index priority; this replaces the 1.50 call wrapper and static checked-player state with the existing source-level shuffle.
 - [x] `asm.pl:17157` - `aquatic treats tundra as swamp`: implemented through `COLCALC::Calc_Player_Climate_()` with synchronized `colony aquatic_treats_tundra_as_swamp`; the shared source-level climate transform keeps population capacity, farmer production, and potential-colony food consistent while preserving classic Terran treatment by default.
-- [ ] `asm.pl:17339` - `transport ship extended fuel tanks`
-- [ ] `asm.pl:17365` - `skip outpostization prompt`
+- [x] `asm.pl:17339` - `transport ship extended fuel tanks`: implemented in `INITSHIP::Load_Transport_Ship_Design_()` with synchronized `colony transport_ship_extended_range` configuration; direct source-level equipment selection replaces the 1.50 helper around the drive-table calculation while preserving the classic default.
+- [x] `asm.pl:17365` - `skip outpostization prompt`: implemented in `REPORT::Colonization_()` by excluding automatic outpost candidates when `interface no_outpost_prompt` is enabled while retaining eligible colony prompts; direct source-level candidate filtering replaces the 1.50 call wrapper.
 - [ ] `asm.pl:17499` - `freighter cost`
 - [ ] `asm.pl:17531` - `satellite special 6 and 14`
 - [ ] `asm.pl:18379` - `ground defense armor multiplier`
