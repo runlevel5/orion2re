@@ -29,6 +29,11 @@ namespace {
         { WEAPON_CAUSTIC_SLIME, 25, 50 },
     };
 
+    constexpr int16_t kAlwaysHitWeaponsWithoutDoubleRangePenalty[] = {
+        WEAPON_MAULER_DEVICE,
+        WEAPON_PLASMA_BREATH,
+    };
+
     struct s_expected_special_exclusions {
         int16_t special_id;
         uint16_t excluded[6];
@@ -53,6 +58,14 @@ DOCTEST_TEST_CASE("strategic weapon damage uses corrected estimates") {
             TECHDATA::_weapons[expected.weapon_id];
         DOCTEST_CHECK(weapon.strat_min_damage == expected.minimum);
         DOCTEST_CHECK(weapon.strat_max_damage == expected.maximum);
+    }
+}
+
+DOCTEST_TEST_CASE("always-hit weapons do not use double range penalty") {
+    for (int16_t weapon_id : kAlwaysHitWeaponsWithoutDoubleRangePenalty) {
+        const uint16_t natural_mods = TECHDATA::_weapons[weapon_id].natural_mods;
+        DOCTEST_CHECK((natural_mods & WEAPON_NATURAL_FLAG_ALWAYS_HITS) != 0);
+        DOCTEST_CHECK((natural_mods & WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY) == 0);
     }
 }
 

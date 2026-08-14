@@ -305,7 +305,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:16106` - `fair beams`: implemented in `CMBTFIRE::Fire_Beam_Weapon_()` with synchronized `combat simplified_beam_formula`; enabled range and Point Defense modifiers are applied to beam attack instead of the capped threshold, replacing the 1.50 call-site helper with direct source logic while preserving the classic default.
 - [x] `asm.pl:16844` - `subterranean bonuses`: fixed in `AIDATA::Uncolonized_Planet_Worth_To_Player_()` and `COLCALC::Size_And_Climate_Race_Pop_Limit_()` by making the classic size term a common AI valuation baseline and applying the synchronized per-size Subterranean capacity table at its source; direct source logic replaces the 1.50 branch and helper call.
 - [x] `asm.pl:16912` - `stealth mutual exclusive with cloaks`: implemented in `TECHDATA::_specials` by making Stealth Field, Cloaking Device, and Phasing Cloak reciprocal exclusions; the authoritative table is shared by human and AI design legality and directly replaces the 1.50 binary data writes.
-- [ ] `asm.pl:16935` - `double range accuracy penalty inherent mod removals`
+- [x] `asm.pl:16935` - `double range accuracy penalty inherent mod removals`: fixed in `TECHDATA::_weapons` by retaining the intrinsic always-hit property while removing the contradictory double-range penalty from Mauler Device and Plasma Breath; direct source table corrections replace the two 1.50 data-byte patches.
 - [ ] `asm.pl:16951` - `starting relations symmetry meklar-bulrathi`
 - [ ] `asm.pl:16960` - `leader hire tech`
 - [ ] `asm.pl:17108` - `star base fleet beam offense`

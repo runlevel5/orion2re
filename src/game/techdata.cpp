@@ -506,7 +506,7 @@ s_tech_weapon_data _weapons[WEAPON_COUNT] = {
     { kEmptyName, kEmptyName, 24, 118, 3, 10, 10, 9, 0, 10, 60, 10, 60, 0 },
     { kEmptyName, kEmptyName, 25, 48, 3, 10, 5, 5, WEAPON_NATURAL_FLAG_BIOLOGICAL, 10, 10, 10, 10, 0 },
     { kEmptyName, kEmptyName, 26, 28, 3, 10, 7, 8, WEAPON_NATURAL_FLAG_BIOLOGICAL, 20, 20, 20, 20, 0 },
-    { kEmptyName, kEmptyName, 27, 105, 0, -1, 50, 75, WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY | WEAPON_NATURAL_FLAG_ALWAYS_HITS, 100, 100, 100, 100, 2 },
+    { kEmptyName, kEmptyName, 27, 105, 0, -1, 50, 75, WEAPON_NATURAL_FLAG_ALWAYS_HITS, 100, 100, 100, 100, 2 },
     { kEmptyName, kEmptyName, 28, 17, 4, 1, 25, 10, 0, 0, 0, 0, 0, 0 },
     { kEmptyName, kEmptyName, 29, 83, 4, 1, 80, 50, 0, 0, 0, 8, 32, 0 },
     { kEmptyName, kEmptyName, 30, 31, 4, 1, 60, 30, 0, 0, 0, 5, 20, 0 },
@@ -522,7 +522,7 @@ s_tech_weapon_data _weapons[WEAPON_COUNT] = {
     { kEmptyName, kEmptyName, 40, 0, 2, 1, 25, 20, WEAPON_NATURAL_FLAG_ALWAYS_HITS, 300, 300, 250, 250, 2 },
     { kEmptyName, kEmptyName, 41, 0, 0, -1, 10, 10, 0, 5, 10, 5, 10, 214 },
     { kEmptyName, kEmptyName, 42, 0, 0, -1, 60, 75, WEAPON_NATURAL_FLAG_KILLS_MARINES, 40, 80, 40, 80, 18 },
-    { kEmptyName, kEmptyName, 43, 0, 0, -1, 50, 75, WEAPON_NATURAL_FLAG_DOUBLE_RANGE_PENALTY | WEAPON_NATURAL_FLAG_ALWAYS_HITS, 60, 60, 60, 60, 2 },
+    { kEmptyName, kEmptyName, 43, 0, 0, -1, 50, 75, WEAPON_NATURAL_FLAG_ALWAYS_HITS, 60, 60, 60, 60, 2 },
     { kEmptyName, kEmptyName, 44, 0, 5, -1, 250, 100, 0, 10, 40, 10, 40, 0 },
     { kEmptyName, kEmptyName, 45, 0, 5, -1, 300, 100, 0, 25, 50, 25, 50, 0 }
 };
