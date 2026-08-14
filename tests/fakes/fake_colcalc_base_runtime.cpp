@@ -15,6 +15,8 @@ namespace TEST_COLCALC_BASE {
         research_cost = 0;
         random_value = 100;
         give_player_field_calls = 0;
+        memset(MOX::_food_per_farmer_table, 0, sizeof(MOX::_food_per_farmer_table));
+        COLCALC::_aquatic_treats_tundra_as_swamp = 0;
         COLCALC::_keep_research_on_breakthrough = 0;
         COLCALC::_keep_research_on_finds = 0;
     }

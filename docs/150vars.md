@@ -348,7 +348,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:11859` - `nova_minimum_research_per_turn`
 - [ ] `conf.pl:11882` - `computer_virus`
 - [ ] `conf.pl:11905` - `govt_assimilation_points`
-- [ ] `conf.pl:11923` - `aquatic_treats_tundra_as_swamp`
+- [x] `conf.pl:11923` - `aquatic_treats_tundra_as_swamp` -> `colony.aquatic_treats_tundra_as_swamp`
 - [ ] `conf.pl:11936` - `non_ics_phasing_cloak_mode`
 - [x] `conf.pl:11949` - `non_ics_tractor_and_bhg_mode` -> `combat.non_ics_tractor_and_bhg_mode`
 - [x] `conf.pl:11963` - `satellite_size_class_plus_one` -> `combat.satellite_size_class_plus_one`

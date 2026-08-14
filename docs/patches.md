@@ -310,7 +310,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [ ] `asm.pl:16960` - `leader hire tech`
 - [x] `asm.pl:17108` - `star base fleet beam offense`: implemented in `CMBTFIR2::Fleet_Offensive_Bonus_()` with synchronized `combat_bonus starbase_fleet_beam_offense` configuration; direct source-level station-tier selection replaces the 1.50 code-cave diversion while preserving the classic zero default.
 - [x] `asm.pl:17131` - `fair leader hire`: fixed in `NEXTTURN::Next_Turn_Calc_()` by shuffling each turn's player order before checking leader offers, so every player is checked exactly once without persistent lower-index priority; this replaces the 1.50 call wrapper and static checked-player state with the existing source-level shuffle.
-- [ ] `asm.pl:17157` - `aquatic treats tundra as swamp`
+- [x] `asm.pl:17157` - `aquatic treats tundra as swamp`: implemented through `COLCALC::Calc_Player_Climate_()` with synchronized `colony aquatic_treats_tundra_as_swamp`; the shared source-level climate transform keeps population capacity, farmer production, and potential-colony food consistent while preserving classic Terran treatment by default.
 - [ ] `asm.pl:17339` - `transport ship extended fuel tanks`
 - [ ] `asm.pl:17365` - `skip outpostization prompt`
 - [ ] `asm.pl:17499` - `freighter cost`

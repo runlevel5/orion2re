@@ -1293,6 +1293,20 @@
         symbol: "COLCALC::weather_control_climate",
       },
     },
+    aquatic_treats_tundra_as_swamp: {
+      title: "Aquatic races treat Tundra as Swamp",
+      description: "Makes Aquatic races use Swamp population capacity and farmer food values on Tundra planets.",
+      remarks: "False preserves classic behavior, where Aquatic races treat Tundra as Terran.",
+      examples: ["colony aquatic_treats_tundra_as_swamp = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_aquatic_treats_tundra_as_swamp",
+      },
+    },
     growth_rate_bonus: {
       title: "Population growth-rate modifiers",
       description: "Configures the general, technology, and event modifiers used by colony population growth.",

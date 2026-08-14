@@ -49,6 +49,7 @@ namespace TEST_COLONY_POP_GROWTH {
             subterranean_defaults,
             sizeof(subterranean_defaults));
         COLCALC::weather_control_climate = PLANET_CLIMATE_TOXIC;
+        COLCALC::_aquatic_treats_tundra_as_swamp = 0;
         COLCALC::_federation_no_mixed_races_penalty = 0;
         COLCALC::_housing_creates_no_farmers = 0;
         COLCALC::_planet_extinction = 0;
@@ -60,6 +61,7 @@ namespace TEST_COLONY_POP_GROWTH {
         COLCALC::misc_costs.android_farmer = 50;
         COLCALC::misc_costs.android_worker = 50;
         COLCALC::misc_costs.android_scientist = 50;
+        memset(MOX::_food_per_farmer_table, 0, sizeof(MOX::_food_per_farmer_table));
     }
 
     int32_t Destroy_Colony_Reason_() {
@@ -95,6 +97,7 @@ namespace MOX {
     s_settings _settings = {};
     s_crew_data _crew_data[CREW_QUALITY_COUNT] = {};
     int8_t _planet_max_population[PLANET_SIZE_COUNT] = {5, 10, 15, 20, 25};
+    int8_t _food_per_farmer_table[PLANET_CLIMATE_COUNT] = {};
 }
 
 namespace TECHDATA {

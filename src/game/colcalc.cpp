@@ -127,22 +127,6 @@ namespace COLCALC {
         TEXTBOX::Text_Box_(_command_summary_msg, msg_buffer);
     }
 
-    int __cdecl Calc_Player_Climate_(int player_idx, int climate) {
-        if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_AQUATIC] != 0) {
-            switch (climate) {
-                case PLANET_CLIMATE_TUNDRA: // 4
-                case PLANET_CLIMATE_SWAMP: // 6
-                    return PLANET_CLIMATE_TERRAN; // 8
-                case PLANET_CLIMATE_OCEAN: // 5
-                case PLANET_CLIMATE_TERRAN: // 8
-                    return PLANET_CLIMATE_GAIA; // 9
-                default:
-                    break;
-            }
-        }
-        return climate;
-    }
-
     int __cdecl Colony_Officer_(s_colony* colony) {
         int16_t star_idx = MOX::_planet[colony->planet].star_index;
 
@@ -937,9 +921,11 @@ namespace COLCALC {
 
     int16_t __cdecl Size_And_Climate_Race_Pop_Limit_(int8_t size, int climate, int16_t player_idx) {
         bool is_immune = false;
+        const s_player* player = nullptr;
 
         if (player_idx < MAX_PLAYERS) {
-            if (MOX::_player[player_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] != 0) {
+            player = &MOX::_player[player_idx];
+            if (player->traits[TRAIT_ENVIRONMENT_IMMUNE] != 0) {
                 is_immune = true;
             }
         } else if (player_idx == MAX_PLAYERS) {
@@ -947,7 +933,7 @@ namespace COLCALC {
             is_immune = true;
         }
 
-        int adjusted_climate = COLCALC::Calc_Player_Climate_(player_idx, climate);
+        int adjusted_climate = COLCALC::Calc_Player_Climate_(player, climate);
         int max_pop = COLCALC::Size_And_Climate_Max_Population_(size, adjusted_climate, is_immune);
 
         if (player_idx < MAX_PLAYERS && MOX::_player[player_idx].traits[TRAIT_SUBTERRANEAN] != 0) {
@@ -1736,25 +1722,11 @@ namespace COLCALC {
         if (food_val > 0) {
             results->food += static_cast<int16_t>(plr->traits[TRAIT_FOOD_BONUS]);
 
-            if (plr->traits[TRAIT_AQUATIC] != 0) {
-                int8_t bonus_base = 0;
-                bool has_bonus = true;
-                switch (planet->climate) {
-                    case PLANET_CLIMATE_TUNDRA:
-                    case PLANET_CLIMATE_SWAMP:
-                        bonus_base = MOX::_food_per_farmer_table[PLANET_CLIMATE_TERRAN];
-                        break;
-                    case PLANET_CLIMATE_OCEAN:
-                    case PLANET_CLIMATE_TERRAN:
-                        bonus_base = MOX::_food_per_farmer_table[PLANET_CLIMATE_GAIA];
-                        break;
-                    default:
-                        has_bonus = false;
-                        break;
-                }
-                if (has_bonus) {
-                    results->food += (static_cast<int16_t>(bonus_base) - static_cast<int16_t>(MOX::_food_per_farmer_table[planet->climate])) * 2;
-                }
+            int adjusted_climate = Calc_Player_Climate_(plr, planet->climate);
+            if (adjusted_climate != planet->climate) {
+                results->food +=
+                    (static_cast<int16_t>(MOX::_food_per_farmer_table[adjusted_climate]) -
+                     static_cast<int16_t>(MOX::_food_per_farmer_table[planet->climate])) * 2;
             }
 
             if (results->food < 1) {

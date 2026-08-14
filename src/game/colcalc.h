@@ -48,6 +48,7 @@ namespace COLCALC {
     extern uint8_t _pop_bonus_biospheres;
     extern uint8_t _pop_bonus_subterranean[PLANET_SIZE_COUNT];
     extern uint8_t weather_control_climate;
+    extern uint8_t _aquatic_treats_tundra_as_swamp;
 
     extern uint8_t _federation_no_mixed_races_penalty;
     extern uint8_t _housing_creates_no_farmers;
@@ -359,7 +360,7 @@ namespace COLCALC {
 
     bool __cdecl Colony_Is_Blockaded(s_colony* colony);
 
-    int __cdecl Calc_Player_Climate_(int player_idx, int climate);
+    int __cdecl Calc_Player_Climate_(const s_player* player, int climate);
 
     int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, uint8_t is_immune);
 
