@@ -7,6 +7,7 @@ namespace TEST_COLONY_POP_GROWTH {
     int32_t Destroy_Colony_Reason_();
     void Set_Add_Spy_Result_(int16_t result);
     int16_t Deleted_Product_();
+    void Set_Government_Cost_Reduction_(int32_t amount);
     void Set_Population_Boom_(bool enabled);
     void Set_Plague_(bool enabled);
 }
@@ -312,6 +313,65 @@ DOCTEST_TEST_CASE("Subterranean population bonus is configurable by planet size"
             PLANET_SIZE_SMALL, PLANET_CLIMATE_GAIA, 0) == 19);
 }
 
+DOCTEST_TEST_CASE("uncolonized planet AI separates size weight from Subterranean capacity") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_planet_data* planet = &MOX::_planet[0];
+    planet->colony_index = -1;
+    planet->planet_type = PLANET_TYPE_PLANET;
+    planet->size = PLANET_SIZE_MEDIUM;
+    planet->climate = PLANET_CLIMATE_GAIA;
+    planet->mineral_class = 0;
+    planet->gravity_class = PLANET_GRAVITY_NORMAL_G;
+
+    DOCTEST_CHECK(AIDATA::Uncolonized_Planet_Worth_To_Player_(
+        planet, &MOX::_player[0]) == 27);
+
+    MOX::_player[0].traits[TRAIT_SUBTERRANEAN] = 1;
+    COLCALC::_pop_bonus_subterranean[PLANET_SIZE_MEDIUM] = 9;
+
+    DOCTEST_CHECK(AIDATA::Uncolonized_Planet_Worth_To_Player_(
+        planet, &MOX::_player[0]) == 43);
+}
+
+DOCTEST_TEST_CASE("Aquatic Tundra population uses the configured climate treatment") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+    MOX::_player[0].traits[TRAIT_AQUATIC] = 1;
+
+    DOCTEST_CHECK(
+        COLCALC::Size_And_Climate_Race_Pop_Limit_(
+            PLANET_SIZE_SMALL, PLANET_CLIMATE_TUNDRA, 0) == 8);
+
+    COLCALC::_aquatic_treats_tundra_as_swamp = 1;
+
+    DOCTEST_CHECK(
+        COLCALC::Size_And_Climate_Race_Pop_Limit_(
+            PLANET_SIZE_SMALL, PLANET_CLIMATE_TUNDRA, 0) == 4);
+}
+
+DOCTEST_TEST_CASE("potential colony food uses the configured Aquatic Tundra treatment") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_player player = {};
+    player.traits[TRAIT_AQUATIC] = 1;
+
+    s_planet_data planet = {};
+    planet.climate = PLANET_CLIMATE_TUNDRA;
+    planet.food_per_farmer = 2;
+
+    MOX::_food_per_farmer_table[PLANET_CLIMATE_TUNDRA] = 2;
+    MOX::_food_per_farmer_table[PLANET_CLIMATE_SWAMP] = 4;
+    MOX::_food_per_farmer_table[PLANET_CLIMATE_TERRAN] = 6;
+
+    s_potential_colony_info info = {};
+    COLCALC::Compute_Potential_Colony_Info_(&player, &planet, &info);
+    DOCTEST_CHECK(info.food == 12);
+
+    COLCALC::_aquatic_treats_tundra_as_swamp = 1;
+    COLCALC::Compute_Potential_Colony_Info_(&player, &planet, &info);
+    DOCTEST_CHECK(info.food == 8);
+}
+
 DOCTEST_TEST_CASE("classic starvation preserves the final population") {
     s_colony* colony = Prepare_Starving_Colony_();
 
@@ -404,6 +464,25 @@ DOCTEST_TEST_CASE("Android production costs are selected independently") {
     DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_FARMER) == 30);
     DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_WORKER) == 40);
     DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(colony, COLONY_PRODUCTION_SCIENTIST) == 60);
+}
+
+DOCTEST_TEST_CASE("freighter production cost uses configured cost and optional government reduction") {
+    TEST_COLONY_POP_GROWTH::Reset_();
+
+    s_colony* colony = &MOX::_colony[0];
+    colony->owner = 0;
+
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(
+        colony, COLONY_PRODUCTION_FREIGHTERS) == 50);
+
+    COLCALC::misc_costs.freighters = 48;
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(
+        colony, COLONY_PRODUCTION_FREIGHTERS) == 48);
+
+    TEST_COLONY_POP_GROWTH::Set_Government_Cost_Reduction_(16);
+    COLCALC::_feudal_affects_freighters = 1;
+    DOCTEST_CHECK(COLCALC::Colony_Product_Cost_(
+        colony, COLONY_PRODUCTION_FREIGHTERS) == 32);
 }
 
 DOCTEST_TEST_CASE("completed building grants no maintenance cash") {

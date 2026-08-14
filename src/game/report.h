@@ -1,6 +1,7 @@
 #pragma once
 
 namespace REPORT {
+    extern uint8_t _no_outpost_prompt;
     extern int16_t _n_reports;
     extern s_report _reports[MAX_REPORTS];
     extern uint8_t _done_player_reports;

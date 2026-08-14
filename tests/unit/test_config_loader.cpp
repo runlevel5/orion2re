@@ -72,6 +72,12 @@ namespace {
         MOX::_settings.sound_fx_level = 50;
     }
 
+    config::t_variable_id Variable_Id_(const char* path) {
+        config::t_variable_id id = config::CONFIG_NO_VARIABLE;
+        config::Find_Variable(path, std::strlen(path), &id);
+        return id;
+    }
+
     std::string Manifest_(const std::string& id, const std::string& extra = {}) {
         return "{\n"
                "  id: \"" + id + "\",\n"
@@ -116,6 +122,10 @@ DOCTEST_TEST_CASE("cycle detection follows case-insensitive VFS path identity") 
 DOCTEST_TEST_SUITE("configuration include loader") {
 
 DOCTEST_TEST_CASE("nested includes resolve relative paths in statement order") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("config/main.cfg",
         "audio music_volume = 60;\n"
@@ -134,9 +144,9 @@ DOCTEST_TEST_CASE("nested includes resolve relative paths in statement order") {
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "config/main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK_FALSE(effective.state.values[0].bool_value);
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 80);
-    DOCTEST_CHECK(effective.state.values[3].integer_value == 25);
+    DOCTEST_CHECK_FALSE(effective.state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 80);
+    DOCTEST_CHECK(effective.state.values[sound_volume].integer_value == 25);
     DOCTEST_CHECK(MOX::_settings.music_level == 80);
 
     config::t_variable_id music_index = 0;
@@ -153,6 +163,9 @@ DOCTEST_TEST_CASE("nested includes resolve relative paths in statement order") {
 }
 
 DOCTEST_TEST_CASE("stop ends only the included file") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("main.cfg",
         "include child.cfg;\n"
@@ -169,8 +182,8 @@ DOCTEST_TEST_CASE("stop ends only the included file") {
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 75);
-    DOCTEST_CHECK(effective.state.values[3].integer_value == 30);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 75);
+    DOCTEST_CHECK(effective.state.values[sound_volume].integer_value == 30);
 }
 
 DOCTEST_TEST_CASE("include cycles report the normalized include chain") {
@@ -191,6 +204,8 @@ DOCTEST_TEST_CASE("include cycles report the normalized include chain") {
 }
 
 DOCTEST_TEST_CASE("missing and malformed includes are distinct and roll back") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("missing-main.cfg",
         "audio music_volume = 80;\n"
@@ -210,14 +225,14 @@ DOCTEST_TEST_CASE("missing and malformed includes are distinct and roll back") {
     DOCTEST_CHECK(diagnostic.message ==
                   "configuration file not found: 'absent.cfg'");
     DOCTEST_CHECK(diagnostic.location.source == "missing-main.cfg");
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 50);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
 
     DOCTEST_CHECK_FALSE(config::Load_Config_File(
         "malformed-main.cfg", "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message == "malformed numeric value '0x'");
     DOCTEST_CHECK(diagnostic.location.source == "malformed.cfg");
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 50);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
 }
 
@@ -240,6 +255,8 @@ DOCTEST_TEST_CASE("invalid include paths cannot escape the VFS root") {
 }
 
 DOCTEST_TEST_CASE("missing enabled package is an error and rolls back configuration") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("main.cfg",
         "audio music_volume = 80;\n"
@@ -253,11 +270,13 @@ DOCTEST_TEST_CASE("missing enabled package is an error and rolls back configurat
     DOCTEST_CHECK_FALSE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
     DOCTEST_CHECK(diagnostic.message == "package not found: 'balance_mod'");
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 50);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 50);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
 }
 
 DOCTEST_TEST_CASE("first enable wins configuration and VFS resource precedence") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("main.cfg", "enable first;\nenable second;\n");
     files.Write(fs::path("data") / "mods" / "first" / "mod.json5",
@@ -280,13 +299,15 @@ DOCTEST_TEST_CASE("first enable wins configuration and VFS resource precedence")
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 81);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 81);
     DOCTEST_CHECK(MOX::_settings.music_level == 81);
     DOCTEST_CHECK(Read_Vfs_Text_("priority.dat") == "first");
-    DOCTEST_CHECK(effective.provenance[1].package_id == "first");
+    DOCTEST_CHECK(effective.provenance[music_volume].package_id == "first");
 }
 
 DOCTEST_TEST_CASE("supported community patch package ID can be enabled") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("main.cfg", "enable ver150;\n");
     files.Write(fs::path("data") / "mods" / "ver150" / "mod.json5",
@@ -301,11 +322,14 @@ DOCTEST_TEST_CASE("supported community patch package ID can be enabled") {
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 76);
-    DOCTEST_CHECK(effective.provenance[1].package_id == "ver150");
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 76);
+    DOCTEST_CHECK(effective.provenance[music_volume].package_id == "ver150");
 }
 
 DOCTEST_TEST_CASE("direct dependency is loaded once below its package") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("main.cfg", "enable parent;\n");
     files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
@@ -325,13 +349,15 @@ DOCTEST_TEST_CASE("direct dependency is loaded once below its package") {
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 77);
-    DOCTEST_CHECK(effective.state.values[3].integer_value == 42);
-    DOCTEST_CHECK(effective.provenance[1].package_id == "parent");
-    DOCTEST_CHECK(effective.provenance[3].package_id == "shared");
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 77);
+    DOCTEST_CHECK(effective.state.values[sound_volume].integer_value == 42);
+    DOCTEST_CHECK(effective.provenance[music_volume].package_id == "parent");
+    DOCTEST_CHECK(effective.provenance[sound_volume].package_id == "shared");
 }
 
 DOCTEST_TEST_CASE("later explicit enable outranks dependencies of an earlier package") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("main.cfg", "enable parent;\nenable explicit_mod;\n");
     files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
@@ -359,12 +385,14 @@ DOCTEST_TEST_CASE("later explicit enable outranks dependencies of an earlier pac
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 69);
-    DOCTEST_CHECK(effective.provenance[1].package_id == "explicit_mod");
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 69);
+    DOCTEST_CHECK(effective.provenance[music_volume].package_id == "explicit_mod");
     DOCTEST_CHECK(Read_Vfs_Text_("priority.dat") == "explicit");
 }
 
 DOCTEST_TEST_CASE("nested enable resolves a package and preserves parent priority") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("main.cfg", "enable parent;\n");
     files.Write(fs::path("data") / "mods" / "parent" / "mod.json5",
@@ -383,10 +411,12 @@ DOCTEST_TEST_CASE("nested enable resolves a package and preserves parent priorit
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 79);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 79);
 }
 
 DOCTEST_TEST_CASE("ZIP package manifest config and data use projected virtual paths") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("main.cfg", "enable zipped;\n");
     files.Write_Zip(fs::path("data") / "mods" / "zipped.zip", {
@@ -402,7 +432,7 @@ DOCTEST_TEST_CASE("ZIP package manifest config and data use projected virtual pa
 
     DOCTEST_REQUIRE(config::Load_Config_File(
         "main.cfg", "base_game", &effective, &diagnostic));
-    DOCTEST_CHECK(effective.state.values[1].integer_value == 73);
+    DOCTEST_CHECK(effective.state.values[music_volume].integer_value == 73);
     DOCTEST_CHECK(Read_Vfs_Text_("zipped.dat") == "zip-resource");
 }
 
@@ -597,6 +627,8 @@ DOCTEST_TEST_CASE("failed reload preserves previously committed package layers a
 }
 
 DOCTEST_TEST_CASE("successful reload rebuilds configuration and package layers from defaults") {
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    DOCTEST_REQUIRE(music_volume != config::CONFIG_NO_VARIABLE);
     s_config_test_directory files;
     files.Write("modded.cfg", "enable stable;\n");
     files.Write("plain.cfg", "audio sound_effects_volume = 31;\n");
@@ -621,8 +653,8 @@ DOCTEST_TEST_CASE("successful reload rebuilds configuration and package layers f
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
     DOCTEST_CHECK(MOX::_settings.sound_fx_level == 31);
     DOCTEST_CHECK(vfs::File_Exists("stable.dat") == 0);
-    DOCTEST_CHECK_FALSE(effective.provenance[1].has_override);
-    DOCTEST_CHECK(effective.prior_values[1].empty());
+    DOCTEST_CHECK_FALSE(effective.provenance[music_volume].has_override);
+    DOCTEST_CHECK(effective.prior_values[music_volume].empty());
 }
 
 DOCTEST_TEST_CASE("ambiguous package forms and unsafe ZIP paths are fatal") {

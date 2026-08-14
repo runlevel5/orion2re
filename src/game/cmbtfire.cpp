@@ -109,6 +109,11 @@ namespace CMBTFIRE {
         return (int32_t)(((int64_t)damage * _damper_field_ratio) / 100);
     }
 
+    int32_t Ground_Defense_Structure_(int16_t armor_bonus) {
+        return ((int32_t)(armor_bonus + 100) *
+                _ground_defense_armor_multiplier) / 100;
+    }
+
     bool Spherical_Effect_In_Range_(
         int16_t source_ship_idx,
         int16_t target_idx,
@@ -1133,8 +1138,8 @@ namespace CMBTFIRE {
         struct_::Clear_Structure_(&bomb_stats, sizeof(s_combat_bomb_result));
 
         int16_t best_armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
-        int16_t armor_threshold = (int16_t)(((TECHDATA::_armor[best_armor_idx].ships_bonus * 4 + 400) * 25) /
-            100);
+        int16_t armor_threshold = (int16_t)Ground_Defense_Structure_(
+            TECHDATA::_armor[best_armor_idx].ships_bonus);
         uint16_t civilian_armor_hits = _civilian_armor[best_armor_idx];
 
         (void)specials;

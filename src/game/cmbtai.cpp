@@ -7,6 +7,216 @@ namespace CMBTAI {
 int16_t _fleet_target;
 
 namespace {
+    int32_t Expected_Damage_After_Absorber_(
+        int16_t target_idx,
+        int32_t damage
+    ) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                target_idx, SPECIAL_ENERGY_ABSORBER) != 0) {
+            damage -= CMBTFIRE::Energy_Absorber_Blocked_Damage_(damage);
+        }
+        return damage;
+    }
+
+    int16_t Expected_Shield_Block_(int16_t target_idx) {
+        if (target_idx == 0) {
+            return MOX::_combat_data[0].shield_arc_max;
+        }
+
+        const bool has_hard_shields =
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                target_idx, SPECIAL_HARD_SHIELDS) != 0;
+        const s_combat_data* target = &MOX::_combat_data[target_idx];
+        if (target->shield_current_hits <= 0 ||
+            (MOX::_in_nebula_flag != 0 && !has_hard_shields)) {
+            return 0;
+        }
+
+        int16_t blocked = TECHDATA::_shields[target->shield_type].shield_class;
+        if (has_hard_shields) {
+            blocked += TECHDATA::_hard_shields_damage_reduction;
+        }
+        return blocked;
+    }
+
+    bool Expected_Shield_Piercing_(
+        int16_t target_idx,
+        int16_t weapon_id,
+        uint16_t specials
+    ) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(
+                target_idx, SPECIAL_HARD_SHIELDS) != 0) {
+            return false;
+        }
+
+        return (TECHDATA::_weapons[weapon_id].natural_mods &
+                WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) != 0 ||
+            (specials & WEAPON_MOD_FLAG_SHIELD_PIERCING) != 0;
+    }
+
+    int32_t Expected_Special_Hit_Damage_(
+        int16_t target_idx,
+        int16_t weapon_id,
+        uint16_t specials,
+        int32_t damage
+    ) {
+        damage = Expected_Damage_After_Absorber_(target_idx, damage);
+        if (!Expected_Shield_Piercing_(target_idx, weapon_id, specials)) {
+            damage -= Expected_Shield_Block_(target_idx);
+        }
+        // 1.50 retains negative special-weapon estimates for the caller's AI scoring.
+        return damage;
+    }
+
+    int32_t Expected_Damage_After_1_50_Cloak_(
+        int32_t damage,
+        bool actively_cloaked
+    ) {
+        if (!actively_cloaked ||
+            CMBTMIS::missile_defense.cloaking_device_missile_defense != 0) {
+            return damage;
+        }
+
+        // 1.50 uses the configured miss percentage as the retained damage fraction.
+        return damage *
+            CMBTMIS::missile_defense.cloaking_device_missile_miss_percent / 100;
+    }
+
+    bool Missile_Can_Damage_Target_(
+        int16_t target_idx,
+        const s_missile* missile
+    ) {
+        const int16_t missile_weapon_id = missile->type;
+        switch (missile_weapon_id) {
+            case WEAPON_ANTI_MATTER_TORP:
+            case WEAPON_PROTON_TORPEDO:
+            case WEAPON_PLASMA_TORPEDO:
+                return false;
+            default:
+                break;
+        }
+        if (missile_weapon_id == WEAPON_ASSAULT_SHUTTLE) {
+            return true;
+        }
+
+        const bool is_planet = target_idx == 0;
+        const bool planet_has_defenses =
+            CMBTFIRE::Does_Combat_Planet_Have_Defenses_() != 0;
+        if (is_planet && !planet_has_defenses) {
+            return false;
+        }
+
+        const bool has_hard_shields =
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                target_idx, SPECIAL_HARD_SHIELDS) != 0;
+        const bool has_damper_field =
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                target_idx, SPECIAL_DAMPER_FIELD) != 0;
+
+        int32_t shield = 0;
+        if (is_planet) {
+            shield = planet_has_defenses && !has_damper_field
+                ? MOX::_combat_data[0].shield_arc_current[0]
+                : MOX::_combat_data[0].shield_arc_current[1];
+        } else {
+            const s_combat_data* target = &MOX::_combat_data[target_idx];
+            const bool shields_online =
+                MOX::_in_nebula_flag == 0 || has_hard_shields;
+            if (target->shield_current_hits > 0 && shields_online) {
+                shield = TECHDATA::_shields[target->shield_type].shield_class;
+                if (has_hard_shields) {
+                    shield += TECHDATA::_hard_shields_damage_reduction;
+                }
+            }
+        }
+
+        const int16_t owner = missile->owner;
+        const bool has_fighter_loadout =
+            owner >= 0 && owner <= MAX_PLAYERS;
+        int16_t weapon_ids[3] = {
+            missile_weapon_id,
+            (int16_t)(has_fighter_loadout
+                ? MOX::_fighter_beam_type[owner]
+                : -1),
+            (int16_t)(has_fighter_loadout
+                ? MOX::_fighter_bomb_type[owner]
+                : -1),
+        };
+        enum e_missile_payload {
+            MISSILE_PAYLOAD_MISSILE,
+            MISSILE_PAYLOAD_BEAM,
+            MISSILE_PAYLOAD_BOMB,
+            MISSILE_PAYLOAD_COUNT,
+        };
+
+        switch (missile_weapon_id) {
+            case WEAPON_INTERCEPTOR:
+                weapon_ids[MISSILE_PAYLOAD_MISSILE] = -1;
+                weapon_ids[MISSILE_PAYLOAD_BOMB] = -1;
+                break;
+            case WEAPON_BOMBER:
+                weapon_ids[MISSILE_PAYLOAD_MISSILE] = -1;
+                weapon_ids[MISSILE_PAYLOAD_BEAM] = -1;
+                break;
+            case WEAPON_HEAVY_FIGHTER:
+                weapon_ids[MISSILE_PAYLOAD_MISSILE] = -1;
+                break;
+            default:
+                weapon_ids[MISSILE_PAYLOAD_BEAM] = -1;
+                weapon_ids[MISSILE_PAYLOAD_BOMB] = -1;
+                break;
+        }
+
+        for (int payload = 0; payload < MISSILE_PAYLOAD_COUNT; ++payload) {
+            const int16_t weapon_id = weapon_ids[payload];
+            if (weapon_id < 0) {
+                continue;
+            }
+
+            const s_tech_weapon_data* weapon = &TECHDATA::_weapons[weapon_id];
+            int32_t damage = weapon->max_damage;
+            if (payload == MISSILE_PAYLOAD_BEAM) {
+                if (CMBTFIRE::_fighters_use_point_defense != 0) {
+                    const uint32_t modifier =
+                        CMBTFIRE::_mount_dmg[
+                            CMBTFIRE::HIGH_ENERGY_FOCUS_ABSENT].pd;
+                    damage = (damage * modifier + 50) / 100;
+                    if (damage < 1) {
+                        damage = 1;
+                    }
+                }
+                // 1.50 includes the classic fighter roll's possible point above maximum.
+                damage++;
+                damage = damage * MOX::_ordnance_bonus[owner] / 100;
+                if (is_planet) {
+                    damage /= 2;
+                }
+            } else {
+                int32_t ordnance_bonus = MOX::_ordnance_bonus[owner];
+                if (payload == MISSILE_PAYLOAD_MISSILE &&
+                    (missile->specials & WEAPON_MOD_FLAG_OVERLOADED) != 0) {
+                    ordnance_bonus += 50;
+                }
+                damage = damage * ordnance_bonus / 100;
+            }
+
+            damage = Expected_Damage_After_Absorber_(target_idx, damage);
+            if (has_damper_field) {
+                damage = CMBTFIRE::Damper_Field_Remaining_Damage_(damage);
+            }
+
+            const bool shield_piercing =
+                (weapon->natural_mods &
+                 WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) != 0 &&
+                !has_hard_shields;
+            if (damage > (shield_piercing ? 0 : shield)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     int16_t Range_To_XY_With_Offset_(
         int16_t ship_idx,
         int16_t target_x_px,
@@ -75,32 +285,14 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
     uint16_t specials = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].specials;
     int16_t weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
 
+    points_blocked = target_type_flag == TARGET_TYPE_SHIP
+        ? Expected_Shield_Block_(target_idx)
+        : 0;
     if (target_type_flag == TARGET_TYPE_SHIP) {
-        int16_t has_hard_shields = COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS);
-        if (has_hard_shields != 0 || (specials & 0x40) == 0) {
-            if (target_idx == 0) {
-                use_planetary_shield_adjustment = 1;
-                points_blocked = MOX::_combat_data[0].shield_arc_max;
-            } else {
-                int16_t blocked = 0;
-                if (MOX::_combat_data[target_idx].shield_current_hits > 0) {
-                    int8_t shield_type = MOX::_combat_data[target_idx].shield_type;
-                    blocked = TECHDATA::_shields[shield_type].shield_class;
-                }
-                if (COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) != 0) {
-                    blocked += TECHDATA::_hard_shields_damage_reduction;
-                }
-                if ((TECHDATA::_weapons[weapon_id].natural_mods & WEAPON_NATURAL_FLAG_IGNORES_SHIELDS) != 0 ||
-                    ((specials & 0x40) != 0 && COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) == 0)) {
-                    blocked = 0;
-                }
-               points_blocked = (int32_t)blocked;
-            }
-        } else {
+        use_planetary_shield_adjustment = target_idx == 0;
+        if (Expected_Shield_Piercing_(target_idx, weapon_id, specials)) {
             points_blocked = 0;
         }
-    } else {
-        points_blocked = 0;
     }
 
     int32_t dist_modifier;
@@ -137,14 +329,18 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
         max_damage = min_damage;
     }
 
-    if (use_planetary_shield_adjustment != 0 && TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM) {
+    if (target_idx != 0) {
+        min_damage = Expected_Damage_After_Absorber_(target_idx, min_damage);
+        max_damage = Expected_Damage_After_Absorber_(target_idx, max_damage);
+    }
+
+    if (use_planetary_shield_adjustment != 0) {
         int16_t shield_id = INITSHIP::Best_Ship_Shield_(MOX::_combat_defender_player);
-        min_damage /= 2;
-        max_damage /= 2;
-        if (shield_id == SPECIAL_DAMPER_FIELD) {
-            min_damage /= 4;
-            max_damage /= 4;
-        } else {
+        if (TECHDATA::_weapons[weapon_id].type == WEAPON_TYPE_BEAM) {
+            min_damage /= 2;
+            max_damage /= 2;
+        }
+        if (shield_id != SPECIAL_DAMPER_FIELD) {
             min_damage -= TECHDATA::_shields[shield_id].shield_class;
             max_damage -= TECHDATA::_shields[shield_id].shield_class;
         }
@@ -234,6 +430,10 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                         }
                         break;
                     case WEAPON_PLASMA_WEB:
+                        expected_damage = Expected_Special_Hit_Damage_(
+                            target_idx, weapon_id, specials, avg_damage) *
+                            count * 4;
+                        break;
                     case WEAPON_STELLAR_CONVERTER:
                     case WEAPON_CAUSTIC_SLIME: {
                         int blocked = TECHDATA::_shields[MOX::_combat_data[target_idx].shield_type].shield_class;
@@ -241,9 +441,10 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                         break;
                     }
                     case WEAPON_PULSAR: {
-                        int blocked = TECHDATA::_shields[MOX::_combat_data[target_idx].shield_type].shield_class;
                         int size_mult = MOX::_combat_data[target_idx].size_class + 1;
-                        expected_damage = (avg_damage - blocked) * size_mult * count;
+                        expected_damage = Expected_Special_Hit_Damage_(
+                            target_idx, weapon_id, specials, avg_damage) *
+                            size_mult * count;
                         break;
                     }
                     case WEAPON_TRACTOR_BEAM:
@@ -252,9 +453,10 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                         }
                         break;
                     case WEAPON_PLASMA_FLUX: {
-                        int blocked = TECHDATA::_shields[MOX::_combat_data[target_idx].shield_type].shield_class;
                         int size_mult = MOX::_combat_data[target_idx].size_class + 1;
-                        expected_damage = (avg_damage - blocked) * size_mult * count * 4;
+                        expected_damage = Expected_Special_Hit_Damage_(
+                            target_idx, weapon_id, specials, avg_damage) *
+                            size_mult * count * 4;
                         break;
                     }
                 }
@@ -460,44 +662,7 @@ int16_t __cdecl Range_To_Missile_(int16_t unit_idx, int16_t missile_idx) {
 }
 
 int16_t __cdecl Will_Missile_Do_Damage_(int16_t target_idx, int16_t missile_idx) {
-    int16_t damage = 0;
-    s_missile* missile = &MOX::_missile[missile_idx];
-    int16_t type = missile->type;
-
-    if (TECHDATA::_weapons[type].type != WEAPON_TYPE_FIGHTER) {
-        damage = TECHDATA::_weapons[type].max_damage;
-    } else {
-        switch (type) {
-        case WEAPON_ASSAULT_SHUTTLE:
-            damage = 100;
-            break;
-        case WEAPON_HEAVY_FIGHTER:
-        case WEAPON_BOMBER:
-        {
-            int16_t owner = MOX::_combat_data[missile->source_unit_idx].owner;
-            int16_t fighter_type = MOX::_fighter_bomb_type[owner];
-            damage = TECHDATA::_weapons[fighter_type].max_damage;
-            break;
-        }
-        case WEAPON_INTERCEPTOR:
-        {
-            int16_t owner = MOX::_combat_data[missile->source_unit_idx].owner;
-            int16_t fighter_type = MOX::_fighter_beam_type[owner];
-            damage = TECHDATA::_weapons[fighter_type].max_damage;
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
-    int16_t points_blocked = 0;
-    s_combat_data* target = &MOX::_combat_data[target_idx];
-    if (target->shield_current_hits > 0) {
-       points_blocked = TECHDATA::_shields[target->shield_type].shield_class;
-    }
-
-    return damage > points_blocked;
+    return Missile_Can_Damage_Target_(target_idx, &MOX::_missile[missile_idx]);
 }
 
 bool __cdecl Safe_To_Fire_Sphere_Weapon_(int16_t source_ship_idx) {
@@ -974,6 +1139,10 @@ int16_t __cdecl Choose_Target_(int16_t ship_idx) {
 
 int16_t __cdecl Is_Ship_Out_Of_Ammo_(int16_t ship_idx) {
     int16_t out_of_ammo = 1;
+
+    if (MOX::_combat_data[ship_idx].officer_idx >= 0) {
+        return 0;
+    }
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 37 /* 0x25 */) != 0) {
         out_of_ammo = 0;
@@ -1734,10 +1903,8 @@ int16_t __cdecl Get_Total_Hits_(int16_t ship_idx) {
     else {
         int16_t owner = MOX::_combat_data[0].owner;
         int16_t best_armor_idx = INITSHIP::Best_Armor_(owner);
-        int16_t absorption = TECHDATA::_armor[best_armor_idx].ships_bonus;
-
-        // defense_value = ((absorption * 4 + 400) * 25) / 100
-        int16_t defense_value = (int16_t)(((absorption * 4 + 400) * 25) / 100);
+        int16_t defense_value = (int16_t)CMBTFIRE::Ground_Defense_Structure_(
+            TECHDATA::_armor[best_armor_idx].ships_bonus);
         int16_t planet_defenses = CMBTFIRE::Does_Combat_Planet_Have_Defenses_();
 
         for (int16_t i = 0; i < 4; ++i) {
@@ -1900,8 +2067,8 @@ int16_t __cdecl Missile_Overkill_Check_(int16_t target_idx) {
 
 int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon_id, int16_t weapon_count, uint16_t weapon_specials, int16_t attacker_player_idx) {
     int16_t shield_reduction = 0;
-    int16_t damage;
-    int16_t result_damage = 0;
+    int32_t damage;
+    int32_t result_damage = 0;
 
     if (target_ship_idx == 0) {
         if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() != 0) {
@@ -1911,12 +2078,15 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
         }
     } else {
         s_combat_data* target_ship = &MOX::_combat_data[target_ship_idx];
-        if (target_ship->shield_current_hits > 0) {
+        const bool has_hard_shields =
+            COMBINIT::Does_Combat_Ship_Have_Special_(
+                target_ship_idx, SPECIAL_HARD_SHIELDS) != 0;
+        if (target_ship->shield_current_hits > 0 &&
+            (MOX::_in_nebula_flag == 0 || has_hard_shields)) {
             shield_reduction = TECHDATA::_shields[target_ship->shield_type].shield_class;
-        }
-
-        if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_HARD_SHIELDS) != 0) {
-            shield_reduction += TECHDATA::_hard_shields_damage_reduction;
+            if (has_hard_shields) {
+                shield_reduction += TECHDATA::_hard_shields_damage_reduction;
+            }
         }
     }
 
@@ -1938,9 +2108,11 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
                 break;
         }
 
-        damage = (int16_t)((MOX::_ordnance_bonus[attacker_player_idx] * base_damage) / 100);
-        int16_t volley_damage = (int16_t)((damage - shield_reduction) * weapon_count);
-        result_damage = (int16_t)(volley_damage + volley_damage);
+        damage = (MOX::_ordnance_bonus[attacker_player_idx] * base_damage) / 100;
+        // 1.50 applies absorber and Shield Piercing corrections only to missiles.
+        damage -= shield_reduction;
+        int32_t volley_damage = damage * weapon_count;
+        result_damage = volley_damage + volley_damage;
     } else {
         int16_t base_damage = weapon->max_damage;
 
@@ -1948,11 +2120,7 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
             base_damage = (int16_t)((base_damage * 3) / 2);
         }
 
-        if ((weapon_specials & WEAPON_MOD_FLAG_MIRV) != 0) {
-            base_damage <<= 2;
-        }
-
-        damage = (int16_t)((MOX::_ordnance_bonus[attacker_player_idx] * base_damage) / 100);
+        damage = (MOX::_ordnance_bonus[attacker_player_idx] * base_damage) / 100;
 
         int16_t evade = MOX::_combat_data[target_ship_idx].tac_val_evade;
         if (attacker_player_idx < MAX_PLAYERS) {
@@ -1982,10 +2150,28 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
             damage /= 2;
         }
 
-        int16_t volley_damage = (int16_t)((damage - shield_reduction) * weapon_count);
-        result_damage = (int16_t)(((100 - evade) * (int32_t)volley_damage) / 100);
+        if (target_ship_idx == 0 && weapon->type == WEAPON_TYPE_TORPEDO) {
+            damage /= 2;
+        }
 
-        result_damage = (int16_t)CMBTMIS::Expected_Damage_After_Cloak_(
+        damage = Expected_Damage_After_Absorber_(
+            target_ship_idx, damage);
+        if (!Expected_Shield_Piercing_(
+                target_ship_idx, weapon_id, weapon_specials)) {
+            damage -= shield_reduction;
+        }
+        if ((weapon_specials & WEAPON_MOD_FLAG_MIRV) != 0) {
+            damage *= 4;
+        }
+        // 1.50 prediction always applies Enveloping, including against planets.
+        if ((weapon_specials & WEAPON_MOD_FLAG_ENVELOPING) != 0) {
+            damage *= 4;
+        }
+
+        int32_t volley_damage = damage * weapon_count;
+        result_damage = ((100 - evade) * volley_damage) / 100;
+
+        result_damage = Expected_Damage_After_1_50_Cloak_(
             result_damage,
             MOX::_combat_data[target_ship_idx].special_status_flag == 1);
     }

@@ -24,8 +24,10 @@
 #include "game/initship.h"
 #include "game/mapgen.h"
 #include "game/officer.h"
+#include "game/report.h"
 #include "game/ship_config.h"
 #include "game/shipstak.h"
+#include "game/spy.h"
 #include "game/techinit.h"
 
 namespace {
@@ -78,6 +80,12 @@ namespace {
         write.provenance.line = 7;
         write.provenance.column = 9;
         return write;
+    }
+
+    config::t_variable_id Variable_Id_(const char* path) {
+        config::t_variable_id id = config::CONFIG_NO_VARIABLE;
+        config::Find_Variable(path, std::strlen(path), &id);
+        return id;
     }
 }
 
@@ -361,6 +369,31 @@ DOCTEST_TEST_CASE("civilian armor preserves classic defaults and binds by armor 
         "combat civilian_armor titanium = 0;", &writes, &diagnostic));
 }
 
+DOCTEST_TEST_CASE("ground defense armor multiplier preserves and replaces the classic value") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_ground_defense_armor_multiplier == 100);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat ground_defense_armor_multiplier = 150;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(CMBTFIRE::_ground_defense_armor_multiplier == 150);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat ground_defense_armor_multiplier = 0;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat ground_defense_armor_multiplier = 10001;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("shield tables preserve classic defaults and bind by name") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -431,6 +464,58 @@ DOCTEST_TEST_CASE("Scout Lab research bonuses preserve classic defaults and bind
     DOCTEST_CHECK_FALSE(Append_Decoded_(
         "research scout_lab_research_bonus frigate = 256;",
         &writes, &diagnostic));
+}
+
+DOCTEST_TEST_CASE("command-point settings preserve classic defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::command_points.starting == 5);
+    DOCTEST_CHECK(COLCALC::command_points.star_base == 1);
+    DOCTEST_CHECK(COLCALC::command_points.battlestation == 2);
+    DOCTEST_CHECK(COLCALC::command_points.star_fortress == 3);
+    DOCTEST_CHECK(COLCALC::command_points.tachyon_communications == 1);
+    DOCTEST_CHECK(COLCALC::command_points.sub_space_communications == 2);
+    DOCTEST_CHECK(COLCALC::command_points.hyperspace_communications == 3);
+    DOCTEST_CHECK(COLCALC::command_points.warlord_planet == 2);
+    const uint8_t expected[SHIP_SIZE_COUNT] = {1, 2, 3, 4, 5, 6};
+    DOCTEST_CHECK(std::memcmp(COLCALC::ship_command_points_usage, expected,
+                              sizeof(expected)) == 0);
+    DOCTEST_CHECK(INITSHIP::_landers_size_class == SHIP_SIZE_SMALL);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "command command_points starting = -7;"
+        "command command_points star_base = 4;"
+        "command command_points battlestation = 6;"
+        "command command_points star_fortress = 8;"
+        "command command_points tachyon_communications = 2;"
+        "command command_points sub_space_communications = 4;"
+        "command command_points hyperspace_communications = 6;"
+        "command command_points warlord_planet = 3;"
+        "command ship_command_points_usage cruiser = 9;"
+        "command landers_size_class = cruiser;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::command_points.starting == -7);
+    DOCTEST_CHECK(COLCALC::command_points.star_fortress == 8);
+    DOCTEST_CHECK(COLCALC::ship_command_points_usage[SHIP_SIZE_LARGE] == 9);
+    DOCTEST_CHECK(INITSHIP::_landers_size_class == SHIP_SIZE_LARGE);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "command command_points starting = 128;", &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "command ship_command_points_usage frigate = 256;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "command landers_size_class = orbital;", &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("research retention settings preserve classic defaults") {
@@ -571,6 +656,32 @@ DOCTEST_TEST_CASE("landing ship costs preserve classic defaults and bind indepen
     DOCTEST_CHECK(COLCALC::lander_ship_cost.transport_ship == 80);
 }
 
+DOCTEST_TEST_CASE("freighter cost settings preserve classic defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::misc_costs.freighters == 50);
+    DOCTEST_CHECK(COLCALC::_feudal_affects_freighters == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony misc_costs freighters = 48;"
+        "colony feudal_affects_freighters = true;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::misc_costs.freighters == 48);
+    DOCTEST_CHECK(COLCALC::_feudal_affects_freighters == 1);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony misc_costs freighters = 32768;",
+        &writes, &diagnostic));
+}
+
 DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
     config::s_config_state state;
     DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
@@ -611,6 +722,65 @@ DOCTEST_TEST_CASE("population growth-rate modifiers preserve 1.50 defaults") {
     writes.writes.clear();
     DOCTEST_CHECK_FALSE(Append_Decoded_(
         "colony growth_rate_bonus plague_event = 1;",
+        &writes, &diagnostic));
+}
+
+DOCTEST_TEST_CASE("technology spy bonuses preserve 1.50 defaults and bind independently") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(spy::spy_tech_bonus.neural_scanner == 10);
+    DOCTEST_CHECK(spy::spy_tech_bonus.xeno_psychology == 0);
+    DOCTEST_CHECK(spy::spy_tech_bonus.telepathic_training == 5);
+    DOCTEST_CHECK(spy::spy_tech_bonus.cyber_security_link == 10);
+    DOCTEST_CHECK(spy::spy_tech_bonus.stealth_suit == 10);
+    DOCTEST_CHECK(spy::spy_tech_bonus.psionics == 10);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "spy spy_tech_bonus neural_scanner = 12;"
+        "spy spy_tech_bonus xeno_psychology = 7;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(spy::spy_tech_bonus.neural_scanner == 12);
+    DOCTEST_CHECK(spy::spy_tech_bonus.xeno_psychology == 7);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "spy spy_tech_bonus xeno_psychology = 256;",
+        &writes, &diagnostic));
+}
+
+DOCTEST_TEST_CASE("Subterranean population bonuses bind by planet size") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    const uint8_t expected[PLANET_SIZE_COUNT] = {2, 4, 6, 8, 10};
+    DOCTEST_CHECK(std::memcmp(
+        COLCALC::_pop_bonus_subterranean, expected, sizeof(expected)) == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "colony pop_bonus_subterranean tiny = 3;"
+        "colony pop_bonus_subterranean medium = 9;"
+        "colony pop_bonus_subterranean huge = 12;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COLCALC::_pop_bonus_subterranean[PLANET_SIZE_TINY] == 3);
+    DOCTEST_CHECK(COLCALC::_pop_bonus_subterranean[PLANET_SIZE_MEDIUM] == 9);
+    DOCTEST_CHECK(COLCALC::_pop_bonus_subterranean[PLANET_SIZE_HUGE] == 12);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "colony pop_bonus_subterranean small = 256;",
         &writes, &diagnostic));
 }
 
@@ -710,6 +880,41 @@ DOCTEST_TEST_CASE("satellite capture setting preserves the classic default") {
     DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
     DOCTEST_REQUIRE(config::Commit_State(&state));
     DOCTEST_CHECK(COMBINIT::_satellite_capture_enabled == 1);
+}
+
+DOCTEST_TEST_CASE("satellite special priorities bind as two-dimensional choices") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COMBINIT::starbase_special[4][0] == SPECIAL_WIDE_AREA_JAMMER);
+    DOCTEST_CHECK(COMBINIT::starbase_special[4][1] == SPECIAL_MULTI_WAVE_ECM_JAMMER);
+    DOCTEST_CHECK(COMBINIT::starbase_special[4][2] == SPECIAL_ECM_JAMMER);
+    DOCTEST_CHECK(COMBINIT::starbase_special[5][0] == SPECIAL_WARP_DISSIPATOR);
+    DOCTEST_CHECK(COMBINIT::starbase_special[13][0] == SPECIAL_TRANSPORTERS);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "combat starbase_special 6 1 = reflection_field;"
+        "combat starbase_special 6 2 = 19;"
+        "combat starbase_special 14 1 = warp_dissipator;",
+        &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+
+    DOCTEST_CHECK(COMBINIT::starbase_special[5][0] == SPECIAL_REFLECTION_FIELD);
+    DOCTEST_CHECK(COMBINIT::starbase_special[5][1] == SPECIAL_LIGHTNING_FIELD);
+    DOCTEST_CHECK(COMBINIT::starbase_special[13][0] == SPECIAL_WARP_DISSIPATOR);
+
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat starbase_special 15 1 = ecm_jammer;",
+        &writes, &diagnostic));
+    writes.writes.clear();
+    DOCTEST_CHECK_FALSE(Append_Decoded_(
+        "combat starbase_special 6 4 = ecm_jammer;",
+        &writes, &diagnostic));
 }
 
 DOCTEST_TEST_CASE("satellite torpedo setting preserves the classic default") {
@@ -1506,18 +1711,28 @@ DOCTEST_TEST_CASE("schema defaults restore complete predefined ship templates") 
 }
 
 DOCTEST_TEST_CASE("logical defaults initialize typed candidate state") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     config::s_config_state state;
 
     config::Initialize_Defaults(&state);
 
     DOCTEST_REQUIRE(state.values.size() == config::variable_count);
-    DOCTEST_CHECK(state.values[0].bool_value);
-    DOCTEST_CHECK(state.values[1].integer_value == 50);
-    DOCTEST_CHECK(state.values[2].bool_value);
-    DOCTEST_CHECK(state.values[3].integer_value == 50);
+    DOCTEST_CHECK(state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(state.values[music_volume].integer_value == 50);
+    DOCTEST_CHECK(state.values[sound_enabled].bool_value);
+    DOCTEST_CHECK(state.values[sound_volume].integer_value == 50);
 }
 
 DOCTEST_TEST_CASE("native state conversion normalizes legacy byte flags") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     MOX::_settings.music_on = 7;
     MOX::_settings.music_level = 42;
     MOX::_settings.sound_fx_on = 0;
@@ -1526,13 +1741,18 @@ DOCTEST_TEST_CASE("native state conversion normalizes legacy byte flags") {
     config::s_config_state state;
     config::Read_Current_State(&state);
 
-    DOCTEST_CHECK(state.values[0].bool_value);
-    DOCTEST_CHECK(state.values[1].integer_value == 42);
-    DOCTEST_CHECK_FALSE(state.values[2].bool_value);
-    DOCTEST_CHECK(state.values[3].integer_value == 63);
+    DOCTEST_CHECK(state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(state.values[music_volume].integer_value == 42);
+    DOCTEST_CHECK_FALSE(state.values[sound_enabled].bool_value);
+    DOCTEST_CHECK(state.values[sound_volume].integer_value == 63);
 }
 
 DOCTEST_TEST_CASE("write sets apply to temporary state before explicit commit") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     MOX::_settings.music_on = 1;
     MOX::_settings.music_level = 50;
     MOX::_settings.sound_fx_on = 1;
@@ -1550,10 +1770,10 @@ DOCTEST_TEST_CASE("write sets apply to temporary state before explicit commit") 
     config::s_config_state candidate_state = base_state;
     DOCTEST_REQUIRE(config::Apply_Write_Set(&write_set, &candidate_state, &diagnostic));
 
-    DOCTEST_CHECK_FALSE(candidate_state.values[0].bool_value);
-    DOCTEST_CHECK(candidate_state.values[1].integer_value == 75);
-    DOCTEST_CHECK(candidate_state.values[2].bool_value);
-    DOCTEST_CHECK(candidate_state.values[3].integer_value == 25);
+    DOCTEST_CHECK_FALSE(candidate_state.values[music_enabled].bool_value);
+    DOCTEST_CHECK(candidate_state.values[music_volume].integer_value == 75);
+    DOCTEST_CHECK(candidate_state.values[sound_enabled].bool_value);
+    DOCTEST_CHECK(candidate_state.values[sound_volume].integer_value == 25);
     DOCTEST_CHECK(MOX::_settings.music_on == 1);
     DOCTEST_CHECK(MOX::_settings.music_level == 50);
     DOCTEST_CHECK(MOX::_settings.sound_fx_level == 50);
@@ -1589,6 +1809,11 @@ DOCTEST_TEST_CASE("transaction commits complete write sets and later writes win"
 }
 
 DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
+    const config::t_variable_id music_enabled = Variable_Id_("audio.music_enabled");
+    const config::t_variable_id music_volume = Variable_Id_("audio.music_volume");
+    const config::t_variable_id sound_enabled = Variable_Id_("audio.sound_effects_enabled");
+    const config::t_variable_id sound_volume = Variable_Id_("audio.sound_effects_volume");
+    DOCTEST_REQUIRE(sound_volume != config::CONFIG_NO_VARIABLE);
     MOX::_settings.music_on = 1;
     MOX::_settings.music_level = 40;
     MOX::_settings.sound_fx_on = 1;
@@ -1598,10 +1823,10 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
     config::Read_Current_State(&base_state);
     config::s_config_state candidate_state;
     config::Initialize_Defaults(&candidate_state);
-    candidate_state.values[0].bool_value = false;
-    candidate_state.values[1].integer_value = 1;
-    candidate_state.values[2].bool_value = false;
-    candidate_state.values[3].integer_value = 2;
+    candidate_state.values[music_enabled].bool_value = false;
+    candidate_state.values[music_volume].integer_value = 1;
+    candidate_state.values[sound_enabled].bool_value = false;
+    candidate_state.values[sound_volume].integer_value = 2;
     const config::s_config_state original_candidate = candidate_state;
 
     config::s_config_write_set write_set;
@@ -1609,7 +1834,7 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
     DOCTEST_REQUIRE(Append_Decoded_(
         "audio music_volume = 80;", &write_set, &diagnostic));
     write_set.writes.push_back(Invalid_Write_(
-        3, config::CONFIG_VALUE_INT8, 101));
+        sound_volume, config::CONFIG_VALUE_INT8, 101));
 
     DOCTEST_CHECK_FALSE(config::Apply_Write_Set(
         &write_set, &candidate_state, &diagnostic));
@@ -1624,12 +1849,27 @@ DOCTEST_TEST_CASE("invalid typed writes roll back candidate and native state") {
     DOCTEST_CHECK(MOX::_settings.sound_fx_level == 60);
 
     write_set.writes.back() = Invalid_Write_(
-        3, config::CONFIG_VALUE_BOOL, 0);
+        sound_volume, config::CONFIG_VALUE_BOOL, 0);
     DOCTEST_CHECK_FALSE(config::Apply_Write_Set(
         &write_set, &candidate_state, &diagnostic));
     DOCTEST_CHECK(diagnostic.message ==
                   "typed write mismatch for audio.sound_effects_volume");
     DOCTEST_CHECK(MOX::_settings.music_level == 40);
+}
+
+DOCTEST_TEST_CASE("outpost prompt setting preserves classic behavior by default") {
+    config::s_config_state state;
+    DOCTEST_REQUIRE(config::Initialize_Defaults(&state));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(REPORT::_no_outpost_prompt == 0);
+
+    config::s_config_write_set writes;
+    config::s_cfg_diagnostic diagnostic;
+    DOCTEST_REQUIRE(Append_Decoded_(
+        "interface no_outpost_prompt = true;", &writes, &diagnostic));
+    DOCTEST_REQUIRE(config::Apply_Write_Set(&writes, &state, &diagnostic));
+    DOCTEST_REQUIRE(config::Commit_State(&state));
+    DOCTEST_CHECK(REPORT::_no_outpost_prompt == 1);
 }
 
 }

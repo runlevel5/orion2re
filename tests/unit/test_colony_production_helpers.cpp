@@ -144,6 +144,28 @@ DOCTEST_TEST_CASE("base production reflects recalculated colony fields") {
     DOCTEST_CHECK(COLCALC::Colony_Empire_Base_Research_Produced_(&colony, 0, 0, nullptr) == 2);
 }
 
+DOCTEST_TEST_CASE("Aquatic Tundra food uses the configured climate treatment") {
+    TEST_COLCALC_BASE::Reset_();
+
+    MOX::_player[0].traits[TRAIT_AQUATIC] = 1;
+    MOX::_food_per_farmer_table[PLANET_CLIMATE_TUNDRA] = 2;
+    MOX::_food_per_farmer_table[PLANET_CLIMATE_SWAMP] = 4;
+    MOX::_food_per_farmer_table[PLANET_CLIMATE_TERRAN] = 6;
+
+    s_colony colony = {};
+    colony.owner = 0;
+    colony.climate = PLANET_CLIMATE_TUNDRA;
+    colony.food2_per_farmer = 4;
+
+    DOCTEST_CHECK(
+        COLCALC::Colony_Empire_Base_Food2_Produced_(&colony, 0, 0, nullptr) == 12);
+
+    COLCALC::_aquatic_treats_tundra_as_swamp = 1;
+
+    DOCTEST_CHECK(
+        COLCALC::Colony_Empire_Base_Food2_Produced_(&colony, 0, 0, nullptr) == 8);
+}
+
 DOCTEST_TEST_CASE("research production is banked when no field is selected") {
     struct s_research_case {
         int32_t accumulated;

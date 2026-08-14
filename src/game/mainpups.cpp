@@ -10,8 +10,6 @@ namespace MAINPUPS {
 
     int16_t _officer_gains_level_state;
 
-    char* _g_str_ptr;
-
     int16_t _last_scanned_field;
     int16_t _g_state;
     int8_t _selection_state_flag;
@@ -1968,7 +1966,7 @@ namespace MAINPUPS {
         char message_buffer[500];
         char tech_buffer[500];
         char* leader_name;
-        char* format_string;
+        const char* format_string;
         int16_t officer_cost;
         int16_t maintenance_cost;
 
@@ -1985,60 +1983,62 @@ namespace MAINPUPS {
                                                         MAINPUPS::_g_officer);
         animate::Draw_(MAINPUPS::_g_x + 0x0d, MAINPUPS::_g_y + 0x37, _anims[11]);
 
-        if (MAINPUPS::_on_officer_screen_flag != 0) {
-            ERIC::Print_Paragraph_Centered_(MAINPUPS::_g_x + 0x0e,
-                                            MAINPUPS::_g_y + 0x95,
-                                            0x119,
-                                            0x3e,
-                                            MAINPUPS::_g_str_ptr);
-        } else {
-            const int16_t field_state = MAINPUPS::_field_state;
+        const int16_t field_state = MAINPUPS::_field_state;
 
-            if (field_state == 0) {
-                MAINPUPS::Leader_Technology_String_(MAINPUPS::_g_player_n,
-                                                    MAINPUPS::_g_officer,
-                                                    tech_buffer,
-                                                    sizeof(tech_buffer));
-                maintenance_cost = OFFICER::Officer_Maintenance_(MAINPUPS::_g_player_n,
-                                                                 MAINPUPS::_g_officer);
-                officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
-                                                              MAINPUPS::_g_officer);
-                leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
-                format_string = ESTRINGS::E_Strings_(2);
-                snprintf(message_buffer,
-                        sizeof(message_buffer),
-                        format_string,
-                        leader_name,
-                        officer_cost,
-                        maintenance_cost,
-                        tech_buffer);
-            } else if (field_state == 1) {
-                officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
-                                                              MAINPUPS::_g_officer);
-                leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
-                format_string = ESTRINGS::E_Strings_(6);
-                snprintf(message_buffer, sizeof(message_buffer), format_string, leader_name, officer_cost);
+        if (MAINPUPS::_on_officer_screen_flag != 0 ||
+            field_state == 0 ||
+            field_state == 2) {
+            MAINPUPS::Leader_Technology_String_(MAINPUPS::_g_player_n,
+                                                MAINPUPS::_g_officer,
+                                                tech_buffer,
+                                                sizeof(tech_buffer));
+            maintenance_cost = OFFICER::Officer_Maintenance_(MAINPUPS::_g_player_n,
+                                                             MAINPUPS::_g_officer);
+            officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
+                                                                    MAINPUPS::_g_officer);
+            leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
+
+            if (MAINPUPS::_on_officer_screen_flag != 0) {
+                format_string = HAROLD::H_Message_(HESTR_125_S_WILL_COST_D_BCS_INIT);
             } else if (field_state == 2) {
-                officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
-                                                              MAINPUPS::_g_officer);
-                leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
                 format_string = ESTRINGS::E_Strings_(5);
-                snprintf(message_buffer, sizeof(message_buffer), format_string, leader_name, officer_cost);
-            } else if (field_state == 3) {
-                officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
-                                                              MAINPUPS::_g_officer);
-                leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
-                format_string = ESTRINGS::E_Strings_(4);
-                snprintf(message_buffer, sizeof(message_buffer), format_string, leader_name, officer_cost);
+            } else {
+                format_string = ESTRINGS::E_Strings_(2);
             }
 
-            BILL::Squeeze_Paragraph_Centered_(MAINPUPS::_g_x + 0x0e,
-                                              MAINPUPS::_g_y + 0x95,
-                                              0x119,
-                                              0x3e,
-                                              message_buffer,
-                                              2);
+            snprintf(message_buffer,
+                     sizeof(message_buffer),
+                     format_string,
+                     leader_name,
+                     officer_cost,
+                     maintenance_cost,
+                     tech_buffer);
+
+            if (tech_buffer[0] != '\0' &&
+                strstr(message_buffer, tech_buffer) == nullptr) {
+                strlcat(message_buffer, "\n", sizeof(message_buffer));
+                strlcat(message_buffer, tech_buffer, sizeof(message_buffer));
+            }
+        } else if (field_state == 1) {
+            officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
+                                                                    MAINPUPS::_g_officer);
+            leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
+            format_string = ESTRINGS::E_Strings_(6);
+            snprintf(message_buffer, sizeof(message_buffer), format_string, leader_name, officer_cost);
+        } else if (field_state == 3) {
+            officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
+                                                                    MAINPUPS::_g_officer);
+            leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
+            format_string = ESTRINGS::E_Strings_(4);
+            snprintf(message_buffer, sizeof(message_buffer), format_string, leader_name, officer_cost);
         }
+
+        BILL::Squeeze_Paragraph_Centered_(MAINPUPS::_g_x + 0x0e,
+                                          MAINPUPS::_g_y + 0x95,
+                                          0x119,
+                                          0x3e,
+                                          message_buffer,
+                                          2);
 
         leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 1);
         ERIC::Print_Paragraph_Centered_(MAINPUPS::_g_x + 0x0b,

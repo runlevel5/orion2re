@@ -97,6 +97,7 @@ orion2re_add_unit_test(test_config_decode
         src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/settings.cpp
+        src/game/spy_bonus.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -116,6 +117,7 @@ orion2re_add_unit_test(test_config_bindings
         src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/settings.cpp
+        src/game/spy_bonus.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -136,6 +138,7 @@ orion2re_add_unit_test(test_config_lifecycle
         src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/settings.cpp
+        src/game/spy_bonus.cpp
     FAKE_SOURCES
         tests/fakes/fake_config_runtime.cpp
 )
@@ -159,6 +162,7 @@ orion2re_add_unit_test(test_config_loader
         src/game/invasion_config.cpp
         src/game/ship_config.cpp
         src/game/settings.cpp
+        src/game/spy_bonus.cpp
         src/game/compat.cpp
         src/game/vfs.cpp
         src/game/vfs_file.cpp
@@ -179,6 +183,13 @@ target_include_directories(test_config_loader PRIVATE
 orion2re_add_unit_test(test_pop_helpers
     SOURCES
         tests/unit/test_pop_helpers.cpp
+)
+
+orion2re_add_unit_test(test_spy
+    SOURCES
+        tests/unit/test_spy.cpp
+    PRODUCTION_SOURCES
+        src/game/spy_bonus.cpp
 )
 
 orion2re_add_unit_test(test_aidudes
@@ -259,6 +270,7 @@ orion2re_add_unit_test(test_colony_pop_growth
     SOURCES
         tests/unit/test_colony_pop_growth.cpp
     PRODUCTION_SOURCES
+        src/game/aidata.cpp
         src/game/colcalc.cpp
         src/game/colcalc_config.cpp
     FAKE_SOURCES
@@ -315,6 +327,27 @@ orion2re_add_unit_test(test_colonize
     FAKE_SOURCES
         tests/fakes/fake_colonize_runtime.cpp
 )
+
+orion2re_add_unit_test(test_report
+    SOURCES
+        tests/unit/test_report.cpp
+    PRODUCTION_SOURCES
+        src/game/report.cpp
+    FAKE_SOURCES
+        tests/fakes/fake_report_runtime.cpp
+)
+
+if(MSVC)
+    target_compile_options(test_report PRIVATE /Gy)
+    target_link_options(test_report PRIVATE /OPT:REF)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(test_report PRIVATE -ffunction-sections -fdata-sections)
+    if(APPLE)
+        target_link_options(test_report PRIVATE -Wl,-dead_strip)
+    else()
+        target_link_options(test_report PRIVATE -Wl,--gc-sections)
+    endif()
+endif()
 
 orion2re_add_unit_test(test_shipmove
     SOURCES
@@ -472,6 +505,7 @@ orion2re_add_unit_test(test_combat_stats
     SOURCES
         tests/unit/test_combat_stats.cpp
     PRODUCTION_SOURCES
+        src/game/aipower.cpp
         src/game/cmbtai.cpp
         src/game/combat1.cpp
         src/game/cmbtdrw1.cpp

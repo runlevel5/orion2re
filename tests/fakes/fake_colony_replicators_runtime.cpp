@@ -1,9 +1,9 @@
 #include "pch.h"
 
 namespace {
-    s_colony colonies[1];
+    s_colony colonies[3];
     s_player players[MAX_PLAYERS];
-    s_ship_data ships[1];
+    s_ship_data ships[2];
     s_leader_data leaders[MAX_LEADERS];
     s_planet_data planets[1];
     s_star_data stars[1];
@@ -68,6 +68,10 @@ namespace TEST_PLAYER_STATS {
         MOX::_NUM_SHIPS = 1;
         const uint8_t defaults[SHIP_SIZE_COUNT] = {1, 2, 4, 8, 16, 32};
         memcpy(COLCALC::scout_lab_research_bonus, defaults, sizeof(defaults));
+        COLCALC::command_points = {5, 1, 2, 3, 1, 2, 3, 2};
+        const uint8_t command_usage[SHIP_SIZE_COUNT] = {1, 2, 3, 4, 5, 6};
+        memcpy(COLCALC::ship_command_points_usage, command_usage,
+               sizeof(command_usage));
     }
 }
 

@@ -147,8 +147,15 @@ void __cdecl Next_Turn_Calc_() {
         council::Check_For_Council_Meeting_();
     }
 
+    int16_t player_order[MAX_PLAYERS] = {};
     for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-        OFFICER::Random_Officer_Check_(i);
+        player_order[i] = i;
+    }
+
+    RUSS::Shuffle_Sint_(player_order, static_cast<int16_t>(MOX::_NUM_PLAYERS));
+
+    for (int16_t order_idx = 0; order_idx < MOX::_NUM_PLAYERS; ++order_idx) {
+        OFFICER::Random_Officer_Check_(player_order[order_idx]);
     }
 
     MSG_::Add_Ongoing_Event_Msgs_();

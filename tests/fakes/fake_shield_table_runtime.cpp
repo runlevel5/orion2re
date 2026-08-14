@@ -3,12 +3,14 @@
 namespace {
     s_combat_data combat_data[2];
     s_current_design current_design;
+    s_player player;
 }
 
 namespace TEST_SHIELD_TABLE {
     void Reset_() {
         memset(combat_data, 0, sizeof(combat_data));
         memset(&current_design, 0, sizeof(current_design));
+        memset(&player, 0, sizeof(player));
         MOX::_combat_data = combat_data;
         MOX::_design = &current_design;
         MOX::_in_nebula_flag = 0;
@@ -34,6 +36,15 @@ namespace TEST_SHIELD_TABLE {
         return &current_design;
     }
 
+    s_player* Player_() {
+        return &player;
+    }
+
+    void Research_Special_(int16_t special_id) {
+        player.tech_applications[TECHDATA::_specials[special_id].tech_app_id] =
+            TECH_RESEARCH_STATUS_RESEARCHED;
+    }
+
     void Set_Combat_Special_(int16_t special_id) {
         combat_data[0].special_device_flags[special_id / 8] |=
             (uint8_t)(1u << (special_id % 8));
@@ -56,6 +67,11 @@ namespace MOX {
 }
 
 namespace struct_ {
+    void __cdecl Set_Bit_Field_(void* bit_field, uint16_t bit_index) {
+        uint8_t* bytes = static_cast<uint8_t*>(bit_field);
+        bytes[bit_index / 8] |= (uint8_t)(1u << (bit_index % 8));
+    }
+
     int16_t __cdecl Test_Bit_Field_(void* bit_field, uint16_t bit_index) {
         const uint8_t* bytes = static_cast<const uint8_t*>(bit_field);
         return (bytes[bit_index / 8] >> (bit_index % 8)) & 1;

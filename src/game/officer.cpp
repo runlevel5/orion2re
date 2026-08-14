@@ -435,26 +435,10 @@ namespace OFFICER {
      * @address 00443580
      */
     uint8_t __cdecl Ask_For_Hire_(int16_t leader_idx) {
-        int16_t upkeep;
-        int16_t costs;
-        char template_str[200];
-        char formatted_msg[200];
-
-        Get_Officer_Costs_(leader_idx, &costs, &upkeep);
         fields::Deactivate_Help_List_();
         _full_draw = 1;
 
-        int16_t msg_id = (upkeep == 1) ? HESTR_124_S_WILL_COST_D_BCS_INIT 
-                                       : HESTR_125_S_WILL_COST_D_BCS_INIT;
-
-        const char* template_ptr = HAROLD::H_Message_(msg_id);
-        strlcpy(template_str, template_ptr, sizeof(template_str));
-
-        char* name = Leader_Name_(leader_idx, 1);
-
-        snprintf(formatted_msg, sizeof(formatted_msg), template_str, name, (int)costs, (int)upkeep);
-
-        uint8_t result = Hire_Officer_Popup_(MOX::_PLAYER_NUM, leader_idx, formatted_msg);
+        uint8_t result = Hire_Officer_Popup_(MOX::_PLAYER_NUM, leader_idx);
 
         if (result != 0) {
             Hire_Officer_(MOX::_PLAYER_NUM, leader_idx);
@@ -3889,9 +3873,8 @@ int8_t __cdecl Leader_Available_For_Hire_(int16_t leader_idx) {
     return 0;
 }
 
-uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message) {
+uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id) {
     MAINPUPS::_g_officer = officer_id;
-    MAINPUPS::_g_str_ptr = message;
     MAINPUPS::_on_officer_screen_flag = 1;
 
     uint8_t result = (uint8_t)MAINPUPS::Random_New_Officer_Popup_(player_num);

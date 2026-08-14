@@ -59,12 +59,12 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:1591` - `missile_defense` -> `combat.missile_defense`
 - [ ] `conf.pl:1645` - `ship_communication_range`
 - [ ] `conf.pl:1686` - `planetary_shield`
-- [ ] `conf.pl:1719` - `misc_costs`
+- [x] `conf.pl:1719` - `misc_costs` -> `colony.misc_costs`
 - [x] `conf.pl:1742` - `jump_gate_speed_bonus` -> `movement.jump_gate_speed_bonus`
 - [ ] `conf.pl:1755` - `warp_interdictor_range`
 - [ ] `conf.pl:1788` - `crew_data`
 - [ ] `conf.pl:1903` - `artemis_system_net`
-- [ ] `conf.pl:1975` - `starbase_special`
+- [x] `conf.pl:1975` - `starbase_special` -> `combat.starbase_special`
 - [ ] `conf.pl:2049` - `ai_ship_design_bio_weapons_theme`
 - [ ] `conf.pl:2075` - `ai_ship_design_capture_theme`
 - [ ] `conf.pl:2101` - `ai_ship_design_cloaking_theme`
@@ -225,7 +225,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:8893` - `prewarp_techfield`
 - [ ] `conf.pl:8920` - `ship_initiative`
 - [x] `conf.pl:8945` - `continuous_bhg` -> `combat.continuous_bhg`
-- [ ] `conf.pl:8973` - `command_points`
+- [x] `conf.pl:8973` - `command_points` -> `command.command_points`
 - [ ] `conf.pl:9083` - `skill_cost`
 - [ ] `conf.pl:9106` - `skill_cost_commando`
 - [ ] `conf.pl:9125` - `megawealth_no_double_cost`
@@ -265,8 +265,8 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:9937` - `defensive_fire_max_range`
 - [x] `conf.pl:9950` - `keep_research_on_breakthrough` -> `research.keep_research_on_breakthrough`
 - [x] `conf.pl:9964` - `keep_research_on_finds` -> `research.keep_research_on_finds`
-- [ ] `conf.pl:9978` - `ship_command_points_usage`
-- [ ] `conf.pl:9996` - `landers_size_class`
+- [x] `conf.pl:9978` - `ship_command_points_usage` -> `command.ship_command_points_usage`
+- [x] `conf.pl:9996` - `landers_size_class` -> `command.landers_size_class`
 - [ ] `conf.pl:10010` - `raid_damage_per_marine`
 - [x] `conf.pl:10023` - `finds_presented_by_scientist` -> `research.finds_presented_by_scientist`
 - [ ] `conf.pl:10039` - `barracks_morale_bonus`
@@ -290,7 +290,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:10496` - `monsters_stay_chance`
 - [ ] `conf.pl:10592` - `force_event_type`
 - [x] `conf.pl:10609` - `event_delay` -> `events.event_delay`
-- [ ] `conf.pl:10653` - `no_outpost_prompt`
+- [x] `conf.pl:10653` - `no_outpost_prompt` -> `interface.no_outpost_prompt`
 - [x] `conf.pl:10669` - `crystal_keep` -> `combat.crystal_keep`
 - [x] `conf.pl:10683` - `satellite_warlord_bonus` -> `combat.satellite_warlord_bonus`
 - [x] `conf.pl:10696` - `leader_warlord_bonus` -> `leaders.leader_warlord_bonus`
@@ -324,7 +324,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:11327` - `pop_bonus_tolerant`
 - [ ] `conf.pl:11349` - `reinforced_hull_multiplier`
 - [ ] `conf.pl:11371` - `marine_kill_damage`
-- [ ] `conf.pl:11387` - `ground_defense_armor_multiplier`
+- [x] `conf.pl:11387` - `ground_defense_armor_multiplier` -> `combat.ground_defense_armor_multiplier`
 - [ ] `conf.pl:11401` - `spies_can_frame_anyone`
 - [ ] `conf.pl:11423` - `no_starting_ships`
 - [ ] `conf.pl:11445` - `no_initial_tech_prompt`
@@ -348,7 +348,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:11859` - `nova_minimum_research_per_turn`
 - [ ] `conf.pl:11882` - `computer_virus`
 - [ ] `conf.pl:11905` - `govt_assimilation_points`
-- [ ] `conf.pl:11923` - `aquatic_treats_tundra_as_swamp`
+- [x] `conf.pl:11923` - `aquatic_treats_tundra_as_swamp` -> `colony.aquatic_treats_tundra_as_swamp`
 - [ ] `conf.pl:11936` - `non_ics_phasing_cloak_mode`
 - [x] `conf.pl:11949` - `non_ics_tractor_and_bhg_mode` -> `combat.non_ics_tractor_and_bhg_mode`
 - [x] `conf.pl:11963` - `satellite_size_class_plus_one` -> `combat.satellite_size_class_plus_one`
@@ -357,11 +357,11 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [x] `conf.pl:12027` - `kill_excess_marines_after_capture` -> `combat.kill_excess_marines_after_capture`
 - [x] `conf.pl:12040` - `amoeba_regeneration` -> `combat.amoeba_regeneration`
 - [ ] `conf.pl:12070` - `first_pop_to_production`
-- [ ] `conf.pl:12101` - `transport_ship_extended_range`
+- [x] `conf.pl:12101` - `transport_ship_extended_range` -> `colony.transport_ship_extended_range`
 - [x] `conf.pl:12114` - `recloak_next_turn` -> `combat.recloak_next_turn`
 - [x] `conf.pl:12136` - `rephase_cloak_next_turn` -> `combat.rephase_cloak_next_turn`
 - [x] `conf.pl:12149` - `zero_colony_lost` -> `colony.zero_colony_lost`
-- [ ] `conf.pl:12165` - `feudal_affects_freighters`
+- [x] `conf.pl:12165` - `feudal_affects_freighters` -> `colony.feudal_affects_freighters`
 - [ ] `conf.pl:12187` - `ai_tech_prio`
 - [ ] `conf.pl:12214` - `planet_rangemaster`
 - [ ] `conf.pl:12227` - `planet_achilles`
@@ -387,7 +387,7 @@ Original-executable aliases have no checkboxes because they are navigation evide
 - [ ] `conf.pl:12666` - `no_future_tech_peek`
 - [ ] `conf.pl:12701` - `system_and_event_crystal`
 - [ ] `conf.pl:12722` - `capitol_can_be_bombed`
-- [ ] `conf.pl:12756` - `spy_tech_bonus`
+- [x] `conf.pl:12756` - `spy_tech_bonus` -> `spy.spy_tech_bonus`
 - [ ] `conf.pl:12779` - `loaded_config_prompt`
 - [x] `conf.pl:12794` - `telepathic_multiple_capture` -> `combat.telepathic_multiple_capture`
 - [ ] `conf.pl:12809` - `marine_kill_damage_blocker`

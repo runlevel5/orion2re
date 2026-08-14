@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "doctest/doctest.h"
+#include "game/aipower.h"
 #include "game/cmbtdrw1.h"
 #include "game/cmbtmov1.h"
 #include "game/combat1.h"
@@ -12,8 +13,16 @@ namespace {
     s_missile missiles[300];
     s_planet_data planets[1];
     s_player players[MAX_PLAYERS];
+    int16_t best_bomb_weapon;
+    int16_t best_point_defense_weapon;
+    int16_t best_ship_shield;
     bool has_phase_shifter;
     bool has_sub_space_teleporter;
+    bool has_energy_absorber;
+    bool has_damper_field;
+    bool has_hard_shields;
+    bool planet_has_defenses;
+    bool target_is_legal;
     bool sub_space_teleporter_enabled;
     int16_t teleporter_used;
     int16_t ship_center_offset_x;
@@ -52,6 +61,28 @@ namespace TEST_TRACTOR_POWER {
     }
 }
 
+namespace TEST_EXPECTED_DAMAGE {
+    void Reset_() {
+        memset(combat_data, 0, sizeof(combat_data));
+        memset(missiles, 0, sizeof(missiles));
+        memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+        memset(TECHDATA::_shields, 0, sizeof(TECHDATA::_shields));
+        memset(MOX::_ordnance_bonus, 0, sizeof(MOX::_ordnance_bonus));
+        memset(MOX::_fighter_beam_type, 0, sizeof(MOX::_fighter_beam_type));
+        memset(MOX::_fighter_bomb_type, 0, sizeof(MOX::_fighter_bomb_type));
+        has_energy_absorber = false;
+        has_damper_field = false;
+        has_hard_shields = false;
+        planet_has_defenses = false;
+        target_is_legal = false;
+        MOX::_in_nebula_flag = 0;
+        TECHDATA::_hard_shields_damage_reduction = 3;
+        CMBTFIRE::_fighters_use_point_defense = 0;
+        CMBTFIRE::_planet_non_enveloping = 0;
+        CMBTMIS::missile_defense = {0, 50, 30};
+    }
+}
+
 namespace TEST_MISSILE_BEARING {
     void Reset_() {
         memset(combat_data, 0, sizeof(combat_data));
@@ -79,6 +110,7 @@ namespace MOX {
     s_missile* _missile = missiles;
     s_planet_data* _planet = planets;
     s_player* _player = players;
+    s_settings _settings;
     int16_t _cmbt_colony_id;
     int16_t _combat_total_ship_count;
     int16_t _cur_ship;
@@ -86,6 +118,10 @@ namespace MOX {
     int16_t _speedx2_flag;
     int16_t _auto_combat;
     int16_t _take_control_flag;
+    int16_t _combat_attacker_player;
+    int16_t _combat_defender_player;
+    int16_t _in_nebula_flag;
+    int16_t _ordnance_bonus[15];
     int16_t _combat_grid[COMBAT_GRID_WIDTH][COMBAT_GRID_HEIGHT];
     int16_t _fighter_beam_type[9];
     int16_t _fighter_bomb_type[9];
@@ -95,10 +131,20 @@ namespace TECHDATA {
     s_tech_shield_data _shields[SHIELD_COUNT];
     s_tech_weapon_data _weapons[WEAPON_COUNT];
     s_tech_weapon_mod_data _weapon_modifications[WEAPON_MOD_COUNT];
+    uint8_t _hard_shields_damage_reduction;
 }
 
 namespace COMBINIT {
     int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t, int16_t special_idx) {
+        if (special_idx == SPECIAL_ENERGY_ABSORBER) {
+            return has_energy_absorber;
+        }
+        if (special_idx == SPECIAL_DAMPER_FIELD) {
+            return has_damper_field;
+        }
+        if (special_idx == SPECIAL_HARD_SHIELDS) {
+            return has_hard_shields;
+        }
         if (special_idx == SPECIAL_PHASE_SHIFTER) {
             return has_phase_shifter;
         }
@@ -115,6 +161,14 @@ namespace COMBINIT {
 }
 
 namespace CMBTMIS {
+    int16_t __cdecl Get_Missile_Hits_(int16_t, int16_t, uint16_t) {
+        return 1;
+    }
+
+    int16_t __cdecl Missile_Dcv_(int16_t, int16_t) {
+        return 0;
+    }
+
     char __cdecl Move_Missile_(int16_t missile_idx, int16_t, int16_t, int16_t) {
         s_missile* missile = &MOX::_missile[missile_idx];
         missile->x -= 2;
@@ -132,6 +186,39 @@ namespace CMBTFIR2 {
 }
 
 namespace CMBTFIRE {
+    s_mount_damage _mount_dmg[HIGH_ENERGY_FOCUS_PRESENCE_COUNT] = {
+        {50, 100, 150},
+        {50, 150, 200},
+    };
+
+    int32_t Energy_Absorber_Blocked_Damage_(int32_t damage) {
+        return damage / 4;
+    }
+
+    int32_t Damper_Field_Remaining_Damage_(int32_t damage) {
+        return damage / 4;
+    }
+
+    int16_t __cdecl Does_Combat_Planet_Have_Defenses_() {
+        return planet_has_defenses;
+    }
+
+    bool Enveloping_Applies_To_Target_(int16_t) {
+        return true;
+    }
+
+    void __cdecl Get_Beam_Weapon_Modifiers_(
+        int16_t,
+        int16_t,
+        uint16_t,
+        int16_t,
+        int16_t* hit_bonus_out,
+        int16_t* damage_bonus_out
+    ) {
+        *hit_bonus_out = 0;
+        *damage_bonus_out = 100;
+    }
+
     int8_t __cdecl Special_Is_Turned_On_(int16_t, int16_t) {
         return sub_space_teleporter_enabled;
     }
@@ -141,7 +228,33 @@ namespace CMBTFIRE {
     }
 
     int16_t __cdecl Target_Is_Legal_For_Weapon_(int16_t, uint16_t, int16_t, int16_t) {
-        return 0;
+        return target_is_legal;
+    }
+}
+
+namespace INITSHIP {
+    int16_t __cdecl Best_Bomb_Weapon_(int16_t) {
+        return best_bomb_weapon;
+    }
+
+    int16_t __cdecl Best_Point_Defense_Weapon_(int16_t) {
+        return best_point_defense_weapon;
+    }
+
+    int16_t __cdecl Best_Ship_Shield_(int16_t) {
+        return best_ship_shield;
+    }
+}
+
+namespace GEO {
+    int32_t __cdecl Actual_Expected_Damage_(
+        int32_t min_damage,
+        int32_t,
+        int32_t,
+        int32_t,
+        int32_t points_blocked
+    ) {
+        return min_damage - points_blocked;
     }
 }
 
@@ -242,6 +355,27 @@ namespace special {
         *x_ptr = x2;
         *y_ptr = y2;
     }
+}
+
+DOCTEST_TEST_CASE("fighter garrison strength counts each advanced fighter bay once") {
+    memset(players, 0, sizeof(players));
+    memset(&MOX::_settings, 0, sizeof(MOX::_settings));
+    memset(TECHDATA::_shields, 0, sizeof(TECHDATA::_shields));
+    memset(TECHDATA::_weapons, 0, sizeof(TECHDATA::_weapons));
+
+    best_bomb_weapon = WEAPON_BOMBER;
+    best_point_defense_weapon = WEAPON_INTERCEPTOR;
+    best_ship_shield = 0;
+    TECHDATA::_weapons[best_point_defense_weapon].max_damage = 10;
+
+    MOX::_player[0].tech_applications[TECH_APP_BOMBER_BAYS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    DOCTEST_CHECK(AIPOWER::Fighter_Garrison_Strength_(0, 1) == 120);
+
+    MOX::_player[0].tech_applications[TECH_APP_BOMBER_BAYS] = 0;
+    MOX::_player[0].tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] =
+        TECH_RESEARCH_STATUS_RESEARCHED;
+    DOCTEST_CHECK(AIPOWER::Fighter_Garrison_Strength_(0, 1) == 80);
 }
 
 DOCTEST_TEST_CASE("disabled spent weapons remain red") {
@@ -370,6 +504,21 @@ DOCTEST_TEST_CASE("Trans-Dimensional combat speed uses the configured bonus") {
     DOCTEST_CHECK(COMBAT1::Calc_Current_Speed_(0) == 17);
 
     COMBAT1::_td_combat_speed_bonus = 4;
+}
+
+DOCTEST_TEST_CASE("ship officers prevent automatic out-of-ammo retreat") {
+    memset(combat_data, 0, sizeof(combat_data));
+    has_energy_absorber = false;
+    has_damper_field = false;
+    has_hard_shields = false;
+    has_phase_shifter = false;
+    has_sub_space_teleporter = false;
+
+    MOX::_combat_data[0].officer_idx = -1;
+    DOCTEST_CHECK(CMBTAI::Is_Ship_Out_Of_Ammo_(0) == 1);
+
+    MOX::_combat_data[0].officer_idx = 0;
+    DOCTEST_CHECK(CMBTAI::Is_Ship_Out_Of_Ammo_(0) == 0);
 }
 
 DOCTEST_TEST_CASE("ship range exposes tactical squares without changing legacy range") {
@@ -510,6 +659,237 @@ DOCTEST_TEST_CASE("simulated rotation restores missile bearing") {
     DOCTEST_CHECK(MOX::_missile[0].y == 50);
     DOCTEST_CHECK(MOX::_missile[0].travel_dist == 60);
     DOCTEST_CHECK(MOX::_missile[0].facing_dir == 3);
+}
+
+DOCTEST_TEST_CASE("missile threat uses the requested missile") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    MOX::_ordnance_bonus[0] = 100;
+    MOX::_combat_data[1].shield_current_hits = 1;
+    TECHDATA::_shields[0].shield_class = 10;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].type = WEAPON_TYPE_MISSILE;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].max_damage = 5;
+    TECHDATA::_weapons[WEAPON_MERCULITE_MISSILE].type = WEAPON_TYPE_MISSILE;
+    TECHDATA::_weapons[WEAPON_MERCULITE_MISSILE].max_damage = 20;
+    MOX::_missile[0].type = WEAPON_NUCLEAR_MISSILE;
+    MOX::_missile[0].owner = 0;
+    MOX::_missile[1].type = WEAPON_MERCULITE_MISSILE;
+    MOX::_missile[1].owner = 0;
+
+    DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 1) == 1);
+}
+
+DOCTEST_TEST_CASE("overloaded launched missile can penetrate shields") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].type = WEAPON_TYPE_MISSILE;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].max_damage = 10;
+    TECHDATA::_shields[0].shield_class = 12;
+    MOX::_combat_data[1].shield_type = 0;
+    MOX::_combat_data[1].shield_current_hits = 1;
+    MOX::_missile[0].type = WEAPON_NUCLEAR_MISSILE;
+    MOX::_missile[0].owner = 0;
+    MOX::_missile[0].specials = WEAPON_MOD_FLAG_OVERLOADED;
+    MOX::_ordnance_bonus[0] = 100;
+    DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 0) == 1);
+}
+
+DOCTEST_TEST_CASE("Hard Shields stop inherent Shield Piercing in expected damage") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].type = WEAPON_TYPE_MISSILE;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].natural_mods =
+        WEAPON_NATURAL_FLAG_IGNORES_SHIELDS;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].max_damage = 12;
+    TECHDATA::_shields[0].shield_class = 10;
+    MOX::_combat_data[1].shield_type = 0;
+    MOX::_combat_data[1].shield_current_hits = 1;
+    MOX::_ordnance_bonus[10] = 100;
+    has_hard_shields = true;
+
+    DOCTEST_CHECK(CMBTAI::Expected_Missile_Damage_(
+        1, WEAPON_NUCLEAR_MISSILE, 1, 0, 10) == 0);
+
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].natural_mods = 0;
+    DOCTEST_CHECK(CMBTAI::Expected_Missile_Damage_(
+        1,
+        WEAPON_NUCLEAR_MISSILE,
+        1,
+        WEAPON_MOD_FLAG_SHIELD_PIERCING,
+        10) == 0);
+}
+
+DOCTEST_TEST_CASE("only the three standard torpedoes are unshootable") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    const int16_t unshootable_torpedoes[] = {
+        WEAPON_ANTI_MATTER_TORP,
+        WEAPON_PROTON_TORPEDO,
+        WEAPON_PLASMA_TORPEDO,
+    };
+    MOX::_ordnance_bonus[0] = 100;
+
+    for (const int16_t weapon_id : unshootable_torpedoes) {
+        TECHDATA::_weapons[weapon_id].type = WEAPON_TYPE_TORPEDO;
+        TECHDATA::_weapons[weapon_id].max_damage = 300;
+        MOX::_missile[0].type = weapon_id;
+        MOX::_missile[0].owner = 0;
+
+        DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 0) == 0);
+    }
+}
+
+DOCTEST_TEST_CASE("Dragon Breath remains a shootable torpedo threat") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_DRAGON_BREATH].type = WEAPON_TYPE_TORPEDO;
+    TECHDATA::_weapons[WEAPON_DRAGON_BREATH].max_damage = 300;
+    MOX::_missile[0].type = WEAPON_DRAGON_BREATH;
+    MOX::_missile[0].owner = 0;
+    MOX::_ordnance_bonus[0] = 100;
+
+    DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 0) == 1);
+}
+
+DOCTEST_TEST_CASE("fighter threat includes the classic extra maximum damage point") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_INTERCEPTOR].type = WEAPON_TYPE_FIGHTER;
+    TECHDATA::_weapons[WEAPON_LASER_CANNON].type = WEAPON_TYPE_BEAM;
+    TECHDATA::_weapons[WEAPON_LASER_CANNON].max_damage = 10;
+    TECHDATA::_shields[0].shield_class = 10;
+    MOX::_combat_data[1].shield_type = 0;
+    MOX::_combat_data[1].shield_current_hits = 1;
+    MOX::_fighter_beam_type[0] = WEAPON_LASER_CANNON;
+    MOX::_missile[0].type = WEAPON_INTERCEPTOR;
+    MOX::_missile[0].owner = 0;
+    MOX::_ordnance_bonus[0] = 100;
+
+    DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 0) == 1);
+}
+
+DOCTEST_TEST_CASE("fighter expected damage retains the 1.50 absorber exception") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_BOMBER].type = WEAPON_TYPE_FIGHTER;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_BOMB].max_damage = 20;
+    MOX::_fighter_bomb_type[0] = WEAPON_NUCLEAR_BOMB;
+    MOX::_ordnance_bonus[0] = 100;
+    has_energy_absorber = true;
+
+    DOCTEST_CHECK(CMBTAI::Expected_Missile_Damage_(
+        1, WEAPON_BOMBER, 1, 0, 0) == 40);
+}
+
+DOCTEST_TEST_CASE("fighter expected damage retains the 1.50 Shield Piercing exception") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_BOMBER].type = WEAPON_TYPE_FIGHTER;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_BOMB].max_damage = 5;
+    TECHDATA::_shields[0].shield_class = 10;
+    MOX::_combat_data[1].shield_type = 0;
+    MOX::_combat_data[1].shield_current_hits = 1;
+    MOX::_fighter_bomb_type[0] = WEAPON_NUCLEAR_BOMB;
+    MOX::_ordnance_bonus[0] = 100;
+
+    DOCTEST_CHECK(CMBTAI::Expected_Missile_Damage_(
+        1,
+        WEAPON_BOMBER,
+        1,
+        WEAPON_MOD_FLAG_SHIELD_PIERCING,
+        0) == 0);
+}
+
+DOCTEST_TEST_CASE("1.50 expected damage keeps Enveloping against planets") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].type = WEAPON_TYPE_MISSILE;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].max_damage = 10;
+    MOX::_ordnance_bonus[10] = 100;
+    CMBTFIRE::_planet_non_enveloping = 1;
+
+    DOCTEST_CHECK(CMBTAI::Expected_Missile_Damage_(
+        0,
+        WEAPON_NUCLEAR_MISSILE,
+        1,
+        WEAPON_MOD_FLAG_ENVELOPING,
+        10) == 40);
+}
+
+DOCTEST_TEST_CASE("1.50 cloak prediction retains the configured miss percentage") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].type = WEAPON_TYPE_MISSILE;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].max_damage = 100;
+    MOX::_combat_data[1].special_status_flag = 1;
+    MOX::_ordnance_bonus[10] = 100;
+    CMBTMIS::missile_defense.cloaking_device_missile_miss_percent = 30;
+
+    DOCTEST_CHECK(CMBTAI::Expected_Missile_Damage_(
+        1, WEAPON_NUCLEAR_MISSILE, 1, 0, 10) == 30);
+}
+
+DOCTEST_TEST_CASE("1.50 special expected damage retains negative estimates") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    target_is_legal = true;
+    TECHDATA::_weapons[WEAPON_PLASMA_WEB].type = WEAPON_TYPE_SPECIAL;
+    TECHDATA::_weapons[WEAPON_PLASMA_WEB].min_damage = 5;
+    TECHDATA::_weapons[WEAPON_PLASMA_WEB].max_damage = 5;
+    TECHDATA::_shields[0].shield_class = 10;
+    MOX::_combat_data[0].weapons[0].weapon_id = WEAPON_PLASMA_WEB;
+    MOX::_combat_data[0].weapons[0].count = 1;
+    MOX::_combat_data[1].shield_type = 0;
+    MOX::_combat_data[1].shield_current_hits = 1;
+
+    DOCTEST_CHECK(CMBTAI::Expected_Weapon_Damage_(
+        0, 0, 1, TARGET_TYPE_SHIP, 0) == -20);
+}
+
+DOCTEST_TEST_CASE("nebula disables ordinary shields in missile prediction") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].type = WEAPON_TYPE_MISSILE;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].max_damage = 10;
+    TECHDATA::_shields[0].shield_class = 15;
+    MOX::_combat_data[1].shield_type = 0;
+    MOX::_combat_data[1].shield_current_hits = 1;
+    MOX::_missile[0].type = WEAPON_NUCLEAR_MISSILE;
+    MOX::_missile[0].owner = 0;
+    MOX::_missile[0].specials = 0;
+    MOX::_ordnance_bonus[0] = 100;
+    MOX::_in_nebula_flag = 1;
+
+    DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 0) == 1);
+
+    has_hard_shields = true;
+    DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 0) == 0);
+}
+
+DOCTEST_TEST_CASE("expected missile damage applies absorber before MIRV") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].type = WEAPON_TYPE_MISSILE;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_MISSILE].max_damage = 10;
+    MOX::_combat_data[1].shield_current_hits = 0;
+    MOX::_combat_data[1].tac_val_evade = 0;
+    MOX::_ordnance_bonus[10] = 100;
+    has_energy_absorber = true;
+    DOCTEST_CHECK(CMBTAI::Expected_Missile_Damage_(
+        1,
+        WEAPON_NUCLEAR_MISSILE,
+        1,
+        WEAPON_MOD_FLAG_MIRV,
+        10) == 32);
+}
+
+DOCTEST_TEST_CASE("heavy fighter threat checks each beam and bomb payload") {
+    TEST_EXPECTED_DAMAGE::Reset_();
+    TECHDATA::_weapons[WEAPON_HEAVY_FIGHTER].type = WEAPON_TYPE_FIGHTER;
+    TECHDATA::_weapons[WEAPON_LASER_CANNON].type = WEAPON_TYPE_BEAM;
+    TECHDATA::_weapons[WEAPON_LASER_CANNON].max_damage = 5;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_BOMB].type = WEAPON_TYPE_BOMB;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_BOMB].max_damage = 20;
+    TECHDATA::_shields[0].shield_class = 10;
+    MOX::_combat_data[1].shield_type = 0;
+    MOX::_combat_data[1].shield_current_hits = 1;
+    MOX::_fighter_beam_type[0] = WEAPON_LASER_CANNON;
+    MOX::_fighter_bomb_type[0] = WEAPON_NUCLEAR_BOMB;
+    MOX::_missile[0].type = WEAPON_HEAVY_FIGHTER;
+    MOX::_missile[0].owner = 0;
+    MOX::_ordnance_bonus[0] = 100;
+    DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 0) == 1);
+
+    TECHDATA::_weapons[WEAPON_LASER_CANNON].max_damage = 20;
+    TECHDATA::_weapons[WEAPON_NUCLEAR_BOMB].max_damage = 5;
+    DOCTEST_CHECK(CMBTAI::Will_Missile_Do_Damage_(1, 0) == 1);
 }
 
 DOCTEST_TEST_CASE("simulated movement restores missile bearing") {

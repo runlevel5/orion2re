@@ -708,6 +708,32 @@
         warp_dissipator: 37, wide_area_jammer: 38, regeneration: 39,
       },
     },
+    ship_special: {
+      title: "Ship special system",
+      description: "Identifies one ship special system by its native bit index.",
+      remarks: "Complete SPECIAL domain. None disables a configurable priority choice.",
+      kind: "enum",
+      base_type: "uint8",
+      allow_numeric: true,
+      reject_unknown_numeric: true,
+      values: {
+        none: 0, achilles_targeting_unit: 1, augmented_engines: 2,
+        automated_repair_unit: 3, battle_pods: 4, battle_scanner: 5,
+        cloaking_device: 6, damper_field: 7, displacement_device: 8,
+        ecm_jammer: 9, energy_absorber: 10, extended_fuel_tanks: 11,
+        fast_missile_racks: 12, hard_shields: 13, heavy_armor: 14,
+        high_energy_focus: 15, hyper_x_capacitors: 16,
+        inertial_nullifier: 17, inertial_stabilizer: 18, lightning_field: 19,
+        multi_phased_shields: 20, multi_wave_ecm_jammer: 21,
+        phase_shifter: 22, phasing_cloak: 23, quantum_detonator: 24,
+        rangemaster_unit: 25, reflection_field: 26, reinforced_hull: 27,
+        scout_lab: 28, security_stations: 29, shield_capacitor: 30,
+        stealth_field: 31, structural_analyzer: 32,
+        sub_space_teleporter: 33, time_warp_facilitator: 34,
+        transporters: 35, troop_pods: 36, warp_dissipator: 37,
+        wide_area_jammer: 38, regeneration: 39,
+      },
+    },
     building: {
       title: "Colony building",
       description: "Identifies one entry in the native colony building table.",
@@ -834,6 +860,20 @@
     },
   },
   records: {
+    command_points: {
+      title: "Command-point values",
+      description: "Command capacity supplied by starting state, orbital bases, communications, and Warlord colonies.",
+      fields: [
+        { id: "starting", title: "Starting", description: "Command points available before bonuses.", type: "int8", bind: ["starting"] },
+        { id: "star_base", title: "Star Base", description: "Command points supplied by each Star Base.", type: "int8", bind: ["star_base"] },
+        { id: "battlestation", title: "Battlestation", description: "Command points supplied by each Battlestation.", type: "int8", bind: ["battlestation"] },
+        { id: "star_fortress", title: "Star Fortress", description: "Command points supplied by each Star Fortress.", type: "int8", bind: ["star_fortress"] },
+        { id: "tachyon_communications", title: "Tachyon Communications", description: "Command points supplied per orbital base.", type: "int8", bind: ["tachyon_communications"] },
+        { id: "sub_space_communications", title: "Sub-Space Communications", description: "Command points supplied per orbital base.", type: "int8", bind: ["sub_space_communications"] },
+        { id: "hyperspace_communications", title: "Hyperspace Communications", description: "Command points supplied per orbital base.", type: "int8", bind: ["hyperspace_communications"] },
+        { id: "warlord_planet", title: "Warlord colony", description: "Command points supplied by each Warlord colony.", type: "int8", bind: ["warlord_planet"] },
+      ],
+    },
     trade_goods_ratio: {
       title: "Trade Goods conversion ratios",
       description: "Production-to-BC conversion percentages for normal and Fantastic Traders races.",
@@ -870,8 +910,9 @@
     },
     misc_costs: {
       title: "Miscellaneous production costs",
-      description: "Production costs for Android population types.",
+      description: "Production costs for freighter fleets and Android population types.",
       fields: [
+        { id: "freighters", title: "Freighter Fleet", description: "Production cost of a five-freighter fleet.", type: "uint16", constraints: { max: 32767 }, bind: ["freighters"] },
         { id: "android_farmer", title: "Android Farmer", description: "Production cost of an Android Farmer.", type: "uint16", constraints: { max: 32767 }, bind: ["android_farmer"] },
         { id: "android_worker", title: "Android Worker", description: "Production cost of an Android Worker.", type: "uint16", constraints: { max: 32767 }, bind: ["android_worker"] },
         { id: "android_scientist", title: "Android Scientist", description: "Production cost of an Android Scientist.", type: "uint16", constraints: { max: 32767 }, bind: ["android_scientist"] },
@@ -918,6 +959,18 @@
           constraints: { max: 0 },
           bind: ["plague_event"],
         },
+      ],
+    },
+    spy_tech_bonus: {
+      title: "Technology spying bonuses",
+      description: "Spy bonuses granted by researched technology applications.",
+      fields: [
+        { id: "neural_scanner", title: "Neural Scanner", description: "Spy bonus granted by Neural Scanner.", type: "uint8", bind: ["neural_scanner"] },
+        { id: "xeno_psychology", title: "Xeno Psychology", description: "Spy bonus granted by Xeno Psychology.", type: "uint8", bind: ["xeno_psychology"] },
+        { id: "telepathic_training", title: "Telepathic Training", description: "Spy bonus granted by Telepathic Training.", type: "uint8", bind: ["telepathic_training"] },
+        { id: "cyber_security_link", title: "Cyber Security Link", description: "Spy bonus granted by Cyber Security Link.", type: "uint8", bind: ["cyber_security_link"] },
+        { id: "stealth_suit", title: "Stealth Suit", description: "Spy bonus granted by Stealth Suit.", type: "uint8", bind: ["stealth_suit"] },
+        { id: "psionics", title: "Psionics", description: "Spy bonus granted by Psionics.", type: "uint8", bind: ["psionics"] },
       ],
     },
     mount_damage: {
@@ -1154,6 +1207,59 @@
   },
 
   parameters: {
+    command_points: {
+      title: "Command-point values",
+      description: "Configures command capacity from starting points, orbital bases, communications, and Warlord colonies.",
+      remarks: "Defaults preserve classic behavior and match MOO2 1.50.",
+      examples: [
+        "command command_points starting = 5;",
+        "command command_points star_fortress = 3;",
+      ],
+      units: "command points",
+      group: "gameplay",
+      namespace: "command",
+      type: "command_points",
+      bind_root: { header: "game/colcalc.h", symbol: "COLCALC::command_points" },
+      default: {
+        starting: 5,
+        star_base: 1,
+        battlestation: 2,
+        star_fortress: 3,
+        tachyon_communications: 1,
+        sub_space_communications: 2,
+        hyperspace_communications: 3,
+        warlord_planet: 2,
+      },
+    },
+    ship_command_points_usage: {
+      title: "Ship command-point usage",
+      description: "Configures command points consumed by each ship size class.",
+      remarks: "Defaults preserve classic size-plus-one usage and match MOO2 1.50.",
+      examples: ["command ship_command_points_usage cruiser = 3;"],
+      units: "command points",
+      group: "gameplay",
+      namespace: "command",
+      bind_root: { header: "game/colcalc.h", symbol: "COLCALC::ship_command_points_usage" },
+      type: {
+        kind: "array",
+        count: 6,
+        index_base: 0,
+        index_type: "combat_ship_size_class",
+        element: { type: "uint8" },
+      },
+      default: [1, 2, 3, 4, 5, 6],
+    },
+    landers_size_class: {
+      title: "Landing-ship size class",
+      description: "Sets the hull size used by Colony Ships, Outpost Ships, and Transports.",
+      remarks: "The Frigate default preserves classic behavior and determines command usage through the ship command-point table.",
+      examples: ["command landers_size_class = frigate;"],
+      group: "gameplay",
+      namespace: "command",
+      type: "combat_ship_size_class",
+      default: "frigate",
+      bind_root: { header: "game/initship.h", symbol: "INITSHIP::_landers_size_class" },
+    },
     trade_goods_ratio: {
       title: "Trade Goods conversion ratios",
       description: "Configures the percentage of positive net industry converted to BC by Trade Goods.",
@@ -1229,9 +1335,10 @@
     },
     misc_costs: {
       title: "Miscellaneous production costs",
-      description: "Configures each Android population type's production cost independently.",
+      description: "Configures freighter fleet and Android population production costs independently.",
       remarks: "Defaults preserve classic costs and match MOO2 1.50.",
       examples: [
+        "colony misc_costs freighters = 50;",
         "colony misc_costs android_farmer = 50;",
         "colony misc_costs android_worker = 50;",
         "colony misc_costs android_scientist = 50;",
@@ -1245,9 +1352,24 @@
         symbol: "COLCALC::misc_costs",
       },
       default: {
+        freighters: 50,
         android_farmer: 50,
         android_worker: 50,
         android_scientist: 50,
+      },
+    },
+    feudal_affects_freighters: {
+      title: "Government cost reduction affects freighters",
+      description: "Applies the owning government's ship-cost reduction to freighter fleets.",
+      remarks: "False preserves classic behavior. With default government bonuses, true applies Feudal and Confederation reductions.",
+      examples: ["colony feudal_affects_freighters = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_feudal_affects_freighters",
       },
     },
     pop_bonus_biospheres: {
@@ -1300,6 +1422,20 @@
         symbol: "COLCALC::weather_control_climate",
       },
     },
+    aquatic_treats_tundra_as_swamp: {
+      title: "Aquatic races treat Tundra as Swamp",
+      description: "Makes Aquatic races use Swamp population capacity and farmer food values on Tundra planets.",
+      remarks: "False preserves classic behavior, where Aquatic races treat Tundra as Terran.",
+      examples: ["colony aquatic_treats_tundra_as_swamp = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/colcalc.h",
+        symbol: "COLCALC::_aquatic_treats_tundra_as_swamp",
+      },
+    },
     growth_rate_bonus: {
       title: "Population growth-rate modifiers",
       description: "Configures the general, technology, and event modifiers used by colony population growth.",
@@ -1325,6 +1461,30 @@
         antidote_tech: 50,
         boom_event: 100,
         plague_event: -200,
+      },
+    },
+    spy_tech_bonus: {
+      title: "Technology spying bonuses",
+      description: "Configures the spy bonus granted by each spy-related technology.",
+      remarks: "Defaults preserve classic behavior. Xeno Psychology defaults to zero but can be assigned a multiplayer spy bonus, matching MOO2 1.50.",
+      examples: [
+        "spy spy_tech_bonus neural_scanner = 10;",
+        "spy spy_tech_bonus xeno_psychology = 5;",
+      ],
+      group: "gameplay",
+      namespace: "spy",
+      type: "spy_tech_bonus",
+      bind_root: {
+        header: "game/spy.h",
+        symbol: "spy::spy_tech_bonus",
+      },
+      default: {
+        neural_scanner: 10,
+        xeno_psychology: 0,
+        telepathic_training: 5,
+        cyber_security_link: 10,
+        stealth_suit: 10,
+        psionics: 10,
       },
     },
     build_queue: {
@@ -1839,6 +1999,46 @@
         symbol: "COMBINIT::_satellite_capture_enabled",
       },
       default: false,
+    },
+
+    starbase_special: {
+      title: "Orbital-defense special priority",
+      description: "Configures the ranked special systems installed on researched orbital defenses.",
+      remarks: "Each of the fourteen slots has three ordered alternatives. The first researched alternative in each slot is selected, and at most eight systems are counted including fixed Heavy Armor.",
+      examples: [
+        "combat starbase_special 6 1 = reflection_field;",
+        "combat starbase_special 6 2 = lightning_field;",
+        "combat starbase_special 14 1 = warp_dissipator;",
+      ],
+      group: "gameplay",
+      namespace: "combat",
+      bind_root: {
+        header: "game/combinit.h",
+        symbol: "COMBINIT::starbase_special",
+      },
+      type: {
+        kind: "array", count: 14, index_base: 1,
+        element: { type: {
+          kind: "array", count: 3, index_base: 1,
+          element: { type: "ship_special" },
+        } },
+      },
+      default: [
+        ["reinforced_hull", "none", "none"],
+        ["shield_capacitor", "none", "none"],
+        ["hard_shields", "none", "none"],
+        ["multi_phased_shields", "none", "none"],
+        ["wide_area_jammer", "multi_wave_ecm_jammer", "ecm_jammer"],
+        ["warp_dissipator", "warp_dissipator", "warp_dissipator"],
+        ["security_stations", "none", "none"],
+        ["battle_scanner", "none", "none"],
+        ["high_energy_focus", "none", "none"],
+        ["structural_analyzer", "none", "none"],
+        ["achilles_targeting_unit", "none", "none"],
+        ["rangemaster_unit", "none", "none"],
+        ["transporters", "none", "none"],
+        ["transporters", "none", "none"],
+      ],
     },
 
     satellite_uses_torpedoes: {
@@ -3025,6 +3225,21 @@
       },
     },
 
+    transport_ship_extended_range: {
+      title: "Extended-range transport ships",
+      description: "Equips transport ships with Extended Fuel Tanks.",
+      remarks: "False preserves classic transport range.",
+      examples: ["colony transport_ship_extended_range = true;"],
+      group: "gameplay",
+      namespace: "colony",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/initship.h",
+        symbol: "INITSHIP::_transport_ship_extended_range",
+      },
+    },
+
     satellite_size_class_plus_one: {
       title: "Increase satellite size class",
       description: "Makes Star Bases Battleship-sized, Battlestations Titan-sized, and Star Fortresses Doom Star-sized in tactical combat.",
@@ -3172,6 +3387,38 @@
         symbol: "CMBTFIRE::_simplified_beam_formula",
       },
       default: false,
+    },
+
+    ground_defense_armor_multiplier: {
+      title: "Ground-defense armor multiplier",
+      description: "Multiplies the structure of each planetary ground-defense building after applying the defending armor technology.",
+      remarks: "The value is divided by 100. The default 100 preserves classic behavior and matches MOO2 1.50.",
+      examples: ["combat ground_defense_armor_multiplier = 150;"],
+      units: "percent",
+      group: "gameplay",
+      namespace: "combat",
+      type: "uint16",
+      constraints: { min: 1, max: 10000 },
+      default: 100,
+      bind_root: {
+        header: "game/cmbtfire.h",
+        symbol: "CMBTFIRE::_ground_defense_armor_multiplier",
+      },
+    },
+
+    no_outpost_prompt: {
+      title: "Skip outpost placement prompts",
+      description: "Skips automatic outpost placement prompts when an outpost ship arrives at a star.",
+      remarks: "False preserves classic behavior. Colony placement prompts remain available when the player has a colony ship and an eligible planet.",
+      examples: ["interface no_outpost_prompt = true;"],
+      group: "interface",
+      namespace: "interface",
+      type: "bool",
+      default: false,
+      bind_root: {
+        header: "game/report.h",
+        symbol: "REPORT::_no_outpost_prompt",
+      },
     },
   },
 }

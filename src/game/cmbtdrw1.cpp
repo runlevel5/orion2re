@@ -962,8 +962,8 @@ skip_cursor:
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 int16_t armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data[0].owner);
-                int32_t absorption = TECHDATA::_armor[armor_idx].ships_bonus;
-                int32_t denom = ((absorption * 4 + 400) * 25) / 100;
+                int32_t denom = CMBTFIRE::Ground_Defense_Structure_(
+                    TECHDATA::_armor[armor_idx].ships_bonus);
                 int16_t bar_len = ((struct_dmg * 88) / denom) / 2;
 
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
@@ -3446,7 +3446,8 @@ skip_cursor:
                 sizeof(line_text),
                 "%s%d%s%s",
                 "^ ",
-                static_cast<int32_t>(TECHDATA::_armor[best_armor].ships_bonus) + 100,
+                static_cast<int16_t>(CMBTFIRE::Ground_Defense_Structure_(
+                    TECHDATA::_armor[best_armor].ships_bonus)),
                 " ",
                 [&]() -> const char* {
                     KEN::Ken_Get_Text_Message_(16, message_text, 0x50);

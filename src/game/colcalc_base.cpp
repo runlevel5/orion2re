@@ -67,20 +67,12 @@ namespace COLCALC {
 
             trait_bonus = (int16_t)player->traits[TRAIT_FOOD_BONUS];
 
-            if (player->traits[TRAIT_AQUATIC] != 0) {
-                int climate = (int)colony->climate;
-                switch (climate) {
-                case PLANET_CLIMATE_TUNDRA:
-                case PLANET_CLIMATE_SWAMP:
-                    extra_food = ((int32_t)MOX::_food_per_farmer_table[8] - (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
-                    break;
-                case PLANET_CLIMATE_OCEAN:
-                case PLANET_CLIMATE_TERRAN:
-                    extra_food = ((int32_t)MOX::_food_per_farmer_table[9] - (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
-                    break;
-                default:
-                    break;
-                }
+            int climate = (int)colony->climate;
+            int adjusted_climate = Calc_Player_Climate_(player, climate);
+            if (adjusted_climate != climate) {
+                extra_food =
+                    ((int32_t)MOX::_food_per_farmer_table[adjusted_climate] -
+                     (int32_t)MOX::_food_per_farmer_table[climate]) * 2;
             }
         }
         else if (player_idx == 8) {

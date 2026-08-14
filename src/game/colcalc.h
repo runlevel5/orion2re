@@ -3,6 +3,20 @@
 #include "strbuild.h"
 
 namespace COLCALC {
+    struct s_command_points {
+        int8_t starting;
+        int8_t star_base;
+        int8_t battlestation;
+        int8_t star_fortress;
+        int8_t tachyon_communications;
+        int8_t sub_space_communications;
+        int8_t hyperspace_communications;
+        int8_t warlord_planet;
+    };
+
+    extern s_command_points command_points;
+    extern uint8_t ship_command_points_usage[SHIP_SIZE_COUNT];
+
     struct s_government_bonus {
         s_ratio16 cost_reduction;
         int8_t science;
@@ -22,6 +36,7 @@ namespace COLCALC {
     extern s_lander_ship_cost lander_ship_cost;
 
     struct s_misc_costs {
+        uint16_t freighters;
         uint16_t android_farmer;
         uint16_t android_worker;
         uint16_t android_scientist;
@@ -48,11 +63,13 @@ namespace COLCALC {
     extern uint8_t _pop_bonus_biospheres;
     extern uint8_t _pop_bonus_subterranean[PLANET_SIZE_COUNT];
     extern uint8_t weather_control_climate;
+    extern uint8_t _aquatic_treats_tundra_as_swamp;
 
     extern uint8_t _federation_no_mixed_races_penalty;
     extern uint8_t _housing_creates_no_farmers;
     extern uint8_t _planet_extinction;
     extern uint8_t _zero_colony_lost;
+    extern uint8_t _feudal_affects_freighters;
     extern uint8_t _keep_research_on_breakthrough;
     extern uint8_t _keep_research_on_finds;
     extern uint8_t scout_lab_research_bonus[SHIP_SIZE_COUNT];
@@ -359,7 +376,7 @@ namespace COLCALC {
 
     bool __cdecl Colony_Is_Blockaded(s_colony* colony);
 
-    int __cdecl Calc_Player_Climate_(int player_idx, int climate);
+    int __cdecl Calc_Player_Climate_(const s_player* player, int climate);
 
     int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, uint8_t is_immune);
 

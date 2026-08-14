@@ -836,7 +836,7 @@ namespace COLCALC {
                 plr->maintenance[0] += (uint16_t)(uint8_t)col->maintenance[ECON_BC];
 
                 if (plr->traits[TRAIT_WARLORD] != 0) {
-                    warlord_bonus += 2;
+                    warlord_bonus += command_points.warlord_planet;
                 }
 
                 if (col->buildings[BUILDING_STAR_BASE] != 0) {
@@ -855,22 +855,22 @@ namespace COLCALC {
         int32_t comm_tech_bonus_per_base = 0;
         if (plr->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             comm_tech_idx = TECH_APP_HYPERSPACE_COMMUNICATIONS;
-            comm_tech_bonus_per_base = 3;
+            comm_tech_bonus_per_base = command_points.hyperspace_communications;
         }
         else if (plr->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             comm_tech_idx = TECH_APP_SUB_SPACE_COMMUNICATIONS;
-            comm_tech_bonus_per_base = 2;
+            comm_tech_bonus_per_base = command_points.sub_space_communications;
         }
         else if (plr->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == TECH_RESEARCH_STATUS_RESEARCHED) {
             comm_tech_idx = TECH_APP_TACHYON_COMMUNICATIONS;
-            comm_tech_bonus_per_base = 1;
+            comm_tech_bonus_per_base = command_points.tachyon_communications;
         }
 
         int32_t comm_tech_total = comm_tech_bonus_per_base * (n_star_bases + n_battlestations + n_fortresses);
-        int16_t base_cp = 5;
-        base_cp = (int16_t)(base_cp + (int16_t)n_star_bases);
-        base_cp = (int16_t)(base_cp + (int16_t)(n_battlestations * 2));
-        base_cp = (int16_t)(base_cp + (int16_t)(n_fortresses * 3));
+        int16_t base_cp = command_points.starting;
+        base_cp = (int16_t)(base_cp + (int16_t)(n_star_bases * command_points.star_base));
+        base_cp = (int16_t)(base_cp + (int16_t)(n_battlestations * command_points.battlestation));
+        base_cp = (int16_t)(base_cp + (int16_t)(n_fortresses * command_points.star_fortress));
         base_cp = (int16_t)(base_cp + (int16_t)warlord_bonus);
         base_cp = (int16_t)(base_cp + (int16_t)comm_tech_total);
         base_cp = (int16_t)(base_cp + (int16_t)leader_cp_bonus);
@@ -883,19 +883,19 @@ namespace COLCALC {
         }
 
         if (debug_out) {
-            STRBUILD::Sprintf(debug_out, "%d %s\n", 5, _starting_command_points_msg);
+            STRBUILD::Sprintf(debug_out, "%d %s\n", command_points.starting, _starting_command_points_msg);
 
             if (n_star_bases > 0) {
-                if (n_star_bases == 1) STRBUILD::Sprintf(debug_out, _d_from_1_star_base_msg, 1);
-                else STRBUILD::Sprintf(debug_out, _d_from_d_star_bases_msg, n_star_bases, n_star_bases);
+                if (n_star_bases == 1) STRBUILD::Sprintf(debug_out, _d_from_1_star_base_msg, command_points.star_base);
+                else STRBUILD::Sprintf(debug_out, _d_from_d_star_bases_msg, n_star_bases * command_points.star_base, n_star_bases);
             }
             if (n_battlestations > 0) {
-                if (n_battlestations == 1) STRBUILD::Sprintf(debug_out, _d_from_1_battlestation_msg, 2);
-                else STRBUILD::Sprintf(debug_out, _d_from_d_battlestations_msg, n_battlestations * 2, n_battlestations);
+                if (n_battlestations == 1) STRBUILD::Sprintf(debug_out, _d_from_1_battlestation_msg, command_points.battlestation);
+                else STRBUILD::Sprintf(debug_out, _d_from_d_battlestations_msg, n_battlestations * command_points.battlestation, n_battlestations);
             }
             if (n_fortresses > 0) {
-                if (n_fortresses == 1) STRBUILD::Sprintf(debug_out, _d_from_1_fortress_msg, 3);
-                else STRBUILD::Sprintf(debug_out, _d_from_d_fortresses_msg, n_fortresses * 3, n_fortresses);
+                if (n_fortresses == 1) STRBUILD::Sprintf(debug_out, _d_from_1_fortress_msg, command_points.star_fortress);
+                else STRBUILD::Sprintf(debug_out, _d_from_d_fortresses_msg, n_fortresses * command_points.star_fortress, n_fortresses);
             }
             if (comm_tech_total != 0) {
                 STRBUILD::Sprintf(debug_out, "%d : %s\n", comm_tech_total, TECHDATA::_technology_applications[comm_tech_idx].name);
@@ -923,17 +923,21 @@ namespace COLCALC {
 
         int32_t ship_counts[HULL_CLASS_COUNT] = { 0 };
         int32_t noncombat_ships = 0;
+        int32_t noncombat_command_points = 0;
 
         for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* s = &MOX::_ship[i];
             if (s->owner == player_idx && s->status < 3 && s->just_built == 0) {
+                uint8_t size_class = (uint8_t)s->d.size;
+                uint8_t usage = ship_command_points_usage[size_class];
                 if (s->d.ship_type == SHIP_TYPE_COMBAT) {
-                    ship_counts[(int8_t)s->d.size]++;
+                    ship_counts[size_class]++;
                 }
                 else {
                     noncombat_ships++;
+                    noncombat_command_points += usage;
                 }
-                plr->command_points_used += (int16_t)(s->d.size + 1);
+                plr->command_points_used += usage;
             }
         }
 
@@ -941,16 +945,16 @@ namespace COLCALC {
             for (int i = 0; i < HULL_CLASS_COUNT; ++i) {
                 if (ship_counts[i] > 0) {
                     if (ship_counts[i] == 1) {
-                        STRBUILD::Sprintf(debug_out, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
+                        STRBUILD::Sprintf(debug_out, _d_from_1_s_ship_msg, ship_command_points_usage[i], TECHDATA::_hull_data[i].name);
                     }
                     else {
-                        STRBUILD::Sprintf(debug_out, _d_from_d_s_ships_msg, (i + 1) * ship_counts[i], ship_counts[i], TECHDATA::_hull_data[i].size_name);
+                        STRBUILD::Sprintf(debug_out, _d_from_d_s_ships_msg, ship_command_points_usage[i] * ship_counts[i], ship_counts[i], TECHDATA::_hull_data[i].size_name);
                     }
                 }
             }
             if (noncombat_ships > 0) {
-                if (noncombat_ships == 1) STRBUILD::Sprintf(debug_out, _d_from_1_noncombat_ship_msg, 1);
-                else STRBUILD::Sprintf(debug_out, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
+                if (noncombat_ships == 1) STRBUILD::Sprintf(debug_out, _d_from_1_noncombat_ship_msg, noncombat_command_points);
+                else STRBUILD::Sprintf(debug_out, _d_from_d_noncombat_ships_msg, noncombat_command_points, noncombat_ships);
             }
             const char* used_msg = (plr->command_points_used == 1) ? _total_command_point_used_msg : _total_command_points_used_msg;
             STRBUILD::Sprintf(debug_out, "%d %s\n", (int)plr->command_points_used, used_msg);

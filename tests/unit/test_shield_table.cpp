@@ -8,8 +8,34 @@ namespace TEST_SHIELD_TABLE {
     void Reset_();
     s_combat_data* Combat_Ship_(int16_t ship_idx = 0);
     s_current_design* Design_();
+    s_player* Player_();
+    void Research_Special_(int16_t special_id);
     void Set_Combat_Special_(int16_t special_id);
     void Set_Design_Special_(int16_t special_id);
+}
+
+DOCTEST_TEST_CASE("satellite priority uses grouped slot 6 and slot 14") {
+    TEST_SHIELD_TABLE::Reset_();
+    s_combat_data* satellite = TEST_SHIELD_TABLE::Combat_Ship_(1);
+
+    COMBINIT::starbase_special[5][0] = SPECIAL_REFLECTION_FIELD;
+    COMBINIT::starbase_special[5][1] = SPECIAL_LIGHTNING_FIELD;
+    COMBINIT::starbase_special[5][2] = SPECIAL_STEALTH_FIELD;
+    COMBINIT::starbase_special[13][0] = SPECIAL_ENERGY_ABSORBER;
+
+    TEST_SHIELD_TABLE::Research_Special_(SPECIAL_LIGHTNING_FIELD);
+    TEST_SHIELD_TABLE::Research_Special_(SPECIAL_STEALTH_FIELD);
+    TEST_SHIELD_TABLE::Research_Special_(SPECIAL_ENERGY_ABSORBER);
+
+    COMBINIT::Load_Combat_Satellite_Specials_(
+        satellite, TEST_SHIELD_TABLE::Player_());
+
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        satellite->special_device_flags, SPECIAL_LIGHTNING_FIELD));
+    DOCTEST_CHECK_FALSE(struct_::Test_Bit_Field_(
+        satellite->special_device_flags, SPECIAL_STEALTH_FIELD));
+    DOCTEST_CHECK(struct_::Test_Bit_Field_(
+        satellite->special_device_flags, SPECIAL_ENERGY_ABSORBER));
 }
 
 DOCTEST_TEST_CASE("shield capacity uses configured hull multipliers") {

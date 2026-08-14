@@ -57,6 +57,7 @@ namespace CMBTFIRE {
     inline uint16_t _civilian_armor[ARMOR_COUNT] = {
         100, 100, 100, 100, 100, 100, 100,
     };
+    inline uint16_t _ground_defense_armor_multiplier = 100;
     inline uint8_t _fighters_use_point_defense = 0;
     inline uint8_t _heavy_fighter_can_scramble = 0;
     inline uint8_t _double_range_accuracy_penalty = 1;
@@ -85,6 +86,9 @@ namespace CMBTFIRE {
 
     /** Returns the damage remaining after applying a Damper Field. */
     int32_t Damper_Field_Remaining_Damage_(int32_t damage);
+
+    /** Returns one planetary ground-defense building's armor-scaled structure. */
+    int32_t Ground_Defense_Structure_(int16_t armor_bonus);
 
     /** Applies the supplied weapon damage to the defending planet or colony. */
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t weapon_flags);

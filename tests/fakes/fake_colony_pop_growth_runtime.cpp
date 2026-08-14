@@ -10,6 +10,7 @@ namespace {
     int32_t destroy_colony_reason;
     int16_t add_spy_result;
     int16_t deleted_product;
+    int32_t government_cost_reduction;
     bool population_boom;
     bool plague;
 }
@@ -31,6 +32,7 @@ namespace TEST_COLONY_POP_GROWTH {
         destroy_colony_reason = -1;
         add_spy_result = 1;
         deleted_product = COLONY_PRODUCTION_NONE;
+        government_cost_reduction = 0;
         population_boom = false;
         plague = false;
         COLCALC::growth_rate_bonus = {
@@ -49,17 +51,21 @@ namespace TEST_COLONY_POP_GROWTH {
             subterranean_defaults,
             sizeof(subterranean_defaults));
         COLCALC::weather_control_climate = PLANET_CLIMATE_TOXIC;
+        COLCALC::_aquatic_treats_tundra_as_swamp = 0;
         COLCALC::_federation_no_mixed_races_penalty = 0;
         COLCALC::_housing_creates_no_farmers = 0;
         COLCALC::_planet_extinction = 0;
         COLCALC::_zero_colony_lost = 0;
+        COLCALC::_feudal_affects_freighters = 0;
         COLCALC::_freighters_cash_bonus = 0;
         COLCALC::lander_ship_cost.colony_ship = 500;
         COLCALC::lander_ship_cost.outpost_ship = 100;
         COLCALC::lander_ship_cost.transport_ship = 100;
+        COLCALC::misc_costs.freighters = 50;
         COLCALC::misc_costs.android_farmer = 50;
         COLCALC::misc_costs.android_worker = 50;
         COLCALC::misc_costs.android_scientist = 50;
+        memset(MOX::_food_per_farmer_table, 0, sizeof(MOX::_food_per_farmer_table));
     }
 
     int32_t Destroy_Colony_Reason_() {
@@ -72,6 +78,10 @@ namespace TEST_COLONY_POP_GROWTH {
 
     int16_t Deleted_Product_() {
         return deleted_product;
+    }
+
+    void Set_Government_Cost_Reduction_(int32_t amount) {
+        government_cost_reduction = amount;
     }
 
     void Set_Population_Boom_(bool enabled) {
@@ -95,6 +105,7 @@ namespace MOX {
     s_settings _settings = {};
     s_crew_data _crew_data[CREW_QUALITY_COUNT] = {};
     int8_t _planet_max_population[PLANET_SIZE_COUNT] = {5, 10, 15, 20, 25};
+    int8_t _food_per_farmer_table[PLANET_CLIMATE_COUNT] = {};
 }
 
 namespace TECHDATA {
@@ -196,7 +207,8 @@ namespace DESIGN {
         return 0;
     }
 
-    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t, int32_t*) {
+    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t, int32_t* cost) {
+        *cost -= government_cost_reduction;
     }
 }
 
