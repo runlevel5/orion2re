@@ -1140,6 +1140,10 @@ int16_t __cdecl Choose_Target_(int16_t ship_idx) {
 int16_t __cdecl Is_Ship_Out_Of_Ammo_(int16_t ship_idx) {
     int16_t out_of_ammo = 1;
 
+    if (MOX::_combat_data[ship_idx].officer_idx >= 0) {
+        return 0;
+    }
+
     if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 37 /* 0x25 */) != 0) {
         out_of_ammo = 0;
     } else if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 38 /* 0x26 */) != 0) {

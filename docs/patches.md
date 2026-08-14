@@ -319,7 +319,7 @@ Checkboxes record migration review, not whether MOO2150 implemented the topic.
 - [x] `asm.pl:18892` - `fighter garrison strength for bomber bays`: fixed in `AIPOWER::Fighter_Garrison_Strength_()` by counting interceptor, Heavy Fighter, and Bomber capacity once each in the point-defense estimate; this replaces the 1.50 register-selection patch with the direct source-level formula.
 - [ ] `asm.pl:18901` - `xeno psychology spy bonus`
 - [x] `asm.pl:19202` - `mixed race penalty building`: implemented in `COLCALC::Colony_Can_Build_Product_()` by withholding Alien Control Center from enabled Federation colonies after differing biological races are assimilated, while conquered population retains classic build eligibility.
-- [ ] `asm.pl:19382` - `is_ship_out_of_ammo checks`
+- [x] `asm.pl:19382` - `is_ship_out_of_ammo checks`: fixed in `CMBTAI::Is_Ship_Out_Of_Ammo_()` by treating combat ships with an assigned officer as ineligible for ammo-triggered auto-retreat; this directly expresses the 1.50 code-cave leader guard without additional state.
 - [ ] `asm.pl:19812` - `F9 displays star distance if black hole is in between`
 
 ### Follow-up topics

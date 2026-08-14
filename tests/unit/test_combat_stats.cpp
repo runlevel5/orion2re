@@ -118,6 +118,7 @@ namespace MOX {
     int16_t _speedx2_flag;
     int16_t _auto_combat;
     int16_t _take_control_flag;
+    int16_t _combat_attacker_player;
     int16_t _combat_defender_player;
     int16_t _in_nebula_flag;
     int16_t _ordnance_bonus[15];
@@ -503,6 +504,21 @@ DOCTEST_TEST_CASE("Trans-Dimensional combat speed uses the configured bonus") {
     DOCTEST_CHECK(COMBAT1::Calc_Current_Speed_(0) == 17);
 
     COMBAT1::_td_combat_speed_bonus = 4;
+}
+
+DOCTEST_TEST_CASE("ship officers prevent automatic out-of-ammo retreat") {
+    memset(combat_data, 0, sizeof(combat_data));
+    has_energy_absorber = false;
+    has_damper_field = false;
+    has_hard_shields = false;
+    has_phase_shifter = false;
+    has_sub_space_teleporter = false;
+
+    MOX::_combat_data[0].officer_idx = -1;
+    DOCTEST_CHECK(CMBTAI::Is_Ship_Out_Of_Ammo_(0) == 1);
+
+    MOX::_combat_data[0].officer_idx = 0;
+    DOCTEST_CHECK(CMBTAI::Is_Ship_Out_Of_Ammo_(0) == 0);
 }
 
 DOCTEST_TEST_CASE("ship range exposes tactical squares without changing legacy range") {
