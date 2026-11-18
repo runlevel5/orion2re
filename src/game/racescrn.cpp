@@ -800,7 +800,7 @@ namespace RACESCRN {
             return;
         }
         if (cap->bmp != nullptr) {
-            animate::Draw_(cap->x1, cap->y1, cap->bmp);
+            animate::Draw(cap->x1, cap->y1, cap->bmp);
         }
         Draw_Icon_Group(group);
         int16_t n = (value > (int16_t)group->count) ? (int16_t)group->count : value;

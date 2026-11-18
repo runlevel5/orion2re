@@ -1331,7 +1331,7 @@ namespace TECH {
         // selection, so no stale highlight or marker pixels linger anywhere.
         if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
             _g_list_restore_bitmap != nullptr) {
-            animate::Draw_(_g_list_restore_x, 0x1F, _g_list_restore_bitmap);
+            animate::Draw(_g_list_restore_x, 0x1F, _g_list_restore_bitmap);
         }
 
         LIST::Display_Selected_List_Text_For_Tech_List(&g_tech_list_header, g_selected_list_entry_p);

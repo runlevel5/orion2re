@@ -98,21 +98,16 @@ namespace TURNSUM {
 
         int16_t input_field = fields::Scan_Input();
 
-        if (input_field >= INFO::g_first_list_field && input_field <= INFO::g_last_list_field)
-        {
+        if (input_field >= INFO::g_first_list_field && input_field <= INFO::g_last_list_field) {
             // Enhancement: hover only takes the selection when the pointer
             // actually moves onto a new entry, so keyboard navigation wins
             // until then.
-            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0)
-            {
-                if (g_prior_choice != input_field)
-                {
+            if (ENHANCED_UX::enhanced_ux_settings.enabled != 0) {
+                if (g_prior_choice != input_field) {
                     g_prior_choice = input_field;
                     LIST::Set_Selected_List_Entry(&g_turn_sum_header, input_field);
                 }
-            }
-            else
-            {
+            } else {
                 LIST::Set_Selected_List_Entry(&g_turn_sum_header, input_field);
             }
         }
@@ -151,8 +146,7 @@ namespace TURNSUM {
         return 0;
     }
 
-    void __cdecl Turn_Summary_Popup()
-    {
+    void __cdecl Turn_Summary_Popup() {
         int16_t num_msgs;
         MOX2::action_func_t auto_func;
         s_list_item list_items[100];
@@ -181,20 +175,15 @@ namespace TURNSUM {
         fields::Clear_Fields();
         video::Set_Refresh_Stencil();
 
-        s_animation_header* popup_background_anim = (s_animation_header*)(
-            farload::Far_Reload("turnsum.lbx", 0, MOX::screen_seg));
-        s_animation_header* scroll_up_button_image = (s_animation_header*)(
-            farload::Far_Reload_Next("turnsum.lbx", 1, MOX::screen_seg));
-        s_animation_header* scroll_down_button_image = (s_animation_header*)(
-            farload::Far_Reload_Next("turnsum.lbx", 2, MOX::screen_seg));
-        s_animation_header* ok_button_image = (s_animation_header*)(
-            farload::Far_Reload_Next("turnsum.lbx", 3, MOX::screen_seg));
+        s_animation_header* popup_background_anim = (s_animation_header*)(farload::Far_Reload("turnsum.lbx", 0, MOX::screen_seg));
+        s_animation_header* scroll_up_button_image = (s_animation_header*)(farload::Far_Reload_Next("turnsum.lbx", 1, MOX::screen_seg));
+        s_animation_header* scroll_down_button_image = (s_animation_header*)(farload::Far_Reload_Next("turnsum.lbx", 2, MOX::screen_seg));
+        s_animation_header* ok_button_image = (s_animation_header*)(farload::Far_Reload_Next("turnsum.lbx", 3, MOX::screen_seg));
 
         const bool enhanced = (ENHANCED_UX::enhanced_ux_settings.enabled != 0);
         int16_t kbd_page_flip = 0;
 
-        while (true)
-        {
+        while (true) {
             MOX::FULL_DRAW_SCREEN_FLAG = 0;
             fields::Clear_Fields();
             fields::Assign_Auto_Function(TURNSUM::Draw_Turn_Summary_Popup, 2);
@@ -231,11 +220,9 @@ namespace TURNSUM {
 
                 // Enhancement: land a keyboard page flip on the page's first
                 // or last message.
-                if (kbd_page_flip != 0)
-                {
+                if (kbd_page_flip != 0) {
                     LIST::Set_Selected_List_Entry(&g_turn_sum_header, INFO::g_first_list_field);
-                    if (kbd_page_flip == 2)
-                    {
+                    if (kbd_page_flip == 2) {
                         LIST::Move_List_Selection_(&g_turn_sum_header, -1, 1);
                     }
                     g_selected_msg_p = LIST::Get_Selected_List_Entry(&g_turn_sum_header);
@@ -249,21 +236,17 @@ namespace TURNSUM {
 
                 bool full_draw_requested = false;
 
-                while (true)
-                {
+                while (true) {
                     // Enhancement: keyboard navigation and activation.
                     int16_t input_field = 0;
-                    if (enhanced)
-                    {
+                    if (enhanced) {
                         input_field = Read_Popup_Nav_Keys_(&kbd_page_flip);
-                        if (input_field < 0)
-                        {
+                        if (input_field < 0) {
                             break; // page flipped; rebuild the list fields
                         }
                     }
 
-                    if (input_field == 0)
-                    {
+                    if (input_field == 0) {
                         input_field = fields::Get_Input();
                     }
 

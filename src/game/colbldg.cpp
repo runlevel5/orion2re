@@ -92,9 +92,9 @@ namespace COLBLDG {
         bitmap::Screen_Bitmap_Capture(253, 306, 353, 330, mid);
         bitmap::Create_Blank_Bitmap(35, 25, right);
         bitmap::Screen_Bitmap_Capture(411, 306, 445, 330, right);
-        animate::Draw_(13, 12, left);
-        animate::Draw_(48, 12, mid);
-        animate::Draw_(149, 12, right);
+        animate::Draw(13, 12, left);
+        animate::Draw(48, 12, mid);
+        animate::Draw(149, 12, right);
     }
 
     void Prepare_Arrow_Remap_() {
@@ -2147,7 +2147,7 @@ namespace COLBLDG {
                 if (COLBLDG::_g_preset_edit_mode == 0 && COLBLDG::Kbd_Blocks_Design_() &&
                     MOX::settings.strategic_combat_flag == 0) {
                     animate::Reset_Animation_Frame(COLBLDG::anims[5]);
-                    animate::Draw_(561, 379, COLBLDG::anims[5]);
+                    animate::Draw(561, 379, COLBLDG::anims[5]);
                     graphics::Darken_Fill(561, 379,
                         (int16_t)(560 + animate::Get_Width(COLBLDG::anims[5])),
                         (int16_t)(378 + animate::Get_Height(COLBLDG::anims[5])));
@@ -2164,12 +2164,12 @@ namespace COLBLDG {
                 if (COLBLDG::_g_preset_edit_mode != 0 &&
                     MOX::settings.strategic_combat_flag == 0) {
                     animate::Reset_Animation_Frame(COLBLDG::anims[4]);
-                    animate::Draw_(492, 379, COLBLDG::anims[4]);
+                    animate::Draw(492, 379, COLBLDG::anims[4]);
                     graphics::Darken_Fill(492, 379,
                         (int16_t)(491 + animate::Get_Width(COLBLDG::anims[4])),
                         (int16_t)(378 + animate::Get_Height(COLBLDG::anims[4])));
                     animate::Reset_Animation_Frame(COLBLDG::anims[5]);
-                    animate::Draw_(561, 379, COLBLDG::anims[5]);
+                    animate::Draw(561, 379, COLBLDG::anims[5]);
                     graphics::Darken_Fill(561, 379,
                         (int16_t)(560 + animate::Get_Width(COLBLDG::anims[5])),
                         (int16_t)(378 + animate::Get_Height(COLBLDG::anims[5])));

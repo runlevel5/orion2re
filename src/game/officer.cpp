@@ -2004,7 +2004,7 @@ namespace OFFICER {
             // assign-then-replace dialogs.
             if (ENHANCED_UX::enhanced_ux_settings.enabled != 0 &&
                 MOX::ship[ship_idx].officer_index == leader_idx) {
-                snprintf(display_buf, sizeof(display_buf), "Return %s to the pool?", Leader_Name_(leader_idx, 0));
+                snprintf(display_buf, sizeof(display_buf), "Return %s to the pool?", Leader_Name(leader_idx, 0));
                 if (Officer_Screen_User_Box(display_buf, 1)) {
                     Move_Officer_To_Limbo(leader_idx);
                 }

@@ -600,6 +600,7 @@ orion2re_add_unit_test(test_config_snapshot
         src/game/mapgen_config.cpp
         src/game/raceopt_config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
         src/game/spy_config_validation.cpp
         src/game/spy_bonus.cpp
         src/game/techdata.cpp
@@ -1320,6 +1321,7 @@ orion2re_add_unit_test(test_savegame
         src/game/mapgen_config.cpp
         src/game/raceopt_config.cpp
         src/game/ship_config.cpp
+        src/game/settings.cpp
         src/game/spy_config_validation.cpp
         src/game/spy_bonus.cpp
         src/game/techdata.cpp

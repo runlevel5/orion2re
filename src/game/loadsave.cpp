@@ -1935,7 +1935,7 @@ namespace LOADSAVE {
             // The Enhanced UX row's toggle button.
             animate::Set_Animation_Frame(game_anims->pictures[9],
                 (ENHANCED_UX::enhanced_ux_settings.enabled != 0) ? 1 : 0);
-            animate::Draw_(MOX::popup_base_x + 0x1A,
+            animate::Draw(MOX::popup_base_x + 0x1A,
                            MOX::popup_base_y + 0x29 + 13 * 0x11,
                            game_anims->pictures[9]);
         }
